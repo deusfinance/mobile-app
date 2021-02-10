@@ -18,19 +18,10 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(MyColors.Main_BG_Black),
-      body: Column(
+      body: IndexedStack(
+        index: _currentIndex,
         children: [
-          Row(
-            children: [
-              Text("wallet")
-            ],
-          ),
-          IndexedStack(
-            index: _currentIndex,
-            children: [
-              for (final tabItem in MyNavigationItem.items) tabItem.page,
-            ],
-          ),
+          for (final tabItem in MyNavigationItem.items) tabItem.page,
         ],
       ),
       bottomNavigationBar: MyBottomNavBar(onTabSelected),
