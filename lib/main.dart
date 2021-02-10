@@ -42,9 +42,6 @@ class MyApp extends StatelessWidget {
           screen = MainScreen();
 //          arguments['id']
           break;
-        case SynchronizerScreen.url:
-          screen = SynchronizerScreen();
-          break;
         default:
           return null;
       }
