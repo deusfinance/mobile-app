@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 
-import '../../data_source/currency_data.dart';
 import '../../models/crypto_currency.dart';
+import '../../models/stock.dart';
 import '../../models/token.dart';
 import '../../statics/old_my_colors.dart';
 import 'svg.dart';
+import 'token_selector/currency_selector_screen/currency_selector_screen.dart';
+import 'token_selector/stock_selector_screen/stock_selector_screen.dart';
 
 enum Direction { from, to }
 
 //TODO (@CodingDavid8) use cubit instead of StatefulWidget
-class SwapField extends StatefulWidget {
+///Field where you can enter the amount of tokens and select another token.
+class SwapField<T extends Token> extends StatefulWidget {
   final Direction direction;
   final double balance;
 
   //TODO (@CodingDavid8): Replace with meta-class so it can be used for tokens and stocks.
-  final Token initialToken;
+  final T initialToken;
   const SwapField({
     Key key,
     this.direction,
@@ -23,12 +26,12 @@ class SwapField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _SwapFieldState createState() => _SwapFieldState();
+  _SwapFieldState createState() => _SwapFieldState<T>();
 }
 
-class _SwapFieldState extends State<SwapField> {
+class _SwapFieldState<T extends Token> extends State<SwapField> {
   final controller = TextEditingController(text: '150');
-  Token selectedToken;
+  T selectedToken;
 
   @override
   void initState() {
@@ -58,34 +61,41 @@ class _SwapFieldState extends State<SwapField> {
                   _buildTextField(),
                   if (widget.direction == Direction.from) _buildMaxButton(balance),
                   // Spacer(),
-                  Container(
-                    height: 50,
-                    width: 120,
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                          icon: PlatformSvg.asset('images/icons/chevron_down.svg'),
-                          value: selectedToken,
-                          items: CurrencyData.all
-                              .map((currency) => DropdownMenuItem<CryptoCurrency>(
-                                  value: currency,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      currency.logoPath.showImage(size: 25),
-                                      const SizedBox(width: 5),
-                                      Text(currency.shortName, style: const TextStyle(fontSize: 25, height: 1.5))
-                                    ],
-                                  )))
-                              .toList(),
-                          onChanged: (c) => selectedToken = c),
-                    ),
-                  ),
+                  Container(height: 50, width: 120, child: _buildTokenSelection()),
                 ],
               ),
             ],
           ),
+        ));
+  }
+
+  Widget _buildTokenSelection() {
+    return GestureDetector(
+        onTap: () async {
+          MaterialPageRoute<Token> pushTo;
+          if (selectedToken.runtimeType == Stock) {
+            pushTo = MaterialPageRoute<Stock>(builder: (BuildContext _) => StockSelectorScreen());
+          } else {
+            pushTo = MaterialPageRoute<CryptoCurrency>(builder: (BuildContext _) => CurrencySelectorScreen());
+          }
+          //TODO (@CodingDavid8) Find agreement with @hookman2 on navigation service and improve routing
+          final Token _selectedToken = await Navigator.push(context, pushTo);
+          if (_selectedToken != null)
+            setState(() {
+              selectedToken = _selectedToken;
+            });
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            selectedToken.logoPath.showCircleImage(radius: 15),
+            const SizedBox(width: 5),
+            Text(selectedToken.shortName, style: const TextStyle(fontSize: 25, height: 1.5)),
+            const SizedBox(width: 10),
+            PlatformSvg.asset('images/icons/chevron_down.svg'),
+          ],
         ));
   }
 

@@ -26,7 +26,9 @@ class TokenSelector extends StatelessWidget {
             children: [
               Text(title),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.close), onPressed: () {}),
+              IconButton(icon: const Icon(Icons.close), onPressed: () {
+                Navigator.pop(context);
+              }),
             ],
           ),
           !showSearchBar

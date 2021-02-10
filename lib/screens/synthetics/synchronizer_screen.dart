@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:deus/core/util/responsive.dart';
 import 'package:deus/data_source/currency_data.dart';
+import 'package:deus/data_source/stock_data.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/widgets/filled_gradient_selection_button.dart';
@@ -138,7 +139,7 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
               const SizedBox(height: 12),
               Center(child: PlatformSvg.asset('images/icons/arrow_down.svg')),
               const SizedBox(height: 12),
-              const SwapField(direction: Direction.to, balance: 0, initialToken: CurrencyData.deus),
+              SwapField(direction: Direction.to, balance: 0, initialToken: StockData.tesla),
               const SizedBox(height: 18),
               _buildModeButtons(),
               const SizedBox(height: 16),

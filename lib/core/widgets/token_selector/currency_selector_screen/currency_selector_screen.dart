@@ -2,7 +2,7 @@ import '../token_selector.dart';
 import 'widgets/currency_selector.dart';
 import 'package:flutter/material.dart';
 
-class StockSelectorScreen extends StatelessWidget {
+class CurrencySelectorScreen extends StatelessWidget {
   static const url = '/currencyScreen';
 
   @override

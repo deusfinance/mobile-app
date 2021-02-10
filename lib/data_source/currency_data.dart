@@ -11,5 +11,5 @@ abstract class CurrencyData {
   static const CryptoCurrency eth = CryptoCurrency(
       name: 'Ethereum',
       shortName: 'ETH',
-      logoPath: 'assets/$_basePath/eth.png');
+      logoPath: '$_basePath/eth.png');
 }

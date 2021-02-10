@@ -22,7 +22,7 @@ dependencies:
 
   # FRONTEND
   fluttertoast: ^7.1.6
-  flutter_svg: ^0.18.0
+  flutter_svg: ^0.19.0
   shimmer_animation: ^0.0.9+1
   shared_preferences: ^0.5.8
   flutter_icons: ^1.1.0
@@ -33,6 +33,7 @@ dependencies:
   url_launcher:
   outline_gradient_button: ^1.0.0+2
   flutter_countdown_timer: ^3.0.0
+  flutter_svg_provider: ^0.1.8
 
 dev_dependencies:
   flutter_test:
@@ -47,6 +48,7 @@ flutter:
     # FRONTEND
     - assets/images/
     - assets/images/currencies/
+    - assets/images/stocks/
     - assets/images/icons/
     # BACKEND
     - assets/deus_data/ # data of tokens, contract ABI/functions etc.
