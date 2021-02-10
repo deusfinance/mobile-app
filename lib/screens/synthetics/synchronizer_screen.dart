@@ -53,7 +53,7 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
           child: Column(
             children: <Widget>[
               const SizedBox(height: 30),
-              _buildModeButtons(context),
+              _buildUserInput(context),
               _buildSynchronizerCap(),
               _buildMarketTimer()
             ],
@@ -123,7 +123,7 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
     );
   }
 
-  Widget _buildModeButtons(BuildContext context) {
+  Widget _buildUserInput(BuildContext context) {
     return UnicornOutlineContainer(
       strokeWidth: 1,
       radius: 10,
@@ -134,20 +134,13 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
           padding: const EdgeInsets.all(14.0),
           child: Column(
             children: [
-              const SwapField(direction: Direction.from, balance: 999, initialCurrency: CurrencyData.eth),
+              const SwapField(direction: Direction.from, balance: 999, initialToken: CurrencyData.eth),
               const SizedBox(height: 12),
               Center(child: PlatformSvg.asset('images/icons/arrow_down.svg')),
               const SizedBox(height: 12),
-              const SwapField(direction: Direction.to, balance: 0, initialCurrency: CurrencyData.deus),
+              const SwapField(direction: Direction.to, balance: 0, initialToken: CurrencyData.deus),
               const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: SynchronizerScreen.kPadding / 2),
-                child: Row(children: [
-                  Expanded(child: _buildLongButton()),
-                  const SizedBox(width: 8),
-                  Expanded(child: _buildShortButton()),
-                ]),
-              ),
+              _buildModeButtons(),
               const SizedBox(height: 16),
               KeyValueString('Price', '0.0038 ETH per DEUS ',
                   keyColor: MyColors.primary.withOpacity(0.75),
@@ -189,6 +182,17 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Container _buildModeButtons() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: SynchronizerScreen.kPadding / 2),
+      child: Row(children: [
+        Expanded(child: _buildLongButton()),
+        const SizedBox(width: 8),
+        Expanded(child: _buildShortButton()),
+      ]),
     );
   }
 

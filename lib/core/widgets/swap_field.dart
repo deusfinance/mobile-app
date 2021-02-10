@@ -1,7 +1,8 @@
-import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/models/crypto_currency.dart';
 import 'package:flutter/material.dart';
 
+import '../../data_source/currency_data.dart';
+import '../../models/crypto_currency.dart';
+import '../../models/token.dart';
 import '../../statics/old_my_colors.dart';
 import 'svg.dart';
 
@@ -13,12 +14,12 @@ class SwapField extends StatefulWidget {
   final double balance;
 
   //TODO (@CodingDavid8): Replace with meta-class so it can be used for tokens and stocks.
-  final CryptoCurrency initialCurrency;
+  final Token initialToken;
   const SwapField({
     Key key,
     this.direction,
     this.balance,
-    this.initialCurrency,
+    this.initialToken,
   }) : super(key: key);
 
   @override
@@ -27,12 +28,12 @@ class SwapField extends StatefulWidget {
 
 class _SwapFieldState extends State<SwapField> {
   final controller = TextEditingController(text: '150');
-  CryptoCurrency selectedCurrency;
+  Token selectedToken;
 
   @override
   void initState() {
     super.initState();
-    selectedCurrency = widget.initialCurrency;
+    selectedToken = widget.initialToken;
   }
 
   @override
@@ -63,7 +64,7 @@ class _SwapFieldState extends State<SwapField> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton(
                           icon: PlatformSvg.asset('images/icons/chevron_down.svg'),
-                          value: selectedCurrency,
+                          value: selectedToken,
                           items: CurrencyData.all
                               .map((currency) => DropdownMenuItem<CryptoCurrency>(
                                   value: currency,
@@ -78,7 +79,7 @@ class _SwapFieldState extends State<SwapField> {
                                     ],
                                   )))
                               .toList(),
-                          onChanged: (c) => selectedCurrency = c),
+                          onChanged: (c) => selectedToken = c),
                     ),
                   ),
                 ],
