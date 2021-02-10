@@ -1,6 +1,7 @@
 import 'package:deus/screens/staking/stacking_screen.dart';
 import 'package:deus/screens/swap/swap_screen.dart';
 import 'package:deus/screens/synthetics/synthetics_screen.dart';
+import 'package:deus/screens/test_screen.dart';
 import 'package:deus/screens/vaults/vaults_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -16,22 +17,26 @@ class MyNavigationItem {
   });
 
   static List<MyNavigationItem> get items => [
-    MyNavigationItem(
-      page: SwapScreen(),
-      title:"Swap",
-    ),
-    MyNavigationItem(
-      //TODO (@CodingDavid8): Get states of SynchronizerScreen into SynthethicsScreen.
-      page: SynchronizerScreen(), //SyntheticsScreen(), 
-      title: "Synthetics",
-    ),
-    MyNavigationItem(
-      page: StakingScreen(),
-      title: "Staking",
-    ),
-    MyNavigationItem(
-      page: VaultsScreen(),
-      title: "Vaults",
-    ),
-  ];
+        // MyNavigationItem(
+        //   page: SwapScreen(),
+        //   title:"Swap",
+        // ),
+        MyNavigationItem(
+          page: SwapBackendTestScreen(),
+          title: "Swap Test",
+        ),
+        MyNavigationItem(
+          //TODO (@CodingDavid8): Get states of SynchronizerScreen into SynthethicsScreen.
+          page: SynchronizerScreen(), //SyntheticsScreen(),
+          title: "Synthetics",
+        ),
+        MyNavigationItem(
+          page: StakingScreen(),
+          title: "Staking",
+        ),
+        MyNavigationItem(
+          page: VaultsScreen(),
+          title: "Vaults",
+        ),
+      ];
 }

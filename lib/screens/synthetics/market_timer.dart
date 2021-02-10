@@ -1,7 +1,7 @@
+import 'package:deus/core/widgets/unicorn_outline_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 
-import '../../core/widgets/unicorn_outline_container.dart';
 import 'synchronizer_screen.dart';
 
 class MarketTimer extends StatelessWidget {
@@ -9,7 +9,9 @@ class MarketTimer extends StatelessWidget {
   final String label;
   final Color timerColor;
 
-  const MarketTimer({
+  final DateTime end = DateTime.now().add(Duration(hours: 10));
+
+  MarketTimer({
     Key key,
     @required this.onEnd,
     @required this.label,
@@ -19,7 +21,6 @@ class MarketTimer extends StatelessWidget {
   int get endTimeInMs {
     //TODO (@CodingDavid8): Move into cubit
     final DateTime now = DateTime.now();
-    final DateTime end = now.add(Duration(hours:5) );
 
     final int difference = end.difference(now).inMilliseconds;
     final int endTime = now.millisecondsSinceEpoch + difference;

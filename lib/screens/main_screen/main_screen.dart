@@ -1,8 +1,8 @@
-import 'package:deus/screens/main_screen/bottom_nav_bar.dart';
-import 'package:deus/screens/main_screen/navigation_item.dart';
-import 'package:deus/screens/synthetics/synthetics_screen.dart';
-import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/material.dart';
+
+import '../../statics/my_colors.dart';
+import 'bottom_nav_bar.dart';
+import 'navigation_item.dart';
 
 class MainScreen extends StatefulWidget {
   static const route = "/main";

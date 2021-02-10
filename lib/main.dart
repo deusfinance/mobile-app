@@ -1,4 +1,5 @@
 import 'package:deus/screens/main_screen/main_screen.dart';
+import 'package:deus/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -40,8 +41,11 @@ class MyApp extends StatelessWidget {
       switch (settings.name) {
         case MainScreen.route:
           screen = MainScreen();
-//          arguments['id']
           break;
+        case SwapBackendTestScreen.url:
+          screen = SwapBackendTestScreen();
+          break;
+        
         default:
           return null;
       }
