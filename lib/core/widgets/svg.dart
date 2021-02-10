@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 class PlatformSvg {
   ///Display SVG Image.
+  ///
   ///assetName is /assets/assets/$assetName on Web.
   static Widget asset(String assetName,
       {double width,

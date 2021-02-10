@@ -19,10 +19,10 @@ class MarketTimer extends StatelessWidget {
   int get endTimeInMs {
     //TODO (@CodingDavid8): Move into cubit
     final DateTime now = DateTime.now();
-    final DateTime end = DateTime(2021, 2, 8, 6);
+    final DateTime end = now.add(Duration(hours:5) );
 
     final int difference = end.difference(now).inMilliseconds;
-    final int endTime = DateTime.now().millisecondsSinceEpoch + difference;
+    final int endTime = now.millisecondsSinceEpoch + difference;
     return endTime;
   }
 

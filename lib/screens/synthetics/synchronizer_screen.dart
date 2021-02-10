@@ -33,14 +33,17 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        // appBar: MyAppbar(),
-        body: _sychronizerState != SynchronizerStates.loading
-            ? _buildBody(context)
-            : const Center(
-                child: CircularProgressIndicator(),
-              ));
+    return _sychronizerState != SynchronizerStates.loading
+        ? _buildBody(context)
+        : const Center(child: CircularProgressIndicator());
+    // Scaffold(
+    //     backgroundColor: Theme.of(context).backgroundColor,
+    //     // appBar: MyAppbar(),
+    //     body: _sychronizerState != SynchronizerStates.loading
+    //         ? _buildBody(context)
+    //         : const Center(
+    //             child: CircularProgressIndicator(),
+    //           ));
   }
 
   SingleChildScrollView _buildBody(BuildContext context) {
@@ -70,7 +73,7 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Personal Syncroniser Cap', style: TextStyle(fontSize: 12, height: 1)),
+            const Text('Personal Synchronizer Cap', style: TextStyle(fontSize: 12, height: 1)),
             const SizedBox(height: 13),
             Container(
                 width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 4),
@@ -154,7 +157,7 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
                 height: 16,
               ),
               _sychronizerState == SynchronizerStates.openMarket && selectionState != SelectionMode.none
-                  //TODO (@CodingDavid8): Check for enter an amount
+                  //TODO (@CodingDavid8): Check for amount entered
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: SynchronizerScreen.kPadding / 2),
                       child: FilledGradientSelectionButton(

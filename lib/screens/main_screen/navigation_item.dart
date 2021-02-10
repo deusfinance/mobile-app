@@ -4,6 +4,8 @@ import 'package:deus/screens/synthetics/synthetics_screen.dart';
 import 'package:deus/screens/vaults/vaults_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../synthetics/synchronizer_screen.dart';
+
 class MyNavigationItem {
   final Widget page;
   final String title;
@@ -19,7 +21,8 @@ class MyNavigationItem {
       title:"Swap",
     ),
     MyNavigationItem(
-      page: SyntheticsScreen(),
+      //TODO (@CodingDavid8): Get states of SynchronizerScreen into SynthethicsScreen.
+      page: SynchronizerScreen(), //SyntheticsScreen(), 
       title: "Synthetics",
     ),
     MyNavigationItem(
