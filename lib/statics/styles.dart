@@ -15,65 +15,65 @@ class MyStyles {
 
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(12.0),
+      borderRadius: BorderRadius.circular(cardRadiusSize),
       color: Color(MyColors.Button_BG_Black),
       border: Border.all(color: Color(MyColors.HalfBlack), width: 1.0));
   static var darkWithBorderDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(12.0),
+      borderRadius: BorderRadius.circular(cardRadiusSize),
       color: Color(MyColors.Button_BG_Black),
       border: Border.all(color: Color(MyColors.Black), width: 1.0));
 
   static var darkWithNoBorderDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(12.0),
+      borderRadius: BorderRadius.circular(cardRadiusSize),
       color: Color(MyColors.Button_BG_Black));
 
   static var blueToPurpleDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(12.0),
+      borderRadius: BorderRadius.circular(cardRadiusSize),
       gradient: MyColors.blueToPurpleGradient);
 
   static var greenToBlueDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(12.0),
+      borderRadius: BorderRadius.circular(cardRadiusSize),
       gradient: MyColors.greenToBlueGradient);
 
 //  text styles
-  static var lightWhiteSmallTextStyle = TextStyle(
+  static const lightWhiteSmallTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.HalfWhite),
   );
-  static var lightWhiteMediumTextStyle = TextStyle(
+  static const lightWhiteMediumTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.HalfWhite),
   );
-  static var whiteSmallTextStyle = TextStyle(
+  static const whiteSmallTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.White),
   );
-  static var blackSmallTextStyle = TextStyle(
+  static const blackSmallTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.Black),
   );
-  static var blackMediumTextStyle = TextStyle(
+  static const blackMediumTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.Black),
   );
-  static var whiteMediumTextStyle = TextStyle(
+  static const whiteMediumTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.White),
   );
 
-  static var bottomNavBarUnSelectedStyle = TextStyle(
+  static const bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S5,

@@ -8,9 +8,10 @@ class FilledGradientSelectionButton extends StatelessWidget {
   final Function onPressed;
   final String label;
   final LinearGradient gradient;
+  final TextStyle textStyle;
 
   FilledGradientSelectionButton(
-      {this.selected, this.onPressed, this.label, this.gradient});
+      {this.selected, this.onPressed, this.label, this.gradient, this.textStyle = MyStyles.whiteMediumTextStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +24,10 @@ class FilledGradientSelectionButton extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: this.onPressed,
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
             splashColor: Colors.grey[500],
             child: Center(
-              child: Text(this.label, style: MyStyles.whiteMediumTextStyle),
+              child: Text(this.label, style: this.textStyle),
             ),
           ),
         ));

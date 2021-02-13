@@ -11,9 +11,14 @@ class SelectionButton extends StatefulWidget {
   final void Function(bool selected) onPressed;
   final bool selected;
   final LinearGradient gradient;
+  final TextStyle textStyle;
 
   SelectionButton(
-      {this.label, this.selected = false, this.onPressed, this.gradient});
+      {this.label,
+      this.selected = false,
+      this.onPressed,
+      this.gradient,
+      this.textStyle = MyStyles.whiteMediumTextStyle});
 
   @override
   _SelectionButtonState createState() => _SelectionButtonState();
@@ -44,6 +49,7 @@ class _SelectionButtonState extends State<SelectionButton> {
             selected: widget.selected,
             label: widget.label,
             gradient: widget.gradient,
+            textStyle: widget.textStyle,
           );
   }
 

@@ -17,14 +17,14 @@ class MyNavigationItem {
   });
 
   static List<MyNavigationItem> get items => [
-        // MyNavigationItem(
-        //   page: SwapScreen(),
-        //   title:"Swap",
-        // ),
-        MyNavigationItem(
-          page: SwapBackendTestScreen(),
-          title: "Swap Test",
-        ),
+         MyNavigationItem(
+           page: SwapScreen(),
+           title:"Swap",
+         ),
+//        MyNavigationItem(
+//          page: SwapBackendTestScreen(),
+//          title: "Swap Test",
+//        ),
         MyNavigationItem(
           //TODO (@CodingDavid8): Get states of SynchronizerScreen into SynthethicsScreen.
           page:  SyntheticsScreen(), //SynchronizerScreen(),

@@ -8,10 +8,7 @@ class SwapModel{
   bool approved;
 
 
-  SwapModel(){
-    slippage = 0;
-    approved = false;
-  }
+  SwapModel();
 
   setFrom(dynamic from){
     this.from = from;

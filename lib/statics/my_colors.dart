@@ -15,7 +15,7 @@ class MyColors{
   static const Blue_Gr = 0xFF5EC4D6;
 
 
-  static var blueToPurpleGradient = LinearGradient(
+  static const blueToPurpleGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
     colors: [
@@ -24,7 +24,7 @@ class MyColors{
     ],
   );
 
-  static var greenToBlueGradient = LinearGradient(
+  static const greenToBlueGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
     colors: [
