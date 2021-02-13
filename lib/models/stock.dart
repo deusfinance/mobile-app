@@ -7,18 +7,18 @@ part 'stock.g.dart';
 
 @JsonSerializable(nullable: true)
 class Stock extends Token {
-  final String name;
+  String name;
   String sector;
   String symbol;
   @JsonKey(name: "short_name")
-  final String shortName;
+  String shortName;
   @JsonKey(name: "short_symbol")
   String shortSymbol;
   @JsonKey(name: "long_name")
   String longName;
   @JsonKey(name: "long_symbol")
   String longSymbol;
-  final String logo;
+  String logo;
 
   Stock(String name, String shortName, String logo)
       : this.name = name,

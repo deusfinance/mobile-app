@@ -1,8 +1,10 @@
+import 'package:deus/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:deus/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
 import 'screens/synthetics/synchronizer_screen.dart';
 import 'statics/old_my_colors.dart';
 
@@ -44,6 +46,12 @@ class MyApp extends StatelessWidget {
           break;
         case SwapBackendTestScreen.url:
           screen = SwapBackendTestScreen();
+          break;
+        case StockSelectorScreen.url:
+          screen = StockSelectorScreen();
+          break;
+        case CurrencySelectorScreen.url:
+          screen = CurrencySelectorScreen();
           break;
         
         default:

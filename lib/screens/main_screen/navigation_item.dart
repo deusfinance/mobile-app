@@ -27,7 +27,7 @@ class MyNavigationItem {
         ),
         MyNavigationItem(
           //TODO (@CodingDavid8): Get states of SynchronizerScreen into SynthethicsScreen.
-          page: SynchronizerScreen(), //SyntheticsScreen(),
+          page:  SyntheticsScreen(), //SynchronizerScreen(),
           title: "Synthetics",
         ),
         MyNavigationItem(

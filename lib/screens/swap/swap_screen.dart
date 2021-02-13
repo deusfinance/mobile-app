@@ -77,7 +77,7 @@ class _SwapScreenState extends State<SwapScreen> {
                           ),
                           Text(
                             "ETH",
-                            style: MyStyles.WhiteMediumTextStyle,
+                            style: MyStyles.whiteMediumTextStyle,
                           ),
                           Icon(
                             Icons.keyboard_arrow_down,
@@ -137,7 +137,7 @@ class _SwapScreenState extends State<SwapScreen> {
                           ),
                           Text(
                             "DEUS",
-                            style: MyStyles.WhiteMediumTextStyle,
+                            style: MyStyles.whiteMediumTextStyle,
                           ),
                           Icon(
                             Icons.keyboard_arrow_down,

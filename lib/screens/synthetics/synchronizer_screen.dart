@@ -29,7 +29,7 @@ class SynchronizerScreen extends StatefulWidget {
 }
 
 class _SynchronizerScreenState extends State<SynchronizerScreen> {
-  SynchronizerStates _sychronizerState = SynchronizerStates.openMarket;
+  SynchronizerStates _sychronizerState = SynchronizerStates.closedMarket;
   SelectionMode selectionState = SelectionMode.none;
 
   @override

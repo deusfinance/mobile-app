@@ -1,4 +1,7 @@
+import 'package:deus/core/util/responsive.dart';
 import 'package:deus/core/widgets/unicorn_outline_container.dart';
+import 'package:deus/statics/my_colors.dart';
+import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 
@@ -29,25 +32,48 @@ class MarketTimer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return UnicornOutlineContainer(
-        radius: 10,
-        strokeWidth: 1,
-        gradient: SynchronizerScreen.kGradient,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: SynchronizerScreen.kPadding * 2),
-          child: Column(
-            children: [
-              CountdownTimer(
-                endTime: endTimeInMs,
-                onEnd: this.onEnd,
-                textStyle: TextStyle(fontSize: 25, height: 1, color: this.timerColor),
-              ),
-              Text(
-                this.label,
-                style: const TextStyle(fontSize: 12.5, height: 1),
-              )
-            ],
+//    return UnicornOutlineContainer(
+//        radius: 10,
+//        strokeWidth: 1,
+//        gradient: SynchronizerScreen.kGradient,
+//        child: Padding(
+//          padding: const EdgeInsets.symmetric(vertical: SynchronizerScreen.kPadding * 2),
+//          child: Column(
+//            children: [
+//              CountdownTimer(
+//                endTime: endTimeInMs,
+//                onEnd: this.onEnd,
+//                textStyle: TextStyle(fontSize: 25, height: 1, color: this.timerColor),
+//              ),
+//              Text(
+//                this.label,
+//                style: const TextStyle(fontSize: 12.5, height: 1),
+//              )
+//            ],
+//          ),
+//        ));
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
+          color: Color(MyColors.Main_BG_Black),
+          border: Border.all(color: Color(MyColors.HalfBlack), width: 1.0)),
+      width: getScreenWidth(context),
+      padding:
+          const EdgeInsets.symmetric(vertical: SynchronizerScreen.kPadding * 2),
+      child: Column(
+        children: [
+          CountdownTimer(
+            endTime: endTimeInMs,
+            onEnd: this.onEnd,
+            textStyle:
+                TextStyle(fontSize: 25, height: 1, color: this.timerColor),
           ),
-        ));
+          Text(
+            this.label,
+            style: const TextStyle(fontSize: 12.5, height: 1),
+          )
+        ],
+      ),
+    );
   }
 }

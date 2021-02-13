@@ -1,32 +1,33 @@
 
-import 'package:deus/models/stock.dart';
+enum SelectionMode { none, long, short }
+enum SyntheticState { closedMarket, openMarket, loading, timeRequired }
 
 class SyntheticModel{
-  static final String LONG = "LONG";
-  static final String SHORT = "SHORT";
   dynamic from;
   dynamic to;
-  String type;
+  SelectionMode selectionMode;
+  SyntheticState syntheticState;
   bool isMaxSelected;
 
 
   SyntheticModel(){
     this.from = "DAI";
-    this.type = "";
+    this.selectionMode = SelectionMode.none;
+    this.syntheticState = SyntheticState.loading;
   }
 
-  setFrom(dynamic from){
-    this.from = from;
-    if(from is Stock){
-      this.to = "DAI";
-    }
-  }
-
-  setTo(dynamic to){
-    this.to = to;
-    if(to is Stock){
-      this.from = "DAI";
-    }
-  }
+//  setFrom(dynamic from){
+//    this.from = from;
+//    if(from is Stock){
+//      this.to = "DAI";
+//    }
+//  }
+//
+//  setTo(dynamic to){
+//    this.to = to;
+//    if(to is Stock){
+//      this.from = "DAI";
+//    }
+//  }
 
 }

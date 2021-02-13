@@ -10,6 +10,9 @@ class MyStyles {
   static const S2 = 24.0;
   static const S1 = 32.0;
 
+  static const cardRadiusSize = 12.0;
+  static const mainPadding = 8.0;
+
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(12.0),
@@ -63,7 +66,7 @@ class MyStyles {
     fontSize: S4,
     color: Color(MyColors.Black),
   );
-  static var WhiteMediumTextStyle = TextStyle(
+  static var whiteMediumTextStyle = TextStyle(
     fontFamily: "Monument",
     fontWeight: FontWeight.w300,
     fontSize: S4,

@@ -7,7 +7,11 @@ part of 'stock.dart';
 // **************************************************************************
 
 Stock _$StockFromJson(Map<String, dynamic> json) {
-  return Stock(json['name'] as String, json['short_name'] as String, json['logo'] as String)
+  return Stock(
+    json['name'] as String,
+    json['short_name'] as String,
+    json['logo'] as String,
+  )
     ..sector = json['sector'] as String
     ..symbol = json['symbol'] as String
     ..shortSymbol = json['short_symbol'] as String
