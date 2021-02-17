@@ -20,11 +20,11 @@ class Stock extends Token {
   String longSymbol;
   String logo;
 
-  Stock(String name, String shortName, String logo)
+  Stock(String name, String symbol, String logo)
       : this.name = name,
-        this.shortName = shortName,
+        this.symbol = symbol,
         this.logo = logo,
-        super(name, shortName, logo);
+        super(name, symbol, logo);
 
   factory Stock.fromJson(Map<String, dynamic> json) => _$StockFromJson(json);
   Map<String, dynamic> toJson() => _$StockToJson(this);

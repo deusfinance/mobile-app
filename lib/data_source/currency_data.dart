@@ -7,9 +7,14 @@ abstract class CurrencyData {
   static const List<CryptoCurrency> all = [deus, eth];
 
   static const CryptoCurrency deus = CryptoCurrency(
-      name: 'DEUS', shortName: 'DEUS', logoPath: '$_basePath/deus.svg');
+      name: 'DEUS', symbol: 'DEUS', logoPath: '$_basePath/deus.svg');
+
+  static const CryptoCurrency dea = CryptoCurrency(
+      name: 'DEA', symbol: 'DEA', logoPath: '$_basePath/deus.svg');
+
+  static const CryptoCurrency dai = CryptoCurrency(
+      name: 'DAI', symbol: 'DAI', logoPath: '$_basePath/deus.svg');
+
   static const CryptoCurrency eth = CryptoCurrency(
-      name: 'Ethereum',
-      shortName: 'ETH',
-      logoPath: '$_basePath/eth.png');
+      name: 'Ethereum', symbol: 'ETH', logoPath: '$_basePath/eth.png');
 }

@@ -26,7 +26,6 @@ class MyNavigationItem {
 //          title: "Swap Test",
 //        ),
         MyNavigationItem(
-          //TODO (@CodingDavid8): Get states of SynchronizerScreen into SynthethicsScreen.
           page:  SyntheticsScreen(), //SynchronizerScreen(),
           title: "Synthetics",
         ),

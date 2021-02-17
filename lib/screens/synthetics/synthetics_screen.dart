@@ -11,6 +11,8 @@ import 'package:deus/models/stock.dart';
 import 'package:deus/models/synthetic_model.dart';
 import 'package:deus/models/transaction_status.dart';
 import 'package:deus/screens/synthetics/market_timer.dart';
+import 'package:deus/service/ethereum_service.dart';
+import 'package:deus/service/stock_service.dart';
 import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/statics.dart';
 import 'package:deus/statics/styles.dart';
@@ -23,10 +25,17 @@ class SyntheticsScreen extends StatefulWidget {
 
 class _SyntheticsScreenState extends State<SyntheticsScreen> {
   SyntheticModel syntheticModel;
+  StockService stockService;
+  TextEditingController fromFieldController = new TextEditingController();
+  TextEditingController toFieldController = new TextEditingController();
+  bool isInProgress = false;
 
   @override
   void initState() {
     super.initState();
+//    TODO chain id
+    stockService = new StockService(
+        ethService: new EthereumService(1), privateKey: "0x1321312");
     syntheticModel = new SyntheticModel();
     syntheticModel.syntheticState = SyntheticState.openMarket;
   }
@@ -49,18 +58,66 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   }
 
   Widget _buildUserInput(BuildContext context) {
+    SwapField fromField = new SwapField(
+        direction: Direction.from,
+        balance: 999,
+        initialToken: syntheticModel.from,
+        page: TabPage.synthetics,
+        controller: fromFieldController,
+        tokenSelected: (selectedToken) {
+          setState(() {
+            syntheticModel.to = CurrencyData.dai;
+            syntheticModel.from = selectedToken;
+            if (syntheticModel.selectionMode == SelectionMode.none) {
+              syntheticModel.selectionMode = SelectionMode.long;
+            }
+          });
+        });
+    fromFieldController.addListener(() {
+      setState(() {
+        syntheticModel.fromValue = double.parse(fromFieldController.text);
+        syntheticModel.toValue = syntheticModel.fromValue * 1.023;
+        toFieldController.text = syntheticModel.toValue.toString();
+      });
+    });
+    SwapField toField = new SwapField(
+      direction: Direction.to,
+      balance: 0,
+      controller: toFieldController,
+      initialToken: syntheticModel.to,
+      page: TabPage.synthetics,
+      tokenSelected: (selectedToken) {
+        setState(() {
+          syntheticModel.to = selectedToken;
+          syntheticModel.from = CurrencyData.dai;
+          if (syntheticModel.selectionMode == SelectionMode.none) {
+            syntheticModel.selectionMode = SelectionMode.long;
+          }
+        });
+      },
+    );
+    toFieldController.addListener(() {
+      setState(() {
+        syntheticModel.toValue = double.parse(toFieldController.text);
+      });
+    });
     return Column(
       children: [
         const SizedBox(height: 30),
-        const SwapField(
-            direction: Direction.from,
-            balance: 999,
-            initialToken: CurrencyData.eth),
+        fromField,
         const SizedBox(height: 12),
-        Center(child: PlatformSvg.asset('images/icons/arrow_down.svg')),
+        GestureDetector(
+            onTap: () {
+              setState(() {
+                var a = syntheticModel.from;
+                syntheticModel.from = syntheticModel.to;
+                syntheticModel.to = a;
+              });
+            },
+            child: Center(
+                child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
         const SizedBox(height: 12),
-        SwapField<Stock>(
-            direction: Direction.to, balance: 0, initialToken: null),
+        toField,
         const SizedBox(height: 18),
         _buildModeButtons(),
         const SizedBox(height: 16),
@@ -74,13 +131,14 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
             Row(
               children: [
                 Text(
-                  "0.0038 ETH per DEUS",
+                  "0.0038 ${syntheticModel.from != null ? syntheticModel.from.symbol : "asset name"} per ${syntheticModel.to != null ? syntheticModel.to.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 4.0),
-                  child: PlatformSvg.asset("images/icons/exchange.svg", width: 15),
-                )
+                  child:
+                      PlatformSvg.asset("images/icons/exchange.svg", width: 15),
+                ),
               ],
             ),
           ],
@@ -93,59 +151,168 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
         const SizedBox(
           height: 16,
         ),
-        syntheticModel.syntheticState == SyntheticState.openMarket &&
-                syntheticModel.selectionMode != SelectionMode.none
-            //TODO (@CodingDavid8): Check for amount entered
-            ? FilledGradientSelectionButton(
-                label: syntheticModel.selectionMode == SelectionMode.long
-                    ? 'Sync'
-                    : 'Sync (Sell)',
-                onPressed: () {},
-                gradient: MyColors.blueToPurpleGradient,
-              )
-            : Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.all(16.0),
-                decoration: MyStyles.darkWithNoBorderDecoration,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    syntheticModel.syntheticState == SyntheticState.closedMarket
-                        ? 'MARKETS ARE CLOSED'
-                        : syntheticModel.syntheticState ==
-                                SyntheticState.timeRequired
-                            ? 'YOU NEED TIME TOKENS'
-                            : 'ENTER AN AMOUNT',
-                    style: MyStyles.lightWhiteMediumTextStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-//        Padding(
-//                padding: const EdgeInsets.symmetric(
-//                    horizontal: MyStyles.mainPadding),
-//                child: Container(
-//                  padding: const EdgeInsets.symmetric(
-//                    vertical: MyStyles.mainPadding,
-//                  ),
-//                  width: double.infinity,
-//                  decoration: BoxDecoration(
-//                      borderRadius: BorderRadius.circular(10),
-//                      color: const Color(0xFF242424)),
-//                  child: Text(
-//                    syntheticModel.syntheticState == SyntheticState.closedMarket
-//                        ? 'MARKETS ARE CLOSED'
-//                        : syntheticModel.syntheticState ==
-//                                SyntheticState.timeRequired
-//                            ? 'YOU NEED TIME TOKENS'
-//                            : 'ENTER AN AMOUNT',
-//                    style: MyStyles.lightWhiteMediumTextStyle,
-//                    textAlign: TextAlign.center,
-//                  ),
-//                ),
-//              )
+
+        Opacity(opacity: isInProgress ? 0.5 : 1.0, child: _buildMainButton()),
       ],
     );
+  }
+
+  Widget _buildMainButton() {
+    if (!stockService.checkWallet()) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "CONNECT WALLET",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+    if (syntheticModel.syntheticState == SyntheticState.closedMarket) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "MARKETS ARE CLOSED",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+    if (syntheticModel.to == null) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "SELECT ASSET",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+    if (syntheticModel.fromValue == null || syntheticModel.fromValue == "") {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "ENTER AN AMOUNT",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+//    TODO get balance
+    if (syntheticModel.fromValue < 1) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "INSUFFICIENT BALANCE",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+    // TODO check approved
+    return FilledGradientSelectionButton(
+      label: syntheticModel.from == CurrencyData.dai ? 'Buy' : 'Sell',
+      onPressed: () async {
+        if (syntheticModel.from == CurrencyData.dai) {
+          buy();
+          print("hosh");
+        } else {
+          sell();
+        }
+        ;
+      },
+      gradient: MyColors.blueToPurpleGradient,
+    );
+//    return syntheticModel.syntheticState == SyntheticState.openMarket &&
+//            syntheticModel.selectionMode != SelectionMode.none
+//        //TODO (@CodingDavid8): Check for amount entered
+//        ? FilledGradientSelectionButton(
+//            label: syntheticModel.from == CurrencyData.dai ? 'Buy' : 'Sell',
+//            onPressed: () {},
+//            gradient: MyColors.blueToPurpleGradient,
+//          )
+//        : Container(
+//            width: MediaQuery.of(context).size.width,
+//            padding: EdgeInsets.all(16.0),
+//            decoration: MyStyles.darkWithNoBorderDecoration,
+//            child: Align(
+//              alignment: Alignment.center,
+//              child: Text(
+//                syntheticModel.syntheticState == SyntheticState.closedMarket
+//                    ? 'MARKETS ARE CLOSED'
+//                    : syntheticModel.syntheticState ==
+//                            SyntheticState.timeRequired
+//                        ? 'YOU NEED TIME TOKENS'
+//                        : 'ENTER AN AMOUNT',
+//                style: MyStyles.lightWhiteMediumTextStyle,
+//                textAlign: TextAlign.center,
+//              ),
+//            ),
+//          );
+  }
+
+  Future approve() async {
+    if (!isInProgress) {
+      setState(() {
+        isInProgress = true;
+      });
+      stockService.approve("", "").then((value) {
+        setState(() {
+          isInProgress = false;
+        });
+      });
+    }
+  }
+
+  Future sell() async {
+    if (!isInProgress) {
+      setState(() {
+        isInProgress = true;
+      });
+      stockService.sell("", "", "").then((value) {
+        setState(() {
+          isInProgress = false;
+        });
+      });
+    }
+  }
+
+  Future buy() async {
+    if (!isInProgress) {
+      setState(() {
+        isInProgress = true;
+      });
+      stockService.buy("", "", "").then((value) {
+        setState(() {
+          isInProgress = false;
+        });
+      });
+    }
   }
 
   Container _buildModeButtons() {
@@ -186,9 +353,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       label: 'SHORT',
       onPressed: (bool selected) {
         setState(() {
-          selected
-              ? syntheticModel.selectionMode = SelectionMode.none
-              : syntheticModel.selectionMode = SelectionMode.short;
+//          selected
+//              ? syntheticModel.selectionMode = SelectionMode.none
+//              : syntheticModel.selectionMode = SelectionMode.short;
+          syntheticModel.selectionMode = SelectionMode.short;
         });
       },
       selected: syntheticModel.selectionMode == SelectionMode.short,
@@ -201,9 +369,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       label: 'LONG',
       onPressed: (bool selected) {
         setState(() {
-          selected
-              ? syntheticModel.selectionMode = SelectionMode.none
-              : syntheticModel.selectionMode = SelectionMode.long;
+//          selected
+//              ? syntheticModel.selectionMode = SelectionMode.none
+//              : syntheticModel.selectionMode = SelectionMode.long;
+          syntheticModel.selectionMode = SelectionMode.long;
         });
       },
       selected: syntheticModel.selectionMode == SelectionMode.long,

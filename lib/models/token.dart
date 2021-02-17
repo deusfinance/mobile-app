@@ -6,13 +6,13 @@ import '../core/widgets/svg.dart';
 
 class Token extends Equatable {
   final String name;
-  final String shortName;
+  final String symbol;
   final String logoPath;
 
-  const Token(this.name, this.shortName, this.logoPath);
+  const Token(this.name, this.symbol, this.logoPath);
 
   @override
-  List<Object> get props => [shortName];
+  List<Object> get props => [symbol];
 }
 
 extension PathCheck on String {

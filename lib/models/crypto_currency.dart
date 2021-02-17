@@ -7,7 +7,7 @@ import 'token.dart';
 class CryptoCurrency extends Token {
   const CryptoCurrency({
     @required String name,
-    @required String shortName,
+    @required String symbol,
     String logoPath,
-  }) : super(name, shortName, logoPath);
+  }) : super(name, symbol, logoPath);
 }

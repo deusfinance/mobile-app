@@ -4,6 +4,8 @@ import 'package:deus/core/widgets/swap_field.dart';
 import 'package:deus/data_source/currency_data.dart';
 import 'package:deus/models/stock.dart';
 import 'package:deus/models/swap_model.dart';
+import 'package:deus/service/deus_swap_service.dart';
+import 'package:deus/service/ethereum_service.dart';
 import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,11 +19,18 @@ class SwapScreen extends StatefulWidget {
 }
 
 class _SwapScreenState extends State<SwapScreen> {
-  SwapModel swapModel = SwapModel();
+  SwapModel swapModel = SwapModel(CurrencyData.eth, CurrencyData.deus);
+  TextEditingController fromFieldController = new TextEditingController();
+  TextEditingController toFieldController = new TextEditingController();
+  TextEditingController slippageController = new TextEditingController();
+  bool isInProgress = false;
+  DeusSwapService swapService;
 
   @override
   void initState() {
     super.initState();
+    swapService = new DeusSwapService(
+        ethService: new EthereumService(1), privateKey: "0x312");
   }
 
   @override
@@ -30,6 +39,46 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
+    SwapField fromField = new SwapField(
+      direction: Direction.from,
+      balance: 999,
+      initialToken: swapModel.from,
+      controller: fromFieldController,
+      tokenSelected: (selectedToken) {
+        setState(() {
+          swapModel.from = selectedToken;
+          setState(() {
+            swapModel.approved = false;
+          });
+          getAllowances();
+//         TODO get balance
+        });
+      },
+    );
+    fromFieldController.addListener(() {
+      setState(() {
+        swapModel.fromValue = double.parse(fromFieldController.text);
+        swapModel.toValue = swapModel.fromValue * 1.023;
+        toFieldController.text = swapModel.toValue.toString();
+      });
+    });
+
+    SwapField toField = new SwapField(
+      direction: Direction.to,
+      balance: 0,
+      initialToken: swapModel.to,
+      controller: toFieldController,
+      tokenSelected: (selectedToken) {
+        setState(() {
+          swapModel.to = selectedToken;
+        });
+      },
+    );
+    toFieldController.addListener(() {
+      setState(() {
+        swapModel.toValue = double.parse(toFieldController.text);
+      });
+    });
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding),
       decoration: BoxDecoration(color: Color(MyColors.Main_BG_Black)),
@@ -37,17 +86,19 @@ class _SwapScreenState extends State<SwapScreen> {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            const SwapField(
-                direction: Direction.from,
-                balance: 999,
-                initialToken: CurrencyData.eth),
+            fromField,
             const SizedBox(height: 12),
-            Center(child: PlatformSvg.asset('images/icons/arrow_down.svg')),
+            GestureDetector(
+                onTap: (){
+                  setState(() {
+                    var a = swapModel.from;
+                    swapModel.from = swapModel.to;
+                    swapModel.to = a;
+                  });
+                },
+                child: Center(child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
             const SizedBox(height: 12),
-            SwapField(
-                direction: Direction.to,
-                balance: 0,
-                initialToken: CurrencyData.eth),
+            toField,
             const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,14 +110,14 @@ class _SwapScreenState extends State<SwapScreen> {
                 Row(
                   children: [
                     Text(
-                      "123.23 DEUS per ETH",
+                      "0.0038 ${swapModel.from != null ? swapModel.from.symbol : "asset name"} per ${swapModel.to != null ? swapModel.to.symbol : "asset name"}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 4.0),
-                      child: PlatformSvg.asset("images/icons/exchange.svg",
-                          width: 15),
-                    )
+                        margin: EdgeInsets.only(left: 4.0),
+                        child: PlatformSvg.asset("images/icons/exchange.svg",
+                            width: 15),
+                      ),
                   ],
                 ),
               ],
@@ -104,23 +155,41 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildModeButtons() {
-    return Container(
-      child: Row(children: [
-        Visibility(
-          visible: !swapModel.approved,
-          child: Expanded(
-            child: _buildApproveButton(),
+    if (!swapService.checkWallet()) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "CONNECT WALLET",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
           ),
         ),
-        Visibility(
+      );
+    }
+    return Opacity(
+      opacity: isInProgress ? 0.5 : 1,
+      child: Container(
+        child: Row(children: [
+          Visibility(
             visible: !swapModel.approved,
-            child: SizedBox(
-              width: 8.0,
-            )),
-        Expanded(
-          child: _buildSwapButton(),
-        )
-      ]),
+            child: Expanded(
+              child: _buildApproveButton(),
+            ),
+          ),
+          Visibility(
+              visible: !swapModel.approved,
+              child: SizedBox(
+                width: 8.0,
+              )),
+          Expanded(
+            child: _buildSwapButton(),
+          )
+        ]),
+      ),
     );
   }
 
@@ -129,9 +198,7 @@ class _SwapScreenState extends State<SwapScreen> {
       label: 'Approve',
       onPressed: (bool selected) {
 //        TODO approve it
-        setState(() {
-          swapModel.approved = true;
-        });
+        approve();
       },
       selected: true,
       gradient: MyColors.greenToBlueGradient,
@@ -140,10 +207,26 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildSwapButton() {
+//    TODO get balance
+    if(swapModel.approved && swapModel.fromValue<1.0){
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16.0),
+        decoration: MyStyles.darkWithNoBorderDecoration,
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            "INSUFFICIENT BALANCE",
+            style: MyStyles.lightWhiteMediumTextStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     return SelectionButton(
       label: 'Swap',
       onPressed: (bool selected) {
-//        TODO
+        swapTokens();
       },
       selected: swapModel.approved,
       gradient: MyColors.greenToBlueGradient,
@@ -243,7 +326,7 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.all(12.0),
             margin: EdgeInsets.all(4.0),
-            decoration: swapModel.slippage > 1.0
+            decoration: swapModel.slippage > (1.0)
                 ? MyStyles.greenToBlueDecoration
                 : MyStyles.lightBlackBorderDecoration,
             child: Align(
@@ -252,7 +335,9 @@ class _SwapScreenState extends State<SwapScreen> {
                   children: [
                     Expanded(
                       child: TextField(
-                        style: swapModel.slippage > 1.0
+                        maxLines: 1,
+                        controller: slippageController,
+                        style: swapModel.slippage > (1.0)
                             ? MyStyles.blackSmallTextStyle
                             : MyStyles.whiteSmallTextStyle,
                         decoration: InputDecoration(
@@ -264,7 +349,7 @@ class _SwapScreenState extends State<SwapScreen> {
                     ),
                     Text(
                       "%",
-                      style: swapModel.slippage > 1.0
+                      style: swapModel.slippage > (1.0)
                           ? MyStyles.blackSmallTextStyle
                           : MyStyles.whiteSmallTextStyle,
                     ),
@@ -274,5 +359,52 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       ),
     ]);
+  }
+
+  Future approve() async {
+    if (!isInProgress) {
+      setState(() {
+        isInProgress = true;
+      });
+      swapService.approve(swapModel.from.symbol).then((value) {
+        setState(() {
+//          TODO handle result
+          isInProgress = false;
+          swapModel.approved = true;
+        });
+      });
+    }
+  }
+
+  Future getAllowances() async {
+    setState(() {
+      isInProgress = true;
+    });
+    swapService.getAllowances(swapModel.from.symbol).then((value) {
+      setState(() {
+        isInProgress = false;
+      });
+      if(double.parse(value)>double.parse(fromFieldController.text)){
+        setState(() {
+          swapModel.approved = true;
+        });
+      }
+    });
+  }
+
+  Future swapTokens() async {
+    if (!isInProgress && swapModel.approved) {
+      setState(() {
+        isInProgress = true;
+      });
+      swapService
+          .swapTokens(swapModel.from, swapModel.to, swapModel.fromValue)
+          .then((value) {
+        setState(() {
+//          TODO handle result and show toast and ...
+          isInProgress = false;
+        });
+      });
+    }
   }
 }

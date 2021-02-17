@@ -10,63 +10,42 @@ import 'token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'token_selector/stock_selector_screen/stock_selector_screen.dart';
 
 enum Direction { from, to }
+enum TabPage { synthetics, swap }
 
 //TODO (@CodingDavid8) use cubit instead of StatefulWidget
 ///Field where you can enter the amount of tokens and select another token.
+// ignore: must_be_immutable
 class SwapField<T extends Token> extends StatefulWidget {
   final Direction direction;
   final double balance;
-
+  void Function(T selectedToken) tokenSelected;
+  final TextEditingController controller;
+  final TabPage page;
   //TODO (@CodingDavid8): Replace with meta-class so it can be used for tokens and stocks.
   final T initialToken;
 
-  const SwapField({
-    Key key,
-    this.direction,
-    this.balance,
-    this.initialToken,
-  }) : super(key: key);
+
+   SwapField(
+      {Key key,
+      this.direction = Direction.from,
+      this.balance = 0,
+      this.controller,
+      this.initialToken,
+      this.tokenSelected,
+      this.page,})
+      : super(key: key);
 
   @override
-  _SwapFieldState createState() => _SwapFieldState<T>();
+  _SwapFieldState createState() => new _SwapFieldState<T>();
 }
 
 class _SwapFieldState<T extends Token> extends State<SwapField> {
-  final controller = TextEditingController(text: '0.0');
   T selectedToken;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedToken = widget.initialToken;
-  }
 
   @override
   Widget build(BuildContext context) {
     final balance = widget.balance;
-//    return Card(
-//        shape: RoundedRectangleBorder(
-//            borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Colors.black, width: 1)),
-//        color: const Color(0xFF242424),
-//        child: Padding(
-//          padding: const EdgeInsets.only(left: _kPadding, right: _kPadding, bottom: _kPadding),
-//          child: Column(
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            mainAxisAlignment: MainAxisAlignment.start,
-//            children: <Widget>[
-//              _buildDirectionAndBalance(balance),
-//              Row(
-//                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                children: <Widget>[
-//                  _buildTextField(),
-//                  if (widget.direction == Direction.from) _buildMaxButton(balance),
-//                  // Spacer(),
-//                  Container(height: 50, width: 120, child: _buildTokenSelection()),
-//                ],
-//              ),
-//            ],
-//          ),
-//        ));
+    selectedToken = widget.initialToken;
 
     return Container(
       padding: EdgeInsets.all(12.0),
@@ -87,32 +66,6 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                   if (widget.direction == Direction.from)
                     _buildMaxButton(balance),
                   _buildTokenSelection()
-//                  Container(
-//                    decoration: BoxDecoration(
-//                        borderRadius: BorderRadius.circular(12.0),
-//                        color: Color(MyColors.Cyan),
-//                        border: Border.all(
-//                            color: Color(MyColors.White), width: 1.0)),
-//                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-//                    margin: EdgeInsets.only(right: 8.0),
-//                    child: Text("MAX", style: MyStyles.whiteSmallTextStyle),
-//                  ),
-//                  Container(
-//                    margin: EdgeInsets.only(right: 8),
-//                    child: CircleAvatar(
-//                      radius: 15.0,
-//                      backgroundColor: Colors.amber,
-//                    ),
-//                  ),
-//                  Text(
-//                    "DAI",
-//                    style: MyStyles.whiteMediumTextStyle,
-//                  ),
-//                  Icon(
-//                    Icons.keyboard_arrow_down,
-//                    color: Color(MyColors.White),
-//                    size: 35.0,
-//                  )
                 ],
               ),
             ],
@@ -126,7 +79,10 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
     return GestureDetector(
         onTap: () async {
           MaterialPageRoute<Token> pushTo;
-          if (selectedToken == null) {
+          if (widget.page!=null && widget.page == TabPage.synthetics) {
+            pushTo = MaterialPageRoute<Stock>(
+                builder: (BuildContext _) => StockSelectorScreen());
+          } else if (selectedToken == null) {
             pushTo = MaterialPageRoute<Stock>(
                 builder: (BuildContext _) => StockSelectorScreen());
           } else if (selectedToken.runtimeType == Stock) {
@@ -141,6 +97,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           if (_selectedToken != null)
             setState(() {
               selectedToken = _selectedToken;
+              widget.tokenSelected(selectedToken);
             });
         },
         child: Row(
@@ -157,7 +114,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
             const SizedBox(width: 5),
             Text(
                 selectedToken != null
-                    ? selectedToken.shortName
+                    ? selectedToken.symbol
                     : "select asset",
                 style: MyStyles.whiteMediumTextStyle),
             const SizedBox(width: 10),
@@ -171,7 +128,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
       child: InkWell(
         onTap: () {
           setState(() {
-            controller.text = balance.toString();
+            widget.controller.text = balance.toString();
           });
         },
         child: Container(
@@ -201,18 +158,22 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   Widget _buildTextField() {
     return Flexible(
         child: Container(
-            height: 30,
+//            height: 30,
             child: TextFormField(
+                maxLines: 1,
+//                onChanged: widget.onValueChange,
                 decoration: const InputDecoration(
+                  hintText: "0.0",
+                  hintStyle: MyStyles.lightWhiteMediumTextStyle,
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                 ),
-                controller: controller,
+                controller: widget.controller,
                 keyboardType: TextInputType.number,
-                style: MyStyles.lightWhiteMediumTextStyle)));
+                style: MyStyles.whiteMediumTextStyle)));
   }
 
   Widget _buildDirectionAndBalance(double balance) {
@@ -229,17 +190,5 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
         ),
       ],
     );
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            widget.direction.toString().replaceAll('Direction.', ''),
-            style: TextStyle(color: MyColors.primary.withOpacity(0.75)),
-          ),
-          Text(
-            'Balance: ${balance % 1 == 0 ? balance.round() : balance}',
-            style: TextStyle(color: MyColors.primary.withOpacity(0.75)),
-          )
-        ]);
   }
 }

@@ -153,4 +153,24 @@ class EthereumService {
 //   ethClient.addedBlocks(listener);
 //   ethClient.
 // }
+
+
+
+
+
+
+
+//  (@kazem)
+// synthetics
+  Future<String> getStakingAddrHex(String tokenName) async {
+    return (await getStakingAddr(tokenName)).hex;
+  }
+
+
+  Future<EthereumAddress> getStakingAddr(String tokenName) async {
+    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final decodedAddresses = jsonDecode(allAddresses);
+    final hexAddress = decodedAddresses["staking"][tokenName][chainId.toString()];
+    return EthereumAddress.fromHex(hexAddress);
+  }
 }

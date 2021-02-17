@@ -1,21 +1,22 @@
 
 
+import 'package:deus/models/token.dart';
+
 class SwapModel{
-  dynamic from;
-  dynamic to;
+  Token from;
+  Token to;
+  double fromValue = 0;
+  double toValue = 0;
   double slippage;
-  bool isMaxSelected;
   bool approved;
 
 
-  SwapModel();
-
-  setFrom(dynamic from){
+  SwapModel(from ,to){
+    this.slippage = 0.5;
+    this.approved = false;
     this.from = from;
-  }
-
-  setTo(dynamic to){
     this.to = to;
   }
+
 
 }

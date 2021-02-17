@@ -135,11 +135,11 @@ class _SynchronizerScreenState extends State<SynchronizerScreen> {
           padding: const EdgeInsets.all(14.0),
           child: Column(
             children: [
-              const SwapField(direction: Direction.from, balance: 999, initialToken: CurrencyData.eth),
+              SwapField(direction: Direction.from, balance: 999, initialToken: CurrencyData.eth),
               const SizedBox(height: 12),
               Center(child: PlatformSvg.asset('images/icons/arrow_down.svg')),
               const SizedBox(height: 12),
-              SwapField(direction: Direction.to, balance: 0, initialToken: StockData.tesla),
+//              SwapField(direction: Direction.to, balance: 0, initialToken: StockData.tesla),
               const SizedBox(height: 18),
               _buildModeButtons(),
               const SizedBox(height: 16),

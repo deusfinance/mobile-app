@@ -79,7 +79,7 @@ class _SwapBackendTestScreenState extends State<SwapBackendTestScreen> {
             child: Text("Approve"),
             onPressed: () async {
               print("Approve");
-              await swapService.approve("deus", BigInt.from(1000)).then((value) => setState(() {
+              await swapService.approve("deus").then((value) => setState(() {
                     appovalHash = value;
                   }));
               print("Approve");

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/token.dart';
@@ -17,20 +18,21 @@ class TokenListTile extends StatelessWidget {
       },
       contentPadding: const EdgeInsets.all(0),
       leading: token.logoPath.showCircleImage(),
-      title: Row(
+      title: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(token.shortName, style: const TextStyle(fontSize: 25, height: 0.99999)),
+          Text(token.symbol,maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.whiteMediumTextStyle), //const TextStyle(fontSize: 25, height: 0.99999)
           const SizedBox(
             width: 15,
           ),
-          Text(token.name, style: const TextStyle(fontSize: 15, height: 0.99999)),
+          Text(token.name, maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteSmallTextStyle), //  const TextStyle(fontSize: 15, height: 0.99999)
         ],
       ),
       trailing: const Text(
         '0',
-        style: TextStyle(fontSize: 19),
+        style: MyStyles.whiteSmallTextStyle,
       ),
     );
   }
