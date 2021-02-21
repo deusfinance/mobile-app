@@ -136,13 +136,19 @@ class _StakeScreenState extends State<StakeScreen> {
                   child: Icon(Icons.close))
             ],
           ),
-          Row(
-            children: [
-              Text(
-                'Approved sDEA spend ↗',
-                style: MyStyles.whiteMediumUnderlinedTextStyle,
-              )
-            ],
+          GestureDetector(
+            onTap: () {},//TODO: open link
+
+            child: Row(
+              children: [
+                Text(
+                  'Approved sDEA spend',
+                  style: MyStyles.whiteMediumUnderlinedTextStyle,
+                ),
+                Transform.rotate(angle: 150, child: Icon(Icons.arrow_right_alt_outlined),)
+
+              ],
+            ),
           )
         ],
       ),
@@ -290,7 +296,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   GestureDetector _buildBackButton() {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {}, //TODO: nach verknüpfung back logik hinzufügen
       child: Row(
         children: [
           Icon(
@@ -326,7 +332,8 @@ class _StakeScreenState extends State<StakeScreen> {
         ),
         const Spacer(),
         GestureDetector(
-            onTap: () {}, child: PlatformSvg.asset('images/logout.svg')),
+            onTap: () {}, //TODO: logout logik
+            child: PlatformSvg.asset('images/logout.svg')),
       ],
     );
   }
