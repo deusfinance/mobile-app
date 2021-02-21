@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:ui';
 
 import 'package:deus/statics/my_colors.dart';
@@ -5,11 +6,11 @@ import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class DarkButton extends StatelessWidget {
-  final Function onPressed;
+  final VoidCallback onPressed;
   final String label;
   final TextStyle labelStyle;
 
-  DarkButton({this.onPressed, this.label, this.labelStyle});
+  const DarkButton({this.onPressed, this.label, this.labelStyle});
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,12 @@
 import 'dart:ui';
 
+import 'package:deus/core/widgets/back_button.dart';
 import 'package:deus/core/widgets/dark_button.dart';
 import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
+import 'package:deus/core/widgets/header_with_address.dart';
 import 'package:deus/core/widgets/selection_button.dart';
 import 'package:deus/core/widgets/svg.dart';
+import 'package:deus/core/widgets/text_field_with_max.dart';
 import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +37,9 @@ class _StakeScreenState extends State<StakeScreen> {
 
   StakesStates _stakeState = StakesStates.hasToApprove;
   bool _showToast = false;
+
+  final _textController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,16 +48,16 @@ class _StakeScreenState extends State<StakeScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height-80,
+            height: MediaQuery.of(context).size.height - 80,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeaderAddress(),
+                HeaderWithAddress(walletAddress: address,),
                 SizedBox(
                   height: 23,
                 ),
-                _buildBackButton(),
+                BackButtonWithText(),
                 SizedBox(
                   height: 20,
                 ),
@@ -79,7 +85,7 @@ class _StakeScreenState extends State<StakeScreen> {
                 SizedBox(
                   height: 5,
                 ),
-                _buildTextField(),
+                TextFieldWithMax(controller: _textController, maxValue: balance,),
                 SizedBox(
                   height: 12,
                 ),
@@ -95,10 +101,11 @@ class _StakeScreenState extends State<StakeScreen> {
                 SizedBox(
                   height: 15,
                 ),
-                if (_stakeState == StakesStates.hasToApprove)
-                  _buildSteps(),
+                if (_stakeState == StakesStates.hasToApprove) _buildSteps(),
                 Spacer(),
-                if ((_stakeState != StakesStates.hasToApprove && _showToast) || (_stakeState == StakesStates.stakePendingApprove && _showToast))
+                if ((_stakeState != StakesStates.hasToApprove && _showToast) ||
+                    (_stakeState == StakesStates.stakePendingApprove &&
+                        _showToast))
                   _buildToast()
               ],
             ),
@@ -113,7 +120,8 @@ class _StakeScreenState extends State<StakeScreen> {
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-          color: _stakeState != StakesStates.pendingApprove && _stakeState != StakesStates.stakePendingApprove
+          color: _stakeState != StakesStates.pendingApprove &&
+                  _stakeState != StakesStates.stakePendingApprove
               ? Color(MyColors.ToastGreen)
               : Color(MyColors.ToastGrey)),
       child: Column(
@@ -121,7 +129,8 @@ class _StakeScreenState extends State<StakeScreen> {
           Row(
             children: [
               Text(
-                _stakeState != StakesStates.pendingApprove && _stakeState != StakesStates.stakePendingApprove
+                _stakeState != StakesStates.pendingApprove &&
+                        _stakeState != StakesStates.stakePendingApprove
                     ? 'Successful'
                     : 'Transaction Pending',
                 style: MyStyles.whiteMediumTextStyle,
@@ -137,7 +146,7 @@ class _StakeScreenState extends State<StakeScreen> {
             ],
           ),
           GestureDetector(
-            onTap: () {},//TODO: open link
+            onTap: () {}, //TODO: open link
 
             child: Row(
               children: [
@@ -145,8 +154,10 @@ class _StakeScreenState extends State<StakeScreen> {
                   'Approved sDEA spend',
                   style: MyStyles.whiteMediumUnderlinedTextStyle,
                 ),
-                Transform.rotate(angle: 150, child: Icon(Icons.arrow_right_alt_outlined),)
-
+                Transform.rotate(
+                  angle: 150,
+                  child: Icon(Icons.arrow_right_alt_outlined),
+                )
               ],
             ),
           )
@@ -242,99 +253,27 @@ class _StakeScreenState extends State<StakeScreen> {
           width: double.infinity,
           child: SelectionButton(
               gradient: gradient,
-              onPressed: (bool) {setState(() {
-                _stakeState = StakesStates.stakePendingApprove;
-                _showToast = true;
-                Future.delayed(Duration(seconds: 3), () {
-                  setState(() {
-                    _stakeState = StakesStates.stakeApproved;
+              onPressed: (bool) {
+                setState(() {
+                  _stakeState = StakesStates.stakePendingApprove;
+                  _showToast = true;
+                  Future.delayed(Duration(seconds: 3), () {
+                    setState(() {
+                      _stakeState = StakesStates.stakeApproved;
+                    });
                   });
                 });
-              });},
+              },
               label: 'STAKE',
               selected: true,
               textStyle: MyStyles.blackMediumTextStyle),
         ),
-        crossFadeState: _stakeState == StakesStates.canStake || _stakeState == StakesStates.stakePendingApprove || _stakeState == StakesStates.stakeApproved
+        crossFadeState: _stakeState == StakesStates.canStake ||
+                _stakeState == StakesStates.stakePendingApprove ||
+                _stakeState == StakesStates.stakeApproved
             ? CrossFadeState.showSecond
             : CrossFadeState.showFirst,
         duration: Duration(milliseconds: 150));
   }
 
-  Container _buildTextField() {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-          color: Color(MyColors.Button_BG_Black),
-          border: Border.all(color: Colors.white.withOpacity(0.1))),
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: TextField(
-        cursorColor: Colors.white,
-        style: MyStyles.lightWhiteMediumTextStyle,
-        decoration: InputDecoration(
-            hintText: '0.00',
-            focusedErrorBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            border: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            suffixIcon: Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-              child: Text(
-                'MAX',
-                style: MyStyles.whiteSmallTextStyle,
-              ),
-              decoration: BoxDecoration(
-                  color: Color(0xFF5BCCBD).withOpacity(0.25),
-                  border: Border.all(color: Colors.white, width: 1.5),
-                  borderRadius: BorderRadius.circular(7)),
-            )),
-      ),
-    );
-  }
-
-  GestureDetector _buildBackButton() {
-    return GestureDetector(
-      onTap: () {}, //TODO: nach verknüpfung back logik hinzufügen
-      child: Row(
-        children: [
-          Icon(
-            Icons.arrow_back_ios_rounded,
-          ),
-          SizedBox(
-            width: 8,
-          ),
-          Text(
-            'BACK',
-            style: MyStyles.whiteMediumTextStyle,
-          )
-        ],
-      ),
-    );
-  }
-
-  Row _buildHeaderAddress() {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-              border: Border.all(color: Color(0xFF61C0BF).withOpacity(0.5)),
-              color: Color(0xFF61C0BF).withOpacity(0.25),
-              borderRadius: BorderRadius.all(Radius.circular(6))),
-          child: Center(
-            child: Text(
-              '${address.substring(0, 4)}...${address.substring(address.length - 2)}',
-              style: MyStyles.whiteSmallTextStyle,
-            ),
-          ),
-        ),
-        const Spacer(),
-        GestureDetector(
-            onTap: () {}, //TODO: logout logik
-            child: PlatformSvg.asset('images/logout.svg')),
-      ],
-    );
-  }
 }

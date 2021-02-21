@@ -13,6 +13,8 @@ class MyStyles {
   static const cardRadiusSize = 12.0;
   static const mainPadding = 8.0;
 
+  static const kFontFamily = "Monument";
+
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
@@ -37,43 +39,43 @@ class MyStyles {
 
 //  text styles
   static const lightWhiteSmallTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.HalfWhite),
   );
   static const lightWhiteMediumTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.HalfWhite),
   );
   static const whiteSmallTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.White),
   );
   static const blackSmallTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.Black),
   );
   static const blackMediumTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.Black),
   );
   static const whiteMediumTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.White),
   );
   static const whiteMediumUnderlinedTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     decoration: TextDecoration.underline,
     fontSize: S4,
@@ -81,7 +83,7 @@ class MyStyles {
   );
 
   static const bottomNavBarUnSelectedStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
     color: Color(MyColors.White),

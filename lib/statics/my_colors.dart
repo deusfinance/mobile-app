@@ -12,7 +12,9 @@ class MyColors {
   static const Cyan = 0xFF152b1b;
   static const Green = 0xFFC4EB89;
   static const Blue_Gr = 0xFF5EC4D6;
+  /// color of approved toast container
   static const ToastGreen = 0xFF00D16C;
+  /// color of pending toast container
   static const ToastGrey = 0xFFC4C4C4;
   static const Background = 0xFF0D0D0D;
 

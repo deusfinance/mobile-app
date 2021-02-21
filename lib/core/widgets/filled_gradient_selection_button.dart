@@ -5,7 +5,7 @@ import '../../screens/synthetics/synchronizer_screen.dart';
 
 class FilledGradientSelectionButton extends StatelessWidget {
   final bool selected;
-  final Function onPressed;
+  final VoidCallback onPressed;
   final String label;
   final LinearGradient gradient;
   final TextStyle textStyle;
