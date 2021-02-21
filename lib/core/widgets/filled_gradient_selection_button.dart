@@ -19,15 +19,17 @@ class FilledGradientSelectionButton extends StatelessWidget {
         decoration: BoxDecoration(
             gradient: this.gradient,
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
-        padding: EdgeInsets.all(16.0),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: this.onPressed,
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
             splashColor: Colors.grey[500],
-            child: Center(
-              child: Text(this.label, style: this.textStyle),
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: Text(this.label, style: this.textStyle),
+              ),
             ),
           ),
         ));
