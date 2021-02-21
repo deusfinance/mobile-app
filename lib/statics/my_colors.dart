@@ -1,7 +1,6 @@
-
 import 'package:flutter/cupertino.dart';
 
-class MyColors{
+class MyColors {
   static const White = 0xFFFFFFFF;
   static const HalfWhite = 0x88FFFFFF;
   static const Black = 0xFF000000;
@@ -13,23 +12,18 @@ class MyColors{
   static const Cyan = 0xFF152b1b;
   static const Green = 0xFFC4EB89;
   static const Blue_Gr = 0xFF5EC4D6;
-
+  static const ToastGreen = 0xFF00D16C;
+  static const ToastGrey = 0xFFC4C4C4;
 
   static const blueToPurpleGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [
-      const Color(Blue),
-      const Color(Purple)
-    ],
+    colors: [const Color(Blue), const Color(Purple)],
   );
 
   static const greenToBlueGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [
-      const Color(Green),
-      const Color(Blue_Gr)
-    ],
+    colors: [const Color(Green), const Color(Blue_Gr)],
   );
 }
