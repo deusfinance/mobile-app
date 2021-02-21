@@ -14,6 +14,14 @@ class MyColors {
   static const Blue_Gr = 0xFF5EC4D6;
   static const ToastGreen = 0xFF00D16C;
   static const ToastGrey = 0xFFC4C4C4;
+  static const Background = 0xFF0D0D0D;
+
+
+  static const blueToGreenGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [const Color(0xFF0779E4), const Color(0xFF1DD3BD)],
+  );
 
   static const blueToPurpleGradient = LinearGradient(
     begin: Alignment.centerLeft,
