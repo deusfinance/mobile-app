@@ -1,12 +1,12 @@
 import 'package:deus/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:deus/screens/splash/splash_screen.dart';
+import 'package:deus/screens/stake_screen/stake_screen.dart';
 import 'package:deus/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
-import 'screens/synthetics/synchronizer_screen.dart';
 import 'statics/old_my_colors.dart';
 
 void main() async {
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: generateRoutes(),
-      initialRoute: SplashScreen.route,
+      initialRoute: StakeScreen.url,
     );
   }
 
@@ -56,6 +56,9 @@ class MyApp extends StatelessWidget {
           break;
         case CurrencySelectorScreen.url:
           screen = CurrencySelectorScreen();
+          break;
+        case StakeScreen.url:
+          screen = StakeScreen();
           break;
         
         default:
