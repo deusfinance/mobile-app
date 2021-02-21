@@ -72,6 +72,13 @@ class MyStyles {
     fontSize: S4,
     color: Color(MyColors.White),
   );
+  static const whiteMediumUnderlinedTextStyle = TextStyle(
+    fontFamily: "Monument",
+    fontWeight: FontWeight.w300,
+    decoration: TextDecoration.underline,
+    fontSize: S4,
+    color: Color(MyColors.White),
+  );
 
   static const bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: "Monument",
