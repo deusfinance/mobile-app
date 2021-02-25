@@ -5,10 +5,12 @@ import 'filled_gradient_selection_button.dart';
 
 class SelectionButton extends StatefulWidget {
   final String label;
-  final void Function(bool selected) onPressed;
+  final onPressed;
   final bool selected;
   final LinearGradient gradient;
   final TextStyle textStyle;
+
+  /// You can choose between using a label or another widget if you use a widget the label is useless
   final Widget child;
 
   SelectionButton(
@@ -36,7 +38,7 @@ class _SelectionButtonState extends State<SelectionButton> {
               padding: EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.center,
-                child: widget.child != null ? widget.child : Text(
+                child: widget.child ?? Text(
                   widget.label,
                   style: MyStyles.lightWhiteMediumTextStyle,
                 ),
