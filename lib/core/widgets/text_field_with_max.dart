@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 
 class TextFieldWithMax extends StatelessWidget {
   final TextEditingController controller;
-  final double maxValue; // the maximum value that can be chosen
+
+  /// the maximum value that can be chosen
+  final double maxValue;
   final TextInputType keyboardType;
   final hintText;
 
