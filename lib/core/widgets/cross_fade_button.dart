@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'filled_gradient_selection_button.dart';
 
 class CrossFadeButton extends StatelessWidget {
-  final VoidCallback mergedButtonOnPressed;
-  final VoidCallback approveOnPressed;
+  final VoidCallback onPressed;
 
   final String mergedButtonLabel;
   final String offButtonLabel;
@@ -17,8 +16,7 @@ class CrossFadeButton extends StatelessWidget {
   final ButtonStates buttonState;
 
   CrossFadeButton(
-      {this.mergedButtonOnPressed,
-      this.approveOnPressed,
+      {this.onPressed,
       this.buttonState,
       this.mergedButtonLabel,
       this.offButtonLabel});
@@ -30,7 +28,7 @@ class CrossFadeButton extends StatelessWidget {
           children: [
             Expanded(
               child: FilledGradientSelectionButton(
-                onPressed: approveOnPressed,
+                onPressed: onPressed,
                 label: 'APPROVE',
                 textStyle: MyStyles.blackMediumTextStyle,
                 gradient: MyColors.blueToGreenGradient,
@@ -62,7 +60,7 @@ class CrossFadeButton extends StatelessWidget {
           width: double.infinity,
           child: FilledGradientSelectionButton(
               gradient: MyColors.blueToGreenGradient,
-              onPressed: mergedButtonOnPressed,
+              onPressed: onPressed,
               label: mergedButtonLabel,
               textStyle: MyStyles.blackMediumTextStyle),
         ),

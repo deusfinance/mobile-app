@@ -148,31 +148,33 @@ class _StakeScreenState extends State<StakeScreen> {
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
       buttonState: _stakeState,
-      mergedButtonOnPressed: () async {
-        setState(() {
-          _showToast = true;
-          _stakeState = ButtonStates.pendingApproveMergedButton;
-        });
-        await Future.delayed(Duration(seconds: 3));
-        setState(() {
-          if(!_showToast){
+      onPressed: () async {
+        if (_stakeState == ButtonStates.isApproved ||
+            _stakeState == ButtonStates.pendingApproveMergedButton) {
+          setState(() {
             _showToast = true;
-          }
-          _stakeState = ButtonStates.isApproved;
-        });
-      },
-      approveOnPressed: () async {
-        setState(() {
-          _stakeState = ButtonStates.pendingApproveDividedButton;
-          _showToast = true;
-        });
-        await Future.delayed(Duration(seconds: 3));
-        setState(() {
-          if(!_showToast){
+            _stakeState = ButtonStates.pendingApproveMergedButton;
+          });
+          await Future.delayed(Duration(seconds: 3));
+          setState(() {
+            if (!_showToast) {
+              _showToast = true;
+            }
+            _stakeState = ButtonStates.isApproved;
+          });
+        } else {
+          setState(() {
+            _stakeState = ButtonStates.pendingApproveDividedButton;
             _showToast = true;
-          }
-          _stakeState = ButtonStates.isApproved;
-        });
+          });
+          await Future.delayed(Duration(seconds: 3));
+          setState(() {
+            if (!_showToast) {
+              _showToast = true;
+            }
+            _stakeState = ButtonStates.isApproved;
+          });
+        }
       },
     );
   }
