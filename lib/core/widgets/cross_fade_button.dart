@@ -13,14 +13,16 @@ class CrossFadeButton extends StatelessWidget {
   final String offButtonLabel;
   final String gradientButtonLabel;
 
-  /// if true shows both button, if false shows just one
-  final ButtonStates buttonState;
+  final bool showLoading;
+  final bool showBothButtons;
 
   CrossFadeButton(
       {this.onPressed,
-      this.buttonState,
+      this.showBothButtons,
+      this.showLoading,
       this.mergedButtonLabel,
-      this.offButtonLabel, this.gradientButtonLabel});
+      this.offButtonLabel,
+      this.gradientButtonLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +37,14 @@ class CrossFadeButton extends StatelessWidget {
                 gradient: MyColors.blueToGreenGradient,
               ),
             ),
-            if (buttonState != ButtonStates.isApproved)
+            if (showBothButtons)
               SizedBox(
                 width: 10,
               ),
             Expanded(
               child: DisabledButton(
                 label: offButtonLabel,
-                child: buttonState == ButtonStates.pendingApproveDividedButton
+                child: showLoading
                     ? SizedBox(
                         height: 21,
                         width: 20,
@@ -65,8 +67,7 @@ class CrossFadeButton extends StatelessWidget {
               label: mergedButtonLabel,
               textStyle: MyStyles.blackMediumTextStyle),
         ),
-        crossFadeState: buttonState == ButtonStates.isApproved ||
-                buttonState == ButtonStates.pendingApproveMergedButton
+        crossFadeState: !showBothButtons
             ? CrossFadeState.showSecond
             : CrossFadeState.showFirst,
         duration: Duration(milliseconds: 150));

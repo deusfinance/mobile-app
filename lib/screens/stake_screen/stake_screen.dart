@@ -148,7 +148,10 @@ class _StakeScreenState extends State<StakeScreen> {
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
-      buttonState: _stakeState,
+      showBothButtons: _stakeState == ButtonStates.hasToApprove ||
+          _stakeState == ButtonStates.pendingApproveDividedButton,
+      showLoading: _stakeState == ButtonStates.pendingApproveDividedButton ||
+          _stakeState == ButtonStates.pendingApproveMergedButton,
       onPressed: () async {
         if (_stakeState == ButtonStates.isApproved ||
             _stakeState == ButtonStates.pendingApproveMergedButton) {
