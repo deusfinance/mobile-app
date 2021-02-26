@@ -1,4 +1,4 @@
-import 'package:deus/core/widgets/selection_button.dart';
+import 'package:deus/core/widgets/disabled_button.dart';
 import 'package:deus/screens/stake_screen/stake_screen.dart';
 import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/styles.dart';
@@ -41,41 +41,33 @@ class CrossFadeButton extends StatelessWidget {
                 width: 10,
               ),
             Expanded(
-              child: SizedBox(
-                child: SelectionButton(
-                  gradient: MyColors.blueToGreenGradient,
-                  child: buttonState == ButtonStates.pendingApprove
-                      ? SizedBox(
-                          height: 21,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : null,
-                  onPressed: (_) => approveOnPressed,
-                  label: offButtonLabel,
-                  selected: false,
-                  textStyle: buttonState == ButtonStates.isApproved
-                      ? MyStyles.blackMediumTextStyle
-                      : MyStyles.lightWhiteMediumTextStyle,
-                ),
+              child: DisabledButton(
+                label: 'STAKE',
+                child: buttonState == ButtonStates.pendingApproveDividedButton
+                    ? SizedBox(
+                        height: 21,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : null,
               ),
             )
           ],
         ),
         secondChild: SizedBox(
           width: double.infinity,
-          child: SelectionButton(
+          child: FilledGradientSelectionButton(
               gradient: MyColors.blueToGreenGradient,
-              onPressed: (_) => mergedButtonOnPressed,
+              onPressed: mergedButtonOnPressed,
               label: mergedButtonLabel,
-              selected: true,
               textStyle: MyStyles.blackMediumTextStyle),
         ),
-        crossFadeState: buttonState == ButtonStates.isApproved
+        crossFadeState: buttonState == ButtonStates.isApproved ||
+                buttonState == ButtonStates.pendingApproveMergedButton
             ? CrossFadeState.showSecond
             : CrossFadeState.showFirst,
         duration: Duration(milliseconds: 150));
