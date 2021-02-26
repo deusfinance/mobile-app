@@ -11,6 +11,7 @@ class CrossFadeButton extends StatelessWidget {
 
   final String mergedButtonLabel;
   final String offButtonLabel;
+  final String gradientButtonLabel;
 
   /// if true shows both button, if false shows just one
   final ButtonStates buttonState;
@@ -19,7 +20,7 @@ class CrossFadeButton extends StatelessWidget {
       {this.onPressed,
       this.buttonState,
       this.mergedButtonLabel,
-      this.offButtonLabel});
+      this.offButtonLabel, this.gradientButtonLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class CrossFadeButton extends StatelessWidget {
             Expanded(
               child: FilledGradientSelectionButton(
                 onPressed: onPressed,
-                label: 'APPROVE',
+                label: gradientButtonLabel,
                 textStyle: MyStyles.blackMediumTextStyle,
                 gradient: MyColors.blueToGreenGradient,
               ),
@@ -40,7 +41,7 @@ class CrossFadeButton extends StatelessWidget {
               ),
             Expanded(
               child: DisabledButton(
-                label: 'STAKE',
+                label: offButtonLabel,
                 child: buttonState == ButtonStates.pendingApproveDividedButton
                     ? SizedBox(
                         height: 21,

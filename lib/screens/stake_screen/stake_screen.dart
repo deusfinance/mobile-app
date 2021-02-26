@@ -145,6 +145,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Widget _buildStakeApproveButton() {
     return CrossFadeButton(
+      gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
       buttonState: _stakeState,
