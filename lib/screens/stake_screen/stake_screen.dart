@@ -3,9 +3,7 @@ import 'dart:ui';
 import 'package:deus/core/widgets/back_button.dart';
 import 'package:deus/core/widgets/cross_fade_button.dart';
 import 'package:deus/core/widgets/dark_button.dart';
-import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
 import 'package:deus/core/widgets/header_with_address.dart';
-import 'package:deus/core/widgets/selection_button.dart';
 import 'package:deus/core/widgets/steps.dart';
 import 'package:deus/core/widgets/text_field_with_max.dart';
 import 'package:deus/core/widgets/toast.dart';
@@ -13,7 +11,12 @@ import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-enum ButtonStates { hasToApprove, pendingApprove, isApproved }
+enum ButtonStates {
+  hasToApprove,
+  pendingApproveDividedButton,
+  isApproved,
+  pendingApproveMergedButton
+}
 
 class StakeScreen extends StatefulWidget {
   static const url = '/stake';
@@ -36,15 +39,9 @@ class _StakeScreenState extends State<StakeScreen> {
 
   final _textController = TextEditingController();
 
-  static const kSpacer = SizedBox(
-    height: 20,
-  );
-  static const kMediumSpacer = SizedBox(
-    height: 15,
-  );
-  static const kSmallSpacer = SizedBox(
-    height: 12,
-  );
+  static const kSpacer = SizedBox(height: 20);
+  static const kMediumSpacer = SizedBox(height: 15);
+  static const kSmallSpacer = SizedBox(height: 12);
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +79,7 @@ class _StakeScreenState extends State<StakeScreen> {
                     style: MyStyles.lightWhiteSmallTextStyle,
                   ),
                 ),
-                SizedBox(
-                  height: 5,
-                ),
+                SizedBox(height: 5),
                 TextFieldWithMax(
                   controller: _textController,
                   maxValue: balance,
@@ -101,7 +96,8 @@ class _StakeScreenState extends State<StakeScreen> {
                 if (_stakeState == ButtonStates.hasToApprove) Steps(),
                 Spacer(),
                 if ((_stakeState != ButtonStates.hasToApprove && _showToast) ||
-                    (_stakeState == ButtonStates.pendingApprove && _showToast))
+                    (_stakeState == ButtonStates.pendingApproveDividedButton &&
+                        _showToast))
                   _buildToast()
               ],
             ),
@@ -112,7 +108,8 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Widget _buildToast() {
-    if (_stakeState != ButtonStates.pendingApprove) {
+    if (_stakeState != ButtonStates.pendingApproveDividedButton &&
+        _stakeState != ButtonStates.pendingApproveMergedButton) {
       return _buildTransactionSuccessToast();
     } else {
       print(_stakeState);
@@ -154,20 +151,26 @@ class _StakeScreenState extends State<StakeScreen> {
       mergedButtonOnPressed: () async {
         setState(() {
           _showToast = true;
-          _stakeState = ButtonStates.pendingApprove;
+          _stakeState = ButtonStates.pendingApproveMergedButton;
         });
         await Future.delayed(Duration(seconds: 3));
         setState(() {
+          if(!_showToast){
+            _showToast = true;
+          }
           _stakeState = ButtonStates.isApproved;
         });
       },
       approveOnPressed: () async {
         setState(() {
-          _stakeState = ButtonStates.pendingApprove;
+          _stakeState = ButtonStates.pendingApproveDividedButton;
           _showToast = true;
         });
         await Future.delayed(Duration(seconds: 3));
         setState(() {
+          if(!_showToast){
+            _showToast = true;
+          }
           _stakeState = ButtonStates.isApproved;
         });
       },
