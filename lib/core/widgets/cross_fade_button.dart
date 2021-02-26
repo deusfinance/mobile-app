@@ -55,7 +55,7 @@ class CrossFadeButton extends StatelessWidget {
                           ),
                         )
                       : null,
-                  onPressed: approveOnPressed,
+                  onPressed: (_) => approveOnPressed,
                   label: offButtonLabel,
                   selected: false,
                   textStyle: buttonState == ButtonStates.isApproved
@@ -70,7 +70,7 @@ class CrossFadeButton extends StatelessWidget {
           width: double.infinity,
           child: SelectionButton(
               gradient: MyColors.blueToGreenGradient,
-              onPressed: mergedButtonOnPressed,
+              onPressed: (_) => mergedButtonOnPressed,
               label: mergedButtonLabel,
               selected: true,
               textStyle: MyStyles.blackMediumTextStyle),

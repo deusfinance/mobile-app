@@ -5,7 +5,7 @@ import 'filled_gradient_selection_button.dart';
 
 class SelectionButton extends StatefulWidget {
   final String label;
-  final onPressed;
+  final void Function(bool selected) onPressed;
   final bool selected;
   final LinearGradient gradient;
   final TextStyle textStyle;
