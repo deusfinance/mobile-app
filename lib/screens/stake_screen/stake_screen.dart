@@ -1,22 +1,21 @@
 import 'dart:ui';
 
 import 'package:deus/core/widgets/back_button.dart';
+import 'package:deus/core/widgets/cross_fade_button.dart';
 import 'package:deus/core/widgets/dark_button.dart';
-import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
 import 'package:deus/core/widgets/header_with_address.dart';
-import 'package:deus/core/widgets/selection_button.dart';
-import 'package:deus/core/widgets/svg.dart';
+import 'package:deus/core/widgets/steps.dart';
 import 'package:deus/core/widgets/text_field_with_max.dart';
+import 'package:deus/core/widgets/toast.dart';
 import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-enum StakesStates {
+enum ButtonStates {
   hasToApprove,
-  pendingApprove,
-  canStake,
-  stakePendingApprove,
-  stakeApproved
+  pendingApproveDividedButton,
+  isApproved,
+  pendingApproveMergedButton
 }
 
 class StakeScreen extends StatefulWidget {
@@ -35,10 +34,14 @@ class _StakeScreenState extends State<StakeScreen> {
 
   final gradient = MyColors.blueToGreenGradient;
 
-  StakesStates _stakeState = StakesStates.hasToApprove;
+  ButtonStates _stakeState = ButtonStates.hasToApprove;
   bool _showToast = false;
 
   final _textController = TextEditingController();
+
+  static const kSpacer = SizedBox(height: 20);
+  static const kMediumSpacer = SizedBox(height: 15);
+  static const kSmallSpacer = SizedBox(height: 12);
 
   @override
   Widget build(BuildContext context) {
@@ -53,28 +56,22 @@ class _StakeScreenState extends State<StakeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HeaderWithAddress(walletAddress: address,),
-                SizedBox(
-                  height: 23,
+                HeaderWithAddress(
+                  walletAddress: address,
                 ),
+                kSpacer,
                 BackButtonWithText(),
-                SizedBox(
-                  height: 20,
-                ),
+                kSpacer,
                 Text(
                   'Stake your sDEA',
                   style: TextStyle(fontSize: 25),
                 ),
-                SizedBox(
-                  height: 8,
-                ),
+                kSmallSpacer,
                 Text(
                   '$apy% APY',
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                kSpacer,
                 Padding(
                   padding: const EdgeInsets.only(left: 15),
                   child: Text(
@@ -82,29 +79,24 @@ class _StakeScreenState extends State<StakeScreen> {
                     style: MyStyles.lightWhiteSmallTextStyle,
                   ),
                 ),
-                SizedBox(
-                  height: 5,
+                SizedBox(height: 5),
+                TextFieldWithMax(
+                  controller: _textController,
+                  maxValue: balance,
                 ),
-                TextFieldWithMax(controller: _textController, maxValue: balance,),
-                SizedBox(
-                  height: 12,
-                ),
+                kSmallSpacer,
                 DarkButton(
                   label: 'Show me the contract',
                   onPressed: () {},
                   labelStyle: MyStyles.whiteMediumTextStyle,
                 ),
-                SizedBox(
-                  height: 12,
-                ),
+                kSmallSpacer,
                 _buildStakeApproveButton(),
-                SizedBox(
-                  height: 15,
-                ),
-                if (_stakeState == StakesStates.hasToApprove) _buildSteps(),
+                kMediumSpacer,
+                if (_stakeState == ButtonStates.hasToApprove) Steps(),
                 Spacer(),
-                if ((_stakeState != StakesStates.hasToApprove && _showToast) ||
-                    (_stakeState == StakesStates.stakePendingApprove &&
+                if ((_stakeState != ButtonStates.hasToApprove && _showToast) ||
+                    (_stakeState == ButtonStates.pendingApproveDividedButton &&
                         _showToast))
                   _buildToast()
               ],
@@ -115,165 +107,79 @@ class _StakeScreenState extends State<StakeScreen> {
     );
   }
 
-  Container _buildToast() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-          color: _stakeState != StakesStates.pendingApprove &&
-                  _stakeState != StakesStates.stakePendingApprove
-              ? Color(MyColors.ToastGreen)
-              : Color(MyColors.ToastGrey)),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                _stakeState != StakesStates.pendingApprove &&
-                        _stakeState != StakesStates.stakePendingApprove
-                    ? 'Successful'
-                    : 'Transaction Pending',
-                style: MyStyles.whiteMediumTextStyle,
-              ),
-              Spacer(),
-              GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _showToast = false;
-                    });
-                  },
-                  child: Icon(Icons.close))
-            ],
-          ),
-          GestureDetector(
-            onTap: () {}, //TODO: open link
+  Widget _buildToast() {
+    if (_stakeState != ButtonStates.pendingApproveDividedButton &&
+        _stakeState != ButtonStates.pendingApproveMergedButton) {
+      return _buildTransactionSuccessToast();
+    } else {
+      print(_stakeState);
+      return _buildTransactionPending();
+    }
+  }
 
-            child: Row(
-              children: [
-                Text(
-                  'Approved sDEA spend',
-                  style: MyStyles.whiteMediumUnderlinedTextStyle,
-                ),
-                Transform.rotate(
-                  angle: 150,
-                  child: Icon(Icons.arrow_right_alt_outlined),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+  Toast _buildTransactionSuccessToast() {
+    return Toast(
+      label: 'Successful',
+      color: Color(MyColors.ToastGreen),
+      onPressed: () {},
+      onClosed: () {
+        setState(() {
+          _showToast = false;
+        });
+      },
     );
   }
 
-  Padding _buildSteps() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 75),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              '1',
-              style: MyStyles.whiteMediumTextStyle,
-            ),
-            decoration:
-                BoxDecoration(gradient: gradient, shape: BoxShape.circle),
-          ),
-          Expanded(
-              child: Container(
-                  height: 3, decoration: BoxDecoration(gradient: gradient))),
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              '2',
-              style: MyStyles.whiteMediumTextStyle,
-            ),
-            decoration: BoxDecoration(
-                color: Color(MyColors.Button_BG_Black), shape: BoxShape.circle),
-          )
-        ],
-      ),
+  Toast _buildTransactionPending() {
+    return Toast(
+      label: 'Transaction Pending',
+      color: Color(MyColors.ToastGrey),
+      onPressed: () {},
+      onClosed: () {
+        setState(() {
+          _showToast = false;
+        });
+      },
     );
   }
 
   Widget _buildStakeApproveButton() {
-    return AnimatedCrossFade(
-        firstChild: Row(
-          children: [
-            Expanded(
-              child: FilledGradientSelectionButton(
-                onPressed: () {
-                  setState(() {
-                    _stakeState = StakesStates.pendingApprove;
-                    _showToast = true;
-                  });
-                  Future.delayed(Duration(seconds: 3), () {
-                    setState(() {
-                      _stakeState = StakesStates.canStake;
-                    });
-                  });
-                },
-                label: 'APPROVE',
-                textStyle: MyStyles.blackMediumTextStyle,
-                gradient: gradient,
-              ),
-            ),
-            if (_stakeState != StakesStates.canStake)
-              SizedBox(
-                width: 15,
-              ),
-            Expanded(
-              child: SizedBox(
-                child: SelectionButton(
-                  gradient: gradient,
-                  child: _stakeState == StakesStates.pendingApprove
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : null,
-                  onPressed: (bool) {},
-                  label: 'STAKE',
-                  selected: false,
-                  textStyle: _stakeState == StakesStates.canStake
-                      ? MyStyles.blackMediumTextStyle
-                      : MyStyles.lightWhiteMediumTextStyle,
-                ),
-              ),
-            )
-          ],
-        ),
-        secondChild: SizedBox(
-          width: double.infinity,
-          child: SelectionButton(
-              gradient: gradient,
-              onPressed: (bool) {
-                setState(() {
-                  _stakeState = StakesStates.stakePendingApprove;
-                  _showToast = true;
-                  Future.delayed(Duration(seconds: 3), () {
-                    setState(() {
-                      _stakeState = StakesStates.stakeApproved;
-                    });
-                  });
-                });
-              },
-              label: 'STAKE',
-              selected: true,
-              textStyle: MyStyles.blackMediumTextStyle),
-        ),
-        crossFadeState: _stakeState == StakesStates.canStake ||
-                _stakeState == StakesStates.stakePendingApprove ||
-                _stakeState == StakesStates.stakeApproved
-            ? CrossFadeState.showSecond
-            : CrossFadeState.showFirst,
-        duration: Duration(milliseconds: 150));
+    return CrossFadeButton(
+      gradientButtonLabel: 'APPROVE',
+      mergedButtonLabel: 'Stake',
+      offButtonLabel: 'Stake',
+      showBothButtons: _stakeState == ButtonStates.hasToApprove ||
+          _stakeState == ButtonStates.pendingApproveDividedButton,
+      showLoading: _stakeState == ButtonStates.pendingApproveDividedButton ||
+          _stakeState == ButtonStates.pendingApproveMergedButton,
+      onPressed: () async {
+        if (_stakeState == ButtonStates.isApproved ||
+            _stakeState == ButtonStates.pendingApproveMergedButton) {
+          setState(() {
+            _showToast = true;
+            _stakeState = ButtonStates.pendingApproveMergedButton;
+          });
+          await Future.delayed(Duration(seconds: 3));
+          setState(() {
+            if (!_showToast) {
+              _showToast = true;
+            }
+            _stakeState = ButtonStates.isApproved;
+          });
+        } else {
+          setState(() {
+            _stakeState = ButtonStates.pendingApproveDividedButton;
+            _showToast = true;
+          });
+          await Future.delayed(Duration(seconds: 3));
+          setState(() {
+            if (!_showToast) {
+              _showToast = true;
+            }
+            _stakeState = ButtonStates.isApproved;
+          });
+        }
+      },
+    );
   }
-
 }

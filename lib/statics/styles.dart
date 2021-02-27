@@ -14,7 +14,7 @@ class MyStyles {
   static const cardRadiusSize = 12.0;
   static const mainPadding = 8.0;
 
-  static const kFontFamily = "Monument";
+  static const String kFontFamily = "Monument";
 
 
 //  decorations
