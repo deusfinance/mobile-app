@@ -1,9 +1,6 @@
-import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:outline_gradient_button/outline_gradient_button.dart';
 
-import '../../screens/synthetics/synchronizer_screen.dart';
 import 'filled_gradient_selection_button.dart';
 
 class SelectionButton extends StatefulWidget {
@@ -13,11 +10,15 @@ class SelectionButton extends StatefulWidget {
   final LinearGradient gradient;
   final TextStyle textStyle;
 
+  /// You can choose between using a label or another widget if you use a widget the label is useless
+  final Widget child;
+
   SelectionButton(
       {this.label,
       this.selected = false,
       this.onPressed,
       this.gradient,
+      this.child,
       this.textStyle = MyStyles.whiteMediumTextStyle});
 
   @override
@@ -37,7 +38,7 @@ class _SelectionButtonState extends State<SelectionButton> {
               padding: EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.center,
-                child: Text(
+                child: widget.child ?? Text(
                   widget.label,
                   style: MyStyles.lightWhiteMediumTextStyle,
                 ),
