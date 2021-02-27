@@ -1,20 +1,13 @@
-import 'package:deus/core/util/responsive.dart';
 import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
-import 'package:deus/core/widgets/key_value_string.dart';
 import 'package:deus/core/widgets/selection_button.dart';
 import 'package:deus/core/widgets/svg.dart';
 import 'package:deus/core/widgets/swap_field.dart';
 import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/data_source/stock_data.dart';
-import 'package:deus/models/crypto_currency.dart';
-import 'package:deus/models/stock.dart';
 import 'package:deus/models/synthetic_model.dart';
-import 'package:deus/models/transaction_status.dart';
 import 'package:deus/screens/synthetics/market_timer.dart';
 import 'package:deus/service/ethereum_service.dart';
 import 'package:deus/service/stock_service.dart';
 import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/statics.dart';
 import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +53,6 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   Widget _buildUserInput(BuildContext context) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
-        balance: 999,
         initialToken: syntheticModel.from,
         page: TabPage.synthetics,
         controller: fromFieldController,
@@ -82,7 +74,6 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     });
     SwapField toField = new SwapField(
       direction: Direction.to,
-      balance: 0,
       controller: toFieldController,
       initialToken: syntheticModel.to,
       page: TabPage.synthetics,
@@ -131,13 +122,16 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
             Row(
               children: [
                 Text(
-                  "0.0038 ${syntheticModel.from != null ? syntheticModel.from.symbol : "asset name"} per ${syntheticModel.to != null ? syntheticModel.to.symbol : "asset name"}",
+                  "0.0038 ${syntheticModel.from != null ? syntheticModel.from
+                      .symbol : "asset name"} per ${syntheticModel.to != null
+                      ? syntheticModel.to.symbol
+                      : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 4.0),
                   child:
-                      PlatformSvg.asset("images/icons/exchange.svg", width: 15),
+                  PlatformSvg.asset("images/icons/exchange.svg", width: 15),
                 ),
               ],
             ),
@@ -160,7 +154,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   Widget _buildMainButton() {
     if (!stockService.checkWallet()) {
       return Container(
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -175,7 +172,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     }
     if (syntheticModel.syntheticState == SyntheticState.closedMarket) {
       return Container(
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -190,7 +190,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     }
     if (syntheticModel.to == null) {
       return Container(
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -205,7 +208,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     }
     if (syntheticModel.fromValue == null || syntheticModel.fromValue == "") {
       return Container(
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -221,7 +227,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
 //    TODO get balance
     if (syntheticModel.fromValue < 1) {
       return Container(
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -240,7 +249,6 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       onPressed: () async {
         if (syntheticModel.from == CurrencyData.dai) {
           buy();
-          print("hosh");
         } else {
           sell();
         }
@@ -281,7 +289,8 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       setState(() {
         isInProgress = true;
       });
-      stockService.approve("", "").then((value) {
+      stockService.approve(syntheticModel.from.symbol.toLowerCase()).then((
+          value) {
         setState(() {
           isInProgress = false;
         });
@@ -294,7 +303,8 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       setState(() {
         isInProgress = true;
       });
-      stockService.sell("", "", "").then((value) {
+      stockService.sell(syntheticModel.from.symbol.toLowerCase(), "",null).then((
+          value) {
         setState(() {
           isInProgress = false;
         });
@@ -307,7 +317,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       setState(() {
         isInProgress = true;
       });
-      stockService.buy("", "", "").then((value) {
+      stockService.buy("", "", null).then((value) {
         setState(() {
           isInProgress = false;
         });
@@ -330,10 +340,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-            //TODO: add colors to my_colors.dart (.red and .green)
-            syntheticModel.syntheticState == SyntheticState.openMarket
-                ? const Color(0xFF00D16C)
-                : const Color(0xFFD40000),
+        //TODO: add colors to my_colors.dart (.red and .green)
+        syntheticModel.syntheticState == SyntheticState.openMarket
+            ? const Color(0xFF00D16C)
+            : const Color(0xFFD40000),
         onEnd: () {
           setState(() {
             syntheticModel.syntheticState == SyntheticState.openMarket

@@ -48,9 +48,9 @@ class MyApp extends StatelessWidget {
         case SplashScreen.route:
           screen = SplashScreen();
           break;
-        case SwapBackendTestScreen.url:
-          screen = SwapBackendTestScreen();
-          break;
+//        case SwapBackendTestScreen.url:
+//          screen = SwapBackendTestScreen();
+//          break;
         case StockSelectorScreen.url:
           screen = StockSelectorScreen();
           break;

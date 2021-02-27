@@ -34,6 +34,7 @@ dependencies:
   outline_gradient_button: ^1.0.0+2
   flutter_countdown_timer: ^3.0.0
   flutter_svg_provider: ^0.1.8
+  stream_transform: ^0.0.19
 
 dev_dependencies:
   flutter_test:

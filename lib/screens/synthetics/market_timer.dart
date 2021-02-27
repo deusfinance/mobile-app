@@ -59,7 +59,7 @@ class MarketTimer extends StatelessWidget {
           border: Border.all(color: Color(MyColors.HalfBlack), width: 1.0)),
       width: getScreenWidth(context),
       padding:
-          const EdgeInsets.symmetric(vertical: SynchronizerScreen.kPadding * 2),
+          const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         children: [
           CountdownTimer(
