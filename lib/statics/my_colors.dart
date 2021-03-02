@@ -17,6 +17,7 @@ class MyColors {
   /// color of pending toast container
   static const ToastGrey = 0xFFC4C4C4;
   static const Background = 0xFF0D0D0D;
+  static const kAddressBackground = 0xFF61C0BF;
 
 
   static const blueToGreenGradient = LinearGradient(
