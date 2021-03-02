@@ -2,6 +2,7 @@ import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/cupertino.dart';
 
 class MyStyles {
+
 //  font sizes
   static const S6 = 13.0;
   static const S5 = 16.0;
@@ -12,6 +13,9 @@ class MyStyles {
 
   static const cardRadiusSize = 12.0;
   static const mainPadding = 8.0;
+
+  static const String kFontFamily = "Monument";
+
 
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
@@ -37,46 +41,68 @@ class MyStyles {
 
 //  text styles
   static const lightWhiteSmallTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.HalfWhite),
   );
   static const lightWhiteMediumTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.HalfWhite),
   );
   static const whiteSmallTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.White),
   );
   static const blackSmallTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: Color(MyColors.Black),
   );
   static const blackMediumTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.Black),
   );
   static const whiteMediumTextStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: Color(MyColors.White),
   );
 
+  static TextStyle gradientMediumTextStyle = TextStyle(
+      fontFamily: kFontFamily,
+      fontWeight: FontWeight.w300,
+      fontSize: S4,
+      foreground: Paint()
+        ..shader = LinearGradient(
+          colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
+        ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
+
+
+  static const whiteMediumUnderlinedTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    decoration: TextDecoration.underline,
+    fontSize: S4,
+    color: Color(MyColors.White),
+  );
+
+
   static const bottomNavBarUnSelectedStyle = TextStyle(
-    fontFamily: "Monument",
+    fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
     color: Color(MyColors.White),
   );
+
+
 }
+
