@@ -1,4 +1,5 @@
 import 'package:deus/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
+import 'package:deus/screens/lock/lock_screen.dart';
 import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:deus/screens/splash/splash_screen.dart';
 import 'package:deus/screens/stake_screen/stake_screen.dart';
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: generateRoutes(),
-      initialRoute: StakeScreen.url,
+      initialRoute: LockScreen.url,
     );
   }
 
@@ -59,6 +60,9 @@ class MyApp extends StatelessWidget {
           break;
         case StakeScreen.url:
           screen = StakeScreen();
+          break;
+        case LockScreen.url:
+          screen = LockScreen();
           break;
         
         default:
