@@ -1,11 +1,12 @@
 import 'dart:ui';
 
 import 'package:deus/core/widgets/back_button.dart';
-import 'package:deus/core/widgets/cross_fade_button.dart';
+import 'package:deus/core/widgets/cross_fade_duo_button.dart';
 import 'package:deus/core/widgets/dark_button.dart';
 import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
 import 'package:deus/core/widgets/header_with_address.dart';
 import 'package:deus/core/widgets/selection_button.dart';
+import 'package:deus/core/widgets/steps.dart';
 import 'package:deus/core/widgets/text_field_with_max.dart';
 import 'package:deus/core/widgets/toast.dart';
 import 'package:deus/statics/my_colors.dart';
@@ -13,7 +14,7 @@ import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 
-enum ButtonStates {
+enum LockScreenStates {
   hasToApprove,
   pendingApproveDividedButton,
   isApproved,
@@ -34,7 +35,7 @@ class _LockScreenState extends State<LockScreen> {
 
   final gradient = MyColors.blueToGreenGradient;
 
-  ButtonStates _lockState = ButtonStates.hasToApprove;
+  LockScreenStates _lockState = LockScreenStates.hasToApprove;
   bool _showToast = false;
 
   final _textController = TextEditingController();
@@ -101,10 +102,10 @@ class _LockScreenState extends State<LockScreen> {
                 kSmallSpacer,
                 _buildLockApproveButton(),
                 kMediumSpacer,
-                if (_lockState == ButtonStates.hasToApprove) _buildSteps(),
+                if (_lockState == LockScreenStates.hasToApprove) Steps(),
                 Spacer(),
-                if ((_lockState != ButtonStates.hasToApprove && _showToast) ||
-                    (_lockState == ButtonStates.pendingApproveDividedButton &&
+                if ((_lockState != LockScreenStates.hasToApprove && _showToast) ||
+                    (_lockState == LockScreenStates.pendingApproveDividedButton &&
                         _showToast))
                   _buildToast()
               ],
@@ -134,8 +135,8 @@ class _LockScreenState extends State<LockScreen> {
   }
 
   Widget _buildToast() {
-    if (_lockState != ButtonStates.pendingApproveDividedButton &&
-        _lockState != ButtonStates.pendingApproveMergedButton) {
+    if (_lockState != LockScreenStates.pendingApproveDividedButton &&
+        _lockState != LockScreenStates.pendingApproveMergedButton) {
       return _buildTransactionSuccessToast();
     } else {
       return _buildTransactionPending();
@@ -168,63 +169,34 @@ class _LockScreenState extends State<LockScreen> {
     );
   }
 
-  Padding _buildSteps() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 75),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              '1',
-              style: MyStyles.whiteMediumTextStyle,
-            ),
-            decoration:
-                BoxDecoration(gradient: gradient, shape: BoxShape.circle),
-          ),
-          Expanded(
-              child: Container(
-                  height: 3, decoration: BoxDecoration(gradient: gradient))),
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              '2',
-              style: MyStyles.whiteMediumTextStyle,
-            ),
-            decoration: BoxDecoration(
-                color: Color(MyColors.Button_BG_Black), shape: BoxShape.circle),
-          )
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildLockApproveButton() {
-    return CrossFadeButton(
+    return CrossFadeDuoButton(
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'LOCK',
       offButtonLabel: 'LOCK',
-      showBothButtons: _lockState == ButtonStates.hasToApprove ||
-          _lockState == ButtonStates.pendingApproveDividedButton,
-      showLoading: _lockState == ButtonStates.pendingApproveDividedButton ||
-          _lockState == ButtonStates.pendingApproveMergedButton,
+      showBothButtons: _lockState == LockScreenStates.hasToApprove ||
+          _lockState == LockScreenStates.pendingApproveDividedButton,
+      showLoading: _lockState == LockScreenStates.pendingApproveDividedButton ||
+          _lockState == LockScreenStates.pendingApproveMergedButton,
       onPressed: () async {
-        if (_lockState == ButtonStates.isApproved ||
-            _lockState == ButtonStates.pendingApproveMergedButton) {
+        if (_lockState == LockScreenStates.isApproved ||
+            _lockState == LockScreenStates.pendingApproveMergedButton) {
           setState(() {
             _showToast = true;
-            _lockState = ButtonStates.pendingApproveMergedButton;
+            _lockState = LockScreenStates.pendingApproveMergedButton;
           });
           await Future.delayed(Duration(seconds: 3));
           setState(() {
             if (!_showToast) {
               _showToast = true;
             }
-            _lockState = ButtonStates.isApproved;
+            _lockState = LockScreenStates.isApproved;
           });
         } else {
           setState(() {
-            _lockState = ButtonStates.pendingApproveDividedButton;
+            _lockState = LockScreenStates.pendingApproveDividedButton;
             _showToast = true;
           });
           await Future.delayed(Duration(seconds: 3));
@@ -232,7 +204,7 @@ class _LockScreenState extends State<LockScreen> {
             if (!_showToast) {
               _showToast = true;
             }
-            _lockState = ButtonStates.isApproved;
+            _lockState = LockScreenStates.isApproved;
           });
         }
       },
