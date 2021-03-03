@@ -1,11 +1,18 @@
-import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 
+import 'package:deus/statics/styles.dart';
+
 class BackButtonWithText extends StatelessWidget {
+  final VoidCallback onPressed;
+  const BackButtonWithText({
+    Key key,
+    this.onPressed,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {}, //TODO: nach verknüpfung back logik hinzufügen
+      onTap: this.onPressed,
       child: Row(
         children: [
           Icon(
