@@ -18,6 +18,18 @@ RouteFactory generateRoutes() {
     final Map<String, dynamic> arguments = settings.arguments;
     Widget screen;
     switch (settings.name) {
+      case '/':
+        screen = Builder(builder: (ctx) {
+          var configurationService = Provider.of<ConfigurationService>(context);
+          if (configurationService.didSetupWallet())
+            return WalletProvider(builder: (context, store) {
+              return WalletMainPage("Your wallet");
+            });
+
+          return IntroPage();
+        });
+        break;
+
       case MainScreen.route:
         screen = MainScreen();
         break;

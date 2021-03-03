@@ -20,10 +20,8 @@ Future<List<SingleChildWidget>> createProviders(
   final configurationService = ConfigurationService(sharedPrefs);
   final addressService = AddressService(configurationService);
 
-
   return [
     Provider.value(value: addressService),
- 
     Provider.value(value: configurationService),
   ];
 }
