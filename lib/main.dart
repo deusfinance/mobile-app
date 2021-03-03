@@ -1,14 +1,12 @@
-import 'package:deus/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
-import 'package:deus/screens/lock/lock_screen.dart';
-import 'package:deus/screens/main_screen/main_screen.dart';
-import 'package:deus/screens/splash/splash_screen.dart';
-import 'package:deus/screens/stake_screen/stake_screen.dart';
-import 'package:deus/screens/test_screen.dart';
+import 'package:deus/config.dart';
+import 'package:deus/route_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
+import 'screens/wallet_intro_screen/intro_page.dart';
+import 'service/services_provider.dart';
 import 'statics/old_my_colors.dart';
+  
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +14,8 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  final stores = await createProviders(AppConfig.selectedConfig.params);
 
   runApp(MyApp());
 }
@@ -34,41 +34,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: generateRoutes(),
-      initialRoute: LockScreen.url,
+      initialRoute: IntroPage.url,
     );
   }
 
-  RouteFactory generateRoutes() {
-    return (settings) {
-      final Map<String, dynamic> arguments = settings.arguments;
-      Widget screen;
-      switch (settings.name) {
-        case MainScreen.route:
-          screen = MainScreen();
-          break;
-        case SplashScreen.route:
-          screen = SplashScreen();
-          break;
-        case SwapBackendTestScreen.url:
-          screen = SwapBackendTestScreen();
-          break;
-        case StockSelectorScreen.url:
-          screen = StockSelectorScreen();
-          break;
-        case CurrencySelectorScreen.url:
-          screen = CurrencySelectorScreen();
-          break;
-        case StakeScreen.url:
-          screen = StakeScreen();
-          break;
-        case LockScreen.url:
-          screen = LockScreen();
-          break;
-        
-        default:
-          return null;
-      }
-      return MaterialPageRoute(builder: (BuildContext context) => screen);
-    };
-  }
+  
 }

@@ -1,3 +1,4 @@
+import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -7,6 +8,8 @@ import '../../models/wallet/wallet_setup.dart';
 import 'widgets/wallet/import_wallet_form.dart';
 
 class WalletImportPage extends HookWidget {
+  static const String url = '/importWallet';
+
   WalletImportPage(this.title);
 
   final String title;
@@ -19,7 +22,7 @@ class WalletImportPage extends HookWidget {
         leading: BackButtonWithText(
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Color(MyColors.Background),
         centerTitle: true,
         title: Text(
           title,
