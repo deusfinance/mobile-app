@@ -5,7 +5,7 @@ import 'token.dart';
 
 //TODO (@CodingDavid8) Refactor and rename into Token etc.
 class CryptoCurrency extends Token {
-  const CryptoCurrency({
+  CryptoCurrency({
     @required String name,
     @required String symbol,
     String logoPath,

@@ -11,7 +11,11 @@ class TransactionStatus{
   TransactionStatus(this.message, this.status);
 
   String getMessage(){
-    return "Successful\nApproved deus cakjv advkjdnjna askjnsk";
+    String fullMessage = "";
+    if (status == PENDING) fullMessage += "Pending\n";
+    if (status == SUCCESSFUL) fullMessage += "Successful\n";
+    if (status == FAILED) fullMessage += "Failed\n";
+    return fullMessage + message;
   }
 
 }

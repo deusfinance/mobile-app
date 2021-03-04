@@ -31,6 +31,7 @@ class TokenSelector extends StatelessWidget {
               }),
             ],
           ),
+          SizedBox(height: 12,),
           !showSearchBar
               ? const Divider(
                   height: 25,
@@ -54,6 +55,7 @@ class TokenSelector extends StatelessWidget {
                     ),
                   ),
                 ),
+          SizedBox(height: 12,),
           Row(
             children: [Text(title), const Spacer(), const Text('Balance')],
           ),
