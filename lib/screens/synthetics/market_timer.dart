@@ -1,7 +1,7 @@
-import 'package:deus/core/util/responsive.dart';
-import 'package:deus/core/widgets/unicorn_outline_container.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/util/responsive.dart';
+import 'package:deus_mobile/core/widgets/unicorn_outline_container.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 

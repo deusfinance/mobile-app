@@ -1,4 +1,4 @@
-import 'package:deus/service/ethereum_service.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';

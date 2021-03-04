@@ -1,7 +1,7 @@
-import 'package:deus/core/util/crypto_util.dart';
-import 'package:deus/core/widgets/svg.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/util/crypto_util.dart';
+import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class HeaderWithAddress extends StatelessWidget {

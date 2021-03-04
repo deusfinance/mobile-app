@@ -1,14 +1,14 @@
-import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
-import 'package:deus/core/widgets/selection_button.dart';
-import 'package:deus/core/widgets/svg.dart';
-import 'package:deus/core/widgets/swap_field.dart';
-import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/models/synthetic_model.dart';
-import 'package:deus/screens/synthetics/market_timer.dart';
-import 'package:deus/service/ethereum_service.dart';
-import 'package:deus/service/stock_service.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
+import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/core/widgets/swap_field.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/models/synthetic_model.dart';
+import 'package:deus_mobile/screens/synthetics/market_timer.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/service/stock_service.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class SyntheticsScreen extends StatefulWidget {

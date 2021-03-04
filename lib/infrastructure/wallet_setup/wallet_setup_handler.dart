@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:deus/models/wallet/wallet_setup.dart';
-import 'package:deus/service/address_service.dart';
+import 'package:deus_mobile/models/wallet/wallet_setup.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import 'setup/../wallet_setup_state.dart';

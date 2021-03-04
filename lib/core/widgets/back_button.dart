@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/statics/styles.dart';
 
 class BackButtonWithText extends StatelessWidget {
   final VoidCallback onPressed;

@@ -1,5 +1,5 @@
-name: deus
-description: A new Flutter project.
+name: deus_mobile
+description: The future of mobile trading.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -60,7 +60,7 @@ flutter:
     # BACKEND
     - assets/deus_data/ # data of tokens, contract ABI/functions etc.
   
-flutter_icons:
+flutter_icons: # flutter pub run flutter_launcher_icons:main
   android: "launcher_icon"
   ios: true
   image_path: "assets/launcher_icon/deus_dea.png"

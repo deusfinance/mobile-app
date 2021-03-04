@@ -1,6 +1,6 @@
 
-import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/models/token.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/models/token.dart';
 
 enum SelectionMode { none, long, short }
 enum SyntheticState { closedMarket, openMarket, loading, timeRequired }

@@ -1,16 +1,16 @@
 import 'dart:ui';
 
-import 'package:deus/core/widgets/back_button.dart';
-import 'package:deus/core/widgets/cross_fade_duo_button.dart';
-import 'package:deus/core/widgets/dark_button.dart';
-import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
-import 'package:deus/core/widgets/header_with_address.dart';
-import 'package:deus/core/widgets/selection_button.dart';
-import 'package:deus/core/widgets/steps.dart';
-import 'package:deus/core/widgets/text_field_with_max.dart';
-import 'package:deus/core/widgets/toast.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/widgets/back_button.dart';
+import 'package:deus_mobile/core/widgets/cross_fade_duo_button.dart';
+import 'package:deus_mobile/core/widgets/dark_button.dart';
+import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
+import 'package:deus_mobile/core/widgets/header_with_address.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
+import 'package:deus_mobile/core/widgets/steps.dart';
+import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
+import 'package:deus_mobile/core/widgets/toast.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 

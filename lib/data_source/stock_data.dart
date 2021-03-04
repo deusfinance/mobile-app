@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:deus/models/contract_input_data.dart';
-import 'package:deus/models/stock_address.dart';
+import 'package:deus_mobile/models/contract_input_data.dart';
+import 'package:deus_mobile/models/stock_address.dart';
 
 import '../models/stock.dart';
 import 'package:http/http.dart' as http;

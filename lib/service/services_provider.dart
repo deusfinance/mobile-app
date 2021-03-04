@@ -1,4 +1,4 @@
-import 'package:deus/service/ethereum_service.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

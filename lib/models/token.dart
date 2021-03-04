@@ -1,4 +1,4 @@
-import 'package:deus/service/ethereum_service.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;

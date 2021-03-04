@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/token.dart';
