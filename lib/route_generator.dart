@@ -17,8 +17,6 @@ import 'screens/wallet_intro_screen/wallet_import_page.dart';
 import 'service/config_service.dart';
 
 Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
-  // final cxonfigurationService = Provider.of<ConfigurationService>(appContext, listen: false);
-
   return {
     '/': (BuildContext ctx) {
       final configurationService = Provider.of<ConfigurationService>(ctx);

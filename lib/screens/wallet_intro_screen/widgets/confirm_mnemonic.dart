@@ -4,11 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../../../core/widgets/form/paper_form.dart';
-import '../../../../core/widgets/form/paper_input.dart';
-import '../../../../core/widgets/form/paper_validation_summary.dart';
-import '../../../../core/widgets/grey_outline_button.dart';
-import '../../../../core/widgets/raised_gradient_button.dart';
+import '../../../core/widgets/form/paper_form.dart';
+import '../../../core/widgets/form/paper_input.dart';
+import '../../../core/widgets/form/paper_validation_summary.dart';
+import '../../../core/widgets/grey_outline_button.dart';
+import '../../../core/widgets/raised_gradient_button.dart';
 
 class ConfirmMnemonic extends HookWidget {
   ConfirmMnemonic({this.mnemonic, this.errors, this.onConfirm, this.onGenerateNew});

@@ -12,7 +12,7 @@ class BackButtonWithText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: this.onPressed,
+      onTap: this.onPressed ?? () => Navigator.pop(context),
       child: Row(
         children: [
           Icon(

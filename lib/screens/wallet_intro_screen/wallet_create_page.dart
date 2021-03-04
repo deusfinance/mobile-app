@@ -5,8 +5,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import '../../core/widgets/back_button.dart';
 import '../../infrastructure/wallet_setup/wallet_setup_provider.dart';
 import '../../models/wallet/wallet_setup.dart';
-import 'widgets/wallet/confirm_mnemonic.dart';
-import 'widgets/wallet/display_mnemonic.dart';
+import 'widgets/confirm_mnemonic.dart';
+import 'widgets/display_mnemonic.dart';
 
 class WalletCreatePage extends HookWidget {
 
