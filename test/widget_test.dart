@@ -17,7 +17,7 @@ void main() {
     // Build our app and trigger a frame.
     final List<Provider> providers = await createProviders();
 
-    await tester.pumpWidget(MyApp(providers));
+    await tester.pumpWidget(DEUSApp(providers));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

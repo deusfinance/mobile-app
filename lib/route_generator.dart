@@ -16,64 +16,38 @@ import 'screens/wallet_intro_screen/wallet_create_page.dart';
 import 'screens/wallet_intro_screen/wallet_import_page.dart';
 import 'service/config_service.dart';
 
-RouteFactory generateRoutes(BuildContext context) {
-  return (settings) {
-    // final Map<String, dynamic> arguments = settings.arguments;
-    Widget screen;
-    switch (settings.name) {
-      case '/':
-        final configurationService = Provider.of<ConfigurationService>(context);
-        if (configurationService.didSetupWallet())
-          screen = WalletProvider(builder: (_, __) {
-            return MainScreen();
-          });
-        else screen = IntroPage();
-        break;
-      case MainScreen.route:
-        screen = MainScreen();
-        break;
-      case WalletImportPage.url:
-        screen = WalletSetupProvider(
-          builder: (context, store) {
-            return WalletImportPage("Import wallet");
-          },
-        );
-        break;
-      case WalletCreatePage.url:
-        screen = WalletSetupProvider(builder: (context, store) {
-          useEffect(() {
-            store.generateMnemonic();
-            return null;
-          }, []);
+Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
+  // final cxonfigurationService = Provider.of<ConfigurationService>(appContext, listen: false);
 
-          return WalletCreatePage("Create wallet");
+  return {
+    '/': (BuildContext ctx) {
+      final configurationService = Provider.of<ConfigurationService>(ctx);
+      if (configurationService.didSetupWallet())
+        return WalletProvider(builder: (_, __) {
+          return MainScreen();
         });
-        break;
-      case IntroPage.url:
-        screen = IntroPage();
-        break;
-      case SplashScreen.route:
-        screen = SplashScreen();
-        break;
-      case SwapBackendTestScreen.url:
-        screen = SwapBackendTestScreen();
-        break;
-      case StockSelectorScreen.url:
-        screen = StockSelectorScreen();
-        break;
-      case CurrencySelectorScreen.url:
-        screen = CurrencySelectorScreen();
-        break;
-      case StakeScreen.url:
-        screen = StakeScreen();
-        break;
-      case LockScreen.url:
-        screen = LockScreen();
-        break;
+      else
+        return IntroPage();
+    },
+    WalletCreatePage.url: (_) {
+      return WalletSetupProvider(builder: (__, store) {
+        useEffect(() {
+          store.generateMnemonic();
+          return null;
+        }, []);
 
-      default:
-        return null;
-    }
-    return MaterialPageRoute(builder: (BuildContext context) => screen);
+        return WalletCreatePage("Create wallet");
+      });
+    },
+    WalletImportPage.url: (_) => WalletSetupProvider(builder: (_, __) => WalletImportPage("Import wallet")),
+    MainScreen.route: (_) => MainScreen(),
+    IntroPage.url: (_) => IntroPage(),
+    SplashScreen.route: (_) => SplashScreen(),
+    SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
+    StockSelectorScreen.url: (_) => StockSelectorScreen(),
+    CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
+    StakeScreen.url: (_) => StakeScreen(),
+    LockScreen.url: (_) => LockScreen(),
   };
+  // return MaterialPageRoute(builder: (BuildContext context) => screen);
 }
