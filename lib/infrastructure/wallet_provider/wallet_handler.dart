@@ -1,23 +1,25 @@
 import 'package:deus/models/wallet/wallet.dart';
 import 'package:deus/service/address_service.dart';
 import 'package:deus/service/config_service.dart';
+import 'package:deus/service/ethereum_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:web3dart/web3dart.dart' as web3;
 
 import 'wallet_state.dart';
 
+//TODO: Use cubit instead of Hooks.
 class WalletHandler {
   WalletHandler(
     this._store,
     this._addressService,
-    this._contractService,
+    this._ethereumService,
     this._configurationService,
   );
 
   final Store<Wallet, WalletAction> _store;
   final AddressService _addressService;
   final ConfigurationService _configurationService;
-  final ContractService _contractService;
+  final EthereumService _ethereumService;
 
   Wallet get state => _store.state;
 
@@ -54,28 +56,28 @@ class WalletHandler {
   Future<void> _initialise() async {
     await this.fetchOwnBalance();
 
-    _contractService.listenTransfer((from, to, value) async {
-      var fromMe = from.toString() == state.address;
-      var toMe = to.toString() == state.address;
+    // _ethereumService.listenTransfer((from, to, value) async {
+    //   final bool fromMe = from.toString() == state.address;
+    //   final bool toMe = to.toString() == state.address;
 
-      if (!fromMe && !toMe) {
-        return;
-      }
+    //   if (!fromMe && !toMe) {
+    //     return;
+    //   }
+    //   // TODO (@kazemghareghani): We need a listener that updates whenever a Transfer occurs.
+    //   // maybe you can take a look at the ether_wallet_flutter repo on my github and get a quick overview into the contract service?
+    //   // You should find everything you need in there.
+    //   print('======= balance updated =======');
 
-      print('======= balance updated =======');
-
-      await fetchOwnBalance();
-    });
+    //   await fetchOwnBalance();
+    // });
   }
 
   Future<void> fetchOwnBalance() async {
     _store.dispatch(UpdatingBalance());
 
-    var tokenBalance = await _contractService.getTokenBalance(web3.EthereumAddress.fromHex(state.address));
+    var ethBalance = await _ethereumService.getEtherBalance(await _ethereumService.credentialsForKey(state.privateKey));
 
-    var ethBalance = await _contractService.getEthBalance(web3.EthereumAddress.fromHex(state.address));
-
-    _store.dispatch(BalanceUpdated(ethBalance.getInWei, tokenBalance));
+    _store.dispatch(BalanceUpdated(ethBalance.getInWei));
   }
 
   Future<void> resetWallet() async {

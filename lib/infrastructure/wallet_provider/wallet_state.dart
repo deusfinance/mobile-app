@@ -11,9 +11,9 @@ class InitialiseWallet extends WalletAction {
 }
 
 class BalanceUpdated extends WalletAction {
-  BalanceUpdated(this.ethBalance, this.tokenBalance);
+  BalanceUpdated(this.ethBalance);
   final BigInt ethBalance;
-  final BigInt tokenBalance;
+  // final BigInt tokenBalance;
 }
 
 class UpdatingBalance extends WalletAction {}
@@ -33,7 +33,8 @@ Wallet reducer(Wallet state, WalletAction action) {
     return state.rebuild((b) => b
       ..loading = false
       ..ethBalance = action.ethBalance
-      ..tokenBalance = action.tokenBalance);
+      // ..tokenBalance = action.tokenBalance
+      );
   }
 
   return state;

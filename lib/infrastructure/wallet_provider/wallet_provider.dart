@@ -2,6 +2,7 @@
 import 'package:deus/models/wallet/wallet.dart';
 import 'package:deus/service/address_service.dart';
 import 'package:deus/service/config_service.dart';
+import 'package:deus/service/ethereum_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -22,13 +23,13 @@ class WalletProvider extends ContextProviderWidget<WalletHandler> {
         useReducer<Wallet, WalletAction>(reducer, initialState: Wallet());
 
     final addressService = Provider.of<AddressService>(context);
-    final contractService = Provider.of<ContractService>(context);
+    final ethereumService = Provider.of<EthereumService>(context);
     final configurationService = Provider.of<ConfigurationService>(context);
     final handler = useMemoized(
       () => WalletHandler(
         store,
         addressService,
-        contractService,
+        ethereumService,
         configurationService,
       ),
       [addressService, store],

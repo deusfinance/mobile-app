@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
 
 import 'core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
+import 'infrastructure/wallet_provider/wallet_provider.dart';
 import 'infrastructure/wallet_setup/wallet_setup_provider.dart';
 import 'screens/lock/lock_screen.dart';
 import 'screens/main_screen/main_screen.dart';
@@ -12,24 +14,21 @@ import 'screens/test_screen.dart';
 import 'screens/wallet_intro_screen/intro_page.dart';
 import 'screens/wallet_intro_screen/wallet_create_page.dart';
 import 'screens/wallet_intro_screen/wallet_import_page.dart';
+import 'service/config_service.dart';
 
-RouteFactory generateRoutes() {
+RouteFactory generateRoutes(BuildContext context) {
   return (settings) {
-    final Map<String, dynamic> arguments = settings.arguments;
+    // final Map<String, dynamic> arguments = settings.arguments;
     Widget screen;
     switch (settings.name) {
       case '/':
-        screen = Builder(builder: (ctx) {
-          var configurationService = Provider.of<ConfigurationService>(context);
-          if (configurationService.didSetupWallet())
-            return WalletProvider(builder: (context, store) {
-              return WalletMainPage("Your wallet");
-            });
-
-          return IntroPage();
-        });
+        final configurationService = Provider.of<ConfigurationService>(context);
+        if (configurationService.didSetupWallet())
+          screen = WalletProvider(builder: (_, __) {
+            return MainScreen();
+          });
+        else screen = IntroPage();
         break;
-
       case MainScreen.route:
         screen = MainScreen();
         break;

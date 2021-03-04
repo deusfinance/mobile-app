@@ -15,6 +15,7 @@ class EthereumService {
 
   static const ABIS_PATH = "assets/deus_data/abis.json";
   static const ADDRESSES_PATH = "assets/deus_data/addresses.json";
+  //TODO (@CodingDavid8): Create Network class.
   static const NETWORK_NAMES = {
     1: "Mainnet",
     3: "Ropsten",

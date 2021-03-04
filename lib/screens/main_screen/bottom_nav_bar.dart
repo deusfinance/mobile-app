@@ -47,12 +47,11 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                       MyNavigationItem.items[0].title,
                       style: _selectedIndex == 0
                           ? TextStyle(
-                              fontFamily: "Monument",
+                              fontFamily: MyStyles.kFontFamily,
                               fontWeight: FontWeight.w300,
                               fontSize: MyStyles.S5,
                               foreground: Paint()
-                                ..shader = MyColors.greenToBlueGradient
-                                    .createShader(Rect.fromLTRB(0, 0, 50, 30)))
+                                ..shader = MyColors.greenToBlueGradient.createShader(Rect.fromLTRB(0, 0, 50, 30)))
                           : MyStyles.bottomNavBarUnSelectedStyle,
                     ),
                     Container(
@@ -61,8 +60,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         width: (MediaQuery.of(context).size.width - 50) / 4,
                         decoration: _selectedIndex == 0
                             ? MyStyles.greenToBlueDecoration
-                            : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                            : BoxDecoration(color: Color(MyColors.Main_BG_Black)))
                   ],
                 ),
               )),
@@ -78,12 +76,11 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                       MyNavigationItem.items[1].title,
                       style: _selectedIndex == 1
                           ? TextStyle(
-                              fontFamily: "Monument",
+                              fontFamily: MyStyles.kFontFamily,
                               fontWeight: FontWeight.w300,
                               fontSize: MyStyles.S5,
                               foreground: Paint()
-                                ..shader = MyColors.blueToPurpleGradient
-                                    .createShader(Rect.fromLTRB(0, 0, 50, 30)))
+                                ..shader = MyColors.blueToPurpleGradient.createShader(Rect.fromLTRB(0, 0, 50, 30)))
                           : MyStyles.bottomNavBarUnSelectedStyle,
                     ),
                     Container(
@@ -92,8 +89,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         width: (MediaQuery.of(context).size.width - 50) / 4,
                         decoration: _selectedIndex == 1
                             ? MyStyles.blueToPurpleDecoration
-                            : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                            : BoxDecoration(color: Color(MyColors.Main_BG_Black)))
                   ],
                 ),
               )),
@@ -109,12 +105,11 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                       MyNavigationItem.items[2].title,
                       style: _selectedIndex == 2
                           ? TextStyle(
-                              fontFamily: "Monument",
+                              fontFamily: MyStyles.kFontFamily,
                               fontWeight: FontWeight.w300,
                               fontSize: MyStyles.S5,
                               foreground: Paint()
-                                ..shader = MyColors.blueToPurpleGradient
-                                    .createShader(Rect.fromLTRB(0, 0, 100, 30)))
+                                ..shader = MyColors.blueToPurpleGradient.createShader(Rect.fromLTRB(0, 0, 100, 30)))
                           : MyStyles.bottomNavBarUnSelectedStyle,
                     ),
                     Container(
@@ -123,8 +118,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         width: (MediaQuery.of(context).size.width - 50) / 4,
                         decoration: _selectedIndex == 2
                             ? MyStyles.blueToPurpleDecoration
-                            : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                            : BoxDecoration(color: Color(MyColors.Main_BG_Black)))
                   ],
                 ),
               )),
@@ -140,12 +134,11 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                       MyNavigationItem.items[3].title,
                       style: _selectedIndex == 3
                           ? TextStyle(
-                              fontFamily: "Monument",
+                              fontFamily: MyStyles.kFontFamily,
                               fontWeight: FontWeight.w300,
                               fontSize: MyStyles.S5,
                               foreground: Paint()
-                                ..shader = MyColors.blueToPurpleGradient
-                                    .createShader(Rect.fromLTRB(0, 0, 100, 30)))
+                                ..shader = MyColors.blueToPurpleGradient.createShader(Rect.fromLTRB(0, 0, 100, 30)))
                           : MyStyles.bottomNavBarUnSelectedStyle,
                     ),
                     Container(
@@ -154,8 +147,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         width: (MediaQuery.of(context).size.width - 50) / 4,
                         decoration: _selectedIndex == 3
                             ? MyStyles.blueToPurpleDecoration
-                            : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                            : BoxDecoration(color: Color(MyColors.Main_BG_Black)))
                   ],
                 ),
               )),

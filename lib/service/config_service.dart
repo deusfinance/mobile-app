@@ -1,3 +1,5 @@
+///Saved config, private key etc. on the local device.
+//TODO (@CodingDavid8): Use better encryption!!!
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class IConfigurationService {
@@ -28,7 +30,6 @@ class ConfigurationService implements IConfigurationService {
     await _preferences.setBool("didSetupWallet", value);
   }
 
-  // gets
   @override
   String getMnemonic() {
     return _preferences.getString("mnemonic");

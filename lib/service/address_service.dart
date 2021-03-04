@@ -1,6 +1,6 @@
 import 'config_service.dart';
 import 'package:bip39/bip39.dart' as bip39;
-import '../util/hd_key.dart';
+import '../core/util/hd_key.dart';
 import 'package:hex/hex.dart';
 import 'package:web3dart/credentials.dart';
 
