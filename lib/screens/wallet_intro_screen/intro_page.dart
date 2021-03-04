@@ -1,8 +1,13 @@
 import 'dart:ui';
 
+import 'package:deus/screens/wallet_intro_screen/wallet_create_page.dart';
+import 'package:deus/screens/wallet_intro_screen/wallet_import_page.dart';
+import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 
 class IntroPage extends StatelessWidget {
+  static const String url = '/intro';
+
   final LinearGradient button_gradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
 
   final darkGrey = Color(0xFF1C1C1C);
@@ -10,6 +15,7 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(MyColors.Background),
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Stack(
@@ -71,7 +77,7 @@ class IntroPage extends StatelessWidget {
           style: TextStyle(fontSize: 20),
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed("/import");
+          Navigator.of(context).pushNamed(WalletImportPage.url);
         },
       ),
     );
@@ -90,7 +96,7 @@ class IntroPage extends StatelessWidget {
           style: TextStyle(fontSize: 20, color: Colors.black),
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed("/create");
+          Navigator.of(context).pushNamed(WalletCreatePage.url);
         },
       ),
     );

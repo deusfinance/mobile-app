@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:deus/models/contract_input_data.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 
 import 'ethereum_service.dart';
@@ -18,9 +20,6 @@ class StockService {
   };
 
   final EthereumService ethService;
-
-  // will probably be a web3 PrivateKey
-  // this.account = account;
   final String privateKey;
   String marketMaker;
 
@@ -36,96 +35,89 @@ class StockService {
     }
   }
 
+  Future<Credentials> get credentials =>
+      ethService.credentialsForKey(privateKey);
+
+  Future<EthereumAddress> get address async =>
+      (await credentials).extractAddress();
+
   bool checkWallet() {
     return ethService != null && this.privateKey != null;
   }
-
-  BigInt getWei(BigInt amount, [String token = "eth"]) {
-    var max =
-        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
-    // let value = typeof number === "string" ? parseFloat(number).toFixed(18) : number.toFixed(18)
-    var ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount)
-        .getInWei
-        .toString();
-    ans = ans.substring(0, ans.length - (18 - max));
-    return BigInt.parse(ans.toString());
-  }
-
-  String fromWei(BigInt value, String token) {
-    var max =
-        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
-    String ans = value.toString();
-
-    while (ans.length < max) {
-      ans = "0" + ans;
+  Future<String> getAllowances(tokenName) async {
+    if (!checkWallet()) {
+      return "0";
     }
-    ans = ans.substring(0, ans.length - max) +
-        "." +
-        ans.substring(ans.length - max);
-    if (ans[0] == ".") {
-      ans = "0" + ans;
+    if (tokenName != "dai") {
+      return EthereumService.fromWei(BigInt.from(pow(10, 25)), "ether");
     }
-    return ans;
+    DeployedContract tokenContract =
+    await ethService.loadTokenContract(tokenName);
+    final res = await ethService
+        .query(tokenContract, "allowance", [await address, EthereumAddress.fromHex(marketMaker)]);
+
+    return EthereumService.fromWei(res.single, tokenName);
   }
 
-  //  TODO implement its body and arguments
-  Future<BigInt> getAllowances(tokenName, tokenAddress) async {
-//    if(!checkWallet()){
-//      return null;
-//    }
-//    if (tokenAddress != ethService.getTokenAddr("dai")) {
-//      return BigInt.from(1000000000000000);
-//    }
-//    DeployedContract tokenContract = await ethService.loadTokenContract(tokenName);
-//    ethService.query(tokenContract, "allowance", [privateKey, marketMaker]).then((value) {
-//      print(value);
-//      return value;
-//    });
-
-    await Future.delayed(const Duration(milliseconds: 2000), () {
-      return true;
-    });
-
+  Future<String> approve(tokenName) async {
+    if (!checkWallet()) {
+      return "0";
+    }
+    var amount = "100000000";
+    DeployedContract tokenContract =
+    await ethService.loadTokenContract(tokenName);
+    var res = ethService.submit(await credentials, tokenContract, "approve",
+        [EthereumAddress.fromHex(marketMaker), EthereumService.getWei(amount, tokenName)]);
+    return res;
   }
 
-  //  TODO implement its body and arguments
-  Future<dynamic> approve(tokenAddress, tokenName) async {
-//    if(!checkWallet()){
-//      return 0;
-//    }
-//    var amount = BigInt.from(pow(10, 25));
-//    if (tokenAddress != ethService.getTokenAddr("dai")) {
-//      return BigInt.from(1000000000000000);
-//    }
-//    DeployedContract tokenContract = await ethService.loadTokenContract(tokenName);
-//
-//    ethService.query(tokenContract, "approve", [marketMaker, getWei(amount)]).then((value) {
-//      print(value);
-//      return value;
-//    });
-    await Future.delayed(const Duration(milliseconds: 2000), () {
-      return true;
-    });
+  Future<String> getTokenBalance(tokenName) async {
+    if (!checkWallet()) {
+      return "0";
+    }
+    DeployedContract tokenContract =
+    await ethService.loadTokenContract(tokenName);
 
-
+    final res =
+    await ethService.query(tokenContract, "balanceOf", [await address]);
+    return EthereumService.fromWei(res.single, tokenName);
   }
 
-//  TODO implement its body and arguments
-  Future<bool> buy(tokenAddress, tokenName, amount) async {
-    await Future.delayed(const Duration(milliseconds: 2000), () {
-      return true;
-    });
-
+  Future<String> buy(tokenName, String amount, ContractInputData info) async {
+    if (!checkWallet()) {
+      return "0";
+    }
+    String tokenAddress = await ethService.getTokenAddrHex(tokenName, "token");
+    DeployedContract contract =
+    await ethService.loadContractWithGivenAddress("stocks_contract", this.marketMaker);
+    return ethService.submit(await credentials, contract, "buyStock", [
+      tokenAddress,
+      EthereumService.getWei(amount, tokenName),
+      info.blockNo.toString(),
+      info.price.toString(),
+      info.fee.toString(),
+      info.signs[0].v.toString(),
+      info.signs[0].r,
+      info.signs[0].s
+    ]);
   }
 
-  //  TODO implement its body and arguments
-  Future<dynamic> sell(tokenAddress, tokenName, amount) async {
-    await Future.delayed(const Duration(milliseconds: 2000), () {
-      return true;
-    });
-
+  Future<String> sell(tokenName, String amount, ContractInputData info) async {
+    if (!checkWallet()) {
+      return "0";
+    }
+    String tokenAddress = await ethService.getTokenAddrHex(tokenName, "token");
+    DeployedContract contract =
+    await ethService.loadContractWithGivenAddress("stocks_contract", this.marketMaker);
+    return ethService.submit(await credentials, contract, "sellStock", [
+      tokenAddress,
+      EthereumService.getWei(amount, tokenName),
+      info.blockNo.toString(),
+      info.price.toString(),
+      info.fee.toString(),
+      info.signs[0].v.toString(),
+      info.signs[0].r,
+      info.signs[0].s
+    ]);
   }
-  
-  
-
 }

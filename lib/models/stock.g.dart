@@ -9,11 +9,11 @@ part of 'stock.dart';
 Stock _$StockFromJson(Map<String, dynamic> json) {
   return Stock(
     json['name'] as String,
-    json['short_name'] as String,
+    json['symbol'] as String,
     json['logo'] as String,
   )
     ..sector = json['sector'] as String
-    ..symbol = json['symbol'] as String
+    ..shortName = json['short_name'] as String
     ..shortSymbol = json['short_symbol'] as String
     ..longName = json['long_name'] as String
     ..longSymbol = json['long_symbol'] as String;

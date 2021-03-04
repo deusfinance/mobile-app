@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class RaisedGradientButton extends StatelessWidget {
   final String label;
-  final Function onPressed;
+  final VoidCallback onPressed;
   final gradient;
 
   RaisedGradientButton({this.label, this.onPressed, @required this.gradient});
@@ -23,7 +23,7 @@ class RaisedGradientButton extends StatelessWidget {
             label,
             style: TextStyle(fontSize: 20, color: Colors.black),
           ),
-          onPressed: () => onPressed,
+          onPressed: onPressed,
         ),
       ),
     );

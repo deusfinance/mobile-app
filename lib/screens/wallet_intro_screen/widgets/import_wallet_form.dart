@@ -1,33 +1,31 @@
 import 'dart:ui';
 
+import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../../../core/widgets/form/paper_form.dart';
-import '../../../../core/widgets/form/paper_input.dart';
-import '../../../../core/widgets/form/paper_validation_summary.dart';
-import '../../../../core/widgets/raised_gradient_button.dart';
-import '../../../../models/wallet/wallet_setup.dart';
-
+import '../../../core/widgets/form/paper_form.dart';
+import '../../../core/widgets/form/paper_input.dart';
+import '../../../core/widgets/form/paper_validation_summary.dart';
+import '../../../core/widgets/raised_gradient_button.dart';
+import '../../../models/wallet/wallet_setup.dart';
 
 class ImportWalletForm extends HookWidget {
   ImportWalletForm({this.onImport, this.errors});
 
   final Function(WalletImportType type, String value) onImport;
   final List<String> errors;
+  static const indexMap = {0: WalletImportType.mnemonic, 1: WalletImportType.privateKey};
 
   @override
   Widget build(BuildContext context) {
-    var importType = useState(WalletImportType.mnemonic);
-    var inputController = useTextEditingController();
+    final importType = useState(WalletImportType.mnemonic);
+    final inputController = useTextEditingController();
 
-    final LinearGradient button_gradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
+    final LinearGradient buttonGradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
 
-    final _selections = useState([true, false]);
-
-    void changeSelections() {
-      _selections.value[0] = !_selections.value[0];
-      _selections.value[1] = !_selections.value[1];
+    void changeSelections(int index) {
+      importType.value = indexMap[index];
     }
 
     return Center(
@@ -37,7 +35,7 @@ class ImportWalletForm extends HookWidget {
           child: PaperForm(
             actionButtons: <Widget>[
               RaisedGradientButton(
-                gradient: button_gradient,
+                gradient: buttonGradient,
                 label: 'IMPORT',
                 onPressed:
                     this.onImport != null ? () => this.onImport(importType.value, inputController.value.text) : null,
@@ -48,34 +46,20 @@ class ImportWalletForm extends HookWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   ToggleButtons(
+                    borderColor: Color(MyColors.Background),
+                    selectedBorderColor: Color(MyColors.Background),
                     fillColor: Colors.transparent,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Text(
-                          'Seed',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.transparent,
-                            decoration: _selections.value[0] ? TextDecoration.underline : null,
-                            decorationColor: Colors.white,
-                            shadows: [Shadow(color: Colors.white, offset: Offset(0, -5))],
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'Private Key',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.transparent,
-                          decoration: _selections.value[1] ? TextDecoration.underline : null,
-                          decorationColor: Colors.white,
-                          shadows: [Shadow(color: Colors.white, offset: Offset(0, -5))],
-                        ),
-                      )
+                          padding: const EdgeInsets.only(right: 20),
+                          child: _buildImportOption('Seed', WalletImportType.mnemonic, importType.value)),
+                      _buildImportOption('Private key', WalletImportType.privateKey, importType.value)
                     ],
-                    isSelected: _selections.value,
-                    onPressed: (ind) => changeSelections(),
+                    isSelected: [
+                      importType.value == WalletImportType.mnemonic,
+                      importType.value == WalletImportType.privateKey
+                    ],
+                    onPressed: changeSelections,
                   )
                 ],
               ),
@@ -102,6 +86,19 @@ class ImportWalletForm extends HookWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Text _buildImportOption(String label, WalletImportType type, WalletImportType currentType) {
+    return Text(
+      label,
+      style: TextStyle(
+        fontSize: 15,
+        color: Colors.transparent,
+        decoration: currentType == type ? TextDecoration.underline : null,
+        decorationColor: Colors.white,
+        shadows: [Shadow(color: Colors.white, offset: Offset(0, -5))],
       ),
     );
   }

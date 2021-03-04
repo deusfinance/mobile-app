@@ -1,12 +1,15 @@
+import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../core/widgets/back_button.dart';
 import '../../infrastructure/wallet_setup/wallet_setup_provider.dart';
 import '../../models/wallet/wallet_setup.dart';
-import 'widgets/wallet/import_wallet_form.dart';
+import 'widgets/import_wallet_form.dart';
 
 class WalletImportPage extends HookWidget {
+  static const String url = '/importWallet';
+
   WalletImportPage(this.title);
 
   final String title;
@@ -16,10 +19,8 @@ class WalletImportPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 100,
-        leading: BackButtonWithText(
-          onPressed: () => Navigator.pop(context),
-        ),
-        backgroundColor: Colors.black,
+        leading: BackButtonWithText(),
+        backgroundColor: Color(MyColors.Background).withOpacity(1),
         centerTitle: true,
         title: Text(
           title,
