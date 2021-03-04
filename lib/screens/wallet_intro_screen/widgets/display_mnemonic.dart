@@ -63,8 +63,10 @@ class DisplayMnemonic extends HookWidget {
       children: <Widget>[
         RaisedGradientButton(
           label: 'COPY',
-          onPressed: () {
-            Clipboard.setData(new ClipboardData(text: this.mnemonic));
+          onPressed: () async {
+            print("copy...");
+            await Clipboard.setData(ClipboardData(text: this.mnemonic));
+            print("copied :)");
           },
           gradient: button_gradient,
         ),
