@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'filled_gradient_selection_button.dart';
 
-class CrossFadeButton extends StatelessWidget {
+class CrossFadeDuoButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   final String mergedButtonLabel;
@@ -16,7 +16,7 @@ class CrossFadeButton extends StatelessWidget {
   final bool showLoading;
   final bool showBothButtons;
 
-  CrossFadeButton(
+  CrossFadeDuoButton(
       {this.onPressed,
       this.showBothButtons,
       this.showLoading,

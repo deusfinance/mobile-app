@@ -1,3 +1,4 @@
+//TODO (@CodingDavid8): Merge address_service.dart and ethereum_service.dart
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
@@ -8,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
 
-///general service in order to connect to the Ethereum blockchain.
+/// General service in order to connect to the Ethereum blockchain.
 class EthereumService {
   int chainId;
   String ethUrl;
@@ -28,6 +29,7 @@ class EthereumService {
 
   static const ABIS_PATH = "assets/deus_data/abis.json";
   static const ADDRESSES_PATH = "assets/deus_data/addresses.json";
+  //TODO (@CodingDavid8): Create Network class.
   static const NETWORK_NAMES = {
     1: "Mainnet",
     3: "Ropsten",
@@ -39,10 +41,7 @@ class EthereumService {
   String get networkName => NETWORK_NAMES[this.chainId];
 
   // IMPORTANT use http instead of wss infura endpoint, web3dart not supporting wss yet
-  String get INFURA_URL =>
-      'https://' +
-      networkName +
-      '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
+  String get INFURA_URL => 'https://' + networkName + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
 
   EthereumService(this.chainId) {
     httpClient = new Client();
@@ -145,6 +144,7 @@ class EthereumService {
 
     final decodedAbis = jsonDecode(allAbis);
     final abiCode = jsonEncode(decodedAbis["token"]);
+
     final contractAddress = await getTokenAddr(tokenName, "token");
     return DeployedContract(
         ContractAbi.fromJson(abiCode, tokenName), contractAddress);
@@ -164,8 +164,7 @@ class EthereumService {
     final decodedAbis = jsonDecode(allAbis);
     final abiCode = jsonEncode(decodedAbis[contractName]);
     final contractAddress = await getContractAddress(contractName);
-    return DeployedContract(
-        ContractAbi.fromJson(abiCode, contractName), contractAddress);
+    return DeployedContract(ContractAbi.fromJson(abiCode, contractName), contractAddress);
   }
 
   // will probably throw error since addresses is not complete
@@ -202,11 +201,11 @@ class EthereumService {
     return await ethClient.getBalance(await credentials.extractAddress());
   }
 
-  /// submit a tx from the supplied [credentials]
-  /// calls deploayed [contract] with the function [functionName] supplying all [args] in order of appearence in the api
-  /// returns a [String] containing the tx hash which can be used to acquire further information about the tx
-  Future<String> submit(Credentials credentials, DeployedContract contract,
-      String functionName, List<dynamic> args,
+  /// Submit a tx from the supplied [credentials].
+  ///
+  /// Calls deploayed [contract] with the function [functionName] supplying all [args] in order of appearence in the api.
+  /// Returns a [String] containing the tx hash which can be used to acquire further information about the tx.
+  Future<String> submit(Credentials credentials, DeployedContract contract, String functionName, List<dynamic> args,
       {EtherAmount value}) async {
     final ethFunction = contract.function(functionName);
 
@@ -224,21 +223,19 @@ class EthereumService {
     return result;
   }
 
-  Future<List<dynamic>> query(DeployedContract contract, String functionName,
-      List<dynamic> args) async {
+  Future<List<dynamic>> query(DeployedContract contract, String functionName, List<dynamic> args) async {
     final ethFunction = contract.function(functionName);
-    final data = await ethClient.call(
-        contract: contract, function: ethFunction, params: args);
+    final data = await ethClient.call(contract: contract, function: ethFunction, params: args);
     return data;
   }
 
-  // Function to get receipt
+  /// Function to get receipt
   Future<TransactionReceipt> getTransactionReceipt(String txHash) async {
     return await ethClient.getTransactionReceipt(txHash);
   }
 
-  Stream<TransactionReceipt> pollTransactionReceipt(String txHash,
-      {int pollingTimeMs = 2000}) async* {
+
+  Stream<TransactionReceipt> pollTransactionReceipt(String txHash, {int pollingTimeMs = 2000}) async* {
     StreamController<TransactionReceipt> controller = StreamController();
     Timer timer;
 
@@ -277,4 +274,17 @@ class EthereumService {
 //   ethClient.addedBlocks(listener);
 //   ethClient.
 // }
+
+//  (@kazem)
+// synthetics
+  Future<String> getStakingAddrHex(String tokenName) async {
+    return (await getStakingAddr(tokenName)).hex;
+  }
+
+  Future<EthereumAddress> getStakingAddr(String tokenName) async {
+    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final decodedAddresses = jsonDecode(allAddresses);
+    final hexAddress = decodedAddresses["staking"][tokenName][chainId.toString()];
+    return EthereumAddress.fromHex(hexAddress);
+  }
 }
