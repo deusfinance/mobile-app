@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:deus/core/util/responsive.dart';
-import 'package:deus/core/widgets/selection_button.dart';
-import 'package:deus/models/GWei.dart';
-import 'package:deus/models/gas.dart';
-import 'package:deus/service/deus_swap_service.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/util/responsive.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
+import 'package:deus_mobile/models/GWei.dart';
+import 'package:deus_mobile/models/gas.dart';
+import 'package:deus_mobile/service/deus_swap_service.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

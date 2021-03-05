@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/models/gas.dart';
 import 'package:deus_mobile/models/token.dart';
 
 import 'package:flutter/services.dart';

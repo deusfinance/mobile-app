@@ -1,27 +1,28 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/core/widgets/svg.dart';
-import 'package:deus_mobile/core/widgets/swap_field.dart';
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/models/stock.dart';
-import 'package:deus_mobile/models/swap_model.dart';
-import 'package:deus_mobile/models/token.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/service/deus_swap_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/statics.dart';
-import 'package:deus_mobile/statics/styles.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:stream_transform/stream_transform.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
 import 'package:web3dart/web3dart.dart';
+
+import '../../core/widgets/selection_button.dart';
+import '../../core/widgets/svg.dart';
+import '../../core/widgets/swap_field.dart';
+import '../../core/widgets/toast.dart';
+import '../../data_source/currency_data.dart';
+import '../../models/gas.dart';
+import '../../models/swap_model.dart';
+import '../../models/token.dart';
+import '../../models/transaction_status.dart';
+import '../../service/deus_swap_service.dart';
+import '../../service/ethereum_service.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/statics.dart';
+import '../../statics/styles.dart';
+import 'confirm_swap.dart';
 
 class SwapScreen extends StatefulWidget {
   static const route = "/swap";
