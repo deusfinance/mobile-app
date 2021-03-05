@@ -1,23 +1,20 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus/core/util/responsive.dart';
-import 'package:deus/core/widgets/selection_button.dart';
-import 'package:deus/core/widgets/svg.dart';
-import 'package:deus/core/widgets/swap_field.dart';
-import 'package:deus/core/widgets/toast.dart';
-import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/models/gas.dart';
-import 'package:deus/models/stock.dart';
-import 'package:deus/models/swap_model.dart';
-import 'package:deus/models/token.dart';
-import 'package:deus/models/transaction_status.dart';
-import 'package:deus/screens/swap/confirm_swap.dart';
-import 'package:deus/service/deus_swap_service.dart';
-import 'package:deus/service/ethereum_service.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/statics.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
+import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/core/widgets/swap_field.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/models/stock.dart';
+import 'package:deus_mobile/models/swap_model.dart';
+import 'package:deus_mobile/models/token.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/service/deus_swap_service.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/statics.dart';
+import 'package:deus_mobile/statics/styles.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

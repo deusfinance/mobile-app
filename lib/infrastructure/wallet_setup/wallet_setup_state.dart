@@ -1,4 +1,4 @@
-import 'package:deus/models/wallet/wallet_setup.dart';
+import 'package:deus_mobile/models/wallet/wallet_setup.dart';
 
 abstract class WalletSetupAction {}
 

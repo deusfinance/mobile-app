@@ -1,5 +1,5 @@
-import 'package:deus/core/widgets/grey_outline_button.dart';
-import 'package:deus/core/widgets/raised_gradient_button.dart';
+import 'package:deus_mobile/core/widgets/grey_outline_button.dart';
+import 'package:deus_mobile/core/widgets/raised_gradient_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

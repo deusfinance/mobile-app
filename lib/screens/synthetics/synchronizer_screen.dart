@@ -1,8 +1,8 @@
 //import 'dart:ui';
 //
-//import 'package:deus/core/util/responsive.dart';
-//import 'package:deus/data_source/currency_data.dart';
-//import 'package:deus/data_source/stock_data.dart';
+//import 'package:deus_mobile/core/util/responsive.dart';
+//import 'package:deus_mobile/data_source/currency_data.dart';
+//import 'package:deus_mobile/data_source/stock_data.dart';
 //import 'package:flutter/material.dart';
 //
 //import '../../core/widgets/filled_gradient_selection_button.dart';

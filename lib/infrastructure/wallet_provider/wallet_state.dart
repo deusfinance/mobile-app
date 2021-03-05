@@ -1,6 +1,6 @@
 
 
-import 'package:deus/models/wallet/wallet.dart';
+import 'package:deus_mobile/models/wallet/wallet.dart';
 
 abstract class WalletAction {}
 

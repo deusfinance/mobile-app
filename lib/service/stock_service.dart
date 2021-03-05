@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:deus/models/contract_input_data.dart';
+import 'package:deus_mobile/models/contract_input_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';

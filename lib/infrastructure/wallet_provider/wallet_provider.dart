@@ -1,8 +1,8 @@
 
-import 'package:deus/models/wallet/wallet.dart';
-import 'package:deus/service/address_service.dart';
-import 'package:deus/service/config_service.dart';
-import 'package:deus/service/ethereum_service.dart';
+import 'package:deus_mobile/models/wallet/wallet.dart';
+import 'package:deus_mobile/service/address_service.dart';
+import 'package:deus_mobile/service/config_service.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 

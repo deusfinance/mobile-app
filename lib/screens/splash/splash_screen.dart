@@ -1,8 +1,8 @@
-import 'package:deus/data_source/stock_data.dart';
-import 'package:deus/screens/main_screen/main_screen.dart';
-import 'package:deus/screens/test_screen.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/statics.dart';
+
+import 'package:deus_mobile/data_source/stock_data.dart';
+import 'package:deus_mobile/screens/main_screen/main_screen.dart';
+import 'package:deus_mobile/screens/test_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

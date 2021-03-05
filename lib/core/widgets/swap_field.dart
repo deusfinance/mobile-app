@@ -1,5 +1,5 @@
-import 'package:deus/service/ethereum_service.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

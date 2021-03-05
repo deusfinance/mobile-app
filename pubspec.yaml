@@ -1,5 +1,5 @@
-name: deus
-description: A new Flutter project.
+name: deus_mobile
+description: The future of mobile trading.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -46,7 +46,7 @@ dev_dependencies:
   build_runner: ^1.10.0
   built_value_generator: ^7.1.0
   json_serializable: ^3.5.1
-
+  flutter_launcher_icons: "^0.8.0"
 
 flutter:
   uses-material-design: true
@@ -56,10 +56,14 @@ flutter:
     - assets/images/currencies/
     - assets/images/stocks/
     - assets/images/icons/
+    - assets/launcher_icon/
     # BACKEND
     - assets/deus_data/ # data of tokens, contract ABI/functions etc.
   
-
+flutter_icons: # flutter pub run flutter_launcher_icons:main
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher_icon/deus_dea.png"
 
   fonts:
     - family: Monument

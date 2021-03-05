@@ -3,9 +3,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/models/gas.dart';
-import 'package:deus/models/token.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/models/token.dart';
+
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
