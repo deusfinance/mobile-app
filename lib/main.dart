@@ -1,14 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:deus/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:deus/screens/splash/splash_screen.dart';
 import 'package:deus/screens/stake_screen/stake_screen.dart';
 import 'package:deus/screens/swap/confirm_swap.dart';
 import 'package:deus/screens/test_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-import 'core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
-import 'statics/old_my_colors.dart';
+import 'route_generator.dart';
+import 'service/services_provider.dart';
+import 'statics/my_colors.dart';
+import 'statics/styles.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,59 +20,32 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(MyApp());
+  final List<Provider> providers = await createProviders();
+  runApp(DEUSApp(providers));
 }
 
-class MyApp extends StatelessWidget {
+class DEUSApp extends StatelessWidget {
+  final List<Provider> providers;
+
+  const DEUSApp(this.providers, {Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Deus Finance',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Monument',
-        backgroundColor: MyColors.background.withOpacity(1),
-        brightness: Brightness.dark,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      onGenerateRoute: generateRoutes(),
-      initialRoute: SplashScreen.route,
-    );
-  }
-
-  RouteFactory generateRoutes() {
-    return (settings) {
-      final Map<String, dynamic> arguments = settings.arguments;
-      Widget screen;
-      switch (settings.name) {
-        case MainScreen.route:
-          screen = MainScreen();
-          break;
-        case SplashScreen.route:
-          screen = SplashScreen();
-          break;
-//        case SwapBackendTestScreen.url:
-//          screen = SwapBackendTestScreen();
-//          break;
-        case StockSelectorScreen.url:
-          screen = StockSelectorScreen();
-          break;
-        case CurrencySelectorScreen.url:
-          screen = CurrencySelectorScreen();
-          break;
-        case StakeScreen.url:
-          screen = StakeScreen();
-          break;
-
-        case ConfirmSwapScreen.route:
-          screen = ConfirmSwapScreen();
-          break;
-        
-        default:
-          return null;
-      }
-      return MaterialPageRoute(builder: (BuildContext context) => screen);
-    };
+    return MultiProvider(
+        providers: providers,
+        child: MaterialApp(
+          title: 'Deus Finance',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            fontFamily: MyStyles.kFontFamily,
+            backgroundColor: Color(MyColors.Background),
+            brightness: Brightness.dark,
+            canvasColor: Color(MyColors.Background),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          routes: generateRoutes(context),
+          initialRoute: '/',
+        ));
   }
 }

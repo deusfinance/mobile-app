@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 abstract class MyColors {
-  
+
   static MaterialColor background = _getMaterialColor(0, 0, 0, 0xFF000000);
 
   static MaterialColor _getMaterialColor(int r, int g, int b, var hex) {
@@ -36,9 +36,9 @@ abstract class MyColors {
   static MaterialColor ToastGreen = _getMaterialColor(0, 209, 108, 0xFF00D16C);
   static MaterialColor ToastGrey = _getMaterialColor(196, 196, 196, 0xFFC4C4C4);
 
-  
-  
-  
+
+
+
 
 //  static const White = 0xFFFFFFFF;
 //  static const HalfWhite = 0xAAFFFFFF;
@@ -52,6 +52,11 @@ abstract class MyColors {
 //  static const Green = 0xFFC4EB89;
 //  static const Blue_Gr = 0xFF5EC4D6;
   /// color of approved toast container
+  static const ToastGreen = 0xFF00D16C;
+  /// color of pending toast container
+  static const ToastGrey = 0xFFC4C4C4;
+  static const Background = 0xFF0D0D0D;
+  static const kAddressBackground = 0xFF61C0BF;
 //  static const ToastGreen = 0xFF00D16C;
 //  /// color of pending toast container
 //  static const ToastGrey = 0xFFC4C4C4;

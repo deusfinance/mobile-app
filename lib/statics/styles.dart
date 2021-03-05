@@ -2,6 +2,7 @@ import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/cupertino.dart';
 
 class MyStyles {
+
 //  font sizes
   static const S6 = 13.0;
   static const S5 = 16.0;
@@ -14,6 +15,7 @@ class MyStyles {
   static const mainPadding = 8.0;
 
   static const String kFontFamily = "Monument";
+
 
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
@@ -75,6 +77,18 @@ class MyStyles {
     color: MyColors.White,
   );
   static var whiteMediumUnderlinedTextStyle = TextStyle(
+
+  static TextStyle gradientMediumTextStyle = TextStyle(
+      fontFamily: kFontFamily,
+      fontWeight: FontWeight.w300,
+      fontSize: S4,
+      foreground: Paint()
+        ..shader = LinearGradient(
+          colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
+        ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
+
+
+  static const whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     decoration: TextDecoration.underline,
@@ -83,9 +97,14 @@ class MyStyles {
   );
 
   static var bottomNavBarUnSelectedStyle = TextStyle(
+
+  static const bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
     color: MyColors.White,
   );
+
+
 }
+
