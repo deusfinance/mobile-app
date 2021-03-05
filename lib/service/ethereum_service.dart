@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/models/token.dart';
+
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
@@ -18,14 +19,16 @@ class EthereumService {
 
   static const TOKEN_MAX_DIGITS = {
     "wbtc": 8,
+    "usdt": 6,
     "usdc": 6,
+    "coinbase": 18,
     "dea": 18,
     "deus": 18,
     "dai": 18,
     "eth": 18,
   };
 
-  static Map<String, Token> addressToOtkenMap = new Map();
+  static Map<String, Token> addressToTokenMap = new Map();
 
   static const ABIS_PATH = "assets/deus_data/abis.json";
   static const ADDRESSES_PATH = "assets/deus_data/addresses.json";
@@ -56,16 +59,16 @@ class EthereumService {
     tokensAddresses.forEach((key, value) {
       Token t = _getTokenObjectByName(key);
       if (t != null) {
-        addressToOtkenMap.addEntries(
+        addressToTokenMap.addEntries(
             [MapEntry<String, Token>(value["1"].toString().toLowerCase(), t)]);
-        addressToOtkenMap.addEntries(
+        addressToTokenMap.addEntries(
             [MapEntry<String, Token>(value["4"].toString().toLowerCase(), t)]);
       }
     });
   }
 
   Token _getTokenObjectByName(String tokenName) {
-    if(tokenName == "weth"){
+    if (tokenName == "weth") {
       tokenName = "eth";
     }
     for (var i = 0; i < CurrencyData.allForDict.length; i++) {
@@ -201,26 +204,71 @@ class EthereumService {
     return await ethClient.getBalance(await credentials.extractAddress());
   }
 
-  /// Submit a tx from the supplied [credentials].
-  ///
-  /// Calls deploayed [contract] with the function [functionName] supplying all [args] in order of appearence in the api.
-  /// Returns a [String] containing the tx hash which can be used to acquire further information about the tx.
-  Future<String> submit(Credentials credentials, DeployedContract contract, String functionName, List<dynamic> args,
-      {EtherAmount value}) async {
-    final ethFunction = contract.function(functionName);
-
+  /// submit a tx from the supplied [credentials]
+  /// calls deploayed [contract] with the function [functionName] supplying all [args] in order of appearence in the api
+  /// returns a [String] containing the tx hash which can be used to acquire further information about the tx
+  Future<String> submit(Credentials credentials, DeployedContract contract,
+      String functionName, List<dynamic> args,
+      {EtherAmount value, Gas gas}) async {
+    Transaction transaction = await makeTransaction(credentials, contract, functionName, args,
+        gas: gas, value: value);
     var result = await ethClient.sendTransaction(
         credentials,
-        Transaction.callContract(
-            from: await credentials.extractAddress(),
-            contract: contract,
-            function: ethFunction,
-            parameters: args,
-            gasPrice: EtherAmount.inWei(BigInt.from(1000000000)),
-            maxGas: 5000000,
-            value: value),
+        transaction,
         chainId: chainId);
     return result;
+  }
+
+
+  Future<String> sendTransaction(
+      Credentials credentials, Transaction transaction) async {
+    var result = await ethClient.sendTransaction(credentials, transaction,
+        chainId: chainId);
+    return result;
+  }
+
+  Future<BigInt> estimateGas(Transaction transaction) async {
+    try {
+      return await ethClient.estimateGas(
+          sender: transaction.from,
+          to: transaction.to,
+          value: transaction.value,
+          data: transaction.data);
+    } on Exception catch (value) {
+      print(value);
+      return null;
+    }
+  }
+
+  Future<Transaction> makeTransaction(Credentials credentials,
+      DeployedContract contract, String functionName, List<dynamic> args,
+      {EtherAmount value, Gas gas}) async {
+    final ethFunction = contract.function(functionName);
+    Transaction transaction;
+    if (gas != null && gas.nonce > 0) {
+      transaction = Transaction.callContract(
+          from: await credentials.extractAddress(),
+          contract: contract,
+          function: ethFunction,
+          parameters: args,
+          gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
+          maxGas: gas.gasLimit > 0 ? gas.gasLimit : 500000,
+          nonce: gas.nonce,
+          value: value);
+    } else {
+      transaction = Transaction.callContract(
+          from: await credentials.extractAddress(),
+          contract: contract,
+          function: ethFunction,
+          parameters: args,
+          gasPrice: gas != null
+              ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
+              : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
+          maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 500000,
+          value: value);
+    }
+
+    return transaction;
   }
 
   Future<List<dynamic>> query(DeployedContract contract, String functionName, List<dynamic> args) async {
@@ -234,8 +282,8 @@ class EthereumService {
     return await ethClient.getTransactionReceipt(txHash);
   }
 
-
-  Stream<TransactionReceipt> pollTransactionReceipt(String txHash, {int pollingTimeMs = 2000}) async* {
+  Stream<TransactionReceipt> pollTransactionReceipt(String txHash,
+      {int pollingTimeMs = 1500}) async* {
     StreamController<TransactionReceipt> controller = StreamController();
     Timer timer;
 

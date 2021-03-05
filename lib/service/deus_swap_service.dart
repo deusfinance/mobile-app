@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:core';
 
+import 'package:deus/models/gas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
@@ -10,7 +11,6 @@ import 'ethereum_service.dart';
 
 class SwapService {
   static const GRAPH_PATH = "assets/deus_data/rinkbey_graph.json";
-  
 
   final EthereumService ethService;
   final String privateKey;
@@ -71,11 +71,11 @@ class SwapService {
 
     final tokenContract = await ethService.loadTokenContract(token);
     var amount = "10000000";
-    final result = await ethService.submit(
-        await credentials,
-        tokenContract,
-        "approve",
-        [await ethService.getAddr("multi_swap_contract"), EthereumService.getWei(amount, token)]);
+    final result =
+        await ethService.submit(await credentials, tokenContract, "approve", [
+      await ethService.getAddr("multi_swap_contract"),
+      EthereumService.getWei(amount, token)
+    ]);
     return result;
   }
 
@@ -90,7 +90,143 @@ class SwapService {
     return EthereumService.fromWei(result.single, tokenName);
   }
 
-  Future<String> swapTokens(fromToken, toToken, String _amountIn, String _minAmountOut) async {
+  Future<String> sendSwapTransaction(Transaction transaction) async {
+    return await ethService.sendTransaction(await credentials, transaction);
+  }
+
+  Future<Transaction> makeSwapTransaction(
+      fromToken, toToken, String _amountIn, String _minAmountOut,) async {
+    if (!this.checkWallet()) return null;
+    var path = await getPath(fromToken, toToken);
+
+    BigInt amountIn = EthereumService.getWei(_amountIn, fromToken);
+    BigInt minAmountOut = EthereumService.getWei(_minAmountOut, toToken);
+
+    if (fromToken == 'eth' && toToken == 'deus') {
+      return await ethService.makeTransaction(await credentials,
+          automaticMarketMakerContract, "buy", [minAmountOut],
+          value: EtherAmount.inWei(amountIn));
+    }
+    if (fromToken == 'deus' && toToken == 'eth') {
+      return await ethService.makeTransaction(await credentials,
+          multiSwapContract, "uniDeusEth", [amountIn, [], minAmountOut],
+          );
+    }
+
+    final deusAddress = await ethService.getTokenAddrHex("deus", "token");
+    int deusIndex = path.indexOf(deusAddress);
+    if (deusIndex == -1) {
+      if (path[0] == await ethService.getTokenAddrHex("weth", "token")) {
+        var deadLine = (DateTime.now().millisecond / 1000).floor() + 60 * 5000;
+        List<EthereumAddress> addressPath = _pathListToAddresses(path);
+        return await ethService.makeTransaction(
+            await credentials,
+            uniswapRouter,
+            "swapExactETHForTokens",
+            [minAmountOut, addressPath, await address, BigInt.from(deadLine)],
+            value: EtherAmount.inWei(amountIn),
+            );
+      }
+      if (path.last == await ethService.getTokenAddrHex("weth", "token")) {
+        List<EthereumAddress> addressPath = _pathListToAddresses(path);
+        return await ethService.makeTransaction(
+            await credentials,
+            multiSwapContract,
+            "tokensToEthOnUni",
+            [amountIn, addressPath, minAmountOut]);
+      }
+      List<EthereumAddress> addressPath = _pathListToAddresses(path);
+      return await ethService.makeTransaction(
+          await credentials,
+          multiSwapContract,
+          "tokensToTokensOnUni",
+          [amountIn, addressPath, minAmountOut]);
+    }
+
+    if (deusIndex == path.length - 1) {
+      if (path[path.length - 2] ==
+          await ethService.getTokenAddrHex("weth", "token")) {
+        var path1 = path.sublist(0, deusIndex);
+        var path2 = [];
+        List<EthereumAddress> addressPath = _pathListToAddresses(path1);
+        return await ethService.makeTransaction(
+            await credentials,
+            multiSwapContract,
+            "uniEthDeusUni",
+            [amountIn, addressPath, path2, minAmountOut]);
+      }
+      List<EthereumAddress> addressPath = _pathListToAddresses(path);
+      return await ethService.makeTransaction(
+          await credentials,
+          multiSwapContract,
+          "tokensToTokensOnUni",
+          [amountIn, addressPath, minAmountOut]);
+    }
+
+    if (deusIndex == 0) {
+      if (path[1] == await ethService.getTokenAddrHex("weth", "token")) {
+        var path1 = path.sublist(1);
+        List<EthereumAddress> addressPath = _pathListToAddresses(path1);
+        return await ethService.makeTransaction(
+            await credentials,
+            multiSwapContract,
+            "deusEthUni",
+            [amountIn, addressPath, minAmountOut]);
+      }
+      List<EthereumAddress> addressPath = _pathListToAddresses(path);
+      return await ethService.makeTransaction(
+          await credentials,
+          multiSwapContract,
+          "tokensToTokensOnUni",
+          [amountIn, addressPath, minAmountOut]);
+    }
+    if (path[deusIndex - 1] ==
+        await ethService.getTokenAddrHex("weth", "token")) {
+      var path1 = path.sublist(0, deusIndex);
+      var path2 = path.sublist(deusIndex);
+      List<EthereumAddress> addressPath1 = _pathListToAddresses(path1);
+      List<EthereumAddress> addressPath2 = _pathListToAddresses(path2);
+      if (path1.length > 1) {
+        return await ethService.makeTransaction(
+            await credentials,
+            multiSwapContract,
+            "uniEthDeusUni",
+            [amountIn, addressPath1, addressPath2, minAmountOut]);
+      }
+      var path3 = path.sublist(deusIndex);
+      List<EthereumAddress> addressPath = _pathListToAddresses(path3);
+      return await ethService.makeTransaction(await credentials,
+          multiSwapContract, "ethDeusUni", [addressPath, minAmountOut],
+          value: EtherAmount.inWei(amountIn));
+    }
+
+    if (path[deusIndex + 1] ==
+        await ethService.getTokenAddrHex("weth", "token")) {
+      var path1 = path.sublist(0, deusIndex + 1);
+      var path2 = path.sublist(deusIndex + 1);
+      List<EthereumAddress> addressPath1 = _pathListToAddresses(path1);
+      List<EthereumAddress> addressPath2 = _pathListToAddresses(path2);
+      if (path1.length >= 2 && path2.length <= 1) {
+        return await ethService.makeTransaction(
+            await credentials,
+            multiSwapContract,
+            "uniDeusEth",
+            [amountIn, addressPath1, minAmountOut]);
+      }
+      if (path1.length >= 2 && path2.length >= 2) {
+        return await ethService.makeTransaction(
+            await credentials,
+            multiSwapContract,
+            "uniDeusEthUni",
+            [amountIn, addressPath1, addressPath2, minAmountOut]);
+      }
+    }
+
+    return null;
+  }
+
+  Future<String> swapTokens(
+      fromToken, toToken, String _amountIn, String _minAmountOut, Gas gas) async {
     if (!this.checkWallet()) return "0";
     var path = await getPath(fromToken, toToken);
 
@@ -100,11 +236,11 @@ class SwapService {
     if (fromToken == 'eth' && toToken == 'deus') {
       return await ethService.submit(await credentials,
           automaticMarketMakerContract, "buy", [minAmountOut],
-          value: EtherAmount.inWei(amountIn));
+          value: EtherAmount.inWei(amountIn),gas: gas);
     }
     if (fromToken == 'deus' && toToken == 'eth') {
       return await ethService.submit(await credentials, multiSwapContract,
-          "uniDeusEth", [amountIn, [], minAmountOut]);
+          "uniDeusEth", [amountIn, [], minAmountOut],gas: gas);
     }
 
     final deusAddress = await ethService.getTokenAddrHex("deus", "token");
@@ -118,16 +254,16 @@ class SwapService {
             uniswapRouter,
             "swapExactETHForTokens",
             [minAmountOut, addressPath, await address, BigInt.from(deadLine)],
-            value: EtherAmount.inWei(amountIn));
+            value: EtherAmount.inWei(amountIn),gas: gas);
       }
       if (path.last == await ethService.getTokenAddrHex("weth", "token")) {
         List<EthereumAddress> addressPath = _pathListToAddresses(path);
         return await ethService.submit(await credentials, multiSwapContract,
-            "tokensToEthOnUni", [amountIn, addressPath, minAmountOut]);
+            "tokensToEthOnUni", [amountIn, addressPath, minAmountOut],gas: gas);
       }
       List<EthereumAddress> addressPath = _pathListToAddresses(path);
       return await ethService.submit(await credentials, multiSwapContract,
-          "tokensToTokensOnUni", [amountIn, addressPath, minAmountOut]);
+          "tokensToTokensOnUni", [amountIn, addressPath, minAmountOut],gas: gas);
     }
 
     if (deusIndex == path.length - 1) {
@@ -137,11 +273,11 @@ class SwapService {
         var path2 = [];
         List<EthereumAddress> addressPath = _pathListToAddresses(path1);
         return await ethService.submit(await credentials, multiSwapContract,
-            "uniEthDeusUni", [amountIn, addressPath, path2, minAmountOut]);
+            "uniEthDeusUni", [amountIn, addressPath, path2, minAmountOut],gas: gas);
       }
       List<EthereumAddress> addressPath = _pathListToAddresses(path);
       return await ethService.submit(await credentials, multiSwapContract,
-          "tokensToTokensOnUni", [amountIn, addressPath, minAmountOut]);
+          "tokensToTokensOnUni", [amountIn, addressPath, minAmountOut],gas: gas);
     }
 
     if (deusIndex == 0) {
@@ -149,11 +285,11 @@ class SwapService {
         var path1 = path.sublist(1);
         List<EthereumAddress> addressPath = _pathListToAddresses(path1);
         return await ethService.submit(await credentials, multiSwapContract,
-            "deusEthUni", [amountIn, addressPath, minAmountOut]);
+            "deusEthUni", [amountIn, addressPath, minAmountOut],gas: gas);
       }
       List<EthereumAddress> addressPath = _pathListToAddresses(path);
       return await ethService.submit(await credentials, multiSwapContract,
-          "tokensToTokensOnUni", [amountIn, addressPath, minAmountOut]);
+          "tokensToTokensOnUni", [amountIn, addressPath, minAmountOut],gas: gas);
     }
     if (path[deusIndex - 1] ==
         await ethService.getTokenAddrHex("weth", "token")) {
@@ -162,14 +298,17 @@ class SwapService {
       List<EthereumAddress> addressPath1 = _pathListToAddresses(path1);
       List<EthereumAddress> addressPath2 = _pathListToAddresses(path2);
       if (path1.length > 1) {
-        return await ethService.submit(await credentials, multiSwapContract,
-            "uniEthDeusUni", [amountIn, addressPath1, addressPath2, minAmountOut]);
+        return await ethService.submit(
+            await credentials,
+            multiSwapContract,
+            "uniEthDeusUni",
+            [amountIn, addressPath1, addressPath2, minAmountOut],gas: gas);
       }
       var path3 = path.sublist(deusIndex);
       List<EthereumAddress> addressPath = _pathListToAddresses(path3);
       return await ethService.submit(await credentials, multiSwapContract,
           "ethDeusUni", [addressPath, minAmountOut],
-          value: EtherAmount.inWei(amountIn));
+          value: EtherAmount.inWei(amountIn),gas: gas);
     }
 
     if (path[deusIndex + 1] ==
@@ -180,16 +319,18 @@ class SwapService {
       List<EthereumAddress> addressPath2 = _pathListToAddresses(path2);
       if (path1.length >= 2 && path2.length <= 1) {
         return await ethService.submit(await credentials, multiSwapContract,
-            "uniDeusEth", [amountIn, addressPath1, minAmountOut]);
+            "uniDeusEth", [amountIn, addressPath1, minAmountOut],gas: gas);
       }
       if (path1.length >= 2 && path2.length >= 2) {
-        return await ethService.submit(await credentials, multiSwapContract,
-            "uniDeusEthUni", [amountIn, addressPath1, addressPath2, minAmountOut]);
+        return await ethService.submit(
+            await credentials,
+            multiSwapContract,
+            "uniDeusEthUni",
+            [amountIn, addressPath1, addressPath2, minAmountOut],gas: gas);
       }
     }
 
     return "0";
-
   }
 
   List<EthereumAddress> _pathListToAddresses(List<String> paths) {
@@ -325,14 +466,14 @@ class SwapService {
   }
 
   Future<BigInt> _ammPurchaseReturn(BigInt amountIn) async {
-    final result = await ethService.query(automaticMarketMakerContract,
-        "calculatePurchaseReturn", [amountIn]);
+    final result = await ethService.query(
+        automaticMarketMakerContract, "calculatePurchaseReturn", [amountIn]);
     return result[0] as BigInt;
   }
 
   Future<BigInt> _ammSaleReturn(BigInt amountIn) async {
-    final result = await ethService.query(automaticMarketMakerContract,
-        "calculateSaleReturn", [amountIn]);
+    final result = await ethService
+        .query(automaticMarketMakerContract, "calculateSaleReturn", [amountIn]);
     return result[0] as BigInt;
   }
 

@@ -20,7 +20,7 @@ class TextFieldWithMax extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-          color: Color(MyColors.Button_BG_Black),
+          color: MyColors.Button_BG_Black,
           border: Border.all(color: Colors.white.withOpacity(0.1))),
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: TextField(

@@ -1,7 +1,7 @@
 import 'dart:convert';
-
 import 'package:deus_mobile/models/contract_input_data.dart';
 import 'package:deus_mobile/models/stock_address.dart';
+
 
 import '../models/stock.dart';
 import 'package:http/http.dart' as http;
@@ -15,9 +15,20 @@ abstract class StockData {
   static Map<String, ContractInputData> contractInputData = new Map();
 
 
-  static Future<bool> getdata() async {
-    var response = await http.get("https://sync.deus.finance/oracle-files/registrar.json");
-    if (response.statusCode == 200) {
+  static StockAddress getStockAddress(Token stock ){
+    for(var i = 0; i<addresses.length;i++){
+      if(addresses[i].id == stock.getTokenName()){
+        return addresses[i];
+      }
+    }
+    return null;
+  }
+
+
+  static Future<bool> getData() async {
+      var response = await http.get("https://sync.deus.finance/oracle-files/registrar.json");
+    print(response);
+      if (response.statusCode == 200) {
       var map = json.decode(response.body);
       map.forEach((key, value) {
         values.add(Stock.fromJson(value));
@@ -29,7 +40,7 @@ abstract class StockData {
 
   }
 
-  static Future<bool> getStockAddress() async {
+  static Future<bool> getStockAddresses() async {
     var response = await http.get(
         "https://sync.deus.finance/oracle-files/conducted.json");
     if (response.statusCode == 200) {
@@ -53,6 +64,22 @@ abstract class StockData {
         ContractInputData c = ContractInputData.fromJson(value);
         contractInputData.addEntries([new MapEntry(key, c)]);
       });
+      return true;
+    } else {
+      return false;
+    }
+
+  }
+
+  static Future<bool> getPrices() async {
+    var response = await http.get("https://sync.deus.finance/oracle-files/price.json");
+    if (response.statusCode == 200) {
+//      contractInputData.clear();
+//      var map = json.decode(response.body);
+//      map.forEach((key, value) {
+//        ContractInputData c = ContractInputData.fromJson(value);
+//        contractInputData.addEntries([new MapEntry(key, c)]);
+//      });
       return true;
     } else {
       return false;

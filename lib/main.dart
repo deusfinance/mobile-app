@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:deus/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
+import 'package:deus/screens/main_screen/main_screen.dart';
+import 'package:deus/screens/splash/splash_screen.dart';
+import 'package:deus/screens/stake_screen/stake_screen.dart';
+import 'package:deus/screens/swap/confirm_swap.dart';
+import 'package:deus/screens/test_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 

@@ -1,8 +1,10 @@
+
 import 'package:deus_mobile/screens/staking/stacking_screen.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_screen.dart';
 import 'package:deus_mobile/screens/test_screen.dart';
 import 'package:deus_mobile/screens/vaults/vaults_screen.dart';
+
 import 'package:flutter/material.dart';
 
 import '../synthetics/synchronizer_screen.dart';
@@ -30,7 +32,7 @@ class MyNavigationItem {
           title: "Synthetics",
         ),
         MyNavigationItem(
-          page: StakingScreen(),
+          page: StakeScreen(),
           title: "Staking",
         ),
         MyNavigationItem(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/core/widgets/svg.dart';
@@ -13,6 +14,7 @@ import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/statics.dart';
 import 'package:deus_mobile/statics/styles.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +42,8 @@ class _SwapScreenState extends State<SwapScreen> {
   double priceImpact = 0;
   List<Token> route = [];
   bool isPriceRatioForward = true;
+  bool showingToast = false;
+  String toastMessage;
 
   @override
   void initState() {
@@ -51,7 +55,7 @@ class _SwapScreenState extends State<SwapScreen> {
     swapService = new SwapService(
         ethService: new EthereumService(4),
         privateKey:
-            "0xefadf3f48a2fd1c1815b153a7e134451df88c70e54630eb36323f2a0a555eaa3");
+            "0x394b2559d9e727734001346346e311d3bba6a0a2d566d8cb79647c755e41355d");
     fetchBalances();
     streamController.stream
         .transform(debounce(Duration(milliseconds: 500)))
@@ -93,6 +97,48 @@ class _SwapScreenState extends State<SwapScreen> {
             child: CircularProgressIndicator(),
           )
         : _buildBody(context);
+  }
+
+  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas res = await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black38,
+      barrierLabel: "Barrier",
+      pageBuilder: (_, __, ___) => Align(
+          alignment: Alignment.center,
+          child: ConfirmSwapScreen(
+            service: swapService,
+            transaction: transaction,
+          )),
+      barrierDismissible: true,
+      transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+        filter:
+            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        child: FadeTransition(
+          child: child,
+          opacity: anim1,
+        ),
+      ),
+      transitionDuration: Duration(milliseconds: 10),
+    );
+    return res;
+  }
+
+  Widget _buildTransactionPending() {
+    return Container(
+      margin: EdgeInsets.only(left:16, right: 16),
+      child: Toast(
+        label: 'Transaction Pending',
+        message: toastMessage,
+        color: MyColors.ToastGrey,
+        onPressed: () {},
+        onClosed: () {
+          setState(() {
+            showingToast = false;
+          });
+        },
+      ),
+    );
   }
 
   Widget _buildBody(BuildContext context) {
@@ -147,87 +193,98 @@ class _SwapScreenState extends State<SwapScreen> {
     );
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding),
-      decoration: BoxDecoration(color: Color(MyColors.Main_BG_Black)),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            fromField,
-            const SizedBox(height: 12),
-            GestureDetector(
-                onTap: () async {
-                  setState(() {
-                    Token a = swapModel.from;
-                    swapModel.from = swapModel.to;
-                    swapModel.to = a;
-                    fromFieldController.text = "";
-                    toFieldController.text = "";
-                    route = new List.from(route.reversed);
-                  });
-                  getAllowances();
-                },
-                child: Center(
-                    child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
-            const SizedBox(height: 12),
-            toField,
-            const SizedBox(height: 18),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      decoration: BoxDecoration(color: MyColors.Main_BG_Black),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
               children: [
-                Text(
-                  "Price",
-                  style: MyStyles.whiteSmallTextStyle,
-                ),
+                const SizedBox(height: 30),
+                fromField,
+                const SizedBox(height: 12),
+                GestureDetector(
+                    onTap: () async {
+                      setState(() {
+                        Token a = swapModel.from;
+                        swapModel.from = swapModel.to;
+                        swapModel.to = a;
+                        fromFieldController.text = "";
+                        toFieldController.text = "";
+                        route = new List.from(route.reversed);
+                      });
+                      getAllowances();
+                    },
+                    child: Center(
+                        child:
+                            PlatformSvg.asset('images/icons/arrow_down.svg'))),
+                const SizedBox(height: 12),
+                toField,
+                const SizedBox(height: 18),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isPriceRatioForward
-                          ? "${_getPriceRatio()} ${swapModel.from != null ? swapModel.from.symbol : "asset name"} per ${swapModel.to != null ? swapModel.to.symbol : "asset name"}"
-                          : "${_getPriceRatio()} ${swapModel.to != null ? swapModel.to.symbol : "asset name"} per ${swapModel.from != null ? swapModel.from.symbol : "asset name"}",
+                      "Price",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isPriceRatioForward = !isPriceRatioForward;
-                        });
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(left: 4.0),
-                        child: PlatformSvg.asset("images/icons/exchange.svg",
-                            width: 15),
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          isPriceRatioForward
+                              ? "${_getPriceRatio()} ${swapModel.from != null ? swapModel.from.symbol : "asset name"} per ${swapModel.to != null ? swapModel.to.symbol : "asset name"}"
+                              : "${_getPriceRatio()} ${swapModel.to != null ? swapModel.to.symbol : "asset name"} per ${swapModel.from != null ? swapModel.from.symbol : "asset name"}",
+                          style: MyStyles.whiteSmallTextStyle,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isPriceRatioForward = !isPriceRatioForward;
+                            });
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(left: 4.0),
+                            child: PlatformSvg.asset(
+                                "images/icons/exchange.svg",
+                                width: 15),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                _buildPriceImpact(),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Slippage Tolerance",
+                    style: MyStyles.whiteSmallTextStyle,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildSlippageButtons(),
+                const SizedBox(height: 12),
+                _buildModeButtons(),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Route",
+                    style: MyStyles.whiteSmallTextStyle,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildRouteWidget(),
               ],
             ),
-            const SizedBox(height: 12),
-            _buildPriceImpact(),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Slippage Tolerance",
-                style: MyStyles.whiteSmallTextStyle,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildSlippageButtons(),
-            const SizedBox(height: 12),
-            _buildModeButtons(),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Route",
-                style: MyStyles.whiteSmallTextStyle,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildRouteWidget(),
-          ],
-        ),
+          ),
+          showingToast
+              ? Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _buildTransactionPending())
+              : Container(),
+        ],
       ),
     );
   }
@@ -291,14 +348,19 @@ class _SwapScreenState extends State<SwapScreen> {
       child: Container(
         child: Row(children: [
           Visibility(
-
-            visible: !swapModel.approved && fromFieldController.text != "" && double.tryParse(fromFieldController.text) != null && double.tryParse(fromFieldController.text) != 0,
+            visible: !swapModel.approved &&
+                fromFieldController.text != "" &&
+                double.tryParse(fromFieldController.text) != null &&
+                double.tryParse(fromFieldController.text) != 0,
             child: Expanded(
               child: _buildApproveButton(),
             ),
           ),
           Visibility(
-              visible: !swapModel.approved && fromFieldController.text != "" && double.tryParse(fromFieldController.text) != null && double.tryParse(fromFieldController.text) != 0,
+              visible: !swapModel.approved &&
+                  fromFieldController.text != "" &&
+                  double.tryParse(fromFieldController.text) != null &&
+                  double.tryParse(fromFieldController.text) != 0,
               child: SizedBox(
                 width: 8.0,
               )),
@@ -328,7 +390,7 @@ class _SwapScreenState extends State<SwapScreen> {
           .getPath(swapModel.from.getTokenName(), swapModel.to.getTokenName())
           .then((value) {
         value.forEach((addr) {
-          route.add(EthereumService.addressToOtkenMap[addr.toLowerCase()]);
+          route.add(EthereumService.addressToTokenMap[addr.toLowerCase()]);
         });
         setState(() {});
       });
@@ -406,7 +468,6 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildSwapButton() {
-
     if (fromFieldController.text == "" || (double.tryParse(fromFieldController.text) != null && double.tryParse(fromFieldController.text) == 0)) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -592,29 +653,28 @@ class _SwapScreenState extends State<SwapScreen> {
     if (!isInProgress) {
       setState(() {
         isInProgress = true;
+        toastMessage = "Approve ${swapModel.from.name}";
+        showingToast = true;
       });
-      showToast(
-          context,
-          TransactionStatus(
-              "Approve ${swapModel.from.name}", TransactionStatus.PENDING));
       var res = await swapService.approve(swapModel.from.getTokenName());
       Stream<TransactionReceipt> result =
           swapService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
         setState(() {
           isInProgress = false;
+          showingToast = false;
           swapModel.approved = event.status;
         });
         if (event.status) {
           showToast(
               context,
               TransactionStatus("Approved ${swapModel.from.name}",
-                  TransactionStatus.SUCCESSFUL));
+                  TransactionStatus.SUCCESSFUL, "Successful"));
         } else {
           showToast(
               context,
               TransactionStatus("Approve of ${swapModel.from.name}",
-                  TransactionStatus.FAILED));
+                  TransactionStatus.FAILED, "Failed"));
         }
       });
     }
@@ -636,59 +696,73 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Future swapTokens() async {
     if (!isInProgress && swapModel.approved) {
-      setState(() {
-        isInProgress = true;
-      });
-      showToast(
-          context,
-          new TransactionStatus(
-              "Buy ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
-              TransactionStatus.PENDING));
-      var res = await swapService.swapTokens(
+      Transaction transaction = await swapService.makeSwapTransaction(
           swapModel.from.getTokenName(),
           swapModel.to.getTokenName(),
           fromFieldController.text,
           ((1 - getSlippage()) * double.parse(toFieldController.text))
               .toString());
-      Stream<TransactionReceipt> result =
-          swapService.ethService.pollTransactionReceipt(res);
-      result.listen((event) async {
+
+      Gas gas = await showConfirmGasFeeDialog(transaction);
+
+      if (gas != null) {
         setState(() {
-          isInProgress = false;
+          isInProgress = true;
+          toastMessage = "Swap ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}";
+          showingToast = true;
         });
-        if (event.status) {
-          showToast(
-              context,
-              new TransactionStatus(
-                  "Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
-                  TransactionStatus.SUCCESSFUL));
-          getTokenBalance(swapModel.from);
-          getTokenBalance(swapModel.to);
-//          swapModel.from.balance =
-//              await swapService.getTokenBalance(swapModel.from.getTokenName());
-//          swapModel.to.balance =
-//          await swapService.getTokenBalance(swapModel.to.getTokenName());
-        } else {
+
+        try {
+          var res = await swapService.swapTokens(
+              swapModel.from.getTokenName(),
+              swapModel.to.getTokenName(),
+              fromFieldController.text,
+              ((1 - getSlippage()) * double.parse(toFieldController.text))
+                  .toString(),
+              gas);
+          Stream<TransactionReceipt> result =
+              swapService.ethService.pollTransactionReceipt(res);
+          result.listen((event) async {
+            setState(() {
+              isInProgress = false;
+              showingToast = false;
+            });
+            if (event.status) {
+              showToast(
+                  context,
+                  new TransactionStatus(
+                      "Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
+                      TransactionStatus.SUCCESSFUL, "Successful"));
+              getTokenBalance(swapModel.from);
+              getTokenBalance(swapModel.to);
+            } else {
+              showToast(
+                  context,
+                  new TransactionStatus(
+                      "Not Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
+                      TransactionStatus.FAILED, "Failed"));
+            }
+          });
+        } on Exception catch (error) {
+          print(error);
+          setState(() {
+            isInProgress = false;
+            showingToast = false;
+          });
           showToast(
               context,
               new TransactionStatus(
                   "Not Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
-                  TransactionStatus.FAILED));
+                  TransactionStatus.FAILED, "Failed"));
         }
-      });
-
-//      if (result == null || !result) {
-//        showToast(
-//            context,
-//            TransactionStatus(
-//                "Approved ${swapModel.from.name}", TransactionStatus.FAILED));
-//      }
-//      else {
-//        showToast(
-//            context,
-//            TransactionStatus("Approved ${swapModel.from.name}",
-//                TransactionStatus.SUCCESSFUL));
-//      }
+      }
+      else{
+        showToast(
+            context,
+            new TransactionStatus(
+                "Transaction Rejected",
+                TransactionStatus.FAILED, "Failed"));
+      }
     }
   }
 

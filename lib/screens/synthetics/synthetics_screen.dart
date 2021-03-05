@@ -1,3 +1,4 @@
+
 import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
 import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/core/widgets/svg.dart';
@@ -9,7 +10,9 @@ import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/service/stock_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
+
 import 'package:flutter/material.dart';
+import 'package:web3dart/web3dart.dart';
 
 class SyntheticsScreen extends StatefulWidget {
   @override
@@ -21,16 +24,40 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   StockService stockService;
   TextEditingController fromFieldController = new TextEditingController();
   TextEditingController toFieldController = new TextEditingController();
+  StreamController<String> streamController = StreamController();
   bool isInProgress = false;
+  bool isPriceRatioForward = true;
+
 
   @override
   void initState() {
     super.initState();
-//    TODO chain id
-    stockService = new StockService(
-        ethService: new EthereumService(1), privateKey: "0x1321312");
-    syntheticModel = new SyntheticModel();
+    _init();
+    fetchBalance();
+  }
+
+  fetchBalance(){
+    getTokenBalance(syntheticModel.from);
     syntheticModel.syntheticState = SyntheticState.openMarket;
+  }
+
+  _init() {
+    stockService = new StockService(
+        ethService: new EthereumService(4),
+        privateKey:
+            "0xefadf3f48a2fd1c1815b153a7e134451df88c70e54630eb36323f2a0a555eaa3");
+    syntheticModel = new SyntheticModel();
+    streamController.stream
+        .transform(debounce(Duration(milliseconds: 500)))
+        .listen((s) async {
+      if (double.tryParse(s) != null && double.tryParse(s) > 0) {
+        StockData.getPrices();
+      } else {
+        setState(() {
+          toFieldController.text = "0.0";
+        });
+      }
+    });
   }
 
   @override
@@ -50,28 +77,41 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     );
   }
 
+  String _getPriceRatio() {
+    double a = double.tryParse(fromFieldController.text) ?? 0;
+    double b = double.tryParse(toFieldController.text) ?? 0;
+    if (a != 0 && b != 0) {
+      if (isPriceRatioForward)
+        return EthereumService.formatDouble((a / b).toString(), 5);
+      return EthereumService.formatDouble((b / a).toString(), 5);
+    }
+    return "0.0";
+  }
+
   Widget _buildUserInput(BuildContext context) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: syntheticModel.from,
         page: TabPage.synthetics,
         controller: fromFieldController,
-        tokenSelected: (selectedToken) {
+        tokenSelected: (selectedToken) async {
           setState(() {
             syntheticModel.to = CurrencyData.dai;
             syntheticModel.from = selectedToken;
             if (syntheticModel.selectionMode == SelectionMode.none) {
               syntheticModel.selectionMode = SelectionMode.long;
             }
+            fromFieldController.text = "";
+            toFieldController.text = "";
           });
+          await getAllowances();
+          getTokenBalance(syntheticModel.from);
         });
-    fromFieldController.addListener(() {
-      setState(() {
-        syntheticModel.fromValue = double.parse(fromFieldController.text);
-        syntheticModel.toValue = syntheticModel.fromValue * 1.023;
-        toFieldController.text = syntheticModel.toValue.toString();
+    if (!fromFieldController.hasListeners) {
+      fromFieldController.addListener(() {
+        listenInput();
       });
-    });
+    }
     SwapField toField = new SwapField(
       direction: Direction.to,
       controller: toFieldController,
@@ -84,14 +124,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           if (syntheticModel.selectionMode == SelectionMode.none) {
             syntheticModel.selectionMode = SelectionMode.long;
           }
+          fromFieldController.text = "";
+          toFieldController.text = "";
         });
+        getTokenBalance(syntheticModel.to);
       },
     );
-    toFieldController.addListener(() {
-      setState(() {
-        syntheticModel.toValue = double.parse(toFieldController.text);
-      });
-    });
     return Column(
       children: [
         const SizedBox(height: 30),
@@ -103,6 +141,8 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
                 var a = syntheticModel.from;
                 syntheticModel.from = syntheticModel.to;
                 syntheticModel.to = a;
+                fromFieldController.text = "";
+                toFieldController.text = "";
               });
             },
             child: Center(
@@ -122,16 +162,22 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
             Row(
               children: [
                 Text(
-                  "0.0038 ${syntheticModel.from != null ? syntheticModel.from
-                      .symbol : "asset name"} per ${syntheticModel.to != null
-                      ? syntheticModel.to.symbol
-                      : "asset name"}",
+                  isPriceRatioForward
+                      ? "${_getPriceRatio()} ${syntheticModel.from != null ? syntheticModel.from.symbol : "asset name"} per ${syntheticModel.to != null ? syntheticModel.to.symbol : "asset name"}"
+                      : "${_getPriceRatio()} ${syntheticModel.to != null ? syntheticModel.to.symbol : "asset name"} per ${syntheticModel.from != null ? syntheticModel.from.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                Container(
-                  margin: EdgeInsets.only(left: 4.0),
-                  child:
-                  PlatformSvg.asset("images/icons/exchange.svg", width: 15),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      isPriceRatioForward = !isPriceRatioForward;
+                    });
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(left: 4.0),
+                    child:
+                        PlatformSvg.asset("images/icons/exchange.svg", width: 15),
+                  ),
                 ),
               ],
             ),
@@ -154,10 +200,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   Widget _buildMainButton() {
     if (!stockService.checkWallet()) {
       return Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -172,10 +215,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     }
     if (syntheticModel.syntheticState == SyntheticState.closedMarket) {
       return Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -190,10 +230,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     }
     if (syntheticModel.to == null) {
       return Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -206,12 +243,9 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
         ),
       );
     }
-    if (syntheticModel.fromValue == null || syntheticModel.fromValue == "") {
+    if (fromFieldController.text == "" || (double.tryParse(fromFieldController.text) != null && double.tryParse(fromFieldController.text) == 0)) {
       return Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -224,13 +258,19 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
         ),
       );
     }
-//    TODO get balance
-    if (syntheticModel.fromValue < 1) {
+    if(!syntheticModel.approved){
+      return FilledGradientSelectionButton(
+        label: 'Approve',
+        onPressed: () async {
+          approve();
+        },
+        gradient: MyColors.blueToPurpleGradient,
+      );
+    }
+    if (syntheticModel.from.getBalance() <
+            EthereumService.getWei(fromFieldController.text)) {
       return Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
@@ -243,7 +283,6 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
         ),
       );
     }
-    // TODO check approved
     return FilledGradientSelectionButton(
       label: syntheticModel.from == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
@@ -256,32 +295,20 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       },
       gradient: MyColors.blueToPurpleGradient,
     );
-//    return syntheticModel.syntheticState == SyntheticState.openMarket &&
-//            syntheticModel.selectionMode != SelectionMode.none
-//        //TODO (@CodingDavid8): Check for amount entered
-//        ? FilledGradientSelectionButton(
-//            label: syntheticModel.from == CurrencyData.dai ? 'Buy' : 'Sell',
-//            onPressed: () {},
-//            gradient: MyColors.blueToPurpleGradient,
-//          )
-//        : Container(
-//            width: MediaQuery.of(context).size.width,
-//            padding: EdgeInsets.all(16.0),
-//            decoration: MyStyles.darkWithNoBorderDecoration,
-//            child: Align(
-//              alignment: Alignment.center,
-//              child: Text(
-//                syntheticModel.syntheticState == SyntheticState.closedMarket
-//                    ? 'MARKETS ARE CLOSED'
-//                    : syntheticModel.syntheticState ==
-//                            SyntheticState.timeRequired
-//                        ? 'YOU NEED TIME TOKENS'
-//                        : 'ENTER AN AMOUNT',
-//                style: MyStyles.lightWhiteMediumTextStyle,
-//                textAlign: TextAlign.center,
-//              ),
-//            ),
-//          );
+  }
+
+  Future getAllowances() async {
+    if (syntheticModel.from.getTokenName() == "dai") {
+      setState(() {
+        isInProgress = true;
+      });
+    }
+    stockService.getAllowances(syntheticModel.from.getTokenName()).then((value) {
+      setState(() {
+        syntheticModel.from.allowances = value;
+        isInProgress = false;
+      });
+    });
   }
 
   Future approve() async {
@@ -289,11 +316,30 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       setState(() {
         isInProgress = true;
       });
-      stockService.approve(syntheticModel.from.symbol.toLowerCase()).then((
-          value) {
+      showToast(
+          context,
+          TransactionStatus(
+              "Approve ${syntheticModel.from.name}", TransactionStatus.PENDING, "Pending"));
+
+      var res = await stockService.approve(syntheticModel.from.getTokenName());
+      Stream<TransactionReceipt> result =
+      stockService.ethService.pollTransactionReceipt(res);
+      result.listen((event) {
         setState(() {
           isInProgress = false;
+          syntheticModel.approved = event.status;
         });
+        if (event.status) {
+          showToast(
+              context,
+              TransactionStatus("Approved ${syntheticModel.from.name}",
+                  TransactionStatus.SUCCESSFUL, "Successful"));
+        } else {
+          showToast(
+              context,
+              TransactionStatus("Approve of ${syntheticModel.from.name}",
+                  TransactionStatus.FAILED, "Failed"));
+        }
       });
     }
   }
@@ -303,11 +349,32 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       setState(() {
         isInProgress = true;
       });
-      stockService.sell(syntheticModel.from.symbol.toLowerCase(), "",null).then((
-          value) {
+      String tokenAddress;
+      if(syntheticModel.from.getTokenName() == "dai"){
+        tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
+      }else{
+        StockAddress stockAddress = StockData.getStockAddress(syntheticModel.from);
+        tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
+      }
+      var res = await stockService.sell(tokenAddress, fromFieldController.text, null);
+      Stream<TransactionReceipt> result =
+      stockService.ethService.pollTransactionReceipt(res);
+      result.listen((event) {
         setState(() {
           isInProgress = false;
+          syntheticModel.approved = event.status;
         });
+        if (event.status) {
+          showToast(
+              context,
+              TransactionStatus("Sell ${syntheticModel.from.name}",
+                  TransactionStatus.SUCCESSFUL, "Failed"));
+        } else {
+          showToast(
+              context,
+              TransactionStatus("Sell of ${syntheticModel.from.name}",
+                  TransactionStatus.FAILED, "Failed"));
+        }
       });
     }
   }
@@ -317,10 +384,33 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       setState(() {
         isInProgress = true;
       });
-      stockService.buy("", "", null).then((value) {
+      String tokenAddress;
+      if(syntheticModel.from.getTokenName() == "dai"){
+        tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
+      }else{
+        StockAddress stockAddress = StockData.getStockAddress(syntheticModel.from);
+        tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
+      }
+
+      var res = await stockService.buy(tokenAddress, fromFieldController.text, null);
+      Stream<TransactionReceipt> result =
+      stockService.ethService.pollTransactionReceipt(res);
+      result.listen((event) {
         setState(() {
           isInProgress = false;
+          syntheticModel.approved = event.status;
         });
+        if (event.status) {
+          showToast(
+              context,
+              TransactionStatus("Buy ${syntheticModel.from.name}",
+                  TransactionStatus.SUCCESSFUL, "Successful"));
+        } else {
+          showToast(
+              context,
+              TransactionStatus("Buy of ${syntheticModel.from.name}",
+                  TransactionStatus.FAILED, "Failed"));
+        }
       });
     }
   }
@@ -340,10 +430,10 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-        //TODO: add colors to my_colors.dart (.red and .green)
-        syntheticModel.syntheticState == SyntheticState.openMarket
-            ? const Color(0xFF00D16C)
-            : const Color(0xFFD40000),
+            //TODO: add colors to my_colors.dart (.red and .green)
+            syntheticModel.syntheticState == SyntheticState.openMarket
+                ? const Color(0xFF00D16C)
+                : const Color(0xFFD40000),
         onEnd: () {
           setState(() {
             syntheticModel.syntheticState == SyntheticState.openMarket
@@ -363,9 +453,6 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       label: 'SHORT',
       onPressed: (bool selected) {
         setState(() {
-//          selected
-//              ? syntheticModel.selectionMode = SelectionMode.none
-//              : syntheticModel.selectionMode = SelectionMode.short;
           syntheticModel.selectionMode = SelectionMode.short;
         });
       },
@@ -379,14 +466,40 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       label: 'LONG',
       onPressed: (bool selected) {
         setState(() {
-//          selected
-//              ? syntheticModel.selectionMode = SelectionMode.none
-//              : syntheticModel.selectionMode = SelectionMode.long;
           syntheticModel.selectionMode = SelectionMode.long;
         });
       },
       selected: syntheticModel.selectionMode == SelectionMode.long,
       gradient: MyColors.blueToPurpleGradient,
     );
+  }
+
+  void listenInput() {
+    String input = fromFieldController.text;
+    if (input == null || input.isEmpty) {
+      input = "0.0";
+    }
+    if (syntheticModel.from.getAllowances() >= EthereumService.getWei(input)) {
+      syntheticModel.approved = true;
+    } else {
+      syntheticModel.approved = false;
+    }
+    setState(() {});
+    streamController.add(input);
+  }
+
+  void getTokenBalance(Token token) async {
+    String tokenAddress;
+    if(token.getTokenName() == "dai"){
+      tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
+    }else{
+      StockAddress stockAddress = StockData.getStockAddress(token);
+      tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
+    }
+    stockService.getTokenBalance(tokenAddress).then((value) {
+      token.balance = value;
+      setState(() {});
+    });
+
   }
 }

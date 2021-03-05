@@ -161,7 +161,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
             child: TextFormField(
                 maxLines: 1,
 //                onChanged: widget.onValueChange,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: "0.0",
                   hintStyle: MyStyles.lightWhiteMediumTextStyle,
                   border: InputBorder.none,

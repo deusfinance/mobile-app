@@ -28,7 +28,7 @@ class Steps extends StatelessWidget {
               style: MyStyles.whiteMediumTextStyle,
             ),
             decoration: BoxDecoration(
-                color: Color(MyColors.Button_BG_Black), shape: BoxShape.circle),
+                color: MyColors.Button_BG_Black, shape: BoxShape.circle),
           )
         ],
       ),
