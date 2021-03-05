@@ -28,9 +28,9 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
     return Container(
       height: 60,
       decoration: BoxDecoration(
-          color: Color(MyColors.Main_BG_Black),
+          color: MyColors.Main_BG_Black,
           border: Border(
-            top: BorderSide(width: 1.0, color: Color(MyColors.HalfBlack)),
+            top: BorderSide(width: 1.0, color: MyColors.HalfBlack),
           )),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -62,7 +62,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         decoration: _selectedIndex == 0
                             ? MyStyles.greenToBlueDecoration
                             : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                                color: MyColors.Main_BG_Black))
                   ],
                 ),
               )),
@@ -93,7 +93,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         decoration: _selectedIndex == 1
                             ? MyStyles.blueToPurpleDecoration
                             : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                                color: MyColors.Main_BG_Black))
                   ],
                 ),
               )),
@@ -124,7 +124,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         decoration: _selectedIndex == 2
                             ? MyStyles.blueToPurpleDecoration
                             : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                                color: MyColors.Main_BG_Black))
                   ],
                 ),
               )),
@@ -155,7 +155,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                         decoration: _selectedIndex == 3
                             ? MyStyles.blueToPurpleDecoration
                             : BoxDecoration(
-                                color: Color(MyColors.Main_BG_Black)))
+                                color: MyColors.Main_BG_Black))
                   ],
                 ),
               )),

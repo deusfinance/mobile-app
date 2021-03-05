@@ -55,8 +55,8 @@ class MarketTimer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-          color: Color(MyColors.Main_BG_Black),
-          border: Border.all(color: Color(MyColors.HalfBlack), width: 1.0)),
+          color: MyColors.Main_BG_Black,
+          border: Border.all(color: MyColors.HalfBlack, width: 1.0)),
       width: getScreenWidth(context),
       padding:
           const EdgeInsets.symmetric(vertical: 16),

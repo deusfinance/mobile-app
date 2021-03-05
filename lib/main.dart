@@ -2,6 +2,7 @@ import 'package:deus/core/widgets/token_selector/currency_selector_screen/curren
 import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:deus/screens/splash/splash_screen.dart';
 import 'package:deus/screens/stake_screen/stake_screen.dart';
+import 'package:deus/screens/swap/confirm_swap.dart';
 import 'package:deus/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: generateRoutes(),
-      initialRoute: StakeScreen.url,
+      initialRoute: SplashScreen.route,
     );
   }
 
@@ -59,6 +60,10 @@ class MyApp extends StatelessWidget {
           break;
         case StakeScreen.url:
           screen = StakeScreen();
+          break;
+
+        case ConfirmSwapScreen.route:
+          screen = ConfirmSwapScreen();
           break;
         
         default:

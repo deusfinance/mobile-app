@@ -18,16 +18,16 @@ class MyStyles {
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
-      color: Color(MyColors.Button_BG_Black),
-      border: Border.all(color: Color(MyColors.HalfBlack), width: 1.0));
+      color: MyColors.Button_BG_Black,
+      border: Border.all(color: MyColors.HalfBlack, width: 1.0));
   static var darkWithBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
-      color: Color(MyColors.Button_BG_Black),
-      border: Border.all(color: Color(MyColors.Black), width: 1.0));
+      color: MyColors.Button_BG_Black,
+      border: Border.all(color: MyColors.Black, width: 1.0));
 
   static var darkWithNoBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
-      color: Color(MyColors.Button_BG_Black));
+      color: MyColors.Button_BG_Black);
 
   static var blueToPurpleDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
@@ -38,54 +38,54 @@ class MyStyles {
       gradient: MyColors.greenToBlueGradient);
 
 //  text styles
-  static const lightWhiteSmallTextStyle = TextStyle(
+  static var lightWhiteSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
-    color: Color(MyColors.HalfWhite),
+    color: MyColors.HalfWhite,
   );
-  static const lightWhiteMediumTextStyle = TextStyle(
+  static var lightWhiteMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
-    color: Color(MyColors.HalfWhite),
+    color: MyColors.HalfWhite,
   );
-  static const whiteSmallTextStyle = TextStyle(
+  static var whiteSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
-    color: Color(MyColors.White),
+    color: MyColors.White,
   );
-  static const blackSmallTextStyle = TextStyle(
+  static var blackSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
-    color: Color(MyColors.Black),
+    color: MyColors.Black,
   );
-  static const blackMediumTextStyle = TextStyle(
+  static var blackMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
-    color: Color(MyColors.Black),
+    color: MyColors.Black,
   );
-  static const whiteMediumTextStyle = TextStyle(
+  static var whiteMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
-    color: Color(MyColors.White),
+    color: MyColors.White,
   );
-  static const whiteMediumUnderlinedTextStyle = TextStyle(
+  static var whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     decoration: TextDecoration.underline,
     fontSize: S4,
-    color: Color(MyColors.White),
+    color: MyColors.White,
   );
 
-  static const bottomNavBarUnSelectedStyle = TextStyle(
+  static var bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
-    color: Color(MyColors.White),
+    color: MyColors.White,
   );
 }

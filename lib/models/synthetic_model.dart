@@ -7,11 +7,10 @@ enum SyntheticState { closedMarket, openMarket, loading, timeRequired }
 
 class SyntheticModel{
   Token from;
-  double fromValue = 0;
   Token to;
-  double toValue = 0;
   SelectionMode selectionMode;
   SyntheticState syntheticState;
+  bool approved;
 
 
   SyntheticModel(){
@@ -19,6 +18,7 @@ class SyntheticModel{
     this.syntheticState = SyntheticState.loading;
     this.from = CurrencyData.dai;
     this.to = null;
+    this.approved = false;
   }
 
 }

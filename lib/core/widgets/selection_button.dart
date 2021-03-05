@@ -8,7 +8,7 @@ class SelectionButton extends StatefulWidget {
   final void Function(bool selected) onPressed;
   final bool selected;
   final LinearGradient gradient;
-  final TextStyle textStyle;
+  TextStyle textStyle;
 
   /// You can choose between using a label or another widget if you use a widget the label is useless
   final Widget child;
@@ -19,7 +19,11 @@ class SelectionButton extends StatefulWidget {
       this.onPressed,
       this.gradient,
       this.child,
-      this.textStyle = MyStyles.whiteMediumTextStyle});
+      this.textStyle}){
+    if(this.textStyle == null){
+      this.textStyle = MyStyles.whiteMediumTextStyle;
+    }
+  }
 
   @override
   _SelectionButtonState createState() => _SelectionButtonState();

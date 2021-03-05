@@ -1,3 +1,4 @@
+import 'package:deus/screens/stake_screen/stake_screen.dart';
 import 'package:deus/screens/staking/stacking_screen.dart';
 import 'package:deus/screens/swap/swap_screen.dart';
 import 'package:deus/screens/synthetics/synthetics_screen.dart';
@@ -30,7 +31,7 @@ class MyNavigationItem {
           title: "Synthetics",
         ),
         MyNavigationItem(
-          page: StakingScreen(),
+          page: StakeScreen(),
           title: "Staking",
         ),
         MyNavigationItem(

@@ -17,7 +17,7 @@ class DarkButton extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
         child: Material(
-          color: Color(MyColors.Button_BG_Black),
+          color: MyColors.Button_BG_Black,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
           child: InkWell(

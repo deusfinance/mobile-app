@@ -4,11 +4,13 @@ class TransactionStatus{
   static const SUCCESSFUL = 1;
   static const FAILED = 2;
 
-  String message;
-  int status;
+  final String message;
+  final String label;
+  final int status;
+  final String hash;
 
 
-  TransactionStatus(this.message, this.status);
+  const TransactionStatus(this.message, this.status, this.label, [this.hash = ""]);
 
   String getMessage(){
     String fullMessage = "";

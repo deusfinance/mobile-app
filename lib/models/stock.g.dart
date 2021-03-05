@@ -12,6 +12,9 @@ Stock _$StockFromJson(Map<String, dynamic> json) {
     json['symbol'] as String,
     json['logo'] as String,
   )
+    ..balance = json['balance'] as String
+    ..allowances = json['allowances'] as String
+    ..chainId = json['chainId'] as int
     ..sector = json['sector'] as String
     ..shortName = json['short_name'] as String
     ..shortSymbol = json['short_symbol'] as String
@@ -20,6 +23,9 @@ Stock _$StockFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$StockToJson(Stock instance) => <String, dynamic>{
+      'balance': instance.balance,
+      'allowances': instance.allowances,
+      'chainId': instance.chainId,
       'name': instance.name,
       'sector': instance.sector,
       'symbol': instance.symbol,

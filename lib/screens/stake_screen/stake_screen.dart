@@ -46,7 +46,7 @@ class _StakeScreenState extends State<StakeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(MyColors.Background),
+      backgroundColor: MyColors.Main_BG_Black,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -120,7 +120,7 @@ class _StakeScreenState extends State<StakeScreen> {
   Toast _buildTransactionSuccessToast() {
     return Toast(
       label: 'Successful',
-      color: Color(MyColors.ToastGreen),
+      color: MyColors.ToastGreen,
       onPressed: () {},
       onClosed: () {
         setState(() {
@@ -133,7 +133,7 @@ class _StakeScreenState extends State<StakeScreen> {
   Toast _buildTransactionPending() {
     return Toast(
       label: 'Transaction Pending',
-      color: Color(MyColors.ToastGrey),
+      color: MyColors.ToastGrey,
       onPressed: () {},
       onClosed: () {
         setState(() {
