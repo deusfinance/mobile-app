@@ -14,12 +14,7 @@ import 'package:deus/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 
-enum LockScreenStates {
-  hasToApprove,
-  pendingApproveDividedButton,
-  isApproved,
-  pendingApproveMergedButton
-}
+enum LockScreenStates { hasToApprove, pendingApproveDividedButton, isApproved, pendingApproveMergedButton }
 
 class LockScreen extends StatefulWidget {
   static const url = '/Lock';
@@ -39,8 +34,9 @@ class _LockScreenState extends State<LockScreen> {
   bool _showToast = false;
 
   final _textController = TextEditingController();
-                                                //Date Format: year, month, day, hour, minute, seconds
-  int endTime = DateTime.now().millisecondsSinceEpoch + DateTime(2021, 5,3, 10, 0, 0).difference(DateTime.now()).inMilliseconds; // Time until countDown ends
+  //Date Format: year, month, day, hour, minute, seconds
+  int endTime = DateTime.now().millisecondsSinceEpoch +
+      DateTime(2021, 5, 3, 10, 0, 0).difference(DateTime.now()).inMilliseconds; // Time until countDown ends
 
   static const kBigSpacer = SizedBox(height: 20);
   static const kMediumSpacer = SizedBox(height: 15);
@@ -105,8 +101,7 @@ class _LockScreenState extends State<LockScreen> {
                 if (_lockState == LockScreenStates.hasToApprove) Steps(),
                 Spacer(),
                 if ((_lockState != LockScreenStates.hasToApprove && _showToast) ||
-                    (_lockState == LockScreenStates.pendingApproveDividedButton &&
-                        _showToast))
+                    (_lockState == LockScreenStates.pendingApproveDividedButton && _showToast))
                   _buildToast()
               ],
             ),
@@ -121,8 +116,7 @@ class _LockScreenState extends State<LockScreen> {
       endTime: endTime,
       widgetBuilder: (_, time) {
         if (time == null) {
-          return Text(
-              'Current locking period still lasts 0 Days, 0 Hours, 0 Minutes and 0 Seconds.',
+          return Text('Current locking period still lasts 0 Days, 0 Hours, 0 Minutes and 0 Seconds.',
               style: MyStyles.gradientMediumTextStyle);
         } else {
           return Text(
@@ -146,7 +140,7 @@ class _LockScreenState extends State<LockScreen> {
   Toast _buildTransactionSuccessToast() {
     return Toast(
       label: 'Successful',
-      color: Color(MyColors.ToastGreen),
+      color: MyColors.ToastGreen,
       onPressed: () {},
       onClosed: () {
         setState(() {
@@ -159,7 +153,7 @@ class _LockScreenState extends State<LockScreen> {
   Toast _buildTransactionPending() {
     return Toast(
       label: 'Transaction Pending',
-      color: Color(MyColors.ToastGrey),
+      color: MyColors.ToastGrey,
       onPressed: () {},
       onClosed: () {
         setState(() {
@@ -169,20 +163,17 @@ class _LockScreenState extends State<LockScreen> {
     );
   }
 
-
-
   Widget _buildLockApproveButton() {
     return CrossFadeDuoButton(
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'LOCK',
       offButtonLabel: 'LOCK',
-      showBothButtons: _lockState == LockScreenStates.hasToApprove ||
-          _lockState == LockScreenStates.pendingApproveDividedButton,
+      showBothButtons:
+          _lockState == LockScreenStates.hasToApprove || _lockState == LockScreenStates.pendingApproveDividedButton,
       showLoading: _lockState == LockScreenStates.pendingApproveDividedButton ||
           _lockState == LockScreenStates.pendingApproveMergedButton,
       onPressed: () async {
-        if (_lockState == LockScreenStates.isApproved ||
-            _lockState == LockScreenStates.pendingApproveMergedButton) {
+        if (_lockState == LockScreenStates.isApproved || _lockState == LockScreenStates.pendingApproveMergedButton) {
           setState(() {
             _showToast = true;
             _lockState = LockScreenStates.pendingApproveMergedButton;
