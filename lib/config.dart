@@ -6,13 +6,15 @@ class AppConfig {
   /// Can be used to switch between development and production mode easily
   static const selectedConfig = AppConfig.testing();
 
-  const AppConfig.testing() : this.params = const AppConfigParams(chainId: 3);
-
+  const AppConfig.testing() : this.params = const AppConfigParams(chainId: 3), this.showDebugMessages = true;
+  
+  final bool showDebugMessages;
   final AppConfigParams params;
 }
 
 class AppConfigParams {
   const AppConfigParams({@required this.chainId});
 
+  
   final int chainId;
 }
