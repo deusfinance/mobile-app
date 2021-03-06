@@ -1,6 +1,6 @@
-import 'package:deus/core/widgets/header_with_address.dart';
-import 'package:deus/service/address_service.dart';
-import 'package:deus/service/config_service.dart';
+import 'package:deus_mobile/core/widgets/header_with_address.dart';
+import 'package:deus_mobile/service/address_service.dart';
+import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

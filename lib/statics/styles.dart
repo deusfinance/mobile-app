@@ -1,4 +1,4 @@
-import 'package:deus/statics/my_colors.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
