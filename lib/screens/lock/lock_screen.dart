@@ -146,7 +146,7 @@ class _LockScreenState extends State<LockScreen> {
   Toast _buildTransactionSuccessToast() {
     return Toast(
       label: 'Successful',
-      color: Color(MyColors.ToastGreen),
+      color: MyColors.ToastGreen,
       onPressed: () {},
       onClosed: () {
         setState(() {
@@ -159,7 +159,7 @@ class _LockScreenState extends State<LockScreen> {
   Toast _buildTransactionPending() {
     return Toast(
       label: 'Transaction Pending',
-      color: Color(MyColors.ToastGrey),
+      color: MyColors.ToastGrey,
       onPressed: () {},
       onClosed: () {
         setState(() {

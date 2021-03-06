@@ -24,7 +24,7 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
 
       if (configurationService.didSetupWallet())
         return WalletProvider(builder: (_, __) {
-          return MainScreen();
+          return SplashScreen();
         });
       else
         return IntroPage();
@@ -43,7 +43,7 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     MainScreen.route: (_) => MainScreen(),
     IntroPage.url: (_) => IntroPage(),
     SplashScreen.route: (_) => SplashScreen(),
-    SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
+//    SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
     StakeScreen.url: (_) => StakeScreen(),

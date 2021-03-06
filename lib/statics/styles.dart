@@ -76,7 +76,6 @@ class MyStyles {
     fontSize: S4,
     color: MyColors.White,
   );
-  static var whiteMediumUnderlinedTextStyle = TextStyle(
 
   static TextStyle gradientMediumTextStyle = TextStyle(
       fontFamily: kFontFamily,
@@ -88,17 +87,7 @@ class MyStyles {
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
 
 
-  static const whiteMediumUnderlinedTextStyle = TextStyle(
-    fontFamily: kFontFamily,
-    fontWeight: FontWeight.w300,
-    decoration: TextDecoration.underline,
-    fontSize: S4,
-    color: MyColors.White,
-  );
-
   static var bottomNavBarUnSelectedStyle = TextStyle(
-
-  static const bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,

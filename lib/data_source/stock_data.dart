@@ -28,7 +28,6 @@ abstract class StockData {
 
   static Future<bool> getData() async {
       var response = await http.get("https://sync.deus.finance/oracle-files/registrar.json");
-    print(response);
       if (response.statusCode == 200) {
       var map = json.decode(response.body);
       map.forEach((key, value) {

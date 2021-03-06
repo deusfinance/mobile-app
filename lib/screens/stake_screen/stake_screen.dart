@@ -56,9 +56,6 @@ class _StakeScreenState extends State<StakeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HeaderWithAddress(
-                  walletAddress: address,
-                ),
                 kSpacer,
                 BackButtonWithText(),
                 kSpacer,

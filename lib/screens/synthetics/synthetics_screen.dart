@@ -138,7 +138,6 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
     );
     return Column(
       children: [
-        const SizedBox(height: 30),
         fromField,
         const SizedBox(height: 12),
         GestureDetector(

@@ -13,8 +13,11 @@ import 'package:deus/models/swap_model.dart';
 import 'package:deus/models/token.dart';
 import 'package:deus/models/transaction_status.dart';
 import 'package:deus/screens/swap/confirm_swap.dart';
+import 'package:deus/service/address_service.dart';
+import 'package:deus/service/config_service.dart';
 import 'package:deus/service/deus_swap_service.dart';
 import 'package:deus/service/ethereum_service.dart';
+import 'package:deus/service/services_provider.dart';
 import 'package:deus/statics/my_colors.dart';
 import 'package:deus/statics/statics.dart';
 import 'package:deus/statics/styles.dart';
@@ -22,6 +25,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
 import 'package:web3dart/web3dart.dart';
@@ -33,33 +37,36 @@ class SwapScreen extends StatefulWidget {
   _SwapScreenState createState() => _SwapScreenState();
 }
 
-class _SwapScreenState extends State<SwapScreen> {
-  SwapModel swapModel = SwapModel(CurrencyData.eth, CurrencyData.deus);
+class _SwapScreenState extends State<SwapScreen>{
+//  text field controllers
   TextEditingController fromFieldController = new TextEditingController();
   TextEditingController toFieldController = new TextEditingController();
   TextEditingController slippageController = new TextEditingController();
   StreamController<String> streamController = StreamController();
+
+
+  SwapService swapService;
+  SwapModel swapModel = SwapModel(CurrencyData.eth, CurrencyData.deus);
+
   bool isInProgress = false;
   bool fetchingData = true;
-  SwapService swapService;
   double priceImpact = 0;
+
+//  route vars
   List<Token> route = [];
   bool isPriceRatioForward = true;
+
+//  toast vars
   bool showingToast = false;
   String toastMessage;
 
   @override
   void initState() {
-    super.initState();
     _init();
+    super.initState();
   }
 
-  _init() {
-    swapService = new SwapService(
-        ethService: new EthereumService(4),
-        privateKey:
-            "0x394b2559d9e727734001346346e311d3bba6a0a2d566d8cb79647c755e41355d");
-    fetchBalances();
+  _init() async {
     streamController.stream
         .transform(debounce(Duration(milliseconds: 500)))
         .listen((s) async {
@@ -95,6 +102,13 @@ class _SwapScreenState extends State<SwapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if(swapService == null) {
+      swapService = new SwapService(
+          ethService: Provider.of<EthereumService>(context),
+          privateKey:
+          Provider.of<ConfigurationService>(context).getPrivateKey());
+      fetchBalances();
+    }
     return fetchingData
         ? Center(
             child: CircularProgressIndicator(),
@@ -202,7 +216,6 @@ class _SwapScreenState extends State<SwapScreen> {
           SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: 30),
                 fromField,
                 const SizedBox(height: 12),
                 GestureDetector(
