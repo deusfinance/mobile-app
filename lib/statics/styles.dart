@@ -1,8 +1,18 @@
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class MyStyles {
-//  font sizes
+  static final ThemeData theme = ThemeData(
+    primarySwatch: Colors.blue,
+    fontFamily: MyStyles.kFontFamily,
+    backgroundColor: Color(MyColors.Background),
+    brightness: Brightness.dark,
+    canvasColor: Color(MyColors.Background),
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
+
+  // font sizes
   static const S6 = 13.0;
   static const S5 = 16.0;
   static const S4 = 18.0;
@@ -15,7 +25,7 @@ class MyStyles {
 
   static const String kFontFamily = "Monument";
 
-//  decorations
+  // decorations
   static var lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
       color: MyColors.Button_BG_Black,
@@ -34,7 +44,7 @@ class MyStyles {
   static var greenToBlueDecoration =
       BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.greenToBlueGradient);
 
-//  text styles
+  // text styles
   static var lightWhiteSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,

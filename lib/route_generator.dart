@@ -1,5 +1,5 @@
-import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
@@ -9,17 +9,19 @@ import 'infrastructure/wallet_provider/wallet_provider.dart';
 import 'infrastructure/wallet_setup/wallet_setup_provider.dart';
 import 'screens/lock/lock_screen.dart';
 import 'screens/main_screen/main_screen.dart';
+import 'screens/splash/cubit/splash_cubit.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/stake_screen/stake_screen.dart';
-import 'screens/test_screen.dart';
 import 'screens/wallet_intro_screen/intro_page.dart';
 import 'screens/wallet_intro_screen/wallet_create_page.dart';
 import 'screens/wallet_intro_screen/wallet_import_page.dart';
 import 'service/config_service.dart';
 
+const kInitialRoute = '/';
+
 Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
   return {
-    '/': (BuildContext ctx) {
+    kInitialRoute: (BuildContext ctx) {
       final configurationService = Provider.of<ConfigurationService>(ctx);
 
       if (configurationService.didSetupWallet())
@@ -42,7 +44,7 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     WalletImportPage.url: (_) => WalletSetupProvider(builder: (_, __) => WalletImportPage("Import wallet")),
     MainScreen.route: (_) => MainScreen(),
     IntroPage.url: (_) => IntroPage(),
-    SplashScreen.route: (_) => SplashScreen(),
+
     // SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),

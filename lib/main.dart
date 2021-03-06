@@ -1,45 +1,57 @@
+import 'package:deus_mobile/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import 'config.dart';
+import 'locator.dart';
 import 'route_generator.dart';
-import 'service/services_provider.dart';
+import 'provider_service.dart';
+import 'screens/splash/cubit/splash_cubit.dart';
 import 'statics/my_colors.dart';
 import 'statics/styles.dart';
 
+void deusDebugPrint(String s, {int wrapWidth}){
+  if(AppConfig.selectedConfig.showDebugMessages) print(s);
+}
+
 void main() async {
+  debugPrint = deusDebugPrint;
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  final List<Provider> providers = await createProviders();
-  runApp(DEUSApp(providers));
+  setupLocator();
+  runApp(DEUSApp());
 }
 
 class DEUSApp extends StatelessWidget {
-  final List<Provider> providers;
-
-  const DEUSApp(this.providers, {Key key}) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: providers,
-        child: MaterialApp(
-          title: 'Deus Finance',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            fontFamily: MyStyles.kFontFamily,
-            backgroundColor: Color(MyColors.Background),
-            brightness: Brightness.dark,
-            canvasColor: Color(MyColors.Background),
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-          routes: generateRoutes(context),
-          initialRoute: '/',
-        ));
+  Widget build(BuildContext ctx) {
+    return BlocProvider<SplashCubit>(
+        create: (_) => SplashCubit(),
+        child: BlocBuilder<SplashCubit, SplashState>(builder: (context, state) {
+          // at the beginning, show a splash screen, when the data hasn't been loaded yet.
+          return FutureBuilder(
+            future: context.read<SplashCubit>().initializeData(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || !(state is SplashSuccess))
+                return MaterialApp(theme: MyStyles.theme, home: SplashScreen());
+
+              return MultiProvider(
+                  providers: locator<ProviderService>().providers,
+                  child: MaterialApp(
+                    title: 'Deus Finance',
+                    debugShowCheckedModeBanner: false,
+                    theme: MyStyles.theme,
+                    routes: generateRoutes(context),
+                    initialRoute: kInitialRoute,
+                  ));
+            },
+          );
+        }));
   }
 }
