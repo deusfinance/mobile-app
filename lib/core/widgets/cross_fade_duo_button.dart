@@ -1,7 +1,7 @@
-import 'package:deus/core/widgets/disabled_button.dart';
-import 'package:deus/screens/stake_screen/stake_screen.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/widgets/disabled_button.dart';
+import 'package:deus_mobile/screens/stake_screen/stake_screen.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import 'filled_gradient_selection_button.dart';

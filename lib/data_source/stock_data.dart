@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:deus/models/contract_input_data.dart';
-import 'package:deus/models/stock_address.dart';
-import 'package:deus/models/token.dart';
-
-import '../models/stock.dart';
 import 'package:http/http.dart' as http;
+
+import '../models/contract_input_data.dart';
+import '../models/stock.dart';
+import '../models/stock_address.dart';
+import '../models/token.dart';
 
 //TODO (@CodingDavid8) fetch all supported stocks from server
 abstract class StockData {
@@ -15,21 +15,20 @@ abstract class StockData {
   static List<StockAddress> addresses = [];
   static Map<String, ContractInputData> contractInputData = new Map();
 
-
-  static StockAddress getStockAddress(Token stock ){
-    for(var i = 0; i<addresses.length;i++){
-      if(addresses[i].id == stock.getTokenName()){
+  static StockAddress getStockAddress(Token stock) {
+    for (var i = 0; i < addresses.length; i++) {
+      if (addresses[i].id == stock.getTokenName()) {
         return addresses[i];
       }
     }
     return null;
   }
 
-
   static Future<bool> getData() async {
-      var response = await http.get("https://sync.deus.finance/oracle-files/registrar.json");
-      if (response.statusCode == 200) {
-      var map = json.decode(response.body);
+    final response = await http.get("https://sync.deus.finance/oracle-files/registrar.json");
+    // print(response);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> map = json.decode(response.body);
       map.forEach((key, value) {
         values.add(Stock.fromJson(value));
       });
@@ -37,12 +36,10 @@ abstract class StockData {
     } else {
       return false;
     }
-
   }
 
   static Future<bool> getStockAddresses() async {
-    var response = await http.get(
-        "https://sync.deus.finance/oracle-files/conducted.json");
+    var response = await http.get("https://sync.deus.finance/oracle-files/conducted.json");
     if (response.statusCode == 200) {
       var js = json.decode(response.body);
       var map = js['tokens'];
@@ -68,7 +65,6 @@ abstract class StockData {
     } else {
       return false;
     }
-
   }
 
   static Future<bool> getPrices() async {
@@ -84,6 +80,5 @@ abstract class StockData {
     } else {
       return false;
     }
-
   }
 }

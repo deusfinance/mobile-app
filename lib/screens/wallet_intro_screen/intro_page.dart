@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:deus/screens/wallet_intro_screen/wallet_create_page.dart';
-import 'package:deus/screens/wallet_intro_screen/wallet_import_page.dart';
-import 'package:deus/statics/my_colors.dart';
+import 'package:deus_mobile/screens/wallet_intro_screen/wallet_create_page.dart';
+import 'package:deus_mobile/screens/wallet_intro_screen/wallet_import_page.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 
 class IntroPage extends StatelessWidget {

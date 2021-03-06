@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:core';
 
-import 'package:deus/models/gas.dart';
+import 'package:deus_mobile/models/gas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';

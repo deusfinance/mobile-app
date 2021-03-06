@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:deus/models/token.dart';
+import 'package:deus_mobile/models/token.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'stock.g.dart';

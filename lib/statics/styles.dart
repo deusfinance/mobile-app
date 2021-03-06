@@ -1,9 +1,18 @@
 import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class MyStyles {
+  static final ThemeData theme = ThemeData(
+    primarySwatch: Colors.blue,
+    fontFamily: MyStyles.kFontFamily,
+    backgroundColor: Color(MyColors.Background),
+    brightness: Brightness.dark,
+    canvasColor: Color(MyColors.Background),
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
 
-//  font sizes
+  // font sizes
   static const S6 = 13.0;
   static const S5 = 16.0;
   static const S4 = 18.0;
@@ -16,8 +25,7 @@ class MyStyles {
 
   static const String kFontFamily = "Monument";
 
-
-//  decorations
+  // decorations
   static var lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
       color: MyColors.Button_BG_Black,
@@ -27,19 +35,16 @@ class MyStyles {
       color: MyColors.Button_BG_Black,
       border: Border.all(color: MyColors.Black, width: 1.0));
 
-  static var darkWithNoBorderDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(cardRadiusSize),
-      color: MyColors.Button_BG_Black);
+  static var darkWithNoBorderDecoration =
+      BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), color: MyColors.Button_BG_Black);
 
-  static var blueToPurpleDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(cardRadiusSize),
-      gradient: MyColors.blueToPurpleGradient);
+  static var blueToPurpleDecoration =
+      BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.blueToPurpleGradient);
 
-  static var greenToBlueDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(cardRadiusSize),
-      gradient: MyColors.greenToBlueGradient);
+  static var greenToBlueDecoration =
+      BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.greenToBlueGradient);
 
-//  text styles
+  // text styles
   static var lightWhiteSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
@@ -86,14 +91,18 @@ class MyStyles {
           colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
 
+  static final whiteMediumUnderlinedTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    decoration: TextDecoration.underline,
+    fontSize: S4,
+    color: MyColors.White,
+  );
 
-  static var bottomNavBarUnSelectedStyle = TextStyle(
+  static final bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
     color: MyColors.White,
   );
-
-
 }
-

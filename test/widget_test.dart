@@ -5,19 +5,18 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:deus/service/services_provider.dart';
+import 'package:deus_mobile/provider_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:deus/main.dart';
+import 'package:deus_mobile/main.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    final List<Provider> providers = await createProviders();
 
-    await tester.pumpWidget(DEUSApp(providers));
+    await tester.pumpWidget(DEUSApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

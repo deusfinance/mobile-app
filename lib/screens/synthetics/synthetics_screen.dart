@@ -1,24 +1,26 @@
+
 import 'dart:async';
 
-import 'package:deus/core/widgets/filled_gradient_selection_button.dart';
-import 'package:deus/core/widgets/selection_button.dart';
-import 'package:deus/core/widgets/svg.dart';
-import 'package:deus/core/widgets/swap_field.dart';
-import 'package:deus/data_source/currency_data.dart';
-import 'package:deus/data_source/stock_data.dart';
-import 'package:deus/models/stock_address.dart';
-import 'package:deus/models/synthetic_model.dart';
-import 'package:deus/models/token.dart';
-import 'package:deus/models/transaction_status.dart';
-import 'package:deus/screens/synthetics/market_timer.dart';
-import 'package:deus/service/ethereum_service.dart';
-import 'package:deus/service/stock_service.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/statics.dart';
-import 'package:deus/statics/styles.dart';
-import 'package:stream_transform/stream_transform.dart';
 import 'package:flutter/material.dart';
+import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
+
+import '../../core/widgets/filled_gradient_selection_button.dart';
+import '../../core/widgets/selection_button.dart';
+import '../../core/widgets/svg.dart';
+import '../../core/widgets/swap_field.dart';
+import '../../data_source/currency_data.dart';
+import '../../data_source/stock_data.dart';
+import '../../models/stock_address.dart';
+import '../../models/synthetic_model.dart';
+import '../../models/token.dart';
+import '../../models/transaction_status.dart';
+import '../../service/ethereum_service.dart';
+import '../../service/stock_service.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/statics.dart';
+import '../../statics/styles.dart';
+import 'market_timer.dart';
 
 class SyntheticsScreen extends StatefulWidget {
   @override

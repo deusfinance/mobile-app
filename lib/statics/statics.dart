@@ -1,11 +1,13 @@
-import 'package:deus/core/util/responsive.dart';
-import 'package:deus/models/transaction_status.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+
+import 'package:deus_mobile/core/util/responsive.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../models/transaction_status.dart';
+import 'my_colors.dart';
+import 'styles.dart';
 
 showToast(BuildContext context, final TransactionStatus status) {
   Color c;

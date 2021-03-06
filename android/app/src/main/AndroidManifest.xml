@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.deus">
+    package="de.app.innovators.deus_mobile">
    <application
-        android:label="deus"
-        android:icon="@mipmap/ic_launcher">
+        android:label="DEUS Finance"
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

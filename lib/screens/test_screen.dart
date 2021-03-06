@@ -1,7 +1,7 @@
-//import 'package:deus/service/deus_swap_service.dart';
-//import 'package:deus/service/ethereum_service.dart';
-//import 'package:deus/service/stock_service.dart';
-//import 'package:deus/statics/styles.dart';
+//import 'package:deus_mobile/service/deus_swap_service.dart';
+//import 'package:deus_mobile/service/ethereum_service.dart';
+//import 'package:deus_mobile/service/stock_service.dart';
+//import 'package:deus_mobile/statics/styles.dart';
 //import 'package:flutter/material.dart';
 //
 /////Test Screen used to check the Deus Swap Service.

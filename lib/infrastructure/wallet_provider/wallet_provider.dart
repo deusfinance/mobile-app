@@ -1,17 +1,15 @@
 
-import 'package:deus/models/wallet/wallet.dart';
-import 'package:deus/service/address_service.dart';
-import 'package:deus/service/config_service.dart';
-import 'package:deus/service/ethereum_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
 import 'package:provider/provider.dart';
 
-
+import '../../models/wallet/wallet.dart';
+import '../../service/address_service.dart';
+import '../../service/config_service.dart';
+import '../../service/ethereum_service.dart';
 import '../hook_provider.dart';
-import 'wallet_state.dart';
 import 'wallet_handler.dart';
+import 'wallet_state.dart';
 
 class WalletProvider extends ContextProviderWidget<WalletHandler> {
   WalletProvider({Widget child, HookWidgetBuilder<WalletHandler> builder})

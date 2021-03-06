@@ -1,6 +1,6 @@
 
 
-import 'package:deus/models/token.dart';
+import 'package:deus_mobile/models/token.dart';
 
 class SwapModel{
   Token from;

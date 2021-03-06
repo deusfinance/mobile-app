@@ -1,12 +1,10 @@
-import 'package:deus/screens/stake_screen/stake_screen.dart';
-import 'package:deus/screens/staking/stacking_screen.dart';
-import 'package:deus/screens/swap/swap_screen.dart';
-import 'package:deus/screens/synthetics/synthetics_screen.dart';
-import 'package:deus/screens/test_screen.dart';
-import 'package:deus/screens/vaults/vaults_screen.dart';
+
 import 'package:flutter/material.dart';
 
-import '../synthetics/synchronizer_screen.dart';
+import '../stake_screen/stake_screen.dart';
+import '../swap/swap_screen.dart';
+import '../synthetics/synthetics_screen.dart';
+import '../vaults/vaults_screen.dart';
 
 class MyNavigationItem {
   final Widget page;

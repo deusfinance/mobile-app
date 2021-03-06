@@ -1,4 +1,4 @@
-import 'package:deus/data_source/currency_data.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
 
 import 'package:flutter/material.dart';
 
