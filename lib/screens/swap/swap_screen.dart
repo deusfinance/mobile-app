@@ -15,6 +15,7 @@ import '../../core/widgets/svg.dart';
 import '../../core/widgets/swap_field.dart';
 import '../../core/widgets/toast.dart';
 import '../../data_source/currency_data.dart';
+import '../../locator.dart';
 import '../../models/gas.dart';
 import '../../models/swap_model.dart';
 import '../../models/token.dart';
@@ -33,13 +34,12 @@ class SwapScreen extends StatefulWidget {
   _SwapScreenState createState() => _SwapScreenState();
 }
 
-class _SwapScreenState extends State<SwapScreen>{
+class _SwapScreenState extends State<SwapScreen> {
 //  text field controllers
   TextEditingController fromFieldController = new TextEditingController();
   TextEditingController toFieldController = new TextEditingController();
   TextEditingController slippageController = new TextEditingController();
   StreamController<String> streamController = StreamController();
-
 
   SwapService swapService;
   SwapModel swapModel = SwapModel(CurrencyData.eth, CurrencyData.deus);
@@ -63,14 +63,9 @@ class _SwapScreenState extends State<SwapScreen>{
   }
 
   _init() async {
-    streamController.stream
-        .transform(debounce(Duration(milliseconds: 500)))
-        .listen((s) async {
+    streamController.stream.transform(debounce(Duration(milliseconds: 500))).listen((s) async {
       if (double.tryParse(s) != null && double.tryParse(s) > 0) {
-        swapService
-            .getAmountsOut(
-                swapModel.from.getTokenName(), swapModel.to.getTokenName(), s)
-            .then((value) {
+        swapService.getAmountsOut(swapModel.from.getTokenName(), swapModel.to.getTokenName(), s).then((value) {
           setState(() {
             toFieldController.text = EthereumService.formatDouble(value);
           });
@@ -86,10 +81,8 @@ class _SwapScreenState extends State<SwapScreen>{
   }
 
   fetchBalances() async {
-    swapModel.from.balance =
-        await swapService.getTokenBalance(swapModel.from.getTokenName());
-    swapModel.to.balance =
-        await swapService.getTokenBalance(swapModel.to.getTokenName());
+    swapModel.from.balance = await swapService.getTokenBalance(swapModel.from.getTokenName());
+    swapModel.to.balance = await swapService.getTokenBalance(swapModel.to.getTokenName());
     await getAllowances();
     setState(() {
       fetchingData = false;
@@ -98,11 +91,9 @@ class _SwapScreenState extends State<SwapScreen>{
 
   @override
   Widget build(BuildContext context) {
-    if(swapService == null) {
+    if (swapService == null) {
       swapService = new SwapService(
-          ethService: Provider.of<EthereumService>(context),
-          privateKey:
-          Provider.of<ConfigurationService>(context).getPrivateKey());
+          ethService: locator<EthereumService>(), privateKey: locator<ConfigurationService>().getPrivateKey());
       fetchBalances();
     }
     return fetchingData
@@ -125,8 +116,7 @@ class _SwapScreenState extends State<SwapScreen>{
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-        filter:
-            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
         child: FadeTransition(
           child: child,
           opacity: anim1,
@@ -139,7 +129,7 @@ class _SwapScreenState extends State<SwapScreen>{
 
   Widget _buildTransactionPending() {
     return Container(
-      margin: EdgeInsets.only(left:16, right: 16),
+      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Pending',
         message: toastMessage,
@@ -226,9 +216,7 @@ class _SwapScreenState extends State<SwapScreen>{
                       });
                       getAllowances();
                     },
-                    child: Center(
-                        child:
-                            PlatformSvg.asset('images/icons/arrow_down.svg'))),
+                    child: Center(child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
                 const SizedBox(height: 12),
                 toField,
                 const SizedBox(height: 18),
@@ -255,9 +243,7 @@ class _SwapScreenState extends State<SwapScreen>{
                           },
                           child: Container(
                             margin: EdgeInsets.only(left: 4.0),
-                            child: PlatformSvg.asset(
-                                "images/icons/exchange.svg",
-                                width: 15),
+                            child: PlatformSvg.asset("images/icons/exchange.svg", width: 15),
                           ),
                         ),
                       ],
@@ -291,11 +277,7 @@ class _SwapScreenState extends State<SwapScreen>{
               ],
             ),
           ),
-          showingToast
-              ? Align(
-                  alignment: Alignment.bottomCenter,
-                  child: _buildTransactionPending())
-              : Container(),
+          showingToast ? Align(alignment: Alignment.bottomCenter, child: _buildTransactionPending()) : Container(),
         ],
       ),
     );
@@ -305,8 +287,7 @@ class _SwapScreenState extends State<SwapScreen>{
     double a = double.tryParse(fromFieldController.text) ?? 0;
     double b = double.tryParse(toFieldController.text) ?? 0;
     if (a != 0 && b != 0) {
-      if (isPriceRatioForward)
-        return EthereumService.formatDouble((a / b).toString(), 5);
+      if (isPriceRatioForward) return EthereumService.formatDouble((a / b).toString(), 5);
       return EthereumService.formatDouble((b / a).toString(), 5);
     }
     return "0.0";
@@ -328,11 +309,7 @@ class _SwapScreenState extends State<SwapScreen>{
             fontSize: MyStyles.S6,
             color: priceImpact <= 1
                 ? Color(0xFF00D16C)
-                : (priceImpact <= 3
-                    ? Color(0xFFFFFFFF)
-                    : (priceImpact < 5
-                        ? Color(0xFFf58516)
-                        : Color(0xFFD40000))),
+                : (priceImpact <= 3 ? Color(0xFFFFFFFF) : (priceImpact < 5 ? Color(0xFFf58516) : Color(0xFFD40000))),
           ),
         ),
       ],
@@ -398,9 +375,7 @@ class _SwapScreenState extends State<SwapScreen>{
 
   Widget _buildRouteWidget() {
     if (route.length == 0) {
-      swapService
-          .getPath(swapModel.from.getTokenName(), swapModel.to.getTokenName())
-          .then((value) {
+      swapService.getPath(swapModel.from.getTokenName(), swapModel.to.getTokenName()).then((value) {
         value.forEach((addr) {
           route.add(EthereumService.addressToTokenMap[addr.toLowerCase()]);
         });
@@ -426,9 +401,7 @@ class _SwapScreenState extends State<SwapScreen>{
                         token.logoPath.showCircleImage(radius: 10),
                         const SizedBox(width: 5),
                         Text(token.symbol, style: MyStyles.whiteSmallTextStyle),
-                        (index < route.length - 1)
-                            ? _buildRouteTransformWidget(route, index)
-                            : Container(),
+                        (index < route.length - 1) ? _buildRouteTransformWidget(route, index) : Container(),
                       ],
                     ),
                   );
@@ -438,10 +411,8 @@ class _SwapScreenState extends State<SwapScreen>{
   }
 
   Widget _buildRouteTransformWidget(List<Token> route, int index) {
-    if ((route[index].getTokenName() == "eth" &&
-            route[index + 1].getTokenName() == "deus") ||
-        (route[index].getTokenName() == "deus" &&
-            route[index + 1].getTokenName() == "eth")) {
+    if ((route[index].getTokenName() == "eth" && route[index + 1].getTokenName() == "deus") ||
+        (route[index].getTokenName() == "deus" && route[index + 1].getTokenName() == "eth")) {
       return Row(
         children: [
           const SizedBox(width: 15),
@@ -480,7 +451,8 @@ class _SwapScreenState extends State<SwapScreen>{
   }
 
   Widget _buildSwapButton() {
-    if (fromFieldController.text == "" || (double.tryParse(fromFieldController.text) != null && double.tryParse(fromFieldController.text) == 0)) {
+    if (fromFieldController.text == "" ||
+        (double.tryParse(fromFieldController.text) != null && double.tryParse(fromFieldController.text) == 0)) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -495,9 +467,7 @@ class _SwapScreenState extends State<SwapScreen>{
         ),
       );
     }
-    if (swapModel.approved &&
-        swapModel.from.getBalance() <
-            EthereumService.getWei(fromFieldController.text)) {
+    if (swapModel.approved && swapModel.from.getBalance() < EthereumService.getWei(fromFieldController.text)) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -548,16 +518,13 @@ class _SwapScreenState extends State<SwapScreen>{
           child: Container(
             padding: EdgeInsets.all(12.0),
             margin: EdgeInsets.all(4.0),
-            decoration: swapModel.slippage == 0.1
-                ? MyStyles.greenToBlueDecoration
-                : MyStyles.lightBlackBorderDecoration,
+            decoration:
+                swapModel.slippage == 0.1 ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "0.1%",
-                style: swapModel.slippage == 0.1
-                    ? MyStyles.blackSmallTextStyle
-                    : MyStyles.whiteSmallTextStyle,
+                style: swapModel.slippage == 0.1 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
@@ -575,16 +542,13 @@ class _SwapScreenState extends State<SwapScreen>{
           child: Container(
             padding: EdgeInsets.all(12.0),
             margin: EdgeInsets.all(4.0),
-            decoration: swapModel.slippage == 0.5
-                ? MyStyles.greenToBlueDecoration
-                : MyStyles.lightBlackBorderDecoration,
+            decoration:
+                swapModel.slippage == 0.5 ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "0.5%",
-                style: swapModel.slippage == 0.5
-                    ? MyStyles.blackSmallTextStyle
-                    : MyStyles.whiteSmallTextStyle,
+                style: swapModel.slippage == 0.5 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
@@ -602,16 +566,13 @@ class _SwapScreenState extends State<SwapScreen>{
           child: Container(
             padding: EdgeInsets.all(12.0),
             margin: EdgeInsets.all(4.0),
-            decoration: swapModel.slippage == 1.0
-                ? MyStyles.greenToBlueDecoration
-                : MyStyles.lightBlackBorderDecoration,
+            decoration:
+                swapModel.slippage == 1.0 ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "1%",
-                style: swapModel.slippage == 1.0
-                    ? MyStyles.blackSmallTextStyle
-                    : MyStyles.whiteSmallTextStyle,
+                style: swapModel.slippage == 1.0 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
@@ -622,37 +583,29 @@ class _SwapScreenState extends State<SwapScreen>{
         child: Container(
           padding: EdgeInsets.all(12.0),
           margin: EdgeInsets.all(4.0),
-          decoration: slippageController.text != ""
-              ? MyStyles.greenToBlueDecoration
-              : MyStyles.lightBlackBorderDecoration,
+          decoration:
+              slippageController.text != "" ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
           child: Align(
               alignment: Alignment.centerRight,
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter(
-                            new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                      ],
+                      inputFormatters: [WhitelistingTextInputFormatter(new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))],
                       keyboardType: TextInputType.number,
                       maxLines: 1,
                       controller: slippageController,
-                      style: slippageController.text != ""
-                          ? MyStyles.blackSmallTextStyle
-                          : MyStyles.whiteSmallTextStyle,
+                      style:
+                          slippageController.text != "" ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
                       decoration: InputDecoration(
                         isDense: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                       ),
                     ),
                   ),
                   Text(
                     "%",
-                    style: slippageController.text != ""
-                        ? MyStyles.blackSmallTextStyle
-                        : MyStyles.whiteSmallTextStyle,
+                    style: slippageController.text != "" ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
                   ),
                 ],
               )),
@@ -669,8 +622,7 @@ class _SwapScreenState extends State<SwapScreen>{
         showingToast = true;
       });
       var res = await swapService.approve(swapModel.from.getTokenName());
-      Stream<TransactionReceipt> result =
-          swapService.ethService.pollTransactionReceipt(res);
+      Stream<TransactionReceipt> result = swapService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
         setState(() {
           isInProgress = false;
@@ -678,15 +630,11 @@ class _SwapScreenState extends State<SwapScreen>{
           swapModel.approved = event.status;
         });
         if (event.status) {
-          showToast(
-              context,
-              TransactionStatus("Approved ${swapModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Successful"));
+          showToast(context,
+              TransactionStatus("Approved ${swapModel.from.name}", TransactionStatus.SUCCESSFUL, "Successful"));
         } else {
           showToast(
-              context,
-              TransactionStatus("Approve of ${swapModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+              context, TransactionStatus("Approve of ${swapModel.from.name}", TransactionStatus.FAILED, "Failed"));
         }
       });
     }
@@ -712,28 +660,22 @@ class _SwapScreenState extends State<SwapScreen>{
           swapModel.from.getTokenName(),
           swapModel.to.getTokenName(),
           fromFieldController.text,
-          ((1 - getSlippage()) * double.parse(toFieldController.text))
-              .toString());
+          ((1 - getSlippage()) * double.parse(toFieldController.text)).toString());
 
       Gas gas = await showConfirmGasFeeDialog(transaction);
 
       if (gas != null) {
         setState(() {
           isInProgress = true;
-          toastMessage = "Swap ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}";
+          toastMessage =
+              "Swap ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}";
           showingToast = true;
         });
 
         try {
-          var res = await swapService.swapTokens(
-              swapModel.from.getTokenName(),
-              swapModel.to.getTokenName(),
-              fromFieldController.text,
-              ((1 - getSlippage()) * double.parse(toFieldController.text))
-                  .toString(),
-              gas);
-          Stream<TransactionReceipt> result =
-              swapService.ethService.pollTransactionReceipt(res);
+          var res = await swapService.swapTokens(swapModel.from.getTokenName(), swapModel.to.getTokenName(),
+              fromFieldController.text, ((1 - getSlippage()) * double.parse(toFieldController.text)).toString(), gas);
+          Stream<TransactionReceipt> result = swapService.ethService.pollTransactionReceipt(res);
           result.listen((event) async {
             setState(() {
               isInProgress = false;
@@ -744,7 +686,8 @@ class _SwapScreenState extends State<SwapScreen>{
                   context,
                   new TransactionStatus(
                       "Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
-                      TransactionStatus.SUCCESSFUL, "Successful"));
+                      TransactionStatus.SUCCESSFUL,
+                      "Successful"));
               getTokenBalance(swapModel.from);
               getTokenBalance(swapModel.to);
             } else {
@@ -752,7 +695,8 @@ class _SwapScreenState extends State<SwapScreen>{
                   context,
                   new TransactionStatus(
                       "Not Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
-                      TransactionStatus.FAILED, "Failed"));
+                      TransactionStatus.FAILED,
+                      "Failed"));
             }
           });
         } on Exception catch (error) {
@@ -765,15 +709,11 @@ class _SwapScreenState extends State<SwapScreen>{
               context,
               new TransactionStatus(
                   "Not Swapped ${toFieldController.text} ${swapModel.to.getTokenName()} for ${fromFieldController.text} ${swapModel.from.getTokenName()}",
-                  TransactionStatus.FAILED, "Failed"));
+                  TransactionStatus.FAILED,
+                  "Failed"));
         }
-      }
-      else{
-        showToast(
-            context,
-            new TransactionStatus(
-                "Transaction Rejected",
-                TransactionStatus.FAILED, "Failed"));
+      } else {
+        showToast(context, new TransactionStatus("Transaction Rejected", TransactionStatus.FAILED, "Failed"));
       }
     }
   }
@@ -797,8 +737,8 @@ class _SwapScreenState extends State<SwapScreen>{
   }
 
   computePriceImpact(String _input, String _y) async {
-    double x = double.parse(await swapService.getAmountsOut(
-        swapModel.from.getTokenName(), swapModel.to.getTokenName(), "0.1"));
+    double x = double.parse(
+        await swapService.getAmountsOut(swapModel.from.getTokenName(), swapModel.to.getTokenName(), "0.1"));
     double r = 0.1;
     double input = double.tryParse(_input) ?? 0;
     double y = double.tryParse(_y) ?? 0;

@@ -1,4 +1,3 @@
-import 'package:deus_mobile/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,9 +6,8 @@ import 'package:provider/provider.dart';
 import 'config.dart';
 import 'locator.dart';
 import 'route_generator.dart';
-import 'provider_service.dart';
 import 'screens/splash/cubit/splash_cubit.dart';
-import 'statics/my_colors.dart';
+import 'screens/splash/splash_screen.dart';
 import 'statics/styles.dart';
 
 void deusDebugPrint(String s, {int wrapWidth}){
@@ -41,15 +39,13 @@ class DEUSApp extends StatelessWidget {
               if (!snapshot.hasData || !(state is SplashSuccess))
                 return MaterialApp(theme: MyStyles.theme, home: SplashScreen());
 
-              return MultiProvider(
-                  providers: locator<ProviderService>().providers,
-                  child: MaterialApp(
-                    title: 'Deus Finance',
-                    debugShowCheckedModeBanner: false,
-                    theme: MyStyles.theme,
-                    routes: generateRoutes(context),
-                    initialRoute: kInitialRoute,
-                  ));
+              return MaterialApp(
+                title: 'Deus Finance',
+                debugShowCheckedModeBanner: false,
+                theme: MyStyles.theme,
+                routes: generateRoutes(context),
+                initialRoute: kInitialRoute,
+              );
             },
           );
         }));

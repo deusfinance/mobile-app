@@ -1,9 +1,9 @@
-import 'package:deus_mobile/core/widgets/header_with_address.dart';
-import 'package:deus_mobile/service/address_service.dart';
-import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import '../../core/widgets/header_with_address.dart';
+import '../../locator.dart';
+import '../../service/address_service.dart';
+import '../../service/config_service.dart';
 import '../../statics/my_colors.dart';
 import 'bottom_nav_bar.dart';
 import 'navigation_item.dart';
@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AddressService>(context).getPublicAddress(Provider.of<ConfigurationService>(context, listen: false).getPrivateKey()).then((value){
+    locator<AddressService>().getPublicAddress(locator<ConfigurationService>().getPrivateKey()).then((value){
       setState(() {
         walletAddress = value.hex;
       });

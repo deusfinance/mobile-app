@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
 
 import 'core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
 import 'infrastructure/wallet_provider/wallet_provider.dart';
 import 'infrastructure/wallet_setup/wallet_setup_provider.dart';
+import 'locator.dart';
 import 'screens/lock/lock_screen.dart';
 import 'screens/main_screen/main_screen.dart';
-import 'screens/splash/cubit/splash_cubit.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/stake_screen/stake_screen.dart';
 import 'screens/wallet_intro_screen/intro_page.dart';
@@ -22,7 +20,7 @@ const kInitialRoute = '/';
 Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
   return {
     kInitialRoute: (BuildContext ctx) {
-      final configurationService = Provider.of<ConfigurationService>(ctx);
+      final configurationService = locator<ConfigurationService>();
 
       if (configurationService.didSetupWallet())
         return WalletProvider(builder: (_, __) {
