@@ -68,18 +68,3 @@ class _DEUSAppState extends State<DEUSApp> {
     });
   }
 }
-
-class Example extends StatelessWidget {
-  static const url = '/x';
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text("dslk")));
-  }
-}
-
-class Example2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text("dslk")));
-  }
-}
