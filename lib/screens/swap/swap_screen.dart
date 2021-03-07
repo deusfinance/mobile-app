@@ -58,8 +58,8 @@ class _SwapScreenState extends State<SwapScreen> {
 
   @override
   void initState() {
-    _init();
     super.initState();
+    _init();
   }
 
   _init() async {

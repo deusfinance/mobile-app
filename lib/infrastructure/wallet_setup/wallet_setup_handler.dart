@@ -4,6 +4,7 @@ import 'package:deus_mobile/models/wallet/wallet_setup.dart';
 import 'package:deus_mobile/service/address_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hex/hex.dart';
+import 'package:string_validator/string_validator.dart';
 
 import 'setup/../wallet_setup_state.dart';
 
@@ -58,11 +59,11 @@ class WalletSetupHandler {
     try {
       _store.dispatch(WalletSetupStarted());
 
-      try {
-        HEX.decode(privateKey);
-      } on Exception catch (e) {
+      if (!isHexadecimal(privateKey) || privateKey.length.isOdd || privateKey.isEmpty) {
         _store.dispatch(WalletSetupAddError("The entered key is not a private key."));
+        return false;
       }
+
       await _addressService.setupFromPrivateKey(privateKey);
       return true;
     } catch (e) {

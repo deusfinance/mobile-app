@@ -1,3 +1,4 @@
+import '../locator.dart';
 import 'config_service.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import '../core/util/hd_key.dart';
@@ -37,7 +38,10 @@ class AddressService implements IAddressService {
   }
 
   @override
-  Future<EthereumAddress> getPublicAddress(String privateKey) async {
+  Future<EthereumAddress> getPublicAddress([String privateKey]) async {
+    //if the privateKey wasn't passed, read it from the config (local device).
+    privateKey??= locator<ConfigurationService>().getPrivateKey();
+    
     final private = EthPrivateKey.fromHex(privateKey);
 
     final address = await private.extractAddress();

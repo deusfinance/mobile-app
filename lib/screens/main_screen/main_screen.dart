@@ -17,25 +17,19 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  String walletAddress;
 
   @override
   Widget build(BuildContext context) {
-    locator<AddressService>().getPublicAddress(locator<ConfigurationService>().getPrivateKey()).then((value){
-      setState(() {
-        walletAddress = value.hex;
-      });
-    });
     return Scaffold(
       backgroundColor: MyColors.Main_BG_Black,
       body: Column(
         children: [
-          SizedBox(height: 50,),
+          SizedBox(
+            height: 50,
+          ),
           Container(
             margin: EdgeInsets.only(right: 8, left: 8),
-            child: HeaderWithAddress(
-              walletAddress: walletAddress,
-            ),
+            child: HeaderWithAddress(),
           ),
           Expanded(
             child: IndexedStack(
