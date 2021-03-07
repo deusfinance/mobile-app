@@ -20,14 +20,13 @@ const kInitialRoute = '/';
 Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
   return {
     kInitialRoute: (BuildContext ctx) {
-      final configurationService = locator<ConfigurationService>();
-
-      if (configurationService.didSetupWallet())
+      if (locator<ConfigurationService>().didSetupWallet()) {
+        return MainScreen();
+      } else {
         return WalletProvider(builder: (_, __) {
-          return SplashScreen();
+          return IntroPage();
         });
-      else
-        return IntroPage();
+      }
     },
     WalletCreatePage.url: (_) {
       return WalletSetupProvider(builder: (__, store) {
