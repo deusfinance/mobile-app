@@ -46,6 +46,11 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void onTabSelected(int value) {
+    if(MyNavigationItem.items[value].onPressed!=null){
+      //TODO (@CodingDavid8): temporary fix - replace with Cubit pattern and structure the screens more efficiently
+      MyNavigationItem.items[value].onPressed(context);
+      return;
+    }
     setState(() {
       _currentIndex = value;
     });

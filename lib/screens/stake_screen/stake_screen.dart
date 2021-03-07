@@ -7,16 +7,12 @@ import 'package:deus_mobile/core/widgets/header_with_address.dart';
 import 'package:deus_mobile/core/widgets/steps.dart';
 import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
+import 'package:deus_mobile/screens/main_screen/bottom_nav_bar.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-enum ButtonStates {
-  hasToApprove,
-  pendingApproveDividedButton,
-  isApproved,
-  pendingApproveMergedButton
-}
+enum StakeStates { hasToApprove, pendingApproveDividedButton, isApproved, pendingApproveMergedButton }
 
 class StakeScreen extends StatefulWidget {
   static const url = '/stake';
@@ -34,7 +30,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   final gradient = MyColors.blueToGreenGradient;
 
-  ButtonStates _stakeState = ButtonStates.hasToApprove;
+  StakeStates _stakeState = StakeStates.hasToApprove;
   bool _showToast = false;
 
   final _textController = TextEditingController();
@@ -47,9 +43,11 @@ class _StakeScreenState extends State<StakeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.Main_BG_Black,
+      bottomNavigationBar: MyBottomNavBar((_){}),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+          
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 80,
             child: Column(
@@ -90,11 +88,10 @@ class _StakeScreenState extends State<StakeScreen> {
                 kSmallSpacer,
                 _buildStakeApproveButton(),
                 kMediumSpacer,
-                if (_stakeState == ButtonStates.hasToApprove) Steps(),
+                if (_stakeState == StakeStates.hasToApprove) Steps(),
                 Spacer(),
-                if ((_stakeState != ButtonStates.hasToApprove && _showToast) ||
-                    (_stakeState == ButtonStates.pendingApproveDividedButton &&
-                        _showToast))
+                if ((_stakeState != StakeStates.hasToApprove && _showToast) ||
+                    (_stakeState == StakeStates.pendingApproveDividedButton && _showToast))
                   _buildToast()
               ],
             ),
@@ -105,8 +102,8 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Widget _buildToast() {
-    if (_stakeState != ButtonStates.pendingApproveDividedButton &&
-        _stakeState != ButtonStates.pendingApproveMergedButton) {
+    if (_stakeState != StakeStates.pendingApproveDividedButton &&
+        _stakeState != StakeStates.pendingApproveMergedButton) {
       return _buildTransactionSuccessToast();
     } else {
       print(_stakeState);
@@ -116,6 +113,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Toast _buildTransactionSuccessToast() {
     return Toast(
+      message: 'Transaction completed.',
       label: 'Successful',
       color: MyColors.ToastGreen,
       onPressed: () {},
@@ -129,6 +127,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Toast _buildTransactionPending() {
     return Toast(
+      message: '',
       label: 'Transaction Pending',
       color: MyColors.ToastGrey,
       onPressed: () {},
@@ -145,27 +144,26 @@ class _StakeScreenState extends State<StakeScreen> {
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
-      showBothButtons: _stakeState == ButtonStates.hasToApprove ||
-          _stakeState == ButtonStates.pendingApproveDividedButton,
-      showLoading: _stakeState == ButtonStates.pendingApproveDividedButton ||
-          _stakeState == ButtonStates.pendingApproveMergedButton,
+      showBothButtons:
+          _stakeState == StakeStates.hasToApprove || _stakeState == StakeStates.pendingApproveDividedButton,
+      showLoading: _stakeState == StakeStates.pendingApproveDividedButton ||
+          _stakeState == StakeStates.pendingApproveMergedButton,
       onPressed: () async {
-        if (_stakeState == ButtonStates.isApproved ||
-            _stakeState == ButtonStates.pendingApproveMergedButton) {
+        if (_stakeState == StakeStates.isApproved || _stakeState == StakeStates.pendingApproveMergedButton) {
           setState(() {
             _showToast = true;
-            _stakeState = ButtonStates.pendingApproveMergedButton;
+            _stakeState = StakeStates.pendingApproveMergedButton;
           });
           await Future.delayed(Duration(seconds: 3));
           setState(() {
             if (!_showToast) {
               _showToast = true;
             }
-            _stakeState = ButtonStates.isApproved;
+            _stakeState = StakeStates.isApproved;
           });
         } else {
           setState(() {
-            _stakeState = ButtonStates.pendingApproveDividedButton;
+            _stakeState = StakeStates.pendingApproveDividedButton;
             _showToast = true;
           });
           await Future.delayed(Duration(seconds: 1));
@@ -173,7 +171,7 @@ class _StakeScreenState extends State<StakeScreen> {
             if (!_showToast) {
               _showToast = true;
             }
-            _stakeState = ButtonStates.isApproved;
+            _stakeState = StakeStates.isApproved;
           });
         }
       },
