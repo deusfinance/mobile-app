@@ -4,6 +4,7 @@ import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:deus/screens/splash/splash_screen.dart';
 import 'package:deus/screens/stake_screen/stake_screen.dart';
 import 'package:deus/screens/test_screen.dart';
+import 'package:deus/screens/wallet/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: generateRoutes(),
-      initialRoute: LockScreen.url,
+      initialRoute: WalletScreen.url,
     );
   }
 
@@ -63,6 +64,9 @@ class MyApp extends StatelessWidget {
           break;
         case LockScreen.url:
           screen = LockScreen();
+          break;
+        case WalletScreen.url:
+          screen = WalletScreen();
           break;
         
         default:
