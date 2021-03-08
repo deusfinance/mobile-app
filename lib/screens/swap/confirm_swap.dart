@@ -121,7 +121,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                 },
                 child: Text("EDIT",
                     style: TextStyle(
-                        fontFamily: "Monument",
+                        fontFamily: MyStyles.kFontFamily,
                         fontWeight: FontWeight.w300,
                         fontSize: MyStyles.S5,
                         foreground: Paint()
@@ -180,7 +180,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                     child: Text(
                       "REJECT",
                       style: TextStyle(
-                        fontFamily: "Monument",
+                        fontFamily: MyStyles.kFontFamily,
                         fontWeight: FontWeight.w300,
                         fontSize: MyStyles.S4,
                         color: MyColors.HalfBlack,
@@ -246,7 +246,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                               style: confirmSwapMode ==
                                       ConfirmSwapMode.BASIC_CUSTOMIZE
                                   ? TextStyle(
-                                      fontFamily: "Monument",
+                                      fontFamily: MyStyles.kFontFamily,
                                       fontWeight: FontWeight.w300,
                                       fontSize: MyStyles.S6,
                                       foreground: Paint()
@@ -285,7 +285,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                               style: confirmSwapMode ==
                                       ConfirmSwapMode.ADVANCED_CUSTOMIZE
                                   ? TextStyle(
-                                      fontFamily: "Monument",
+                                      fontFamily: MyStyles.kFontFamily,
                                       fontWeight: FontWeight.w300,
                                       fontSize: MyStyles.S6,
                                       foreground: Paint()

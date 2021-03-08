@@ -1,12 +1,12 @@
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/back_button.dart';
-import 'package:deus_mobile/core/widgets/cross_fade_duo_button.dart';
+import 'package:deus_mobile/core/widgets/default_screen/back_button.dart';
+import 'package:deus_mobile/core/widgets/stake_and_lock/cross_fade_duo_button.dart';
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
-import 'package:deus_mobile/core/widgets/header_with_address.dart';
+// import 'package:deus_mobile/core/widgets/header_with_address.dart';
 import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/core/widgets/steps.dart';
+import 'package:deus_mobile/core/widgets/stake_and_lock/steps.dart';
 import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
@@ -55,9 +55,9 @@ class _LockScreenState extends State<LockScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HeaderWithAddress(
-                  walletAddress: address,
-                ),
+                // HeaderWithAddress(
+                //   walletAddress: address,
+                // ),
                 kBigSpacer,
                 BackButtonWithText(),
                 kBigSpacer,

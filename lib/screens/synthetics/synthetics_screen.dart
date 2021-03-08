@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
@@ -23,6 +24,9 @@ import '../../statics/styles.dart';
 import 'market_timer.dart';
 
 class SyntheticsScreen extends StatefulWidget {
+
+  const SyntheticsScreen();
+  
   @override
   _SyntheticsScreenState createState() => _SyntheticsScreenState();
 }
@@ -70,9 +74,9 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return syntheticModel.syntheticState != SyntheticState.loading
+    return DefaultScreen(child: syntheticModel.syntheticState != SyntheticState.loading
         ? _buildBody(context)
-        : const Center(child: CircularProgressIndicator());
+        : const Center(child: CircularProgressIndicator()));
   }
 
   Widget _buildBody(BuildContext context) {
