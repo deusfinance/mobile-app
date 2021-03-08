@@ -26,56 +26,56 @@ class MyStyles {
   static const String kFontFamily = "Monument";
 
   // decorations
-  static var lightBlackBorderDecoration = BoxDecoration(
+  static final lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
       color: MyColors.Button_BG_Black,
       border: Border.all(color: MyColors.HalfBlack, width: 1.0));
-  static var darkWithBorderDecoration = BoxDecoration(
+  static final darkWithBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
       color: MyColors.Button_BG_Black,
       border: Border.all(color: MyColors.Black, width: 1.0));
 
-  static var darkWithNoBorderDecoration =
+  static final darkWithNoBorderDecoration =
       BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), color: MyColors.Button_BG_Black);
 
-  static var blueToPurpleDecoration =
+  static final blueToPurpleDecoration =
       BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.blueToPurpleGradient);
 
-  static var greenToBlueDecoration =
+  static final greenToBlueDecoration =
       BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.greenToBlueGradient);
 
   // text styles
-  static var lightWhiteSmallTextStyle = TextStyle(
+  static final lightWhiteSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: MyColors.HalfWhite,
   );
-  static var lightWhiteMediumTextStyle = TextStyle(
+  static final lightWhiteMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: MyColors.HalfWhite,
   );
-  static var whiteSmallTextStyle = TextStyle(
+  static final whiteSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: MyColors.White,
   );
-  static var blackSmallTextStyle = TextStyle(
+  static final blackSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: MyColors.Black,
   );
-  static var blackMediumTextStyle = TextStyle(
+  static final blackMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: MyColors.Black,
   );
-  static var whiteMediumTextStyle = TextStyle(
+  static final whiteMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
@@ -106,3 +106,5 @@ class MyStyles {
     color: MyColors.White,
   );
 }
+
+enum NavigationStyle { BluePurple, GreenBlue }
