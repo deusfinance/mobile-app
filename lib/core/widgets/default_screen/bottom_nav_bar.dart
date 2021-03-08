@@ -27,6 +27,7 @@ class MyBottomNavBar extends StatelessWidget {
     return GestureDetector(
         onTap: () {
           locator<NavigationService>().selectedNavItem = item;
+          locator<NavigationService>().navigateTo(item.routeUrl, context);
         },
         child: Container(
           child: Column(
@@ -39,8 +40,7 @@ class MyBottomNavBar extends StatelessWidget {
                         fontFamily: MyStyles.kFontFamily,
                         fontWeight: FontWeight.w300,
                         fontSize: MyStyles.S5,
-                        foreground: Paint()
-                          ..shader = MyColors.greenToBlueGradient.createShader(Rect.fromLTRB(0, 0, 50, 30)))
+                        foreground: Paint()..shader = _getGradient(item).createShader(Rect.fromLTRB(0, 0, 50, 30)))
                     : MyStyles.bottomNavBarUnSelectedStyle,
               ),
               Container(
@@ -48,10 +48,24 @@ class MyBottomNavBar extends StatelessWidget {
                   height: 3.0,
                   width: (MediaQuery.of(context).size.width - 50) / 4,
                   decoration: locator<NavigationService>().isSelected(item)
-                      ? MyStyles.greenToBlueDecoration
+                      ? _getDecoration(item)
                       : BoxDecoration(color: MyColors.Main_BG_Black))
             ],
           ),
         ));
+  }
+
+  Decoration _getDecoration(NavigationItem item) {
+    if (item.style == NavigationStyle.GreenBlue)
+      return MyStyles.greenToBlueDecoration;
+    else
+      return MyStyles.blueToPurpleDecoration;
+  }
+
+  Gradient _getGradient(NavigationItem item) {
+    if (item.style == NavigationStyle.GreenBlue)
+      return MyColors.greenToBlueGradient;
+    else
+      return MyColors.blueToPurpleGradient;
   }
 }

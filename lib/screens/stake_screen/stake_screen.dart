@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:deus_mobile/core/widgets/default_screen/back_button.dart';
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/stake_and_lock/cross_fade_duo_button.dart';
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 // import 'package:deus_mobile/core/widgets/header_with_address.dart';
@@ -43,12 +44,9 @@ class _StakeScreenState extends State<StakeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: MyColors.Main_BG_Black,
-      bottomNavigationBar: MyBottomNavBar(),
-      body: SafeArea(
+    return DefaultScreen(
+      child: SafeArea(
         child: SingleChildScrollView(
-          
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 80,

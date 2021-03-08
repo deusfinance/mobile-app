@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:deus_mobile/core/widgets/default_screen/back_button.dart';
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/stake_and_lock/cross_fade_duo_button.dart';
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
@@ -18,6 +19,8 @@ enum LockScreenStates { hasToApprove, pendingApproveDividedButton, isApproved, p
 
 class LockScreen extends StatefulWidget {
   static const url = '/Lock';
+
+  const LockScreen();
 
   @override
   _LockScreenState createState() => _LockScreenState();
@@ -44,11 +47,10 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(MyColors.Background),
-      body: SafeArea(
+    return DefaultScreen(
+      child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 15),
           child: SizedBox(
             height: MediaQuery.of(context).size.height + 50,
             child: Column(
@@ -58,9 +60,9 @@ class _LockScreenState extends State<LockScreen> {
                 // HeaderWithAddress(
                 //   walletAddress: address,
                 // ),
-                kBigSpacer,
-                BackButtonWithText(),
-                kBigSpacer,
+                // kBigSpacer,
+                // BackButtonWithText(),
+                // kBigSpacer,
                 Text(
                   'Lock your DEA',
                   style: TextStyle(fontSize: 25),
@@ -139,6 +141,7 @@ class _LockScreenState extends State<LockScreen> {
 
   Toast _buildTransactionSuccessToast() {
     return Toast(
+      message: '',
       label: 'Successful',
       color: MyColors.ToastGreen,
       onPressed: () {},
@@ -152,6 +155,7 @@ class _LockScreenState extends State<LockScreen> {
 
   Toast _buildTransactionPending() {
     return Toast(
+      message: '',
       label: 'Transaction Pending',
       color: MyColors.ToastGrey,
       onPressed: () {},

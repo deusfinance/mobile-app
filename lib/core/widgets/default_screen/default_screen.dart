@@ -17,7 +17,7 @@ class DefaultScreen extends StatelessWidget {
       appBar: CustomAppBar(),
       body: Column(
         children: [
-          const SizedBox(height: 50),
+          // const SizedBox(height: 50),
           //TODO: Move into AppBar
           Container(margin: EdgeInsets.only(right: 8, left: 8), child: HeaderWithAddress()),
           Expanded(child: child),

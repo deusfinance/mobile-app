@@ -24,6 +24,7 @@ import '../../statics/styles.dart';
 import 'market_timer.dart';
 
 class SyntheticsScreen extends StatefulWidget {
+  static const url = '/synthethics';
 
   const SyntheticsScreen();
   
