@@ -1,8 +1,8 @@
 import 'package:deus/statics/my_colors.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class MyStyles {
-
 //  font sizes
   static const S6 = 13.0;
   static const S5 = 16.0;
@@ -15,7 +15,6 @@ class MyStyles {
   static const mainPadding = 8.0;
 
   static const String kFontFamily = "Monument";
-
 
 //  decorations
   static var lightBlackBorderDecoration = BoxDecoration(
@@ -64,6 +63,12 @@ class MyStyles {
     fontSize: S6,
     color: Color(MyColors.Black),
   );
+  static const greenSmallTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    fontSize: S6,
+    color: Color(MyColors.ToastGreen),
+  );
   static const blackMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
@@ -76,6 +81,30 @@ class MyStyles {
     fontSize: S4,
     color: Color(MyColors.White),
   );
+  static const whiteBigTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    fontSize: S2,
+    color: Color(MyColors.White),
+  );
+
+  static const selectedToggleButtonTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    fontSize: S5,
+    color: Colors.transparent,
+    decoration: TextDecoration.underline,
+    decorationColor: Color(MyColors.White),
+    shadows: [Shadow(color: Color(MyColors.White), offset: Offset(0, -5))]
+  );
+
+  static const unselectedToggleButtonTextStyle = TextStyle(
+      fontFamily: kFontFamily,
+      fontWeight: FontWeight.w300,
+      fontSize: S5,
+      color: Colors.transparent,
+      shadows: [Shadow(color: Color(MyColors.HalfWhite), offset: Offset(0, -5))]
+  );
 
   static TextStyle gradientMediumTextStyle = TextStyle(
       fontFamily: kFontFamily,
@@ -86,7 +115,6 @@ class MyStyles {
           colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
 
-
   static const whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
@@ -95,14 +123,10 @@ class MyStyles {
     color: Color(MyColors.White),
   );
 
-
   static const bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
     color: Color(MyColors.White),
   );
-
-
 }
-
