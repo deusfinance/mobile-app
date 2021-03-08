@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:deus/core/widgets/back_button.dart';
-import 'package:deus/core/widgets/cross_fade_button.dart';
+import 'package:deus/core/widgets/cross_fade_duo_button.dart';
 import 'package:deus/core/widgets/dark_button.dart';
 import 'package:deus/core/widgets/header_with_address.dart';
 import 'package:deus/core/widgets/steps.dart';
@@ -144,7 +144,7 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Widget _buildStakeApproveButton() {
-    return CrossFadeButton(
+    return CrossFadeDuoButton(
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
