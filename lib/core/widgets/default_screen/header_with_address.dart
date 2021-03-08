@@ -6,7 +6,9 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:web3dart/credentials.dart';
 
-import '../../locator.dart';
+import '../../../locator.dart';
+
+
 
 class HeaderWithAddress extends StatefulWidget {
   final String walletAddress;

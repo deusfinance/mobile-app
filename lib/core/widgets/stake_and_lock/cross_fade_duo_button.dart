@@ -4,7 +4,7 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-import 'filled_gradient_selection_button.dart';
+import '../filled_gradient_selection_button.dart';
 
 class CrossFadeDuoButton extends StatelessWidget {
   final VoidCallback onPressed;

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,8 @@ import 'confirm_swap.dart';
 
 class SwapScreen extends StatefulWidget {
   static const route = "/swap";
+
+  const SwapScreen();
 
   @override
   _SwapScreenState createState() => _SwapScreenState();
@@ -96,11 +99,8 @@ class _SwapScreenState extends State<SwapScreen> {
           ethService: locator<EthereumService>(), privateKey: locator<ConfigurationService>().getPrivateKey());
       fetchBalances();
     }
-    return fetchingData
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
-        : _buildBody(context);
+
+    return DefaultScreen(child: fetchingData ? Center(child: CircularProgressIndicator()) : _buildBody(context));
   }
 
   Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
@@ -304,7 +304,7 @@ class _SwapScreenState extends State<SwapScreen> {
         Text(
           "${priceImpact == 0 ? "0.0" : priceImpact < 0.005 ? "<0.005" : priceImpact}%",
           style: TextStyle(
-            fontFamily: "Monument",
+            fontFamily: MyStyles.kFontFamily,
             fontWeight: FontWeight.w300,
             fontSize: MyStyles.S6,
             color: priceImpact <= 1
