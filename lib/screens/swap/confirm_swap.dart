@@ -693,7 +693,6 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
     if(eg!=null)estimatedGasNumber = eg.toInt();
     else estimatedGasNumber = 100000;
 
-    print("estimated gas: " + estimatedGasNumber.toString());
     setState(() {
       mode = Mode.NONE;
     });

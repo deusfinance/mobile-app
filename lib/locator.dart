@@ -11,5 +11,5 @@ GetIt locator = GetIt.instance;
 /// locator<ServiceClass>().serviceMethodOfThatClass 
 /// ```
 void setupLocator(){
-  locator.registerLazySingleton<ProviderService>(() => ProviderService());
+  locator.registerLazySingleton<OmniServices>(() => OmniServices());
 }

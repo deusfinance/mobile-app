@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:deus_mobile/models/wallet/wallet_setup.dart';
 import 'package:deus_mobile/service/address_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hex/hex.dart';
+import 'package:string_validator/string_validator.dart';
 
 import 'setup/../wallet_setup_state.dart';
 
@@ -21,8 +23,7 @@ class WalletSetupHandler {
 
   Future<bool> confirmMnemonic(String mnemonic) async {
     if (state.mnemonic != mnemonic) {
-      _store
-          .dispatch(WalletSetupAddError("Invalid mnemonic, please try again."));
+      _store.dispatch(WalletSetupAddError("Invalid mnemonic, please try again."));
       return false;
     }
     _store.dispatch(WalletSetupStarted());
@@ -49,8 +50,7 @@ class WalletSetupHandler {
       _store.dispatch(WalletSetupAddError(e.toString()));
     }
 
-    _store.dispatch(
-        WalletSetupAddError("Invalid mnemonic, it requires 12 words."));
+    _store.dispatch(WalletSetupAddError("Invalid mnemonic, it requires 12 words."));
 
     return false;
   }
@@ -59,14 +59,18 @@ class WalletSetupHandler {
     try {
       _store.dispatch(WalletSetupStarted());
 
+      if (!isHexadecimal(privateKey) || privateKey.length.isOdd || privateKey.isEmpty) {
+        _store.dispatch(WalletSetupAddError("The entered key is not a private key."));
+        return false;
+      }
+
       await _addressService.setupFromPrivateKey(privateKey);
       return true;
     } catch (e) {
       _store.dispatch(WalletSetupAddError(e.toString()));
     }
 
-    _store.dispatch(
-        WalletSetupAddError("Invalid private key, please try again."));
+    _store.dispatch(WalletSetupAddError("Invalid private key, please try again."));
 
     return false;
   }

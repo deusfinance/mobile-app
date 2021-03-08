@@ -24,7 +24,7 @@ class SplashCubit extends Cubit<SplashState> {
       debugPrint("Loading data...");
       final sharedPrefs = await SharedPreferences.getInstance();
       debugPrint("Received sharedPreferences.");
-      await locator<ProviderService>().createProviders(sharedPrefs: sharedPrefs);
+      await locator<OmniServices>().createOmniServices(sharedPrefs: sharedPrefs);
       debugPrint("Created providers.");
 
       /// get data from server

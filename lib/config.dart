@@ -7,7 +7,7 @@ class AppConfig {
   static const selectedConfig = AppConfig.testing();
 
   const AppConfig.testing() : this.params = const AppConfigParams(chainId: 3), this.showDebugMessages = true;
-  
+
   final bool showDebugMessages;
   final AppConfigParams params;
 }
@@ -15,6 +15,6 @@ class AppConfig {
 class AppConfigParams {
   const AppConfigParams({@required this.chainId});
 
-  
+
   final int chainId;
 }

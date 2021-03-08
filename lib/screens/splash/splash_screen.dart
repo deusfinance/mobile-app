@@ -1,12 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../data_source/stock_data.dart';
-import '../../locator.dart';
-import '../../provider_service.dart';
-import '../../route_generator.dart';
 import '../../statics/my_colors.dart';
 import 'cubit/splash_cubit.dart';
 

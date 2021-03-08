@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
+import '../../locator.dart';
 import '../../models/wallet/wallet_setup.dart';
 import '../../service/address_service.dart';
 import '../hook_provider.dart';
@@ -19,7 +20,7 @@ class WalletSetupProvider extends ContextProviderWidget<WalletSetupHandler> {
     final store = useReducer<WalletSetup, WalletSetupAction>(reducer,
         initialState: WalletSetup());
 
-    final addressService = Provider.of<AddressService>(context);
+    final addressService = locator<AddressService>();
     final handler = useMemoized(
       () => WalletSetupHandler(store, addressService),
       [addressService, store],

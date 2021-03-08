@@ -37,6 +37,7 @@ class WalletImportPage extends HookWidget {
                     break;
                   case WalletImportType.privateKey:
                     if (!await store.importFromPrivateKey(value)) return;
+
                     break;
                   default:
                     break;
