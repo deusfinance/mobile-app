@@ -65,54 +65,54 @@ class MyStyles {
     fontSize: S6,
     color: MyColors.White,
   );
-  static const blackSmallTextStyle = TextStyle(
+  static final blackSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
     color: MyColors.Black,
   );
 
-  static const greenSmallTextStyle = TextStyle(
+  static final greenSmallTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S6,
-    color: Color(MyColors.ToastGreen),
+    color: MyColors.ToastGreen,
   );
-  static const blackMediumTextStyle = TextStyle(
+  static final blackMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: MyColors.Black,
   );
-  static const whiteMediumTextStyle = TextStyle(
+  static final whiteMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S4,
     color: MyColors.White,
   );
-  static const whiteBigTextStyle = TextStyle(
+  static final whiteBigTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S2,
-    color: Color(MyColors.White),
+    color: MyColors.White,
   );
 
-  static const selectedToggleButtonTextStyle = TextStyle(
+  static final selectedToggleButtonTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
     color: Colors.transparent,
     decoration: TextDecoration.underline,
-    decorationColor: Color(MyColors.White),
-    shadows: [Shadow(color: Color(MyColors.White), offset: Offset(0, -5))]
+    decorationColor: MyColors.White,
+    shadows: [Shadow(color: MyColors.White, offset: Offset(0, -5))]
   );
 
-  static const unselectedToggleButtonTextStyle = TextStyle(
+  static final unselectedToggleButtonTextStyle = TextStyle(
       fontFamily: kFontFamily,
       fontWeight: FontWeight.w300,
       fontSize: S5,
       color: Colors.transparent,
-      shadows: [Shadow(color: Color(MyColors.HalfWhite), offset: Offset(0, -5))]
+      shadows: [Shadow(color: MyColors.HalfWhite, offset: Offset(0, -5))]
   );
 
   static TextStyle gradientMediumTextStyle = TextStyle(
@@ -125,7 +125,7 @@ class MyStyles {
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
 
 
-  static const whiteMediumUnderlinedTextStyle = TextStyle(
+  static final whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     decoration: TextDecoration.underline,
@@ -133,7 +133,7 @@ class MyStyles {
     color: MyColors.White,
   );
 
-  static const bottomNavBarUnSelectedStyle = TextStyle(
+  static final bottomNavBarUnSelectedStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
     fontSize: S5,
