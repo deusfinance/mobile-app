@@ -1,4 +1,4 @@
-import 'package:deus_mobile/core/widgets/custom_chart.dart';
+import 'file:///D:/AndroidStudioProjects/mobile-app/lib/screens/wallet/widgets/chart_container.dart';
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/default_screen/header_with_address.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
@@ -37,13 +37,13 @@ class _WalletScreenState extends State<WalletScreen> {
   final double performaceInPerc = 25.42;
   final double performaceInCash = 143231.32;
 
-
-
+  final double perfInPerc = 25.13;
+  final double perfInCash = 104244;
+  final double lockedInCash = 504503;
+  final double lockedInEth = 1403;
 
   List<bool> _toggleButtonButtonsSingleLiquidity = [true, false];
   WalletScreenState _screenState = WalletScreenState.LiquidityLockStake;
-
-
 
   void changeToggleButtonSingleLiquidity(int i) {
     if (!_toggleButtonButtonsSingleLiquidity[i]) {
@@ -59,8 +59,6 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-
-
   Divider _divider = Divider(height: 40);
   SizedBox _bigHeightDivider = SizedBox(
     height: 20,
@@ -74,7 +72,6 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return DefaultScreen(
       child: SafeArea(
         child: SingleChildScrollView(
@@ -83,7 +80,7 @@ class _WalletScreenState extends State<WalletScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _midHeightDivider,
-              CustomChart(),
+              ChartContainer(),
               _bigHeightDivider,
               _buildToggleButton(),
               _divider,
