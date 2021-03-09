@@ -13,7 +13,6 @@ class MyStyles {
   );
 
   // font sizes
-
   static const S6 = 13.0;
   static const S5 = 16.0;
   static const S4 = 18.0;
@@ -25,7 +24,6 @@ class MyStyles {
   static const mainPadding = 8.0;
 
   static const String kFontFamily = "Monument";
-
 
   // decorations
   static final lightBlackBorderDecoration = BoxDecoration(
@@ -123,7 +121,6 @@ class MyStyles {
         ..shader = LinearGradient(
           colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
-
 
   static final whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,
