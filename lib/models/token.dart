@@ -1,3 +1,4 @@
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
@@ -8,11 +9,29 @@ class Token extends Equatable {
   final String name;
   final String symbol;
   final String logoPath;
+  String balance;
+  String allowances;
+  int chainId;
 
-  const Token(this.name, this.symbol, this.logoPath);
+  Token(this.name, this.symbol, this.logoPath){
+    balance = "0";
+    allowances = "0";
+  }
 
   @override
   List<Object> get props => [symbol];
+
+  BigInt getBalance(){
+    return EthereumService.getWei(balance, symbol.toLowerCase());
+  }
+
+  BigInt getAllowances(){
+    return EthereumService.getWei(allowances, symbol.toLowerCase());
+  }
+
+  String getTokenName(){
+    return symbol.toLowerCase();
+  }
 }
 
 extension PathCheck on String {

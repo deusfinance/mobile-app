@@ -1,5 +1,7 @@
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../models/crypto_currency.dart';
 import '../../models/stock.dart';
@@ -17,23 +19,21 @@ enum TabPage { synthetics, swap }
 // ignore: must_be_immutable
 class SwapField<T extends Token> extends StatefulWidget {
   final Direction direction;
-  final double balance;
   void Function(T selectedToken) tokenSelected;
   final TextEditingController controller;
   final TabPage page;
+
   //TODO (@CodingDavid8): Replace with meta-class so it can be used for tokens and stocks.
   final T initialToken;
 
-
-   SwapField(
-      {Key key,
-      this.direction = Direction.from,
-      this.balance = 0,
-      this.controller,
-      this.initialToken,
-      this.tokenSelected,
-      this.page,})
-      : super(key: key);
+  SwapField({
+    Key key,
+    this.direction = Direction.from,
+    this.controller,
+    this.initialToken,
+    this.tokenSelected,
+    this.page,
+  }) : super(key: key);
 
   @override
   _SwapFieldState createState() => new _SwapFieldState<T>();
@@ -44,7 +44,6 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
 
   @override
   Widget build(BuildContext context) {
-    final balance = widget.balance;
     selectedToken = widget.initialToken;
 
     return Container(
@@ -52,7 +51,8 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
       decoration: MyStyles.darkWithBorderDecoration,
       child: Column(
         children: [
-          _buildDirectionAndBalance(balance),
+          _buildDirectionAndBalance(
+              selectedToken != null ? selectedToken.balance : "0"),
           SizedBox(
             height: 20,
           ),
@@ -64,7 +64,8 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (widget.direction == Direction.from)
-                    _buildMaxButton(balance),
+                    _buildMaxButton(
+                        selectedToken != null ? selectedToken.balance : "0"),
                   _buildTokenSelection()
                 ],
               ),
@@ -79,7 +80,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
     return GestureDetector(
         onTap: () async {
           MaterialPageRoute<Token> pushTo;
-          if (widget.page!=null && widget.page == TabPage.synthetics) {
+          if (widget.page != null && widget.page == TabPage.synthetics) {
             pushTo = MaterialPageRoute<Stock>(
                 builder: (BuildContext _) => StockSelectorScreen());
           } else if (selectedToken == null) {
@@ -94,11 +95,12 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           }
           //TODO (@CodingDavid8) Find agreement with @hookman2 on navigation service and improve routing
           final dynamic _selectedToken = await Navigator.push(context, pushTo);
-          if (_selectedToken != null)
+          if (_selectedToken != null) {
             setState(() {
               selectedToken = _selectedToken;
               widget.tokenSelected(selectedToken);
             });
+          } 
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -112,10 +114,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                     backgroundColor: Colors.white70,
                   ),
             const SizedBox(width: 5),
-            Text(
-                selectedToken != null
-                    ? selectedToken.symbol
-                    : "select asset",
+            Text(selectedToken != null ? selectedToken.symbol : "select asset",
                 style: MyStyles.whiteMediumTextStyle),
             const SizedBox(width: 10),
             PlatformSvg.asset('images/icons/chevron_down.svg'),
@@ -123,12 +122,12 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
         ));
   }
 
-  Widget _buildMaxButton(double balance) {
+  Widget _buildMaxButton(String balance) {
     return Flexible(
       child: InkWell(
         onTap: () {
           setState(() {
-            widget.controller.text = balance.toString();
+            widget.controller.text = balance;
           });
         },
         child: Container(
@@ -162,7 +161,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
             child: TextFormField(
                 maxLines: 1,
 //                onChanged: widget.onValueChange,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: "0.0",
                   hintStyle: MyStyles.lightWhiteMediumTextStyle,
                   border: InputBorder.none,
@@ -171,12 +170,16 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                 ),
+                inputFormatters: [
+                  WhitelistingTextInputFormatter(
+                      new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+                ],
                 controller: widget.controller,
                 keyboardType: TextInputType.number,
                 style: MyStyles.whiteMediumTextStyle)));
   }
 
-  Widget _buildDirectionAndBalance(double balance) {
+  Widget _buildDirectionAndBalance(String balance) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -185,7 +188,8 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           style: MyStyles.lightWhiteSmallTextStyle,
         ),
         Text(
-          'Balance: ${balance % 1 == 0 ? balance.round() : balance}',
+//          'Balance: ${balance % 1 == 0 ? balance.round() : balance}',
+          'Balance: ${EthereumService.formatDouble(balance)}',
           style: MyStyles.lightWhiteSmallTextStyle,
         ),
       ],

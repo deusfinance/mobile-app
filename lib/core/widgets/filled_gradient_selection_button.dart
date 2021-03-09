@@ -1,4 +1,4 @@
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../screens/synthetics/synchronizer_screen.dart';
@@ -8,10 +8,14 @@ class FilledGradientSelectionButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String label;
   final LinearGradient gradient;
-  final TextStyle textStyle;
+  TextStyle textStyle;
 
   FilledGradientSelectionButton(
-      {this.selected, this.onPressed, this.label, this.gradient, this.textStyle = MyStyles.whiteMediumTextStyle});
+      {this.selected, this.onPressed, this.label, this.gradient, this.textStyle}){
+    if(this.textStyle == null){
+      this.textStyle = MyStyles.whiteMediumTextStyle;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

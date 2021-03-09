@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/token.dart';
@@ -30,7 +30,7 @@ class TokenListTile extends StatelessWidget {
           Text(token.name, maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteSmallTextStyle), //  const TextStyle(fontSize: 15, height: 0.99999)
         ],
       ),
-      trailing: const Text(
+      trailing: Text(
         '0',
         style: MyStyles.whiteSmallTextStyle,
       ),

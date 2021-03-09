@@ -11,7 +11,7 @@ class CurrencySelectorScreen extends StatelessWidget {
         body: TokenSelector(
       selector: CurrencySelector(),
       title: 'Token',
-      showSearchBar: true,
+      showSearchBar: false,
     ));
   }
 }

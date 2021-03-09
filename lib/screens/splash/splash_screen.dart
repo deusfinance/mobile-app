@@ -1,27 +1,38 @@
-import 'package:deus/data_source/stock_data.dart';
-import 'package:deus/screens/main_screen/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class SplashScreen extends StatefulWidget {
+import '../../statics/my_colors.dart';
+import 'cubit/splash_cubit.dart';
+
+class SplashScreen extends StatelessWidget {
   static const route = "/splash";
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
 
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    StockData.getdata().then((value){
-      Navigator.of(context).pushNamedAndRemoveUntil(MainScreen.route, (Route<dynamic> route) => false);
-    });
+  static Future<bool> init(BuildContext context) async {
+    debugPrint("Initializing data...");
+    final bool success = await context.read<SplashCubit>().initializeData();
+    debugPrint("Call finished.");
+    if(!success) return null;
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Text("Splash"),),
+      body: Stack(
+        children: [
+          Container(
+              decoration: BoxDecoration(gradient: MyColors.splashGradient),
+              child: BlocBuilder<SplashCubit, SplashState>(builder: (context, state) {
+                if (state is SplashError)
+                  return Center(
+                      child: GestureDetector(onTap: () async => await init(context) , child: Icon(Icons.refresh, color: MyColors.White)));
+                else
+                  return Center(child: SvgPicture.asset("assets/images/deus.svg"));
+              })),
+//          SvgPicture.asset("assets/images/splash_bg.svg"),
+        ],
+      ),
     );
   }
 }

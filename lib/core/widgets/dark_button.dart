@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class DarkButton extends StatelessWidget {
@@ -17,7 +17,7 @@ class DarkButton extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
         child: Material(
-          color: Color(MyColors.Button_BG_Black),
+          color: MyColors.Button_BG_Black,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
           child: InkWell(
