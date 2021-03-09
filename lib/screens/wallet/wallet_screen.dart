@@ -1,10 +1,11 @@
-import 'package:deus/core/widgets/custom_chart.dart';
-import 'package:deus/core/widgets/dark_button.dart';
-import 'package:deus/core/widgets/header_with_address.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/core/widgets/custom_chart.dart';
+import 'package:deus_mobile/core/widgets/dark_button.dart';
+import 'package:deus_mobile/core/widgets/default_screen/header_with_address.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 
 enum WalletScreenState { Single, LiquidityClaim, LiquidityLockStake }
 
@@ -74,15 +75,13 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      backgroundColor: Color(MyColors.Background),
-      body: SafeArea(
+    return DefaultScreen(
+      child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildHeader(),
               _midHeightDivider,
               CustomChart(),
               _bigHeightDivider,
@@ -417,7 +416,7 @@ class _WalletScreenState extends State<WalletScreen> {
             child: Text('1.345646', style: MyStyles.whiteSmallTextStyle),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(MyColors.HalfBlack))),
+                border: Border.all(color: MyColors.HalfBlack)),
           ),
           SizedBox(height: 8),
           DarkButton(label: 'CLAIM'),
@@ -437,7 +436,7 @@ class _WalletScreenState extends State<WalletScreen> {
             child: Text('1.345646', style: MyStyles.whiteSmallTextStyle),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(MyColors.HalfBlack))),
+                border: Border.all(color: MyColors.HalfBlack)),
           ),
           SizedBox(height: 8),
           DarkButton(label: 'WITHDRAW & CLAIM'),

@@ -1,7 +1,7 @@
-import 'package:deus/models/chart_data_point.dart';
-import 'package:deus/models/value_locked_chart_data.dart';
-import 'package:deus/statics/my_colors.dart';
-import 'package:deus/statics/styles.dart';
+import 'package:deus_mobile/models/chart_data_point.dart';
+import 'package:deus_mobile/models/value_locked_chart_data.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -92,7 +92,7 @@ class _CustomChartState extends State<CustomChart> {
               decoration: BoxDecoration(
                   color: Color(MyColors.kWalletFillChart),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Color(MyColors.HalfBlack))),
+                  border: Border.all(color: MyColors.HalfBlack)),
               child: Center(
                 child: Text(
                   snap.connectionState == ConnectionState.done
@@ -111,7 +111,7 @@ class _CustomChartState extends State<CustomChart> {
               decoration: BoxDecoration(
                   color: Color(MyColors.kWalletFillChart),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Color(MyColors.HalfBlack))),
+                  border: Border.all(color: MyColors.HalfBlack)),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -137,7 +137,7 @@ class _CustomChartState extends State<CustomChart> {
                               gridData: FlGridData(show: false),
                               lineBarsData: [
                                   LineChartBarData(
-                                    colors: [Color(MyColors.ToastGreen)],
+                                    colors: [MyColors.ToastGreen],
                                     spots:
                                         generateList(snap.data.chartDataPoints),
                                     isCurved: false,
