@@ -12,12 +12,10 @@ import '../screens/lock/lock_screen.dart';
 import '../core/widgets/default_screen/default_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/stake_screen/stake_screen.dart';
-import '../screens/wallet/wallet_screen.dart';
 import '../screens/wallet_intro_screen/intro_page.dart';
 import '../screens/wallet_intro_screen/wallet_create_page.dart';
 import '../screens/wallet_intro_screen/wallet_import_page.dart';
 import '../service/config_service.dart';
-
 
 const kInitialRoute = '/';
 
@@ -53,7 +51,6 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     StakeScreen.url: (_) => StakeScreen(),
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
-    WalletScreen.url: (_) => WalletScreen(),
   };
   // return MaterialPageRoute(builder: (BuildContext context) => screen);
 }
