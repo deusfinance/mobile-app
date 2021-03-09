@@ -5,6 +5,7 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 
 enum WalletScreenState { Single, LiquidityClaim, LiquidityLockStake }
 
@@ -74,15 +75,13 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      backgroundColor: Color(MyColors.Background),
-      body: SafeArea(
+    return DefaultScreen(
+      child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildHeader(),
               _midHeightDivider,
               CustomChart(),
               _bigHeightDivider,
