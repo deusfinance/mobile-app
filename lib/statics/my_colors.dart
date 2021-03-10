@@ -35,6 +35,8 @@ abstract class MyColors {
   static MaterialColor Blue_Gr =_getMaterialColor(94, 196, 214, 0xFF5EC4D6);
   static MaterialColor ToastGreen = _getMaterialColor(0, 209, 108, 0xFF00D16C);
   static MaterialColor ToastGrey = _getMaterialColor(196, 196, 196, 0xFFC4C4C4);
+  static MaterialColor ToastRed = _getMaterialColor(196, 0, 0, 0xFFD40000);
+
 
 
 

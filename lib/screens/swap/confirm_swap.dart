@@ -14,7 +14,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
 
 enum ConfirmSwapMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
-enum Mode { LOADING, NONE, PROCESSING }
+enum Mode { LOADING, NONE }
 enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
 
 class ConfirmSwapScreen extends StatefulWidget {
@@ -39,27 +39,25 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
   TextEditingController gasLimitController = new TextEditingController();
   TextEditingController gWeiController = new TextEditingController();
 
-  Future<bool> getGWei() async {
+  Future<GWei> getGWei() async {
     var response =
         await http.get("https://ethgasstation.info/json/ethgasAPI.json");
     if (response.statusCode == 200) {
       var map = json.decode(response.body);
-      gWei = GWei.fromJson(map);
-      return true;
+      return GWei.fromJson(map);
     } else {
-      return false;
+      return null;
     }
   }
 
-  Future<bool> getEthPrice() async {
+  Future<double> getEthPrice() async {
     var response = await http.get(
         "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
     if (response.statusCode == 200) {
       var map = json.decode(response.body);
-      ethPrice = map['ethereum']['usd'];
-      return true;
+      return map['ethereum']['usd'];
     } else {
-      return false;
+      return null;
     }
   }
 
@@ -686,13 +684,9 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
   }
 
   void getData() async {
-    await getGWei();
-    await getEthPrice();
-//    TODO
-    BigInt eg = await widget.service.ethService.estimateGas(widget.transaction);
-    if(eg!=null)estimatedGasNumber = eg.toInt();
-    else estimatedGasNumber = 100000;
-
+    gWei = await getGWei();
+    ethPrice = await getEthPrice();
+    estimatedGasNumber = await estimateGas();
     setState(() {
       mode = Mode.NONE;
     });
@@ -703,6 +697,21 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
       gFee = gasFee;
     }
     return estimatedGasNumber * _computeGasPrice(gFee: gFee);
+  }
+
+  Future<int> estimateGas() async {
+    Map<String, dynamic> map = new Map();
+    map['from'] = widget.transaction.from;
+    map['to'] = widget.transaction.to;
+    map['data'] = widget.transaction.data;
+    map['value'] = widget.transaction.value;
+    var response = await http.post("https://app.deus.finance/app/estimate", body: json.encode(map));
+    if (response.statusCode == 200) {
+      var js = json.decode(response.body);
+      return js['gas_fee'];
+    } else {
+      return 0;
+    }
   }
 
   _computeGasPrice({GasFee gFee}) {

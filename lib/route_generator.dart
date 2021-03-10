@@ -42,7 +42,6 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     MainScreen.route: (_) => MainScreen(),
     IntroPage.url: (_) => IntroPage(),
 
-    // SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
     SplashScreen.route: (_) => SplashScreen(),
 //    SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
