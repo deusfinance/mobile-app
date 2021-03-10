@@ -24,6 +24,7 @@ import '../../statics/my_colors.dart';
 import '../../statics/statics.dart';
 import '../../statics/styles.dart';
 import 'confirm_swap.dart';
+import 'cubit/swap_cubit.dart';
 import 'cubit/swap_state.dart';
 
 class SwapScreen extends StatefulWidget {
@@ -44,14 +45,15 @@ class _SwapScreenState extends State<SwapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SwapCubit, SwapState>(
-        builder: (context, state) {
+    return BlocBuilder<SwapCubit, SwapState>(builder: (context, state) {
       if (state is SwapLoading) {
-        return Center(
-          child: CircularProgressIndicator(),
+        return DefaultScreen(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
         );
       } else {
-        return _buildBody(state);
+        return DefaultScreen(child: _buildBody(state));
       }
     });
   }
@@ -90,7 +92,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGrey,
         onPressed: () {
-          if(transactionStatus.hash!="") {
+          if (transactionStatus.hash != "") {
             String url = "https://etherscan.io/tx/" + transactionStatus.hash;
             _launchInBrowser(url);
           }
@@ -110,7 +112,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          String url = "https://etherscan.io/tx/"+transactionStatus.hash;
+          String url = "https://etherscan.io/tx/" + transactionStatus.hash;
           _launchInBrowser(url);
         },
         onClosed: () {
@@ -128,7 +130,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          String url = "https://etherscan.io/tx/"+transactionStatus.hash;
+          String url = "https://etherscan.io/tx/" + transactionStatus.hash;
           _launchInBrowser(url);
         },
         onClosed: () {
@@ -415,7 +417,7 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildSwapButton(SwapState state) {
-    if(!state.approved){
+    if (!state.approved) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -602,17 +604,16 @@ class _SwapScreenState extends State<SwapScreen> {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));
-    }else if(state is TransactionFinishedState && state.showingToast){
-      if(state.transactionStatus.status == Status.PENDING){
+    } else if (state is TransactionFinishedState && state.showingToast) {
+      if (state.transactionStatus.status == Status.PENDING) {
         return Align(
             alignment: Alignment.bottomCenter,
             child: _buildTransactionPending(state.transactionStatus));
-      }
-      else if(state.transactionStatus.status ==Status.SUCCESSFUL) {
+      } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
         return Align(
             alignment: Alignment.bottomCenter,
             child: _buildTransactionSuccessFul(state.transactionStatus));
-      }else if(state.transactionStatus.status ==Status.FAILED){
+      } else if (state.transactionStatus.status == Status.FAILED) {
         return Align(
             alignment: Alignment.bottomCenter,
             child: _buildTransactionFailed(state.transactionStatus));

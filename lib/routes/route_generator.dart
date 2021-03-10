@@ -1,6 +1,8 @@
+import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
@@ -23,7 +25,7 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
   return {
     kInitialRoute: (BuildContext ctx) {
       if (locator<ConfigurationService>().didSetupWallet()) {
-        return SwapScreen();
+        return BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen());
       } else {
         return WalletProvider(builder: (_, __) {
           return IntroPage();
@@ -47,7 +49,7 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
     //main screens
-    SwapScreen.route: (_) => SwapScreen(),
+    SwapScreen.route: (_) => BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen()),
     StakeScreen.url: (_) => StakeScreen(),
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen()

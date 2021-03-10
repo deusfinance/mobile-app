@@ -13,6 +13,9 @@ class SwapCubit extends Cubit<SwapState> {
   SwapCubit() : super(SwapInitial());
 
   init() async {
+    if(state is SwapLoaded){
+      return;
+    }
     emit(SwapLoading(state));
     fetchBalances();
     state.streamController.stream
