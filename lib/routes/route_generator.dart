@@ -53,7 +53,7 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     StakeScreen.url: (_) => StakeScreen(),
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
-    WalletScreen.url: (_) => WalletScreen(),
+    StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
   };
   // return MaterialPageRoute(builder: (BuildContext context) => screen);
 }

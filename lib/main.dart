@@ -1,3 +1,4 @@
+import 'package:deus_mobile/screens/wallet/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +62,7 @@ class _DEUSAppState extends State<DEUSApp> {
             debugShowCheckedModeBanner: false,
             theme: MyStyles.theme,
             routes: generateRoutes(context),
-            initialRoute: kInitialRoute,
+            initialRoute: StakingVaultOverviewScreen.url,
           );
         },
       );
