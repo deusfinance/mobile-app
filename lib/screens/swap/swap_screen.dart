@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +28,8 @@ import 'cubit/swap_state.dart';
 
 class SwapScreen extends StatefulWidget {
   static const route = "/swap";
+
+  const SwapScreen();
 
   @override
   _SwapScreenState createState() => _SwapScreenState();

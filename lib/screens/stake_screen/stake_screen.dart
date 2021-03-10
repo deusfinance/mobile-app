@@ -1,13 +1,14 @@
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/back_button.dart';
-import 'package:deus_mobile/core/widgets/cross_fade_duo_button.dart';
+import 'package:deus_mobile/core/widgets/default_screen/back_button.dart';
+import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/stake_and_lock/cross_fade_duo_button.dart';
 import 'package:deus_mobile/core/widgets/dark_button.dart';
-import 'package:deus_mobile/core/widgets/header_with_address.dart';
-import 'package:deus_mobile/core/widgets/steps.dart';
+// import 'package:deus_mobile/core/widgets/header_with_address.dart';
+import 'package:deus_mobile/core/widgets/stake_and_lock/steps.dart';
 import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/screens/main_screen/bottom_nav_bar.dart';
+import 'package:deus_mobile/core/widgets/default_screen/bottom_nav_bar.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,8 @@ enum StakeStates { hasToApprove, pendingApproveDividedButton, isApproved, pendin
 
 class StakeScreen extends StatefulWidget {
   static const url = '/stake';
+
+  const StakeScreen();
 
   @override
   _StakeScreenState createState() => _StakeScreenState();
@@ -41,12 +44,9 @@ class _StakeScreenState extends State<StakeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: MyColors.Main_BG_Black,
-      bottomNavigationBar: MyBottomNavBar((_){}),
-      body: SafeArea(
+    return DefaultScreen(
+      child: SafeArea(
         child: SingleChildScrollView(
-          
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           child: SizedBox(
             height: MediaQuery.of(context).size.height - 80,

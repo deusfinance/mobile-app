@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'config.dart';
 import 'locator.dart';
-import 'route_generator.dart';
+import 'routes/route_generator.dart';
 import 'screens/splash/cubit/splash_cubit.dart';
 import 'screens/splash/splash_screen.dart';
 import 'service/config_service.dart';
