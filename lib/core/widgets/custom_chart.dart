@@ -15,9 +15,7 @@ class CustomChart extends StatefulWidget {
 }
 
 class _CustomChartState extends State<CustomChart> {
-
   Future<List<ChartDataPoint>> futureData;
-
 
   List<FlSpot> generateList(List<ChartDataPoint> values) {
     List<FlSpot> reList = [];
@@ -33,8 +31,6 @@ class _CustomChartState extends State<CustomChart> {
     height: 20,
   );
 
-
-
   List<bool> _toggleButtonButtonsTime = [false, false, true, false, false];
 
   void changeToggleButtonTime(int i) {
@@ -46,8 +42,6 @@ class _CustomChartState extends State<CustomChart> {
     }
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -57,23 +51,23 @@ class _CustomChartState extends State<CustomChart> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-               SizedBox(
-                  height: 150,
-                  width: double.infinity,
-                  child: LineChart(LineChartData(
-                      minY: 0,
-                      titlesData: FlTitlesData(show: false),
-                      borderData: FlBorderData(show: false),
-                      axisTitleData: FlAxisTitleData(show: false),
-                      gridData: FlGridData(show: false),
-                      lineBarsData: [
-                        LineChartBarData(
-                          colors: [MyColors.ToastGreen],
-                          spots: generateList(widget.dataPoints),
-                          isCurved: false,
-                          dotData: FlDotData(show: false),
-                        )
-                      ]))),
+        SizedBox(
+            height: 150,
+            width: double.infinity,
+            child: LineChart(LineChartData(
+                minY: 0,
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                axisTitleData: FlAxisTitleData(show: false),
+                gridData: FlGridData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    colors: [MyColors.ToastGreen],
+                    spots: generateList(widget.dataPoints),
+                    isCurved: false,
+                    dotData: FlDotData(show: false),
+                  )
+                ]))),
         _bigHeightDivider,
         _buildToggleButtons()
       ],
@@ -89,29 +83,25 @@ class _CustomChartState extends State<CustomChart> {
           changeToggleButtonTime(ind);
           switch (ind) {
             case 0:
-              {
-                timePressed(Duration(hours: 1));
-              }
+              timePressed(Duration(hours: 1));
+
               break;
             case 1:
-              {
-                timePressed(Duration(days: 1));
-              }
+              timePressed(Duration(days: 1));
               break;
             case 2:
-              {
-                timePressed(Duration(days: 7));
-              }
+              timePressed(Duration(days: 7));
+
               break;
             case 3:
-              {
-                timePressed(Duration(days: 30),);
-              }
+              timePressed(
+                Duration(days: 30),
+              );
+
               break;
             case 4:
-              {
-                timePressed(Duration(days: 365));
-              }
+              timePressed(Duration(days: 365));
+              break;
           }
         },
         children: [

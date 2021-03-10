@@ -1,22 +1,23 @@
-import 'file:///D:/AndroidStudioProjects/mobile-app/lib/screens/wallet/widgets/chart_container.dart';
+
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/default_screen/header_with_address.dart';
+import 'package:deus_mobile/screens/wallet/widgets/chart_container.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 
-enum WalletScreenState { Single, LiquidityClaim, LiquidityLockStake }
+enum StakingVaultOverviewScreenStates { Single, LiquidityClaim, LiquidityLockStake }
 
-class WalletScreen extends StatefulWidget {
+class StakingVaultOverviewScreen extends StatefulWidget {
   static const url = '/wallet-screen';
 
   @override
-  _WalletScreenState createState() => _WalletScreenState();
+  _StakingVaultOverviewScreenState createState() => _StakingVaultOverviewScreenState();
 }
 
-class _WalletScreenState extends State<WalletScreen> {
+class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen> {
   final String address = '0x3a6dabD6B5C75291a3258C29B418f5805792a87e';
 
   final double ethCount = 478.938;
@@ -34,16 +35,8 @@ class _WalletScreenState extends State<WalletScreen> {
   final double timeTokenAPY = 199.98;
   final double sDeusAPY = 99.98;
 
-  final double performaceInPerc = 25.42;
-  final double performaceInCash = 143231.32;
-
-  final double perfInPerc = 25.13;
-  final double perfInCash = 104244;
-  final double lockedInCash = 504503;
-  final double lockedInEth = 1403;
-
   List<bool> _toggleButtonButtonsSingleLiquidity = [true, false];
-  WalletScreenState _screenState = WalletScreenState.LiquidityLockStake;
+  StakingVaultOverviewScreenStates _screenState = StakingVaultOverviewScreenStates.LiquidityLockStake;
 
   void changeToggleButtonSingleLiquidity(int i) {
     if (!_toggleButtonButtonsSingleLiquidity[i]) {
@@ -53,8 +46,8 @@ class _WalletScreenState extends State<WalletScreen> {
       });
       setState(() {
         _screenState = _toggleButtonButtonsSingleLiquidity[0]
-            ? WalletScreenState.Single
-            : WalletScreenState.LiquidityClaim;
+            ? StakingVaultOverviewScreenStates.Single
+            : StakingVaultOverviewScreenStates.LiquidityClaim;
       });
     }
   }
@@ -84,11 +77,11 @@ class _WalletScreenState extends State<WalletScreen> {
               _bigHeightDivider,
               _buildToggleButton(),
               _divider,
-              if (_screenState == WalletScreenState.Single)
+              if (_screenState == StakingVaultOverviewScreenStates.Single)
                 _buildSingleBottom(),
-              if (_screenState == WalletScreenState.LiquidityClaim)
+              if (_screenState == StakingVaultOverviewScreenStates.LiquidityClaim)
                 _buildLiquidityClaim(),
-              if (_screenState == WalletScreenState.LiquidityLockStake)
+              if (_screenState == StakingVaultOverviewScreenStates.LiquidityLockStake)
                 _buildLiquidityLockStake(),
             ],
           ),
@@ -268,7 +261,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 '$nativeBalancerAPY% APY',
                 style: MyStyles.whiteMediumTextStyle,
               ),
-              if (_screenState == WalletScreenState.LiquidityClaim)
+              if (_screenState == StakingVaultOverviewScreenStates.LiquidityClaim)
                 Text(
                   'you own $percOfPool% of the pool',
                   style: MyStyles.whiteSmallTextStyle,

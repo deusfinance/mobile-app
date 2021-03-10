@@ -1,3 +1,4 @@
+import 'package:deus_mobile/core/widgets/chart/util.dart';
 import 'package:deus_mobile/core/widgets/custom_chart.dart';
 import 'package:deus_mobile/models/chart_data_point.dart';
 import 'package:deus_mobile/models/value_locked_chart_data.dart';
@@ -17,6 +18,8 @@ class ChartContainer extends StatefulWidget {
 
 class _ChartContainerState extends State<ChartContainer> {
   Future<ValueLockedChartData> futureData;
+  String timeSpanOfChart = 'Past Week';
+  Duration _displayedChartDuration;
 
   SizedBox _bigHeightDivider = SizedBox(
     height: 20,
@@ -46,21 +49,13 @@ class _ChartContainerState extends State<ChartContainer> {
     return _randomTestData;
   }
 
-  Map<Duration, String> _durationTimeSpan = {
-    Duration(hours: 1): 'Past Hour',
-    Duration(days: 1): 'Past Day',
-    Duration(days: 7): 'Past Week',
-    Duration(days: 30): 'Past Month',
-    Duration(days: 365): 'Past Year',
-  };
 
-  String timeSpanOfChart = 'Past Week';
-  Duration _displayedChartDuration = Duration(days: 7);
+
 
   void _onTimeSelected(Duration dur) {
     setState(() {
       _displayedChartDuration = dur;
-      timeSpanOfChart = _durationTimeSpan[dur];
+      timeSpanOfChart = durationTimeSpan[dur];
       futureData = _getFutureChartData(dur);
     });
   }
@@ -77,56 +72,65 @@ class _ChartContainerState extends State<ChartContainer> {
         future: futureData,
         builder: (context, snap) {
           return Column(children: [
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              width: double.infinity,
-              padding: EdgeInsets.only(top: 10, bottom: 10, left: 40),
-              decoration: BoxDecoration(
-                  color: Color(MyColors.kWalletFillChart),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: MyColors.HalfBlack)),
-              child: Center(
-                child: Text(
-                  snap.connectionState == ConnectionState.done
-                      ? 'TVL: ${snap.data.lockedInCrypto} ETH (\$${snap.data.lockedInCash})'
-                      : 'TVL: --------- ETH(\$---------)', //TODO: Crypto kürzel
-
-                  style: MyStyles.whiteSmallTextStyle,
-                ),
-              ),
-            ),
+            _buildChangeIndicator(snap),
             _midHeightDivider,
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              padding: EdgeInsets.symmetric(vertical: 10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Color(MyColors.kWalletFillChart),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: MyColors.HalfBlack)),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  snap.connectionState == ConnectionState.done
-                      ? _buildHeader(
-                          snap.data.lockedInCash,
-                          snap.data.lockedInCrypto,
-                          snap.data.absoluteChange,
-                          snap.data.relativeChange,
-                          snap.connectionState)
-                      : _buildHeader(
-                          null, null, null, null, snap.connectionState),
-                  _bigHeightDivider,
-                  snap.connectionState == ConnectionState.done
-                      ? CustomChart(snap.data.chartDataPoints, _onTimeSelected)
-                      : Center(
-                          child: CircularProgressIndicator(),
-                        )
-                ],
-              ),
-            ),
+            _buildBody(snap),
           ]);
         });
+  }
+
+  Container _buildBody(AsyncSnapshot<ValueLockedChartData> snap) {
+    final valueLockedData = snap.data;
+    return Container(
+            margin: EdgeInsets.symmetric(horizontal: 15),
+            padding: EdgeInsets.symmetric(vertical: 10),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Color(MyColors.kWalletFillChart),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: MyColors.HalfBlack)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                snap.connectionState == ConnectionState.done
+                    ? _buildHeader(
+                    valueLockedData.lockedInCash,
+                    valueLockedData.lockedInCrypto,
+                    valueLockedData.absoluteChange,
+                    valueLockedData.relativeChange,
+                        snap.connectionState == ConnectionState.done)
+                    : _buildHeader(
+                        null, null, null, null, snap.connectionState == ConnectionState.done),
+                _bigHeightDivider,
+                snap.connectionState == ConnectionState.done
+                    ? CustomChart(valueLockedData.chartDataPoints, _onTimeSelected)
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      )
+              ],
+            ),
+          );
+  }
+
+  Container _buildChangeIndicator(AsyncSnapshot<ValueLockedChartData> snap) {
+    return Container(
+            margin: EdgeInsets.symmetric(horizontal: 15),
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 10, bottom: 10, left: 40),
+            decoration: BoxDecoration(
+                color: Color(MyColors.kWalletFillChart),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: MyColors.HalfBlack)),
+            child: Center(
+              child: Text(
+                snap.connectionState == ConnectionState.done
+                    ? 'TVL: ${snap.data.lockedInCrypto} ETH (\$${snap.data.lockedInCash})'
+                    : 'TVL: --------- ETH(\$---------)', //TODO: Crypto kürzel
+
+                style: MyStyles.whiteSmallTextStyle,
+              ),
+            ),
+          );
   }
 
   Column _buildHeader(
@@ -134,7 +138,7 @@ class _ChartContainerState extends State<ChartContainer> {
       double lockedInCrypto,
       double absoluteChange,
       double relativeChange,
-      ConnectionState connectionState) {
+      bool isLoaded) {
     return Column(
       children: [
         Text(
@@ -143,14 +147,14 @@ class _ChartContainerState extends State<ChartContainer> {
         ),
         _midHeightDivider,
         Text(
-          connectionState == ConnectionState.done
+          isLoaded
               ? '\$$lockedInCash / Ξ$lockedInCrypto'
               : '\$----- / -----',
           style: MyStyles.whiteMediumTextStyle,
         ),
         _midHeightDivider,
         Text(
-          connectionState == ConnectionState.done
+          isLoaded
               ? '+$relativeChange% ($absoluteChange) $timeSpanOfChart'
               : '+--.--% (------) $timeSpanOfChart',
           style: MyStyles.greenSmallTextStyle,
