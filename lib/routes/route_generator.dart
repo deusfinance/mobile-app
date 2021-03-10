@@ -1,6 +1,8 @@
+import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
@@ -48,7 +50,12 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
     //main screens
     SwapScreen.route: (_) => SwapScreen(),
-    StakeScreen.url: (_) => StakeScreen(),
+    StakeScreen.url: (_) {
+      return BlocProvider(
+        create: (context) => StakeCubit(),
+        child: StakeScreen(),
+      );
+    },
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen()
   };
