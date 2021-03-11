@@ -36,6 +36,8 @@ abstract class MyColors {
 
   static MaterialColor ToastGreen = _getMaterialColor(0, 209, 108, 0xFF00D16C);
   static MaterialColor ToastGrey = _getMaterialColor(196, 196, 196, 0xFFC4C4C4);
+  static MaterialColor ToastRed = _getMaterialColor(196, 0, 0, 0xFFD40000);
+
 
 //  static const White = 0xFFFFFFFF;
 //  static const HalfWhite = 0xAAFFFFFF;

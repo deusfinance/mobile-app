@@ -159,6 +159,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
         child: Container(
 //            height: 30,
             child: TextFormField(
+                autofocus: false,
                 maxLines: 1,
 //                onChanged: widget.onValueChange,
                 decoration: InputDecoration(

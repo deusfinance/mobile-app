@@ -12,13 +12,13 @@ import 'styles.dart';
 showToast(BuildContext context, final TransactionStatus status) {
   Color c;
   switch (status.status) {
-    case TransactionStatus.SUCCESSFUL:
+    case Status.SUCCESSFUL:
       c = Color(0xFF00D16C);
       break;
-    case TransactionStatus.PENDING:
+    case Status.PENDING:
       c = Color(0xFFC4C4C4);
       break;
-    case TransactionStatus.FAILED:
+    case Status.FAILED:
       c = Color(0xFFD40000);
       break;
     default:

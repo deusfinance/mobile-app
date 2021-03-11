@@ -331,7 +331,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       showToast(
           context,
           TransactionStatus(
-              "Approve ${syntheticModel.from.name}", TransactionStatus.PENDING, "Pending"));
+              "Approve ${syntheticModel.from.name}", Status.PENDING, "Pending"));
 
       var res = await stockService.approve(syntheticModel.from.getTokenName());
       Stream<TransactionReceipt> result =
@@ -345,12 +345,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           showToast(
               context,
               TransactionStatus("Approved ${syntheticModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Successful"));
+                  Status.SUCCESSFUL, "Successful"));
         } else {
           showToast(
               context,
               TransactionStatus("Approve of ${syntheticModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+                  Status.FAILED, "Failed"));
         }
       });
     }
@@ -380,12 +380,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           showToast(
               context,
               TransactionStatus("Sell ${syntheticModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Failed"));
+                  Status.SUCCESSFUL, "Failed"));
         } else {
           showToast(
               context,
               TransactionStatus("Sell of ${syntheticModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+                  Status.FAILED, "Failed"));
         }
       });
     }
@@ -416,12 +416,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           showToast(
               context,
               TransactionStatus("Buy ${syntheticModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Successful"));
+                  Status.SUCCESSFUL, "Successful"));
         } else {
           showToast(
               context,
               TransactionStatus("Buy of ${syntheticModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+                  Status.FAILED, "Failed"));
         }
       });
     }
