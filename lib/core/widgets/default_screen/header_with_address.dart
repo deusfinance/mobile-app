@@ -1,5 +1,7 @@
+import 'package:deus_mobile/core/util/clipboard.dart';
 import 'package:deus_mobile/core/util/crypto_util.dart';
 import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/infrastructure/wallet_provider/wallet_handler.dart';
 import 'package:deus_mobile/infrastructure/wallet_provider/wallet_provider.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/intro_page.dart';
@@ -8,6 +10,7 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:web3dart/credentials.dart';
 
 import '../../../locator.dart';
@@ -43,7 +46,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
   GestureDetector _buildWalletLogout() {
     return GestureDetector(
         onTap: () async {
-          final walletStore = useWallet(context);
+          final walletStore = Provider.of<WalletHandler>(context, listen: false);
           final bool confirm = await showDialog(
                 context: context,
                 builder: (context) {
@@ -95,7 +98,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
 
   Widget _buildAddress(String address) {
     return GestureDetector(
-        onLongPress: () => Clipboard.setData(ClipboardData(text: address)),
+        onLongPress: () async => await copyToClipBoard(address),
         child: Center(
           child: Text(
             showShortenedAddress(address),
