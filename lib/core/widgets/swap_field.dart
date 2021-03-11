@@ -3,8 +3,8 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../models/crypto_currency.dart';
-import '../../models/stock.dart';
+import '../../models/swap/crypto_currency.dart';
+import '../../models/synthetics/stock.dart';
 import '../../models/token.dart';
 import '../../statics/old_my_colors.dart';
 import 'svg.dart';

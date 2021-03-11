@@ -16,7 +16,7 @@ import '../../core/widgets/selection_button.dart';
 import '../../core/widgets/svg.dart';
 import '../../core/widgets/swap_field.dart';
 import '../../core/widgets/toast.dart';
-import '../../models/gas.dart';
+import '../../models/swap/gas.dart';
 import '../../models/token.dart';
 import '../../models/transaction_status.dart';
 import '../../service/ethereum_service.dart';

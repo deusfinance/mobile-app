@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:deus_mobile/core/util/responsive.dart';
 import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/models/GWei.dart';
-import 'package:deus_mobile/models/gas.dart';
+import 'package:deus_mobile/models/swap/GWei.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/service/deus_swap_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';

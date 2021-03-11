@@ -1,5 +1,5 @@
 import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/models/gas.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';

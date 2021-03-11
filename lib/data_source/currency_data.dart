@@ -1,4 +1,4 @@
-import '../models/crypto_currency.dart';
+import '../models/swap/crypto_currency.dart';
 
 //TODO (@CodingDavid8) fetch all supported tokens from server
 abstract class CurrencyData {
