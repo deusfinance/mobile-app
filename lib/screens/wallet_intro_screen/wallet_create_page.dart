@@ -21,12 +21,13 @@ class WalletCreatePage extends HookWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: title,
-          leading: BackButtonWithText(
-            onPressed: store.state.step == WalletCreateSteps.display
-                ? () => Navigator.pop(context)
-                : () => store.goto(WalletCreateSteps.display),
-          )),
+        title: title,
+        // leading: BackButtonWithText(
+        //   onPressed: store.state.step == WalletCreateSteps.display
+        //       ? () => Navigator.pop(context)
+        //       : () => store.goto(WalletCreateSteps.display),
+        // ),
+      ),
       body: store.state.step == WalletCreateSteps.display
           ? DisplayMnemonic(
               mnemonic: store.state.mnemonic,
