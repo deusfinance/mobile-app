@@ -81,11 +81,13 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(MyStyles.mainPadding),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [_buildUserInput(context), _buildMarketTimer()],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(MyStyles.mainPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [_buildUserInput(context), _buildMarketTimer()],
+        ),
       ),
     );
   }
