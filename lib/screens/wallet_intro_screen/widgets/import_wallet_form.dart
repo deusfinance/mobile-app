@@ -4,9 +4,9 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../../core/widgets/form/paper_form.dart';
-import '../../../core/widgets/form/paper_input.dart';
-import '../../../core/widgets/form/paper_validation_summary.dart';
+import 'form/paper_form.dart';
+import 'form/paper_input.dart';
+import 'form/paper_validation_summary.dart';
 import '../../../core/widgets/raised_gradient_button.dart';
 import '../../../models/wallet/wallet_setup.dart';
 

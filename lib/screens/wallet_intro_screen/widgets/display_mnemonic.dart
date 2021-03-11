@@ -1,3 +1,4 @@
+import 'package:deus_mobile/core/util/clipboard.dart';
 import 'package:deus_mobile/core/widgets/grey_outline_button.dart';
 import 'package:deus_mobile/core/widgets/raised_gradient_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,7 +66,7 @@ class DisplayMnemonic extends HookWidget {
           label: 'COPY',
           onPressed: () async {
             print("copy...");
-            await Clipboard.setData(ClipboardData(text: this.mnemonic));
+            await copyToClipBoard(this.mnemonic);
             print("copied :)");
           },
           gradient: button_gradient,

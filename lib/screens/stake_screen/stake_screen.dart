@@ -12,8 +12,9 @@ import 'package:deus_mobile/core/widgets/default_screen/bottom_nav_bar.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-enum StakeStates { hasToApprove, pendingApproveDividedButton, isApproved, pendingApproveMergedButton }
+import 'cubit/stake_cubit.dart';
 
 class StakeScreen extends StatefulWidget {
   static const url = '/stake';
@@ -25,16 +26,7 @@ class StakeScreen extends StatefulWidget {
 }
 
 class _StakeScreenState extends State<StakeScreen> {
-  final String address = '0x3a6dabD6B5C75291a3258C29B418f5805792a87e';
-
-  final double apy = 99.93;
-
-  final balance = 13.234;
-
   final gradient = MyColors.blueToGreenGradient;
-
-  StakeStates _stakeState = StakeStates.hasToApprove;
-  bool _showToast = false;
 
   final _textController = TextEditingController();
 
@@ -49,51 +41,54 @@ class _StakeScreenState extends State<StakeScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height - 80,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                kSpacer,
-                BackButtonWithText(),
-                kSpacer,
-                Text(
-                  'Stake your sDEA',
-                  style: TextStyle(fontSize: 25),
-                ),
-                kSmallSpacer,
-                Text(
-                  '$apy% APY',
-                  style: TextStyle(fontSize: 20),
-                ),
-                kSpacer,
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Text(
-                    'Balance: $balance',
-                    style: MyStyles.lightWhiteSmallTextStyle,
-                  ),
-                ),
-                SizedBox(height: 5),
-                TextFieldWithMax(
-                  controller: _textController,
-                  maxValue: balance,
-                ),
-                kSmallSpacer,
-                DarkButton(
-                  label: 'Show me the contract',
-                  onPressed: () {},
-                  labelStyle: MyStyles.whiteMediumTextStyle,
-                ),
-                kSmallSpacer,
-                _buildStakeApproveButton(),
-                kMediumSpacer,
-                if (_stakeState == StakeStates.hasToApprove) Steps(),
-                Spacer(),
-                if ((_stakeState != StakeStates.hasToApprove && _showToast) ||
-                    (_stakeState == StakeStates.pendingApproveDividedButton && _showToast))
-                  _buildToast()
-              ],
+            height: MediaQuery.of(context).size.height - kToolbarHeight - kBottomNavigationBarHeight,
+            child: BlocBuilder<StakeCubit, StakeState>(
+              builder: (_, state) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    kSpacer,
+                    Text(
+                      'Stake your sDEA',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                    kSmallSpacer,
+                    Text(
+                      '% APY',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    kSpacer,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(
+                        'Balance: ',
+                        style: MyStyles.lightWhiteSmallTextStyle,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    TextFieldWithMax(
+                      controller: _textController,
+                      maxValue: state.balance,
+                    ),
+                    kSmallSpacer,
+                    DarkButton(
+                      label: 'Show me the contract',
+                      onPressed: () {},
+                      labelStyle: MyStyles.whiteMediumTextStyle,
+                    ),
+                    kSmallSpacer,
+                    _buildStakeApproveButton(state),
+                    kMediumSpacer,
+                    if (state is StakeHasToApprove) Steps(),
+                    Spacer(),
+                    if ((!(state is StakeHasToApprove) && state.showToast) ||
+                        (state is StakePendingApproveDividedButton && state.showToast))
+                      _buildToast(state),
+                    Spacer(),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -101,12 +96,11 @@ class _StakeScreenState extends State<StakeScreen> {
     );
   }
 
-  Widget _buildToast() {
-    if (_stakeState != StakeStates.pendingApproveDividedButton &&
-        _stakeState != StakeStates.pendingApproveMergedButton) {
+  Widget _buildToast(StakeState state) {
+    if (!(state is StakePendingApproveDividedButton) && !(state is StakePendingApproveMergedButton)) {
       return _buildTransactionSuccessToast();
     } else {
-      print(_stakeState);
+      print(state);
       return _buildTransactionPending();
     }
   }
@@ -118,9 +112,7 @@ class _StakeScreenState extends State<StakeScreen> {
       color: MyColors.ToastGreen,
       onPressed: () {},
       onClosed: () {
-        setState(() {
-          _showToast = false;
-        });
+        context.read<StakeCubit>().closeToast();
       },
     );
   }
@@ -132,48 +124,22 @@ class _StakeScreenState extends State<StakeScreen> {
       color: MyColors.ToastGrey,
       onPressed: () {},
       onClosed: () {
-        setState(() {
-          _showToast = false;
-        });
+        context.read<StakeCubit>().closeToast();
       },
     );
   }
 
-  Widget _buildStakeApproveButton() {
+  Widget _buildStakeApproveButton(StakeState state) {
     return CrossFadeDuoButton(
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
-      showBothButtons:
-          _stakeState == StakeStates.hasToApprove || _stakeState == StakeStates.pendingApproveDividedButton,
-      showLoading: _stakeState == StakeStates.pendingApproveDividedButton ||
-          _stakeState == StakeStates.pendingApproveMergedButton,
+      showBothButtons: state is StakeHasToApprove || state is StakePendingApproveDividedButton,
+      showLoading: state is StakePendingApproveDividedButton || state is StakePendingApproveMergedButton,
       onPressed: () async {
-        if (_stakeState == StakeStates.isApproved || _stakeState == StakeStates.pendingApproveMergedButton) {
-          setState(() {
-            _showToast = true;
-            _stakeState = StakeStates.pendingApproveMergedButton;
-          });
-          await Future.delayed(Duration(seconds: 3));
-          setState(() {
-            if (!_showToast) {
-              _showToast = true;
-            }
-            _stakeState = StakeStates.isApproved;
-          });
-        } else {
-          setState(() {
-            _stakeState = StakeStates.pendingApproveDividedButton;
-            _showToast = true;
-          });
-          await Future.delayed(Duration(seconds: 1));
-          setState(() {
-            if (!_showToast) {
-              _showToast = true;
-            }
-            _stakeState = StakeStates.isApproved;
-          });
-        }
+        if (state is StakePendingApproveDividedButton || state is StakePendingApproveMergedButton) return;
+        if (state is StakeIsApproved) context.read<StakeCubit>().stake();
+        if (state is StakeHasToApprove) context.read<StakeCubit>().approve();
       },
     );
   }

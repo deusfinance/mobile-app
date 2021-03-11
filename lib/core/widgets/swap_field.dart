@@ -3,8 +3,8 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../models/crypto_currency.dart';
-import '../../models/stock.dart';
+import '../../models/swap/crypto_currency.dart';
+import '../../models/synthetics/stock.dart';
 import '../../models/token.dart';
 import '../../statics/old_my_colors.dart';
 import 'svg.dart';
@@ -15,6 +15,7 @@ enum Direction { from, to }
 enum TabPage { synthetics, swap }
 
 //TODO (@CodingDavid8) use cubit instead of StatefulWidget
+
 ///Field where you can enter the amount of tokens and select another token.
 // ignore: must_be_immutable
 class SwapField<T extends Token> extends StatefulWidget {
@@ -23,7 +24,6 @@ class SwapField<T extends Token> extends StatefulWidget {
   final TextEditingController controller;
   final TabPage page;
 
-  //TODO (@CodingDavid8): Replace with meta-class so it can be used for tokens and stocks.
   final T initialToken;
 
   SwapField({
@@ -51,8 +51,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
       decoration: MyStyles.darkWithBorderDecoration,
       child: Column(
         children: [
-          _buildDirectionAndBalance(
-              selectedToken != null ? selectedToken.balance : "0"),
+          _buildDirectionAndBalance(selectedToken != null ? selectedToken.balance : "0"),
           SizedBox(
             height: 20,
           ),
@@ -64,8 +63,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (widget.direction == Direction.from)
-                    _buildMaxButton(
-                        selectedToken != null ? selectedToken.balance : "0"),
+                    _buildMaxButton(selectedToken != null ? selectedToken.balance : "0"),
                   _buildTokenSelection()
                 ],
               ),
@@ -81,26 +79,22 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
         onTap: () async {
           MaterialPageRoute<Token> pushTo;
           if (widget.page != null && widget.page == TabPage.synthetics) {
-            pushTo = MaterialPageRoute<Stock>(
-                builder: (BuildContext _) => StockSelectorScreen());
+            pushTo = MaterialPageRoute<Stock>(builder: (BuildContext _) => StockSelectorScreen());
           } else if (selectedToken == null) {
-            pushTo = MaterialPageRoute<Stock>(
-                builder: (BuildContext _) => StockSelectorScreen());
-          } else if (selectedToken.runtimeType == Stock) {
-            pushTo = MaterialPageRoute<Stock>(
-                builder: (BuildContext _) => StockSelectorScreen());
+            pushTo = MaterialPageRoute<Stock>(builder: (BuildContext _) => StockSelectorScreen());
+          } else if (selectedToken is Stock) {
+            pushTo = MaterialPageRoute<Stock>(builder: (BuildContext _) => StockSelectorScreen());
           } else {
-            pushTo = MaterialPageRoute<CryptoCurrency>(
-                builder: (BuildContext _) => CurrencySelectorScreen());
+            pushTo = MaterialPageRoute<CryptoCurrency>(builder: (BuildContext _) => CurrencySelectorScreen());
           }
-          //TODO (@CodingDavid8) Find agreement with @hookman2 on navigation service and improve routing
-          final dynamic _selectedToken = await Navigator.push(context, pushTo);
+
+          final _selectedToken = await Navigator.push(context, pushTo);
           if (_selectedToken != null) {
             setState(() {
               selectedToken = _selectedToken;
               widget.tokenSelected(selectedToken);
             });
-          } 
+          }
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -109,13 +103,9 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           children: <Widget>[
             selectedToken != null
                 ? selectedToken.logoPath.showCircleImage(radius: 15)
-                : CircleAvatar(
-                    radius: 15.0,
-                    backgroundColor: Colors.white70,
-                  ),
+                : CircleAvatar(radius: 15.0, backgroundColor: Colors.white70),
             const SizedBox(width: 5),
-            Text(selectedToken != null ? selectedToken.symbol : "select asset",
-                style: MyStyles.whiteMediumTextStyle),
+            Text(selectedToken != null ? selectedToken.symbol : "select asset", style: MyStyles.whiteMediumTextStyle),
             const SizedBox(width: 10),
             PlatformSvg.asset('images/icons/chevron_down.svg'),
           ],
@@ -159,6 +149,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
         child: Container(
 //            height: 30,
             child: TextFormField(
+                autofocus: false,
                 maxLines: 1,
 //                onChanged: widget.onValueChange,
                 decoration: InputDecoration(
@@ -170,10 +161,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                 ),
-                inputFormatters: [
-                  WhitelistingTextInputFormatter(
-                      new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                ],
+                inputFormatters: [WhitelistingTextInputFormatter(new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))],
                 controller: widget.controller,
                 keyboardType: TextInputType.number,
                 style: MyStyles.whiteMediumTextStyle)));

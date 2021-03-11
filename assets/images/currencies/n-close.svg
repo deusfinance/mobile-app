@@ -1,5 +1,20 @@
 <svg width="606" height="705" viewBox="0 0 606 705" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_f)">
+<defs>
+<filter id="filter0_f" x="0" y="0" width="606" height="693" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="17.5" result="effect1_foregroundBlur"/>
+</filter>
+<linearGradient id="paint0_linear" x1="306.594" y1="35" x2="306.594" y2="700.706" gradientUnits="userSpaceOnUse">
+<stop offset="0.00715083" stop-color="#F1FC68"/>
+<stop offset="1" stop-color="#5EC4D6"/>
+</linearGradient>
+<linearGradient id="paint1_linear" x1="306.5" y1="43" x2="306.5" y2="705.5" gradientUnits="userSpaceOnUse">
+<stop offset="0.00715083" stop-color="#F1FC68"/>
+<stop offset="1" stop-color="#5EC4D6"/>
+</linearGradient>
+</defs>
 <path d="M35 75C35 52.9086 52.9086 35 75 35H531C553.091 35 571 52.9086 571 75V648C571 653.523 566.523 658 561 658H35V75Z" fill="#C4C4C4"/>
 <path d="M35 75C35 52.9086 52.9086 35 75 35H531C553.091 35 571 52.9086 571 75V648C571 653.523 566.523 658 561 658H35V75Z" fill="url(#paint0_linear)"/>
 <path d="M75 36.5H531C552.263 36.5 569.5 53.737 569.5 75V648C569.5 652.694 565.694 656.5 561 656.5H36.5V75C36.5 53.737 53.737 36.5 75 36.5Z" stroke="#272727" stroke-width="3"/>
@@ -58,19 +73,5 @@
 <path d="M74.6006 465.883V509.093" stroke="#242424" stroke-width="3" stroke-miterlimit="10"/>
 <path d="M74.6006 547.526V585.958" stroke="#242424" stroke-width="3" stroke-miterlimit="10"/>
 <path d="M74.6006 624.363V662.795" stroke="#242424" stroke-width="3" stroke-miterlimit="10"/>
-<defs>
-<filter id="filter0_f" x="0" y="0" width="606" height="693" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feGaussianBlur stdDeviation="17.5" result="effect1_foregroundBlur"/>
-</filter>
-<linearGradient id="paint0_linear" x1="306.594" y1="35" x2="306.594" y2="700.706" gradientUnits="userSpaceOnUse">
-<stop offset="0.00715083" stop-color="#F1FC68"/>
-<stop offset="1" stop-color="#5EC4D6"/>
-</linearGradient>
-<linearGradient id="paint1_linear" x1="306.5" y1="43" x2="306.5" y2="705.5" gradientUnits="userSpaceOnUse">
-<stop offset="0.00715083" stop-color="#F1FC68"/>
-<stop offset="1" stop-color="#5EC4D6"/>
-</linearGradient>
-</defs>
+
 </svg>

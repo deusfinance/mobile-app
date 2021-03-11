@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class TokenListTile extends StatelessWidget {
         ],
       ),
       trailing: Text(
-        '0',
+        EthereumService.formatDouble(token.balance),
         style: MyStyles.whiteSmallTextStyle,
       ),
     );

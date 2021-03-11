@@ -38,6 +38,7 @@ class SplashCubit extends Cubit<SplashState> {
         return false;
       }
     } catch (e) {
+      print(e);
       emit(SplashError());
       return false;
     }

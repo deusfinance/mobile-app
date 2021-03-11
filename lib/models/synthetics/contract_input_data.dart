@@ -1,4 +1,4 @@
-import 'package:deus_mobile/models/sign.dart';
+import 'package:deus_mobile/models/synthetics/sign.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'contract_input_data.g.dart';
