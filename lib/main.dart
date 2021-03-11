@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'config.dart';
-import 'core/widgets/will_pop_dialog.dart';
+import 'core/widgets/default_screen/will_pop_dialog.dart';
 import 'locator.dart';
 import 'routes/route_generator.dart';
 import 'screens/splash/cubit/splash_cubit.dart';
@@ -57,16 +57,13 @@ class _DEUSAppState extends State<DEUSApp> {
             return MaterialApp(
                 key: _loadingKey, debugShowCheckedModeBanner: false, theme: MyStyles.theme, home: SplashScreen());
 
-          return WillPopScope(
-            onWillPop: () async  => await showWillPopDialog(ctx),
-            child: MaterialApp(
-              key: _appKey,
-              title: 'Deus Finance',
-              debugShowCheckedModeBanner: false,
-              theme: MyStyles.theme,
-              onGenerateRoute: (settings) => onGenerateRoute(settings, context),
-              initialRoute: kInitialRoute,
-            ),
+          return MaterialApp(
+            key: _appKey,
+            title: 'Deus Finance',
+            debugShowCheckedModeBanner: false,
+            theme: MyStyles.theme,
+            onGenerateRoute: (settings) => onGenerateRoute(settings, context),
+            initialRoute: kInitialRoute,
           );
         },
       );
