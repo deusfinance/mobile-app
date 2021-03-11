@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/models/swap_model.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/config_service.dart';
@@ -32,7 +31,6 @@ abstract class SwapState extends Equatable {
   SwapState();
 
   SwapState.init() {
-    // swapModel = SwapModel(CurrencyData.eth, CurrencyData.deus);
     fromToken = CurrencyData.eth;
     toToken = CurrencyData.deus;
     approved = true;
