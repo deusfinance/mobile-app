@@ -22,9 +22,9 @@ import '../service/config_service.dart';
 
 const kInitialRoute = '/';
 
-Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
-  return {
-    kInitialRoute: (BuildContext ctx) {
+Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
+  final Map<String, WidgetBuilder> routes = {
+    kInitialRoute: (BuildContext _) {
       if (locator<ConfigurationService>().didSetupWallet()) {
         return BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen());
       } else {
@@ -60,5 +60,37 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen()
   };
-  // return MaterialPageRoute(builder: (BuildContext context) => screen);
+  // print("Fading to ${settings.name}");
+  final Widget screenChild = routes[settings.name](context);
+  return _getPageRoute(screenChild, settings);
+}
+
+PageRoute _getPageRoute(Widget child, RouteSettings settings) {
+  return _FadeRoute(child: child, routeName: settings.name);
+}
+
+class _FadeRoute extends PageRouteBuilder {
+  final Widget child;
+  final String routeName;
+
+  _FadeRoute({this.child, this.routeName})
+      : super(
+          settings: RouteSettings(name: routeName),
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              child,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
 }

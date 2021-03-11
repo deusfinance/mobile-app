@@ -24,8 +24,7 @@ void main() async {
   ]);
 
   setupLocator();
-  runApp(BlocProvider<SplashCubit>(
-      create: (_) => SplashCubit(), child: DEUSApp()));
+  runApp(BlocProvider<SplashCubit>(create: (_) => SplashCubit(), child: DEUSApp()));
 }
 
 class DEUSApp extends StatefulWidget {
@@ -55,17 +54,14 @@ class _DEUSAppState extends State<DEUSApp> {
         builder: (context, snapshot) {
           if (!snapshot.hasData || !(state is SplashSuccess))
             return MaterialApp(
-                key: _loadingKey,
-                debugShowCheckedModeBanner: false,
-                theme: MyStyles.theme,
-                home: SplashScreen());
+                key: _loadingKey, debugShowCheckedModeBanner: false, theme: MyStyles.theme, home: SplashScreen());
 
           return MaterialApp(
             key: _appKey,
             title: 'Deus Finance',
             debugShowCheckedModeBanner: false,
             theme: MyStyles.theme,
-            routes: generateRoutes(context),
+            onGenerateRoute: (settings) => onGenerateRoute(settings, context),
             initialRoute: kInitialRoute,
           );
         },
