@@ -5,6 +5,7 @@ import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/models/GWei.dart';
 import 'package:deus_mobile/models/gas.dart';
 import 'package:deus_mobile/service/deus_swap_service.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -140,7 +141,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                 ),
               ),
               Text(
-                "ETH ${_computeGasFee()}",
+                "ETH ${EthereumService.formatDouble(_computeGasFee().toString())}",
                 style: MyStyles.whiteMediumTextStyle,
               )
             ],
@@ -150,7 +151,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
           ),
           Align(
               alignment: Alignment.centerRight,
-              child: Text("\$ ${_computeGasFee() * ethPrice}",
+              child: Text("\$ ${EthereumService.formatDouble((_computeGasFee() * ethPrice).toString())}",
                   style: MyStyles.lightWhiteSmallTextStyle)),
           const Divider(
             height: 15,
@@ -364,7 +365,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "ETH ${_computeGasFee(gFee: GasFee.CUSTOM)}",
+              "ETH ${EthereumService.formatDouble(_computeGasFee(gFee: GasFee.CUSTOM).toString())}",
               style: MyStyles.whiteMediumTextStyle,
             ),
           ),
@@ -558,7 +559,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "ETH ${_computeGasFee(gFee: GasFee.SLOW)}",
+                      "ETH ${EthereumService.formatDouble(_computeGasFee(gFee: GasFee.SLOW).toString())}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -568,7 +569,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "\$ ${_computeGasFee(gFee: GasFee.SLOW) * ethPrice}",
+                      "\$ ${EthereumService.formatDouble((_computeGasFee(gFee: GasFee.SLOW) * ethPrice).toString())}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -609,7 +610,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "ETH ${_computeGasFee(gFee: GasFee.AVERAGE)}",
+                      "ETH ${EthereumService.formatDouble((_computeGasFee(gFee: GasFee.AVERAGE)).toString())}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -619,7 +620,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "\$ ${_computeGasFee(gFee: GasFee.AVERAGE) * ethPrice}",
+                      "\$ ${EthereumService.formatDouble((_computeGasFee(gFee: GasFee.AVERAGE) * ethPrice).toString())}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -660,7 +661,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "ETH ${_computeGasFee(gFee: GasFee.FAST)}",
+                      "ETH ${EthereumService.formatDouble((_computeGasFee(gFee: GasFee.FAST)).toString())}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -670,7 +671,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "\$ ${_computeGasFee(gFee: GasFee.FAST) * ethPrice}",
+                      "\$ ${EthereumService.formatDouble((_computeGasFee(gFee: GasFee.FAST) * ethPrice).toString())}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -687,6 +688,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
     gWei = await getGWei();
     ethPrice = await getEthPrice();
     estimatedGasNumber = await estimateGas();
+
     setState(() {
       mode = Mode.NONE;
     });
@@ -701,11 +703,11 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
 
   Future<int> estimateGas() async {
     Map<String, dynamic> map = new Map();
-    map['from'] = widget.transaction.from;
-    map['to'] = widget.transaction.to;
+    map['from'] = widget.transaction.from.toString();
+    map['to'] = widget.transaction.to.toString();
     map['data'] = widget.transaction.data;
-    map['value'] = widget.transaction.value;
-    var response = await http.post("https://app.deus.finance/app/estimate", body: json.encode(map));
+    map['value'] = widget.transaction.value.getInWei.toString();
+    var response = await http.post("https://app.deus.finance/app/estimate", body: json.encode(map), headers: {"Content-Type": "application/json"});
     if (response.statusCode == 200) {
       var js = json.decode(response.body);
       return js['gas_fee'];

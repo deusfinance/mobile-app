@@ -13,7 +13,7 @@ class SwapCubit extends Cubit<SwapState> {
   SwapCubit() : super(SwapInitial());
 
   init() async {
-    if(state is SwapLoaded){
+    if (state is SwapLoaded) {
       return;
     }
     emit(SwapLoading(state));
@@ -44,6 +44,8 @@ class SwapCubit extends Cubit<SwapState> {
         state.toToken = CurrencyData.eth;
       }
     }
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
 
     emit(SwapLoaded(state, fromToken: selectedToken));
 
@@ -63,6 +65,8 @@ class SwapCubit extends Cubit<SwapState> {
         state.fromToken = CurrencyData.eth;
       }
     }
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
     emit(SwapLoaded(state, toToken: selectedToken));
     selectedToken.balance = await getTokenBalance(selectedToken);
     emit(SwapLoaded(state, toToken: selectedToken));
@@ -74,15 +78,17 @@ class SwapCubit extends Cubit<SwapState> {
       emit(TransactionPendingState(state,
           transactionStatus: TransactionStatus(
               "Approve ${state.fromToken.name}",
-              Status.FAILED,
-              "Transaction Failed")));
+              Status.PENDING,
+              "Transaction Pending")));
       try {
         var res =
             await state.swapService.approve(state.fromToken.getTokenName());
         Stream<TransactionReceipt> result =
             state.swapService.ethService.pollTransactionReceipt(res);
         result.listen((event) {
+          state.approved = event.status;
           if (event.status) {
+            state.approved = true;
             emit(TransactionFinishedState(state,
                 transactionStatus: TransactionStatus(
                     "Approve ${state.fromToken.name}",
@@ -99,6 +105,7 @@ class SwapCubit extends Cubit<SwapState> {
           }
         });
       } on Exception catch (value) {
+        state.approved = false;
         emit(TransactionFinishedState(state,
             transactionStatus: TransactionStatus(
                 "Approve ${state.fromToken.name}",
@@ -114,8 +121,8 @@ class SwapCubit extends Cubit<SwapState> {
         emit(TransactionPendingState(state,
             transactionStatus: TransactionStatus(
                 "Swap ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
-                Status.FAILED,
-                "Transaction Failed")));
+                Status.PENDING,
+                "Transaction Pending")));
         try {
           var res = await state.swapService.swapTokens(
               state.fromToken.getTokenName(),
@@ -128,20 +135,20 @@ class SwapCubit extends Cubit<SwapState> {
               state.swapService.ethService.pollTransactionReceipt(res);
           result.listen((event) async {
             if (event.status) {
-              emit(TransactionFinishedState(state,
-                  transactionStatus: TransactionStatus(
-                      "Swapped ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
-                      Status.SUCCESSFUL,
-                      "Transaction Successful",
-                      res)));
-
               String fromBalance = await getTokenBalance(state.fromToken);
               String toBalance = await getTokenBalance(state.toToken);
               Token from = state.fromToken;
               Token to = state.toToken;
               from.balance = fromBalance;
               to.balance = toBalance;
-              emit(SwapLoaded(state, fromToken: from, toToken: to));
+              state.fromToken = from;
+              state.toToken = to;
+              emit(TransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "Swapped ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                      Status.SUCCESSFUL,
+                      "Transaction Successful",
+                      res)));
             } else {
               emit(TransactionFinishedState(state,
                   transactionStatus: TransactionStatus(
@@ -174,6 +181,8 @@ class SwapCubit extends Cubit<SwapState> {
     Token a = state.fromToken;
     state.fromToken = state.toToken;
     state.toToken = a;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
     getAllowances();
   }
 
@@ -269,15 +278,13 @@ class SwapCubit extends Cubit<SwapState> {
   }
 
   getAllowances() async {
-    if (!state.isInProgress) {
-      emit(SwapLoaded(state, approved: false, isInProgress: true));
-      state.fromToken.allowances =
-          await state.swapService.getAllowances(state.fromToken.getTokenName());
-      if (state.fromToken.getAllowances() > BigInt.zero)
-        emit(SwapLoaded(state, approved: true, isInProgress: false));
-      else
-        emit(SwapLoaded(state, approved: false, isInProgress: false));
-    }
+    emit(SwapLoaded(state, approved: false, isInProgress: true));
+    state.fromToken.allowances =
+        await state.swapService.getAllowances(state.fromToken.getTokenName());
+    if (state.fromToken.getAllowances() > BigInt.zero)
+      emit(SwapLoaded(state, approved: true, isInProgress: false));
+    else
+      emit(SwapLoaded(state, approved: false, isInProgress: false));
   }
 
   getSlippage() {

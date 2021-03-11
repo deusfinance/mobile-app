@@ -141,6 +141,7 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildBody(SwapState state) {
+
     SwapField fromField = new SwapField(
       direction: Direction.from,
       initialToken: state.fromToken,
@@ -160,6 +161,7 @@ class _SwapScreenState extends State<SwapScreen> {
         context.read<SwapCubit>().toTokenChanged(selectedToken);
       },
     );
+
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
@@ -471,8 +473,9 @@ class _SwapScreenState extends State<SwapScreen> {
       onPressed: (bool selected) async {
         Transaction transaction =
             await context.read<SwapCubit>().makeTransaction();
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
         Gas gas = await showConfirmGasFeeDialog(state, transaction);
-        context.read<SwapCubit>().swapTokens(gas);
+        await context.read<SwapCubit>().swapTokens(gas);
       },
       selected: true,
       gradient: MyColors.greenToBlueGradient,
@@ -569,6 +572,7 @@ class _SwapScreenState extends State<SwapScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      autofocus: false,
                       inputFormatters: [
                         WhitelistingTextInputFormatter(
                             new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
