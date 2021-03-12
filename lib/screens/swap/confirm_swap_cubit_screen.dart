@@ -130,7 +130,7 @@
 //               Expanded(
 //                   child: GestureDetector(
 //                 onTap: () {
-//                   Navigator.pop(context);
+//                   locator<NavigationService>().goBack(context);
 //                 },
 //                 child: Container(
 //                   margin: EdgeInsets.all(8.0),
@@ -160,7 +160,7 @@
 //                   onPressed: (bool selected) async {
 //
 //
-//                     Navigator.pop(context, gas);
+//                     locator<NavigationService>().goBack(context, gas);
 //                   },
 //                   selected: true,
 //                   gradient: MyColors.greenToBlueGradient,

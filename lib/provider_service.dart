@@ -14,7 +14,7 @@ class OmniServices {
       try {
         final storage = FlutterSecureStorage();
         locator.registerLazySingleton<ConfigurationService>(() => ConfigurationService(storage));
-        await locator<ConfigurationService>().setTemporaryValues();
+        await locator<ConfigurationService>().readTemporaryValues();
       } catch (e) {
         print("Error setting up storage access ${e.runtimeType}");
         print(e);

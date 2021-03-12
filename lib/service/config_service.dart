@@ -13,9 +13,10 @@ abstract class IConfigurationService {
 ///
 /// Usage with locator: `locator<ConfigurationService>()`
 class ConfigurationService implements IConfigurationService {
-  FlutterSecureStorage _storage;
+  final FlutterSecureStorage _storage;
   ConfigurationService(this._storage);
 
+  /// temporary copy of the values stored in the local storage.
   Map<String, String> _values;
 
   static const _kMnemonicKey = "mnemonic";
@@ -25,7 +26,7 @@ class ConfigurationService implements IConfigurationService {
   /// initially sets all the data saved in the secure storage.
   ///
   /// Enables synchronous access to the saved values.
-  Future<void> setTemporaryValues() async {
+  Future<void> readTemporaryValues() async {
     _values = await _storage.readAll();
   }
 

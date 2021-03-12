@@ -14,4 +14,8 @@ class NavigationService {
     else
       Navigator.pushNamed(context, routeName);
   }
+
+  void goBack(BuildContext context, [result]) {
+    Navigator.pop(context, result);
+  }
 }
