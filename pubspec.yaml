@@ -3,7 +3,7 @@ description: The future of mobile trading.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -29,7 +29,7 @@ dependencies:
   # FRONTEND
   fluttertoast: ^7.1.6
   flutter_hooks: ^0.9.0
-  flutter_svg: ^0.19.3
+  flutter_svg: ^0.19.1
   shimmer_animation: ^0.0.9+1
   shared_preferences: ^0.5.8
   flutter_icons: ^1.1.0
@@ -42,6 +42,7 @@ dependencies:
   flutter_countdown_timer: ^3.0.0
   flutter_svg_provider: ^0.1.8
   stream_transform: ^0.0.19
+  fl_chart: ^0.12.3
   vibration: ^1.7.3
 
 dev_dependencies:

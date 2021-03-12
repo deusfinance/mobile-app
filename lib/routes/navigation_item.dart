@@ -1,4 +1,5 @@
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
@@ -29,23 +30,26 @@ class NavigationItem extends Equatable {
       routeUrl: SwapScreen.route,
       style: NavigationStyle.GreenBlue);
 
+
+  static final NavigationItem stakeAndLockOverview = NavigationItem(
+      page: StakingVaultOverviewScreen(),
+      title: "Lock and Stake",
+      routeUrl: StakingVaultOverviewScreen.url);
+
   static final NavigationItem staking = NavigationItem(
       page: StakeScreen(), title: "Staking", routeUrl: StakeScreen.url);
 
   static final NavigationItem vaults = NavigationItem(
       page: LockScreen(), title: "Vaults", routeUrl: LockScreen.url);
 
+
   static final NavigationItem synthethics = NavigationItem(
       page: SyntheticsScreen(), //SynchronizerScreen(),
       title: "Synthetics",
       routeUrl: SyntheticsScreen.url);
 
-  static List<NavigationItem> get items => [
-        swap,
-        synthethics,
-        staking,
-        vaults,
-      ];
+  static List<NavigationItem> get items =>
+      [swap, synthethics, stakeAndLockOverview];
 
   @override
   List<Object> get props => [title];
