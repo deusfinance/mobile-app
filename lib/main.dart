@@ -1,10 +1,10 @@
-import 'package:deus_mobile/screens/wallet/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'config.dart';
+import 'core/widgets/default_screen/will_pop_dialog.dart';
 import 'locator.dart';
 import 'routes/route_generator.dart';
 import 'screens/splash/cubit/splash_cubit.dart';
@@ -53,16 +53,17 @@ class _DEUSAppState extends State<DEUSApp> {
       return FutureBuilder(
         future: initializeData,
         builder: (context, snapshot) {
-          if (!snapshot.hasData || !(state is SplashSuccess))
-            return MaterialApp(key: _loadingKey, theme: MyStyles.theme, home: SplashScreen());
+          if ( !(state is SplashSuccess))
+            return MaterialApp(
+                key: _loadingKey, debugShowCheckedModeBanner: false, theme: MyStyles.theme, home: SplashScreen());
 
           return MaterialApp(
             key: _appKey,
             title: 'Deus Finance',
             debugShowCheckedModeBanner: false,
             theme: MyStyles.theme,
-            routes: generateRoutes(context),
-            initialRoute: StakingVaultOverviewScreen.url,
+            onGenerateRoute: (settings) => onGenerateRoute(settings, context),
+            initialRoute: kInitialRoute,
           );
         },
       );

@@ -36,6 +36,8 @@ abstract class MyColors {
 
   static MaterialColor ToastGreen = _getMaterialColor(0, 209, 108, 0xFF00D16C);
   static MaterialColor ToastGrey = _getMaterialColor(196, 196, 196, 0xFFC4C4C4);
+  static MaterialColor ToastRed = _getMaterialColor(196, 0, 0, 0xFFD40000);
+
 
 //  static const White = 0xFFFFFFFF;
 //  static const HalfWhite = 0xAAFFFFFF;
@@ -53,9 +55,10 @@ abstract class MyColors {
   // /// color of pending toast container
   // static const ToastGrey = 0xFFC4C4C4;
   static const Background = 0xFF0D0D0D;
-  static const kAddressBackground = 0xFF61C0BF;
 
   static const kWalletFillChart = 0xFF121212;
+  static const kAddressBackground = 0xFF38DBFF;
+  static const kAddressBorder = 0xFF61C0BF;
 
   static const blueToGreenGradient = LinearGradient(
     begin: Alignment.centerLeft,

@@ -6,13 +6,14 @@ import 'package:deus_mobile/models/value_locked_screen_data.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/stake_screen.dart';
-import 'package:deus_mobile/screens/wallet/widgets/chart_container.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+
+import 'widgets/chart_container.dart';
 
 enum StakingVaultOverviewScreenStates {
   Single,
@@ -32,20 +33,6 @@ class _StakingVaultOverviewScreenState
     extends State<StakingVaultOverviewScreen> {
   final String address = '0x3a6dabD6B5C75291a3258C29B418f5805792a87e';
 
-  // final double ethCount = 478.938;
-  // final double ethInUSD = 563008.67;
-  // final double percOfPool = 0.12;
-  //
-  // final double perfDEAns = 36.37;
-  // final double perfsUniDeusDea = 36.37;
-  // final double perfsDEA = 36.37;
-  // final double perfsDEUS = 36.37;
-  // final double perfsUniDeaUsdc = 36.37;
-  // final double perfsUUniDeuusEth = 36.37;
-  //
-  // final double nativeBalancerAPY = 99.98;
-  // final double timeTokenAPY = 199.98;
-  // final double sDeusAPY = 99.98;
 
   Future<ValueLockedScreenData> _testData() async {
     await Future.delayed(Duration(seconds: 3));

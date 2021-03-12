@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import '../../token_list_tile.dart';
 
 class CurrencySelector extends StatelessWidget {
-  
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
