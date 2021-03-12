@@ -15,25 +15,21 @@ class CustomChart extends StatefulWidget {
 }
 
 class _CustomChartState extends State<CustomChart> {
-  Future<List<ChartDataPoint>> futureData;
+  Future<List<ChartDataPoint>> _futureData;
 
-  List<FlSpot> generateList(List<ChartDataPoint> values) {
+  /// List which shows which ToggleButton is selected
+  List<bool> _toggleButtonButtonsTime = [false, false, true, false, false];
+  static const SizedBox _bigHeightDivider = SizedBox(height: 20);
+
+  List<FlSpot> _generateList(List<ChartDataPoint> values) {
     List<FlSpot> reList = [];
-    double counter = 0;
-    values.forEach((elem) {
-      reList.add(FlSpot(counter, elem.value));
-      counter++;
-    });
+    for(double i = 0; i < values.length; i++){
+      reList.add(FlSpot(i,values[i.toInt()].value));
+    }
     return reList;
   }
 
-  SizedBox _bigHeightDivider = SizedBox(
-    height: 20,
-  );
-
-  List<bool> _toggleButtonButtonsTime = [false, false, true, false, false];
-
-  void changeToggleButtonTime(int i) {
+  void _changeToggleButtonTime(int i) {
     if (!_toggleButtonButtonsTime[i]) {
       _toggleButtonButtonsTime = [false, false, false, false, false];
       setState(() {
@@ -63,7 +59,7 @@ class _CustomChartState extends State<CustomChart> {
                 lineBarsData: [
                   LineChartBarData(
                     colors: [MyColors.ToastGreen],
-                    spots: generateList(widget.dataPoints),
+                    spots: _generateList(widget.dataPoints),
                     isCurved: false,
                     dotData: FlDotData(show: false),
                   )
@@ -80,7 +76,7 @@ class _CustomChartState extends State<CustomChart> {
         renderBorder: false,
         fillColor: Colors.transparent,
         onPressed: (int ind) {
-          changeToggleButtonTime(ind);
+          _changeToggleButtonTime(ind);
           switch (ind) {
             case 0:
               timePressed(Duration(hours: 1));
@@ -105,50 +101,25 @@ class _CustomChartState extends State<CustomChart> {
           }
         },
         children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: Text(
-              '1H',
-              style: _toggleButtonButtonsTime[0]
-                  ? MyStyles.selectedToggleButtonTextStyle
-                  : MyStyles.unselectedToggleButtonTextStyle,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: Text(
-              '1D',
-              style: _toggleButtonButtonsTime[1]
-                  ? MyStyles.selectedToggleButtonTextStyle
-                  : MyStyles.unselectedToggleButtonTextStyle,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: Text(
-              '1W',
-              style: _toggleButtonButtonsTime[2]
-                  ? MyStyles.selectedToggleButtonTextStyle
-                  : MyStyles.unselectedToggleButtonTextStyle,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: Text(
-              '1M',
-              style: _toggleButtonButtonsTime[3]
-                  ? MyStyles.selectedToggleButtonTextStyle
-                  : MyStyles.unselectedToggleButtonTextStyle,
-            ),
-          ),
-          Text(
-            '1Y',
-            style: _toggleButtonButtonsTime[4]
-                ? MyStyles.selectedToggleButtonTextStyle
-                : MyStyles.unselectedToggleButtonTextStyle,
-          ),
+          _buildButtonText(label: '1H', padding: true, isSelected: _toggleButtonButtonsTime[0]),
+          _buildButtonText(label: '1D', padding: true, isSelected: _toggleButtonButtonsTime[1]),
+          _buildButtonText(label: '1W', padding: true, isSelected: _toggleButtonButtonsTime[2]),
+          _buildButtonText(label: '1M', padding: true, isSelected: _toggleButtonButtonsTime[3]),
+          _buildButtonText(label: '1Y', padding: false, isSelected: _toggleButtonButtonsTime[4]),
         ],
         isSelected: _toggleButtonButtonsTime);
+  }
+
+  Padding _buildButtonText({String label, bool isSelected, bool padding}) {
+    return Padding(
+      padding: padding ? const EdgeInsets.only(right: 30): EdgeInsets.zero,
+      child: Text(
+        label,
+        style: isSelected
+            ? MyStyles.selectedToggleButtonTextStyle
+            : MyStyles.unselectedToggleButtonTextStyle,
+      ),
+    );
   }
 
   void timePressed(Duration dur) {
