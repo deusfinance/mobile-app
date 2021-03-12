@@ -466,7 +466,7 @@ class _SwapScreenState extends State<SwapScreen> {
       );
     }
     return SelectionButton(
-      label: 'Swap',
+      label: 'SWAP',
       onPressed: (bool selected) async {
         Transaction transaction =
             await context.read<SwapCubit>().makeTransaction();
