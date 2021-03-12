@@ -2,26 +2,26 @@
 import 'dart:async';
 
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
+import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/core/widgets/swap_field.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/data_source/stock_data.dart';
+import 'package:deus_mobile/models/synthetics/stock_address.dart';
+import 'package:deus_mobile/models/synthetics/synthetic_model.dart';
+import 'package:deus_mobile/models/token.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/service/stock_service.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/statics.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../../core/widgets/filled_gradient_selection_button.dart';
-import '../../core/widgets/selection_button.dart';
-import '../../core/widgets/svg.dart';
-import '../../core/widgets/swap_field.dart';
-import '../../data_source/currency_data.dart';
-import '../../data_source/stock_data.dart';
-import '../../models/synthetics/stock_address.dart';
-import '../../models/synthetics/synthetic_model.dart';
-import '../../models/token.dart';
-import '../../models/transaction_status.dart';
-import '../../service/ethereum_service.dart';
-import '../../service/stock_service.dart';
-import '../../statics/my_colors.dart';
-import '../../statics/statics.dart';
-import '../../statics/styles.dart';
-import 'market_timer.dart';
+import '../market_timer.dart';
 
 class SyntheticsScreen extends StatefulWidget {
   static const url = '/synthethics';

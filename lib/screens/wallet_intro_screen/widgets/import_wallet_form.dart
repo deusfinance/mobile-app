@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -115,7 +116,7 @@ class ImportWalletForm extends HookWidget {
         PaperValidationSummary(errors),
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
             color: darkGrey,
           ),
           child: PaperInput(

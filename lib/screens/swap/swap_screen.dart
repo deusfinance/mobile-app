@@ -86,7 +86,6 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Pending',
         message: transactionStatus.message,
@@ -106,7 +105,6 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Successful',
         message: transactionStatus.message,
@@ -124,7 +122,6 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Failed',
         message: transactionStatus.message,
@@ -163,7 +160,7 @@ class _SwapScreenState extends State<SwapScreen> {
     );
 
     return Container(
-      padding: EdgeInsets.all(MyStyles.mainPadding),
+      padding: EdgeInsets.all(MyStyles.mainPadding *1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
       child: Stack(
         children: [
@@ -493,7 +490,7 @@ class _SwapScreenState extends State<SwapScreen> {
             context.read<SwapCubit>().setSlippage(0.1);
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.symmetric(vertical:8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
             decoration: state.slippage == 0.1
                 ? MyStyles.greenToBlueDecoration
@@ -517,7 +514,7 @@ class _SwapScreenState extends State<SwapScreen> {
             context.read<SwapCubit>().setSlippage(0.5);
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.symmetric(vertical:8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
             decoration: state.slippage == 0.5
                 ? MyStyles.greenToBlueDecoration
@@ -541,7 +538,7 @@ class _SwapScreenState extends State<SwapScreen> {
             context.read<SwapCubit>().setSlippage(1);
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.symmetric(vertical:8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
             decoration: state.slippage == 1.0
                 ? MyStyles.greenToBlueDecoration
@@ -559,9 +556,9 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       ),
       Expanded(
-        flex: 5,
+        flex: 6,
         child: Container(
-          padding: EdgeInsets.all(12.0),
+          padding: EdgeInsets.symmetric(vertical:8.0, horizontal: 10),
           margin: EdgeInsets.all(4.0),
           decoration: state.slippageController.text != ""
               ? MyStyles.greenToBlueDecoration
@@ -572,6 +569,8 @@ class _SwapScreenState extends State<SwapScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      // textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
                       autofocus: false,
                       inputFormatters: [
                         WhitelistingTextInputFormatter(
@@ -584,6 +583,14 @@ class _SwapScreenState extends State<SwapScreen> {
                           ? MyStyles.blackSmallTextStyle
                           : MyStyles.whiteSmallTextStyle,
                       decoration: InputDecoration(
+                        hintTextDirection: TextDirection.rtl,
+                        hintText: "0.50",
+                        hintStyle: MyStyles.lightWhiteSmallTextStyle,
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
                         isDense: true,
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 0, vertical: 0),

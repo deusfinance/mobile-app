@@ -1,7 +1,8 @@
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/screens/synthetics/synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,6 +20,7 @@ import '../screens/wallet_intro_screen/intro_page.dart';
 import '../screens/wallet_intro_screen/wallet_create_page.dart';
 import '../screens/wallet_intro_screen/wallet_import_page.dart';
 import '../service/config_service.dart';
+
 
 const kInitialRoute = '/';
 
@@ -59,6 +61,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     SwapScreen.route: (_) => BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen()),
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
+    StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
   };
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);

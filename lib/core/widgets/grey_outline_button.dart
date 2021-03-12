@@ -1,3 +1,4 @@
+import 'package:deus_mobile/statics/styles.dart';
 ///TODO (@CodingDavid8): Clean up buttons and put them in core/widgets/buttons/
 import 'package:flutter/material.dart';
 
@@ -15,11 +16,11 @@ class GreyOutlineButton extends StatelessWidget {
       child: Container(
         height: 55,
         decoration: BoxDecoration(
-            color: darkGrey, borderRadius: BorderRadius.circular(10)),
+            color: darkGrey, borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
         child: OutlineButton(
           highlightedBorderColor: Colors.black,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
           color: Colors.transparent,
           borderSide: BorderSide(color: Colors.black),
           child: Text(

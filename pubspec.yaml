@@ -42,6 +42,7 @@ dependencies:
   flutter_countdown_timer: ^3.0.0
   flutter_svg_provider: ^0.1.8
   stream_transform: ^0.0.19
+  fl_chart: ^0.12.3
   vibration: ^1.7.3
 
 dev_dependencies:
@@ -73,6 +74,10 @@ flutter_icons: # flutter pub run flutter_launcher_icons:main
     - family: Monument
       fonts:
         - asset: assets/fonts/monument-regular.ttf
+          weight: 300
+    - family: EduMonument
+      fonts:
+        - asset: assets/fonts/edumonument-regular.ttf
           weight: 300
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
