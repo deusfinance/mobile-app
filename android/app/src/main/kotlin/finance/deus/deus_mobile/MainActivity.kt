@@ -1,4 +1,4 @@
-package de.app.innovators.deus_mobile
+package finance.deus.deus_mobile
 
 import io.flutter.embedding.android.FlutterActivity
 
