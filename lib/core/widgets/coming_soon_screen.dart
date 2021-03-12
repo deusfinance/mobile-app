@@ -5,27 +5,18 @@ import 'package:flutter/material.dart';
 class ComingSoonScreen extends StatelessWidget {
   final String imgPath;
 
-  const ComingSoonScreen({Key key, this.imgPath}) : super(key: key);
+  const ComingSoonScreen({Key key, @required this.imgPath}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      showHeading: false,
-        child: Stack(
-      children: [
-        Center(
-          child: SizedBox(
-            width: double.infinity,
-            child: Image.asset(
-              imgPath,
-              fit: BoxFit.fill,
-            ),
+        showHeading: false,
+        child: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(alignment: Alignment.center, image: AssetImage(imgPath), fit: BoxFit.fill)),
+          child: Center(
+            child: Text('Coming Soon', style: MyStyles.whiteBigTextStyle),
           ),
-        ),
-        Center(
-          child: Text('Coming Soon', style: MyStyles.whiteBigTextStyle,),
-        )
-      ],
-    ));
+        ));
   }
 }
