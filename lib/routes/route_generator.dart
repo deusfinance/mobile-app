@@ -1,3 +1,5 @@
+import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
+import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
@@ -62,6 +64,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
+    //blurred screens (coming soon)
+    BlurredStakeLockScreen.url : (_) => BlurredStakeLockScreen(),
+    BlurredSyntheticsScreen.url : (_) => BlurredSyntheticsScreen()
   };
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);

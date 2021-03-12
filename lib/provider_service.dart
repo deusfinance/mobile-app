@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'config.dart';
 import 'locator.dart';
@@ -7,17 +7,26 @@ import 'service/config_service.dart';
 import 'service/ethereum_service.dart';
 
 class OmniServices {
-  Future<void> createOmniServices({SharedPreferences sharedPrefs}) async {
+  Future<void> createOmniServices() async {
     final params = AppConfig.selectedConfig.params;
 
-    final preferences = sharedPrefs ?? await SharedPreferences.getInstance();
-
+    if (!locator.isRegistered(instance: ConfigurationService)) {
+      try {
+        final storage = FlutterSecureStorage();
+        locator.registerLazySingleton<ConfigurationService>(() => ConfigurationService(storage));
+        await locator<ConfigurationService>().setTemporaryValues();
+      } catch (e) {
+        print("Error setting up storage access ${e.runtimeType}");
+        print(e);
+      }
+    }
     try {
-      locator.registerLazySingleton<ConfigurationService>(() => ConfigurationService(preferences));
-      locator.registerLazySingleton<AddressService>(() => AddressService(locator<ConfigurationService>()));
-      locator.registerLazySingleton<EthereumService>(() => EthereumService(params.chainId));
-    }  catch (e) {
-      print("runtimeType ${e.runtimeType}");
+      if (!locator.isRegistered(instance: AddressService))
+        locator.registerLazySingleton<AddressService>(() => AddressService(locator<ConfigurationService>()));
+      if (!locator.isRegistered(instance: EthereumService))
+        locator.registerLazySingleton<EthereumService>(() => EthereumService(params.chainId));
+    } catch (e) {
+      print("Error creating providers. ${e.runtimeType}");
       print(e);
     }
   }
