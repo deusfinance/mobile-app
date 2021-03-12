@@ -45,7 +45,13 @@ class EthereumService {
   String get networkName => NETWORK_NAMES[this.chainId];
 
   // IMPORTANT use http instead of wss infura endpoint, web3dart not supporting wss yet
-  String get INFURA_URL => 'https://' + networkName + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
+  String get INFURA_URL {
+    if(this.chainId == 100){
+      return 'https://rpc.xdaichain.com/';
+    }else{
+      return 'https://' + networkName + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
+    }
+  }
 
   EthereumService(this.chainId) {
     httpClient = new Client();
@@ -228,19 +234,6 @@ class EthereumService {
     return result;
   }
 
-  Future<BigInt> estimateGas(Transaction transaction) async {
-    try {
-      return await ethClient.estimateGas(
-          sender: transaction.from,
-          to: transaction.to,
-          value: transaction.value,
-          data: transaction.data);
-    } on Exception catch (value) {
-      print(value);
-      return null;
-    }
-  }
-
   Future<Transaction> makeTransaction(Credentials credentials,
       DeployedContract contract, String functionName, List<dynamic> args,
       {EtherAmount value, Gas gas}) async {
@@ -253,7 +246,7 @@ class EthereumService {
           function: ethFunction,
           parameters: args,
           gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
-          maxGas: gas.gasLimit > 0 ? gas.gasLimit : 500000,
+          maxGas: gas.gasLimit > 0 ? gas.gasLimit : 5000000,
           nonce: gas.nonce,
           value: value);
     } else {
@@ -265,7 +258,7 @@ class EthereumService {
           gasPrice: gas != null
               ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
               : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
-          maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 500000,
+          maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 5000000,
           value: value);
     }
 

@@ -46,7 +46,7 @@ class Toast extends StatelessWidget {
                   angle: 150,
                   child: Icon(
                     Icons.arrow_right_alt_outlined,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
               ],

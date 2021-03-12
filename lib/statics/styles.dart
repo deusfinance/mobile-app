@@ -23,7 +23,7 @@ class MyStyles {
   static const cardRadiusSize = 16.0;
   static const mainPadding = 8.0;
 
-  static const String kFontFamily = "EduMonument";
+  static const String kFontFamily = "Monument";
 
   // decorations
   static final lightBlackBorderDecoration = BoxDecoration(

@@ -2,7 +2,11 @@
 import 'dart:async';
 
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -26,8 +30,6 @@ import '../market_timer.dart';
 class XDaiSyntheticsScreen extends StatefulWidget {
   static const url = '/synthethics';
 
-  const XDaiSyntheticsScreen();
-  
   @override
   _XDaiSyntheticsScreenState createState() => _XDaiSyntheticsScreenState();
 }
@@ -45,6 +47,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<XDaiSyntheticsCubit>().init();
     _init();
     fetchBalance();
   }
@@ -75,12 +78,20 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultScreen(child: syntheticModel.syntheticState != SyntheticState.loading
-        ? _buildBody(context)
-        : const Center(child: CircularProgressIndicator()));
+    return BlocBuilder<XDaiSyntheticsCubit, XDaiSyntheticsState>(builder: (context, state) {
+      if (state is XDaiSyntheticsLoadingState) {
+        return DefaultScreen(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } else {
+        return DefaultScreen(child: _buildBody(state));
+      }
+    });
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(XDaiSyntheticsState state) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(MyStyles.mainPadding),
@@ -119,7 +130,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
             fromFieldController.text = "";
             toFieldController.text = "";
           });
-          await getAllowances();
+          // await getAllowances();
           getTokenBalance(syntheticModel.from);
         });
     if (!fromFieldController.hasListeners) {
@@ -276,7 +287,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          approve();
+          // approve();
         },
         gradient: MyColors.blueToPurpleGradient,
       );
@@ -301,132 +312,14 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       label: syntheticModel.from == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
         if (syntheticModel.from == CurrencyData.dai) {
-          buy();
+          // buy();
         } else {
-          sell();
+          // sell();
         }
         ;
       },
       gradient: MyColors.blueToPurpleGradient,
     );
-  }
-
-  Future getAllowances() async {
-    if (syntheticModel.from.getTokenName() == "dai") {
-      setState(() {
-        isInProgress = true;
-      });
-    }
-    stockService.getAllowances(syntheticModel.from.getTokenName()).then((value) {
-      setState(() {
-        syntheticModel.from.allowances = value;
-        isInProgress = false;
-      });
-    });
-  }
-
-  Future approve() async {
-    if (!isInProgress) {
-      setState(() {
-        isInProgress = true;
-      });
-      showToast(
-          context,
-          TransactionStatus(
-              "Approve ${syntheticModel.from.name}", Status.PENDING, "Pending"));
-
-      var res = await stockService.approve(syntheticModel.from.getTokenName());
-      Stream<TransactionReceipt> result =
-      stockService.ethService.pollTransactionReceipt(res);
-      result.listen((event) {
-        setState(() {
-          isInProgress = false;
-          syntheticModel.approved = event.status;
-        });
-        if (event.status) {
-          showToast(
-              context,
-              TransactionStatus("Approved ${syntheticModel.from.name}",
-                  Status.SUCCESSFUL, "Successful"));
-        } else {
-          showToast(
-              context,
-              TransactionStatus("Approve of ${syntheticModel.from.name}",
-                  Status.FAILED, "Failed"));
-        }
-      });
-    }
-  }
-
-  Future sell() async {
-    if (!isInProgress) {
-      setState(() {
-        isInProgress = true;
-      });
-      String tokenAddress;
-      if(syntheticModel.from.getTokenName() == "dai"){
-        tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
-      }else{
-        StockAddress stockAddress = StockData.getStockAddress(syntheticModel.from);
-        tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
-      }
-      var res = await stockService.sell(tokenAddress, fromFieldController.text, null);
-      Stream<TransactionReceipt> result =
-      stockService.ethService.pollTransactionReceipt(res);
-      result.listen((event) {
-        setState(() {
-          isInProgress = false;
-          syntheticModel.approved = event.status;
-        });
-        if (event.status) {
-          showToast(
-              context,
-              TransactionStatus("Sell ${syntheticModel.from.name}",
-                  Status.SUCCESSFUL, "Failed"));
-        } else {
-          showToast(
-              context,
-              TransactionStatus("Sell of ${syntheticModel.from.name}",
-                  Status.FAILED, "Failed"));
-        }
-      });
-    }
-  }
-
-  Future buy() async {
-    if (!isInProgress) {
-      setState(() {
-        isInProgress = true;
-      });
-      String tokenAddress;
-      if(syntheticModel.from.getTokenName() == "dai"){
-        tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
-      }else{
-        StockAddress stockAddress = StockData.getStockAddress(syntheticModel.from);
-        tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
-      }
-
-      var res = await stockService.buy(tokenAddress, fromFieldController.text, null);
-      Stream<TransactionReceipt> result =
-      stockService.ethService.pollTransactionReceipt(res);
-      result.listen((event) {
-        setState(() {
-          isInProgress = false;
-          syntheticModel.approved = event.status;
-        });
-        if (event.status) {
-          showToast(
-              context,
-              TransactionStatus("Buy ${syntheticModel.from.name}",
-                  Status.SUCCESSFUL, "Successful"));
-        } else {
-          showToast(
-              context,
-              TransactionStatus("Buy of ${syntheticModel.from.name}",
-                  Status.FAILED, "Failed"));
-        }
-      });
-    }
   }
 
   Container _buildModeButtons() {
