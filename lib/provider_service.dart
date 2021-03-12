@@ -12,8 +12,13 @@ class OmniServices {
 
     final preferences = sharedPrefs ?? await SharedPreferences.getInstance();
 
-    locator.registerLazySingleton<ConfigurationService>(() => ConfigurationService(preferences));
-    locator.registerLazySingleton<AddressService>(() => AddressService(locator<ConfigurationService>()));
-    locator.registerLazySingleton<EthereumService>(() => EthereumService(params.chainId));
+    try {
+      locator.registerLazySingleton<ConfigurationService>(() => ConfigurationService(preferences));
+      locator.registerLazySingleton<AddressService>(() => AddressService(locator<ConfigurationService>()));
+      locator.registerLazySingleton<EthereumService>(() => EthereumService(params.chainId));
+    }  catch (e) {
+      print("runtimeType ${e.runtimeType}");
+      print(e);
+    }
   }
 }

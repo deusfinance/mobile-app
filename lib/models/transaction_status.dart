@@ -1,23 +1,21 @@
 
+enum Status{PENDING,SUCCESSFUL,FAILED}
 class TransactionStatus{
-  static const PENDING = 0;
-  static const SUCCESSFUL = 1;
-  static const FAILED = 2;
-
-  final String message;
-  final String label;
-  final int status;
-  final String hash;
+  
+  String message;
+  String label;
+  String hash;
+  Status status;
 
 
-  const TransactionStatus(this.message, this.status, this.label, [this.hash = ""]);
+  TransactionStatus(this.message, this.status, this.label, [this.hash = ""]);
 
   String getMessage(){
-    String fullMessage = "";
-    if (status == PENDING) fullMessage += "Pending\n";
-    if (status == SUCCESSFUL) fullMessage += "Successful\n";
-    if (status == FAILED) fullMessage += "Failed\n";
-    return fullMessage + message;
+    // String fullMessage = "";
+    // if (status == PENDING) fullMessage += "Pending\n";
+    // if (status == SUCCESSFUL) fullMessage += "Successful\n";
+    // if (status == FAILED) fullMessage += "Failed\n";
+    return message;
   }
 
 }

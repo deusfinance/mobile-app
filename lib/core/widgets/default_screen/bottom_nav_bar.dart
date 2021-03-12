@@ -27,7 +27,7 @@ class MyBottomNavBar extends StatelessWidget {
     return GestureDetector(
         onTap: () {
           locator<NavigationService>().selectedNavItem = item;
-          locator<NavigationService>().navigateTo(item.routeUrl, context);
+          locator<NavigationService>().navigateTo(item.routeUrl, context, replace: true);
         },
         child: Container(
           child: Column(

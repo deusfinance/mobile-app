@@ -21,16 +21,16 @@ class MyStyles {
   static const S2 = 24.0;
   static const S1 = 32.0;
 
-  static const cardRadiusSize = 12.0;
+  static const cardRadiusSize = 16.0;
   static const mainPadding = 8.0;
 
-  static const String kFontFamily = "Monument";
+  static const String kFontFamily = "EduMonument";
 
 
   // decorations
   static final lightBlackBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
-      color: MyColors.Button_BG_Black,
+      color: MyColors.Main_BG_Black,
       border: Border.all(color: MyColors.HalfBlack, width: 1.0));
   static final darkWithBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
@@ -130,6 +130,14 @@ class MyStyles {
     fontWeight: FontWeight.w300,
     decoration: TextDecoration.underline,
     fontSize: S4,
+    color: MyColors.White,
+  );
+
+  static final whiteSmallUnderlinedTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    decoration: TextDecoration.underline,
+    fontSize: S6,
     color: MyColors.White,
   );
 

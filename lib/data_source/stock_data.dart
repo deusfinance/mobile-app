@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../models/contract_input_data.dart';
-import '../models/stock.dart';
-import '../models/stock_address.dart';
+import '../models/synthetics/contract_input_data.dart';
+import '../models/synthetics/stock.dart';
+import '../models/synthetics/stock_address.dart';
 import '../models/token.dart';
 
 //TODO (@CodingDavid8) fetch all supported stocks from server

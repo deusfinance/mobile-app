@@ -2,26 +2,26 @@
 import 'dart:async';
 
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/filled_gradient_selection_button.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
+import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/core/widgets/swap_field.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/data_source/stock_data.dart';
+import 'package:deus_mobile/models/synthetics/stock_address.dart';
+import 'package:deus_mobile/models/synthetics/synthetic_model.dart';
+import 'package:deus_mobile/models/token.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/service/stock_service.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/statics.dart';
+import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../../core/widgets/filled_gradient_selection_button.dart';
-import '../../core/widgets/selection_button.dart';
-import '../../core/widgets/svg.dart';
-import '../../core/widgets/swap_field.dart';
-import '../../data_source/currency_data.dart';
-import '../../data_source/stock_data.dart';
-import '../../models/stock_address.dart';
-import '../../models/synthetic_model.dart';
-import '../../models/token.dart';
-import '../../models/transaction_status.dart';
-import '../../service/ethereum_service.dart';
-import '../../service/stock_service.dart';
-import '../../statics/my_colors.dart';
-import '../../statics/statics.dart';
-import '../../statics/styles.dart';
-import 'market_timer.dart';
+import '../market_timer.dart';
 
 class SyntheticsScreen extends StatefulWidget {
   static const url = '/synthethics';
@@ -81,11 +81,13 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(MyStyles.mainPadding),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [_buildUserInput(context), _buildMarketTimer()],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(MyStyles.mainPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [_buildUserInput(context), _buildMarketTimer()],
+        ),
       ),
     );
   }
@@ -331,7 +333,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
       showToast(
           context,
           TransactionStatus(
-              "Approve ${syntheticModel.from.name}", TransactionStatus.PENDING, "Pending"));
+              "Approve ${syntheticModel.from.name}", Status.PENDING, "Pending"));
 
       var res = await stockService.approve(syntheticModel.from.getTokenName());
       Stream<TransactionReceipt> result =
@@ -345,12 +347,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           showToast(
               context,
               TransactionStatus("Approved ${syntheticModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Successful"));
+                  Status.SUCCESSFUL, "Successful"));
         } else {
           showToast(
               context,
               TransactionStatus("Approve of ${syntheticModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+                  Status.FAILED, "Failed"));
         }
       });
     }
@@ -380,12 +382,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           showToast(
               context,
               TransactionStatus("Sell ${syntheticModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Failed"));
+                  Status.SUCCESSFUL, "Failed"));
         } else {
           showToast(
               context,
               TransactionStatus("Sell of ${syntheticModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+                  Status.FAILED, "Failed"));
         }
       });
     }
@@ -416,12 +418,12 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
           showToast(
               context,
               TransactionStatus("Buy ${syntheticModel.from.name}",
-                  TransactionStatus.SUCCESSFUL, "Successful"));
+                  Status.SUCCESSFUL, "Successful"));
         } else {
           showToast(
               context,
               TransactionStatus("Buy of ${syntheticModel.from.name}",
-                  TransactionStatus.FAILED, "Failed"));
+                  Status.FAILED, "Failed"));
         }
       });
     }
