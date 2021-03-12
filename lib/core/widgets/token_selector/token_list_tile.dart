@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
+import '../../../locator.dart';
 import '../../../models/token.dart';
 
 class TokenListTile extends StatelessWidget {
@@ -15,7 +17,7 @@ class TokenListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        Navigator.pop(context, token);
+        locator<NavigationService>().goBack(context, token);
       },
       contentPadding: const EdgeInsets.all(0),
       leading: token.logoPath.showCircleImage(),

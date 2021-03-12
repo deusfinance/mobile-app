@@ -10,6 +10,7 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:web3dart/credentials.dart';
 
@@ -34,19 +35,20 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
 
   @override
   Widget build(BuildContext context) {
+    final WalletHandler walletStore = useWallet(context);
+
     return Row(
       children: [
         _buildAddressContainer(),
         const Spacer(),
-        _buildWalletLogout(),
+        _buildWalletLogout(walletStore),
       ],
     );
   }
 
-  GestureDetector _buildWalletLogout() {
+  GestureDetector _buildWalletLogout(WalletHandler walletStore) {
     return GestureDetector(
         onTap: () async {
-          final walletStore = Provider.of<WalletHandler>(context, listen: false);
           final bool confirm = await showDialog(
                 context: context,
                 builder: (context) {
@@ -56,12 +58,12 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
                       actions: [
                         FlatButton(
                           child: Text("Cancel"),
-                          onPressed: () => Navigator.of(context).pop(false),
+                          onPressed: () => locator<NavigationService>().goBack(context, false),
                         ),
                         FlatButton(
                           child: Text("Reset Wallet"),
                           onPressed: () {
-                            Navigator.of(context).pop(true);
+                            locator<NavigationService>().goBack(context, true);
                           },
                         )
                       ]);
@@ -73,9 +75,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
             locator<NavigationService>().navigateTo(IntroPage.url, context);
           }
         },
-        child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 6),
-            child: PlatformSvg.asset('images/logout.svg')));
+        child: Container(margin: EdgeInsets.symmetric(horizontal: 6), child: PlatformSvg.asset('images/logout.svg')));
   }
 
   Container _buildAddressContainer() {

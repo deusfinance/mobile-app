@@ -4,6 +4,7 @@ import 'package:deus_mobile/core/util/responsive.dart';
 import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/models/swap/GWei.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
+import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/service/deus_swap_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
@@ -13,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
+
+import '../../locator.dart';
 
 enum ConfirmSwapMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
 enum Mode { LOADING, NONE }
@@ -166,7 +169,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
               Expanded(
                   child: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  locator<NavigationService>().goBack(context);
                 },
                 child: Container(
                   margin: EdgeInsets.all(8.0),
@@ -200,7 +203,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                       gas.nonce = int.tryParse(nonceController.text) ?? 0;
                       gas.gasLimit = int.tryParse(gasLimitController.text) ?? 0;
                     }
-                    Navigator.pop(context, gas);
+                    locator<NavigationService>().goBack(context, gas);
                   },
                   selected: true,
                   gradient: MyColors.greenToBlueGradient,

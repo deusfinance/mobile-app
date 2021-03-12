@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:flutter/material.dart';
+
+import '../../../locator.dart';
 
 class TokenSelector extends StatelessWidget {
   final Widget selector;
@@ -27,7 +30,7 @@ class TokenSelector extends StatelessWidget {
               Text(title),
               const Spacer(),
               IconButton(icon: const Icon(Icons.close), onPressed: () {
-                Navigator.pop(context);
+                locator<NavigationService>().goBack(context);
               }),
             ],
           ),
