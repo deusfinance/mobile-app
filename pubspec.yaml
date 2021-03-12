@@ -42,6 +42,7 @@ dependencies:
   flutter_countdown_timer: ^3.0.0
   flutter_svg_provider: ^0.1.8
   stream_transform: ^0.0.19
+  vibration: ^1.7.3
 
 dev_dependencies:
   flutter_test:

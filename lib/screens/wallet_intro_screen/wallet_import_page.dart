@@ -1,10 +1,13 @@
 import 'package:deus_mobile/core/widgets/default_screen/custom_app_bar.dart';
+import 'package:deus_mobile/routes/navigation_service.dart';
+import 'package:deus_mobile/routes/route_generator.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../core/widgets/default_screen/back_button.dart';
 import '../../infrastructure/wallet_setup/wallet_setup_provider.dart';
+import '../../locator.dart';
 import '../../models/wallet/wallet_setup.dart';
 import 'widgets/import_wallet_form.dart';
 
@@ -34,7 +37,7 @@ class WalletImportPage extends HookWidget {
                   default:
                     break;
                 }
-                Navigator.of(context).popAndPushNamed("/");
+                locator<NavigationService>().navigateTo(kInitialRoute, context);
               }
             : null,
       ),

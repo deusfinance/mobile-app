@@ -53,7 +53,7 @@ class _DEUSAppState extends State<DEUSApp> {
       return FutureBuilder(
         future: initializeData,
         builder: (context, snapshot) {
-          if (!snapshot.hasData || !(state is SplashSuccess))
+          if ( !(state is SplashSuccess))
             return MaterialApp(
                 key: _loadingKey, debugShowCheckedModeBanner: false, theme: MyStyles.theme, home: SplashScreen());
 
