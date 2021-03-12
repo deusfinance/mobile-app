@@ -1,7 +1,7 @@
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/screens/synthetics/synthetics_screen.dart';
+import 'file:///D:/flutter%20projects/mobile-app/deus_mobile/lib/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

@@ -73,6 +73,10 @@ flutter_icons: # flutter pub run flutter_launcher_icons:main
       fonts:
         - asset: assets/fonts/monument-regular.ttf
           weight: 300
+    - family: EduMonument
+      fonts:
+        - asset: assets/fonts/edumonument-regular.ttf
+          weight: 300
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf

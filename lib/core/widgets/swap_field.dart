@@ -1,5 +1,6 @@
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/styles.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -132,7 +133,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                 const Color(0xFF69CFB8).withOpacity(0.149)
               ]),
               border: Border.all(color: MyColors.primary),
-              borderRadius: BorderRadius.circular(6)),
+              borderRadius: BorderRadius.circular(8)),
           child: Align(
               alignment: Alignment.center,
               child: Text(
@@ -147,7 +148,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   Widget _buildTextField() {
     return Flexible(
         child: Container(
-//            height: 30,
+           // height: 50,
             child: TextFormField(
                 autofocus: false,
                 maxLines: 1,

@@ -33,21 +33,24 @@ class Toast extends StatelessWidget {
                 GestureDetector(onTap: onClosed, child: Icon(Icons.close))
               ],
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                message,
-                style: MyStyles.whiteSmallTextStyle,
-              ),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    message,
+                    overflow: TextOverflow.ellipsis,
+                    style: MyStyles.whiteSmallUnderlinedTextStyle,
+                  ),
+                ),
+                Transform.rotate(
+                  angle: 150,
+                  child: Icon(
+                    Icons.arrow_right_alt_outlined,
+                    size: 20,
+                  ),
+                ),
+              ],
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Transform.rotate(
-                angle: 150,
-                child: Icon(Icons.arrow_right_alt_outlined),
-              ),
-            )
-
           ],
         ),
       ),
