@@ -61,6 +61,7 @@ flutter:
     - assets/images/stocks/
     - assets/images/icons/
     - assets/launcher_icon/
+    - assets/blur_screens/
     # BACKEND
     - assets/deus_data/ # data of tokens, contract ABI/functions etc.
   

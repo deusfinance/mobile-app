@@ -1,3 +1,5 @@
+import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
+import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_screen.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +56,9 @@ Map<String, WidgetBuilder> generateRoutes(BuildContext appContext) {
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
+    //blurred screens(coming soon)
+    BlurredStakeLockScreen.url : (_) => BlurredStakeLockScreen(),
+    BlurredSyntheticsScreen.url : (_) => BlurredSyntheticsScreen()
   };
   // return MaterialPageRoute(builder: (BuildContext context) => screen);
 }
