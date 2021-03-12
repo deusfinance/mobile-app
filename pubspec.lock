@@ -306,7 +306,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.19.1"
+    version: "0.19.3"
   flutter_svg_provider:
     dependency: "direct main"
     description:
