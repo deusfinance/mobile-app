@@ -23,7 +23,6 @@ import '../screens/wallet_intro_screen/wallet_create_page.dart';
 import '../screens/wallet_intro_screen/wallet_import_page.dart';
 import '../service/config_service.dart';
 
-
 const kInitialRoute = '/';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
@@ -65,12 +64,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
     //blurred screens (coming soon)
-    BlurredStakeLockScreen.url : (_) => BlurredStakeLockScreen(),
-    BlurredSyntheticsScreen.url : (_) => BlurredSyntheticsScreen()
+    BlurredStakeLockScreen.url: (_) => BlurredStakeLockScreen(),
+    BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen()
   };
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);
-  return _getPageRoute(screenChild, settings);
+  //TODO (@CodingDavid8): Replace hooks with cubit :)
+  final Widget screenWithWallet = WalletProvider(builder: (_, __) => screenChild);
+  return _getPageRoute(screenWithWallet, settings);
 }
 
 PageRoute _getPageRoute(Widget child, RouteSettings settings) {
