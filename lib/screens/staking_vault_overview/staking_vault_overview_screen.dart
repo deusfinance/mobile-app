@@ -33,20 +33,6 @@ class _StakingVaultOverviewScreenState
     extends State<StakingVaultOverviewScreen> {
   final String address = '0x3a6dabD6B5C75291a3258C29B418f5805792a87e';
 
-  // final double ethCount = 478.938;
-  // final double ethInUSD = 563008.67;
-  // final double percOfPool = 0.12;
-  //
-  // final double perfDEAns = 36.37;
-  // final double perfsUniDeusDea = 36.37;
-  // final double perfsDEA = 36.37;
-  // final double perfsDEUS = 36.37;
-  // final double perfsUniDeaUsdc = 36.37;
-  // final double perfsUUniDeuusEth = 36.37;
-  //
-  // final double nativeBalancerAPY = 99.98;
-  // final double timeTokenAPY = 199.98;
-  // final double sDeusAPY = 99.98;
 
   Future<ValueLockedScreenData> _testData() async {
     await Future.delayed(Duration(seconds: 3));
