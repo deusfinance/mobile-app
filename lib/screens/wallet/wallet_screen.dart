@@ -1,42 +1,72 @@
-
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/default_screen/header_with_address.dart';
+import 'package:deus_mobile/locator.dart';
+import 'package:deus_mobile/models/value_locked_chart_data.dart';
+import 'package:deus_mobile/models/value_locked_screen_data.dart';
+import 'package:deus_mobile/routes/navigation_service.dart';
+import 'package:deus_mobile/screens/lock/lock_screen.dart';
+import 'package:deus_mobile/screens/stake_screen/stake_screen.dart';
 import 'package:deus_mobile/screens/wallet/widgets/chart_container.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 
-enum StakingVaultOverviewScreenStates { Single, LiquidityClaim, LiquidityLockStake }
+enum StakingVaultOverviewScreenStates {
+  Single,
+  LiquidityClaim,
+  LiquidityLockStake
+}
 
 class StakingVaultOverviewScreen extends StatefulWidget {
   static const url = '/wallet-screen';
 
   @override
-  _StakingVaultOverviewScreenState createState() => _StakingVaultOverviewScreenState();
+  _StakingVaultOverviewScreenState createState() =>
+      _StakingVaultOverviewScreenState();
 }
 
-class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen> {
+class _StakingVaultOverviewScreenState
+    extends State<StakingVaultOverviewScreen> {
   final String address = '0x3a6dabD6B5C75291a3258C29B418f5805792a87e';
 
-  final double ethCount = 478.938;
-  final double ethInUSD = 563008.67;
-  final double percOfPool = 0.12;
+  // final double ethCount = 478.938;
+  // final double ethInUSD = 563008.67;
+  // final double percOfPool = 0.12;
+  //
+  // final double perfDEAns = 36.37;
+  // final double perfsUniDeusDea = 36.37;
+  // final double perfsDEA = 36.37;
+  // final double perfsDEUS = 36.37;
+  // final double perfsUniDeaUsdc = 36.37;
+  // final double perfsUUniDeuusEth = 36.37;
+  //
+  // final double nativeBalancerAPY = 99.98;
+  // final double timeTokenAPY = 199.98;
+  // final double sDeusAPY = 99.98;
 
-  final double perfDEAns = 36.37;
-  final double perfsUniDeusDea = 36.37;
-  final double perfsDEA = 36.37;
-  final double perfsDEUS = 36.37;
-  final double perfsUniDeaUsdc = 36.37;
-  final double perfsUUniDeuusEth = 36.37;
-
-  final double nativeBalancerAPY = 99.98;
-  final double timeTokenAPY = 199.98;
-  final double sDeusAPY = 99.98;
+  Future<ValueLockedScreenData> _testData() async {
+    await Future.delayed(Duration(seconds: 3));
+    return ValueLockedScreenData(
+        ethCount: 478.938,
+        ethInUSD: 563008.67,
+        nativeBalancerAPY: 99.98,
+        percOfPool: 0.12,
+        perfDEAns: 36.37,
+        perfsDEA: 36.37,
+        perfsDEUS: 36.37,
+        perfsUniDeusDea: 36.37,
+        perfsUniDeaUsdc: 36.37,
+        perfsUUniDeuusEth: 36.37,
+        timeTokenAPY: 199.98,
+        sDeusAPY: 99.98);
+  }
 
   List<bool> _toggleButtonButtonsSingleLiquidity = [true, false];
-  StakingVaultOverviewScreenStates _screenState = StakingVaultOverviewScreenStates.LiquidityLockStake;
+  StakingVaultOverviewScreenStates _screenState =
+      StakingVaultOverviewScreenStates.Single;
 
   void changeToggleButtonSingleLiquidity(int i) {
     if (!_toggleButtonButtonsSingleLiquidity[i]) {
@@ -52,16 +82,10 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
     }
   }
 
-  Divider _divider = Divider(height: 40);
-  SizedBox _bigHeightDivider = SizedBox(
-    height: 20,
-  );
-  SizedBox _midHeightDivider = SizedBox(
-    height: 10,
-  );
-  SizedBox _smallHeightDivider = SizedBox(
-    height: 5,
-  );
+  static const Divider _divider = Divider(height: 40);
+  static const SizedBox _bigHeightDivider = SizedBox(height: 20);
+  static const SizedBox _midHeightDivider = SizedBox(height: 10);
+  static const SizedBox _smallHeightDivider = SizedBox(height: 5);
 
   @override
   Widget build(BuildContext context) {
@@ -77,12 +101,25 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
               _bigHeightDivider,
               _buildToggleButton(),
               _divider,
-              if (_screenState == StakingVaultOverviewScreenStates.Single)
-                _buildSingleBottom(),
-              if (_screenState == StakingVaultOverviewScreenStates.LiquidityClaim)
-                _buildLiquidityClaim(),
-              if (_screenState == StakingVaultOverviewScreenStates.LiquidityLockStake)
-                _buildLiquidityLockStake(),
+              FutureBuilder(
+                  future: _testData(),
+                  builder: (context, snapshot) {
+                    return
+                      snapshot.connectionState == ConnectionState.done ?
+                      Column(
+                      children: [
+                        if (_screenState ==
+                            StakingVaultOverviewScreenStates.Single)
+                          _buildSingleBottom(snapshot.data),
+                        if (_screenState ==
+                            StakingVaultOverviewScreenStates.LiquidityClaim)
+                          _buildLiquidityClaim(snapshot.data),
+                        if (_screenState ==
+                            StakingVaultOverviewScreenStates.LiquidityLockStake)
+                          _buildLiquidityLockStake(snapshot.data),
+                      ],
+                    ): Center(child: CircularProgressIndicator(),);
+                  })
             ],
           ),
         ),
@@ -90,13 +127,21 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
     );
   }
 
-  Column _buildSingleBottom() {
+  void navigateToLockScreen(BuildContext ctx) {
+    locator<NavigationService>().navigateTo(LockScreen.url, ctx);
+  }
+
+  void navigateToStakeScreen(BuildContext ctx) {
+    locator<NavigationService>().navigateTo(StakeScreen.url, ctx);
+  }
+
+  Column _buildSingleBottom(ValueLockedScreenData data) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLockStakeButton(),
         _divider,
-        _buildAPYAndPool(),
+        _buildAPYAndPool(sDeusAPY: data.sDeusAPY, percOfPool: data.percOfPool),
         _buildClaimSection(),
         _bigHeightDivider,
         _buildWithDrawClaim(),
@@ -108,11 +153,13 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
     );
   }
 
-  Column _buildLiquidityClaim() {
+  Column _buildLiquidityClaim(ValueLockedScreenData data) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildNativeBalancer(),
+        _buildNativeBalancer(
+            nativeBalancerAPY: data.nativeBalancerAPY,
+            percOfPool: data.percOfPool),
         _buildClaimSection(),
         _bigHeightDivider,
         _buildWithDrawClaim(),
@@ -123,14 +170,36 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
     );
   }
 
-  Column _buildLiquidityLockStake() {
+  Column _buildLiquidityLockStake(ValueLockedScreenData data) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildNativeBalancer(),
-        _buildNativeBalancerLockStake(),
+        _buildNativeBalancer(
+            nativeBalancerAPY: data.nativeBalancerAPY,
+            percOfPool: data.percOfPool),
+        _buildNativeBalancerLockStake(
+            perfsUUniDeuusEth: data.perfsUUniDeuusEth,
+            perfsUniDeaUsdc: data.perfsUniDeaUsdc,
+            perfsUniDeusDea: data.perfsUniDeusDea,
+            perfsDEUS: data.perfsDEUS,
+            perfsDEA: data.perfsDEA,
+            perfDEAns: data.perfDEAns),
         _bigHeightDivider
       ],
+    );
+  }
+
+  _buildStakeButton(String label, BuildContext context) {
+    return DarkButton(
+      label: label,
+      onPressed: () => navigateToStakeScreen(context),
+    );
+  }
+
+  _buildLockButton(String label, BuildContext context) {
+    return DarkButton(
+      label: label,
+      onPressed: () => navigateToLockScreen(context),
     );
   }
 
@@ -140,18 +209,22 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
       child: Row(
         children: [
           Expanded(
-            child: DarkButton(
-              label: 'LOCK MORE',
-            ),
+            child: _buildLockButton('LOCK MORE', context),
           ),
-          SizedBox(width: 15),
-          Expanded(child: DarkButton(label: 'STAKE MORE'))
+          const SizedBox(width: 15),
+          Expanded(child: _buildStakeButton('STAKE MORE', context))
         ],
       ),
     );
   }
 
-  Padding _buildNativeBalancerLockStake() {
+  Padding _buildNativeBalancerLockStake(
+      {perfDEAns,
+      perfsUniDeusDea,
+      perfsDEA,
+      perfsDEUS,
+      perfsUniDeaUsdc,
+      perfsUUniDeuusEth}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -230,12 +303,10 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
           Row(
             children: [
               Expanded(
-                child: DarkButton(
-                  label: 'LOCK',
-                ),
+                child: _buildLockButton('LOCK', context),
               ),
-              SizedBox(width: 15),
-              Expanded(child: DarkButton(label: 'STAKE'))
+              const SizedBox(width: 15),
+              Expanded(child: _buildStakeButton('STAKE', context))
             ],
           )
         ],
@@ -243,7 +314,7 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
     );
   }
 
-  Padding _buildNativeBalancer() {
+  Padding _buildNativeBalancer({nativeBalancerAPY, percOfPool}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -261,7 +332,8 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
                 '$nativeBalancerAPY% APY',
                 style: MyStyles.whiteMediumTextStyle,
               ),
-              if (_screenState == StakingVaultOverviewScreenStates.LiquidityClaim)
+              if (_screenState ==
+                  StakingVaultOverviewScreenStates.LiquidityClaim)
                 Text(
                   'you own $percOfPool% of the pool',
                   style: MyStyles.whiteSmallTextStyle,
@@ -274,7 +346,7 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
     );
   }
 
-  Padding _buildTimeToken() {
+  Padding _buildTimeToken({timeTokenAPY}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -293,21 +365,19 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
           Row(
             children: [
               Expanded(
-                child: DarkButton(
-                  label: 'LOCK',
-                ),
+                child: _buildLockButton('LOCK', context),
               ),
-              SizedBox(width: 15),
-              Expanded(child: DarkButton(label: 'STAKE'))
+              const SizedBox(width: 15),
+              Expanded(child: _buildStakeButton('STAKE', context))
             ],
           ),
-          SizedBox(height: 30)
+          const SizedBox(height: 30)
         ],
       ),
     );
   }
 
-  Padding _buildAPYAndPool() {
+  Padding _buildAPYAndPool({percOfPool, sDeusAPY}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       child: Column(
@@ -370,12 +440,10 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
           Row(
             children: [
               Expanded(
-                child: DarkButton(
-                  label: 'LOCK',
-                ),
+                child: _buildLockButton('LOCK', context),
               ),
-              SizedBox(width: 15),
-              Expanded(child: DarkButton(label: 'STAKE'))
+              const SizedBox(width: 15),
+              Expanded(child: _buildStakeButton('STAKE', context))
             ],
           )
         ],
@@ -408,7 +476,7 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: MyColors.HalfBlack)),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           DarkButton(label: 'CLAIM'),
         ],
       ),
@@ -428,7 +496,7 @@ class _StakingVaultOverviewScreenState extends State<StakingVaultOverviewScreen>
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: MyColors.HalfBlack)),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           DarkButton(label: 'WITHDRAW & CLAIM'),
         ],
       ),
