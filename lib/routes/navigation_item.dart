@@ -1,3 +1,5 @@
+import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
+import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
@@ -32,9 +34,9 @@ class NavigationItem extends Equatable {
 
 
   static final NavigationItem stakeAndLockOverview = NavigationItem(
-      page: StakingVaultOverviewScreen(),
+      page: BlurredStakeLockScreen(),
       title: "Lock and Stake",
-      routeUrl: StakingVaultOverviewScreen.url);
+      routeUrl: BlurredStakeLockScreen.url);
 
   static final NavigationItem staking = NavigationItem(
       page: StakeScreen(), title: "Staking", routeUrl: StakeScreen.url);
@@ -44,9 +46,9 @@ class NavigationItem extends Equatable {
 
 
   static final NavigationItem synthethics = NavigationItem(
-      page: SyntheticsScreen(), //SynchronizerScreen(),
+      page: BlurredSyntheticsScreen(), //SynchronizerScreen(),
       title: "Synthetics",
-      routeUrl: SyntheticsScreen.url);
+      routeUrl: BlurredSyntheticsScreen.url);
 
   static List<NavigationItem> get items =>
       [swap, synthethics, stakeAndLockOverview];
