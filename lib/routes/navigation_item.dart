@@ -1,5 +1,5 @@
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
-import 'package:deus_mobile/screens/wallet/wallet_screen.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';

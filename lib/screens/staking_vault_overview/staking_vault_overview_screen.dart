@@ -6,13 +6,14 @@ import 'package:deus_mobile/models/value_locked_screen_data.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/stake_screen.dart';
-import 'package:deus_mobile/screens/wallet/widgets/chart_container.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+
+import 'widgets/chart_container.dart';
 
 enum StakingVaultOverviewScreenStates {
   Single,
