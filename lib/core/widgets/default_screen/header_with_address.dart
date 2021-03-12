@@ -73,12 +73,15 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
             locator<NavigationService>().navigateTo(IntroPage.url, context);
           }
         },
-        child: PlatformSvg.asset('images/logout.svg'));
+        child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 6),
+            child: PlatformSvg.asset('images/logout.svg')));
   }
 
   Container _buildAddressContainer() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
           border: Border.all(color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
           color: Color(MyColors.kAddressBackground).withOpacity(0.25),
