@@ -19,7 +19,7 @@ dependencies:
   web3dart: ^2.0.0-dev.9
   bip39: ^1.0.3
   hex: ^0.1.2
-  tweetnacl:
+  tweetnacl: ^0.3.2
   get_it: ^5.0.6
   flutter_bloc: ^6.1.3
   string_validator: ^0.1.4
@@ -44,13 +44,16 @@ dependencies:
   fl_chart: ^0.12.3
   vibration: ^1.7.3
 
+dependency_overrides:
+  analyzer: ^0.41.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^1.10.0
   built_value_generator: ^7.1.0
   json_serializable: ^3.5.1
-  flutter_launcher_icons: "^0.8.0"
+  flutter_launcher_icons: ^0.8.0
 
 flutter:
   uses-material-design: true

@@ -25,12 +25,18 @@ class _$Wallet extends Wallet {
 
   _$Wallet._(
       {this.address,
-        this.privateKey,
-        this.tokenBalance,
-        this.ethBalance,
-        this.loading,
-        this.errors})
+      this.privateKey,
+      this.tokenBalance,
+      this.ethBalance,
+      this.loading,
+      this.errors})
       : super._() {
+    if (address == null) {
+      throw new BuiltValueNullFieldError('Wallet', 'address');
+    }
+    if (privateKey == null) {
+      throw new BuiltValueNullFieldError('Wallet', 'privateKey');
+    }
     if (tokenBalance == null) {
       throw new BuiltValueNullFieldError('Wallet', 'tokenBalance');
     }
@@ -39,6 +45,9 @@ class _$Wallet extends Wallet {
     }
     if (loading == null) {
       throw new BuiltValueNullFieldError('Wallet', 'loading');
+    }
+    if (errors == null) {
+      throw new BuiltValueNullFieldError('Wallet', 'errors');
     }
   }
 
@@ -76,12 +85,12 @@ class _$Wallet extends Wallet {
   @override
   String toString() {
     return (newBuiltValueToStringHelper('Wallet')
-      ..add('address', address)
-      ..add('privateKey', privateKey)
-      ..add('tokenBalance', tokenBalance)
-      ..add('ethBalance', ethBalance)
-      ..add('loading', loading)
-      ..add('errors', errors))
+          ..add('address', address)
+          ..add('privateKey', privateKey)
+          ..add('tokenBalance', tokenBalance)
+          ..add('ethBalance', ethBalance)
+          ..add('loading', loading)
+          ..add('errors', errors))
         .toString();
   }
 }
@@ -153,12 +162,12 @@ class WalletBuilder implements Builder<Wallet, WalletBuilder> {
               tokenBalance: tokenBalance,
               ethBalance: ethBalance,
               loading: loading,
-              errors: _errors?.build());
+              errors: errors.build());
     } catch (_) {
       String _$failedField;
       try {
         _$failedField = 'errors';
-        _errors?.build();
+        errors.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'Wallet', _$failedField, e.toString());

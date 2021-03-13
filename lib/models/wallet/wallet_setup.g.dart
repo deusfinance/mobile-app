@@ -25,12 +25,18 @@ class _$WalletSetup extends WalletSetup {
 
   _$WalletSetup._(
       {this.mnemonic,
-        this.privateKey,
-        this.step,
-        this.method,
-        this.loading,
-        this.errors})
+      this.privateKey,
+      this.step,
+      this.method,
+      this.loading,
+      this.errors})
       : super._() {
+    if (mnemonic == null) {
+      throw new BuiltValueNullFieldError('WalletSetup', 'mnemonic');
+    }
+    if (privateKey == null) {
+      throw new BuiltValueNullFieldError('WalletSetup', 'privateKey');
+    }
     if (step == null) {
       throw new BuiltValueNullFieldError('WalletSetup', 'step');
     }
@@ -39,6 +45,9 @@ class _$WalletSetup extends WalletSetup {
     }
     if (loading == null) {
       throw new BuiltValueNullFieldError('WalletSetup', 'loading');
+    }
+    if (errors == null) {
+      throw new BuiltValueNullFieldError('WalletSetup', 'errors');
     }
   }
 
@@ -76,12 +85,12 @@ class _$WalletSetup extends WalletSetup {
   @override
   String toString() {
     return (newBuiltValueToStringHelper('WalletSetup')
-      ..add('mnemonic', mnemonic)
-      ..add('privateKey', privateKey)
-      ..add('step', step)
-      ..add('method', method)
-      ..add('loading', loading)
-      ..add('errors', errors))
+          ..add('mnemonic', mnemonic)
+          ..add('privateKey', privateKey)
+          ..add('step', step)
+          ..add('method', method)
+          ..add('loading', loading)
+          ..add('errors', errors))
         .toString();
   }
 }
@@ -153,12 +162,12 @@ class WalletSetupBuilder implements Builder<WalletSetup, WalletSetupBuilder> {
               step: step,
               method: method,
               loading: loading,
-              errors: _errors?.build());
+              errors: errors.build());
     } catch (_) {
       String _$failedField;
       try {
         _$failedField = 'errors';
-        _errors?.build();
+        errors.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'WalletSetup', _$failedField, e.toString());
