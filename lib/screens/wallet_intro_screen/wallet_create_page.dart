@@ -27,7 +27,7 @@ class WalletCreatePage extends HookWidget {
         title: title,
         // leading: BackButtonWithText(
         //   onPressed: store.state.step == WalletCreateSteps.display
-        //       ? () => Navigator.pop(context)
+        //       ? () => locator<NavigationService>().goBack(context)
         //       : () => store.goto(WalletCreateSteps.display),
         // ),
       ),
@@ -44,7 +44,7 @@ class WalletCreatePage extends HookWidget {
               onConfirm: !store.state.loading
                   ? (confirmedMnemonic) async {
                       if (await store.confirmMnemonic(confirmedMnemonic)) {
-                        locator<NavigationService>().navigateTo(kInitialRoute, context);
+                        locator<NavigationService>().navigateTo(kInitialRoute, context, replaceAll: true);
                       }
                     }
                   : null,

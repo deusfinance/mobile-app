@@ -59,6 +59,8 @@ class WalletSetupHandler {
     try {
       _store.dispatch(WalletSetupStarted());
 
+      privateKey = privateKey.startsWith('0x') ? privateKey.substring(2) : privateKey;
+
       if (!isHexadecimal(privateKey) || privateKey.length.isOdd || privateKey.isEmpty) {
         _store.dispatch(WalletSetupAddError("The entered key is not a private key."));
         return false;

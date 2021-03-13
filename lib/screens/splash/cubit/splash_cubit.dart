@@ -21,24 +21,10 @@ class SplashCubit extends Cubit<SplashState> {
 
     /// get data from device
     try {
-      debugPrint("Loading data...");
-      final sharedPrefs = await SharedPreferences.getInstance();
-      debugPrint("Received sharedPreferences.");
-      await locator<OmniServices>().createOmniServices(sharedPrefs: sharedPrefs);
+      debugPrint("Creating providers...");
+      await locator<OmniServices>().createOmniServices();
       debugPrint("Created providers.");
-
-      /// get data from server
-      final bool gotStockData = await StockData.getData();
-      debugPrint("got Stock data.");
-      final bool gotStockAddresses = await StockData.getStockAddresses();
-      debugPrint("got Stock addresses.");
-
-      if (!gotStockData || !gotStockAddresses) {
-        emit(SplashError());
-        return false;
-      }
     } catch (e) {
-      print(e);
       emit(SplashError());
       return false;
     }

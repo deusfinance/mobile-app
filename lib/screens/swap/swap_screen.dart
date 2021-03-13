@@ -58,8 +58,7 @@ class _SwapScreenState extends State<SwapScreen> {
     });
   }
 
-  Future<Gas> showConfirmGasFeeDialog(
-      SwapState state, Transaction transaction) async {
+  Future<Gas> showConfirmGasFeeDialog(SwapState state, Transaction transaction) async {
     Gas res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
@@ -72,8 +71,7 @@ class _SwapScreenState extends State<SwapScreen> {
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-        filter:
-            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
         child: FadeTransition(
           child: child,
           opacity: anim1,
@@ -86,15 +84,13 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Pending',
         message: transactionStatus.message,
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            String url = "https://etherscan.io/tx/" + transactionStatus.hash;
-            _launchInBrowser(url);
+            _launchInBrowser(transactionStatus.transactionUrl);
           }
         },
         onClosed: () {
@@ -106,14 +102,12 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Successful',
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          String url = "https://etherscan.io/tx/" + transactionStatus.hash;
-          _launchInBrowser(url);
+          _launchInBrowser(transactionStatus.transactionUrl);
         },
         onClosed: () {
           context.read<SwapCubit>().closeToast();
@@ -124,14 +118,12 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
       child: Toast(
         label: 'Transaction Failed',
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          String url = "https://etherscan.io/tx/" + transactionStatus.hash;
-          _launchInBrowser(url);
+          _launchInBrowser(transactionStatus.transactionUrl);
         },
         onClosed: () {
           context.read<SwapCubit>().closeToast();
@@ -141,7 +133,6 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildBody(SwapState state) {
-
     SwapField fromField = new SwapField(
       direction: Direction.from,
       initialToken: state.fromToken,
@@ -163,7 +154,7 @@ class _SwapScreenState extends State<SwapScreen> {
     );
 
     return Container(
-      padding: EdgeInsets.all(MyStyles.mainPadding),
+      padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
       child: Stack(
         children: [
@@ -176,9 +167,7 @@ class _SwapScreenState extends State<SwapScreen> {
                     onTap: () {
                       context.read<SwapCubit>().reverseSwap();
                     },
-                    child: Center(
-                        child:
-                            PlatformSvg.asset('images/icons/arrow_down.svg'))),
+                    child: Center(child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
                 const SizedBox(height: 12),
                 toField,
                 const SizedBox(height: 18),
@@ -203,9 +192,7 @@ class _SwapScreenState extends State<SwapScreen> {
                           },
                           child: Container(
                             margin: EdgeInsets.only(left: 4.0),
-                            child: PlatformSvg.asset(
-                                "images/icons/exchange.svg",
-                                width: 15),
+                            child: PlatformSvg.asset("images/icons/exchange.svg", width: 15),
                           ),
                         ),
                       ],
@@ -266,9 +253,7 @@ class _SwapScreenState extends State<SwapScreen> {
                     fontSize: MyStyles.S6,
                     color: p <= 1
                         ? Color(0xFF00D16C)
-                        : (p <= 3
-                            ? Color(0xFFFFFFFF)
-                            : (p < 5 ? Color(0xFFf58516) : Color(0xFFD40000))),
+                        : (p <= 3 ? Color(0xFFFFFFFF) : (p < 5 ? Color(0xFFf58516) : Color(0xFFD40000))),
                   ),
                 );
               } else {
@@ -312,9 +297,7 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       );
     } else if (state.approved) {
-      return Opacity(
-          opacity: state.isInProgress ? 0.5 : 1,
-          child: _buildSwapButton(state));
+      return Opacity(opacity: state.isInProgress ? 0.5 : 1, child: _buildSwapButton(state));
     } else {
       return Container();
     }
@@ -327,7 +310,7 @@ class _SwapScreenState extends State<SwapScreen> {
         await context.read<SwapCubit>().approve();
       },
       selected: true,
-      gradient: MyColors.greenToBlueGradient,
+      gradient: MyColors.blueToGreenSwapScreenGradient,
       textStyle: MyStyles.blackMediumTextStyle,
     );
   }
@@ -355,11 +338,9 @@ class _SwapScreenState extends State<SwapScreen> {
                             children: <Widget>[
                               token.logoPath.showCircleImage(radius: 10),
                               const SizedBox(width: 5),
-                              Text(token.symbol,
-                                  style: MyStyles.whiteSmallTextStyle),
+                              Text(token.symbol, style: MyStyles.whiteSmallTextStyle),
                               (index < snapshot.data.length - 1)
-                                  ? _buildRouteTransformWidget(
-                                      snapshot.data, index)
+                                  ? _buildRouteTransformWidget(snapshot.data, index)
                                   : Container(),
                             ],
                           ),
@@ -377,10 +358,8 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildRouteTransformWidget(List<Token> route, int index) {
-    if ((route[index].getTokenName() == "eth" &&
-            route[index + 1].getTokenName() == "deus") ||
-        (route[index].getTokenName() == "deus" &&
-            route[index + 1].getTokenName() == "eth")) {
+    if ((route[index].getTokenName() == "eth" && route[index + 1].getTokenName() == "deus") ||
+        (route[index].getTokenName() == "deus" && route[index + 1].getTokenName() == "eth")) {
       return Row(
         children: [
           const SizedBox(width: 15),
@@ -451,9 +430,7 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       );
     }
-    if (state.approved &&
-        state.fromToken.getBalance() <
-            EthereumService.getWei(state.fromFieldController.text)) {
+    if (state.approved && state.fromToken.getBalance() < EthereumService.getWei(state.fromFieldController.text)) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -469,16 +446,15 @@ class _SwapScreenState extends State<SwapScreen> {
       );
     }
     return SelectionButton(
-      label: 'Swap',
+      label: 'SWAP',
       onPressed: (bool selected) async {
-        Transaction transaction =
-            await context.read<SwapCubit>().makeTransaction();
+        Transaction transaction = await context.read<SwapCubit>().makeTransaction();
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
         Gas gas = await showConfirmGasFeeDialog(state, transaction);
         await context.read<SwapCubit>().swapTokens(gas);
       },
       selected: true,
-      gradient: MyColors.greenToBlueGradient,
+      gradient: MyColors.blueToGreenGradient,
       textStyle: MyStyles.blackMediumTextStyle,
     );
   }
@@ -493,18 +469,14 @@ class _SwapScreenState extends State<SwapScreen> {
             context.read<SwapCubit>().setSlippage(0.1);
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 0.1
-                ? MyStyles.greenToBlueDecoration
-                : MyStyles.lightBlackBorderDecoration,
+            decoration: state.slippage == 0.1 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "0.1%",
-                style: state.slippage == 0.1
-                    ? MyStyles.blackSmallTextStyle
-                    : MyStyles.whiteSmallTextStyle,
+                style: state.slippage == 0.1 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
@@ -517,10 +489,10 @@ class _SwapScreenState extends State<SwapScreen> {
             context.read<SwapCubit>().setSlippage(0.5);
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
             decoration: state.slippage == 0.5
-                ? MyStyles.greenToBlueDecoration
+                ? MyStyles.blueToGreenSwapScreenDecoration
                 : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
@@ -541,27 +513,25 @@ class _SwapScreenState extends State<SwapScreen> {
             context.read<SwapCubit>().setSlippage(1);
           },
           child: Container(
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
             decoration: state.slippage == 1.0
-                ? MyStyles.greenToBlueDecoration
+                ? MyStyles.blueToGreenSwapScreenDecoration
                 : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "1%",
-                style: state.slippage == 1.0
-                    ? MyStyles.blackSmallTextStyle
-                    : MyStyles.whiteSmallTextStyle,
+                style: state.slippage == 1.0 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
         ),
       ),
       Expanded(
-        flex: 5,
+        flex: 6,
         child: Container(
-          padding: EdgeInsets.all(12.0),
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
           margin: EdgeInsets.all(4.0),
           decoration: state.slippageController.text != ""
               ? MyStyles.greenToBlueDecoration
@@ -572,11 +542,10 @@ class _SwapScreenState extends State<SwapScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      // textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
                       autofocus: false,
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter(
-                            new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                      ],
+                      inputFormatters: [WhitelistingTextInputFormatter(new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))],
                       keyboardType: TextInputType.number,
                       maxLines: 1,
                       controller: state.slippageController,
@@ -584,9 +553,16 @@ class _SwapScreenState extends State<SwapScreen> {
                           ? MyStyles.blackSmallTextStyle
                           : MyStyles.whiteSmallTextStyle,
                       decoration: InputDecoration(
+                        hintTextDirection: TextDirection.rtl,
+                        hintText: "0.50",
+                        hintStyle: MyStyles.lightWhiteSmallTextStyle,
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
                         isDense: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                       ),
                     ),
                   ),
@@ -605,22 +581,14 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildToastWidget(SwapState state) {
     if (state is TransactionPendingState && state.showingToast) {
-      return Align(
-          alignment: Alignment.bottomCenter,
-          child: _buildTransactionPending(state.transactionStatus));
+      return Align(alignment: Alignment.bottomCenter, child: _buildTransactionPending(state.transactionStatus));
     } else if (state is TransactionFinishedState && state.showingToast) {
       if (state.transactionStatus.status == Status.PENDING) {
-        return Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildTransactionPending(state.transactionStatus));
+        return Align(alignment: Alignment.bottomCenter, child: _buildTransactionPending(state.transactionStatus));
       } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
-        return Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildTransactionSuccessFul(state.transactionStatus));
+        return Align(alignment: Alignment.bottomCenter, child: _buildTransactionSuccessFul(state.transactionStatus));
       } else if (state.transactionStatus.status == Status.FAILED) {
-        return Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildTransactionFailed(state.transactionStatus));
+        return Align(alignment: Alignment.bottomCenter, child: _buildTransactionFailed(state.transactionStatus));
       }
     }
     return Container();

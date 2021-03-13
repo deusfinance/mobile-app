@@ -81,4 +81,6 @@ abstract class StockData {
       return false;
     }
   }
+
+
 }
