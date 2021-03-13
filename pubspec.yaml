@@ -69,11 +69,11 @@ flutter:
   fonts:
     - family: Monument
       fonts:
-        - asset: fonts/monument-regular.ttf
+        - asset: assets/fonts/monument-regular.ttf
           weight: 300
     - family: EduMonument
       fonts:
-        - asset: fonts/edumonument-regular.ttf
+        - asset: assets/fonts/edumonument-regular.ttf
           weight: 300
 
 flutter_icons: # flutter pub run flutter_launcher_icons:main
