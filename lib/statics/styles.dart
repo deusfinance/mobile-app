@@ -26,25 +26,33 @@ class MyStyles {
 
   static const String kFontFamily = "EduMonument";
 
-
   // decorations
   static final lightBlackBorderDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(cardRadiusSize),
+      borderRadius: BorderRadius.circular(cardRadiusSize / 2),
       color: MyColors.Main_BG_Black,
-      border: Border.all(color: MyColors.HalfBlack, width: 1.0));
+      border: Border.all(color: MyColors.Button_BG_Black, width: 1.0));
   static final darkWithBorderDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(cardRadiusSize),
       color: MyColors.Button_BG_Black,
       border: Border.all(color: MyColors.Black, width: 1.0));
 
-  static final darkWithNoBorderDecoration =
-      BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), color: MyColors.Button_BG_Black);
+  static final darkWithNoBorderDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(cardRadiusSize),
+      color: MyColors.Button_BG_Black);
 
-  static final blueToPurpleDecoration =
-      BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.blueToPurpleGradient);
+  static final blueToPurpleDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(cardRadiusSize),
+      gradient: MyColors.blueToPurpleGradient);
 
-  static final greenToBlueDecoration =
-      BoxDecoration(borderRadius: BorderRadius.circular(cardRadiusSize), gradient: MyColors.greenToBlueGradient);
+  static final greenToBlueDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(cardRadiusSize / 2),
+      gradient: MyColors.greenToBlueGradient);
+  static final blueToGreenDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(cardRadiusSize / 2),
+      gradient: MyColors.blueToGreenGradient);
+  static final blueToGreenSwapScreenDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(cardRadiusSize / 2),
+      gradient: MyColors.blueToGreenSwapScreenGradient);
 
   // text styles
   static final lightWhiteSmallTextStyle = TextStyle(
@@ -98,22 +106,20 @@ class MyStyles {
   );
 
   static final selectedToggleButtonTextStyle = TextStyle(
-    fontFamily: kFontFamily,
-    fontWeight: FontWeight.w300,
-    fontSize: S5,
-    color: Colors.transparent,
-    decoration: TextDecoration.underline,
-    decorationColor: MyColors.White,
-    shadows: [Shadow(color: MyColors.White, offset: Offset(0, -5))]
-  );
+      fontFamily: kFontFamily,
+      fontWeight: FontWeight.w300,
+      fontSize: S5,
+      color: Colors.transparent,
+      decoration: TextDecoration.underline,
+      decorationColor: MyColors.White,
+      shadows: [Shadow(color: MyColors.White, offset: Offset(0, -5))]);
 
   static final unselectedToggleButtonTextStyle = TextStyle(
       fontFamily: kFontFamily,
       fontWeight: FontWeight.w300,
       fontSize: S5,
       color: Colors.transparent,
-      shadows: [Shadow(color: MyColors.HalfWhite, offset: Offset(0, -5))]
-  );
+      shadows: [Shadow(color: MyColors.HalfWhite, offset: Offset(0, -5))]);
 
   static TextStyle gradientMediumTextStyle = TextStyle(
       fontFamily: kFontFamily,
@@ -123,7 +129,6 @@ class MyStyles {
         ..shader = LinearGradient(
           colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
-
 
   static final whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,
