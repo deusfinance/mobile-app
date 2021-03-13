@@ -1,7 +1,7 @@
 import 'package:deus_mobile/models/synthetics/sign.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'xdai_contract_input_data.g.dart';
+// part 'xdai_contract_input_data.g.dart';
 
 @JsonSerializable(nullable: true)
 class XDaiContractInputData{
@@ -13,7 +13,7 @@ class XDaiContractInputData{
 
 
   XDaiContractInputData();
-
-  factory XDaiContractInputData.fromJson(Map<String, dynamic> json) => _$XDaiContractInputDataFromJson(json);
-  Map<String, dynamic> toJson() => _$XDaiContractInputDataToJson(this);
+  //
+  // factory XDaiContractInputData.fromJson(Map<String, dynamic> json) => _$XDaiContractInputDataFromJson(json);
+  // Map<String, dynamic> toJson() => _$XDaiContractInputDataToJson(this);
 }

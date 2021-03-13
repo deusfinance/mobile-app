@@ -37,7 +37,8 @@ abstract class SwapState extends Equatable {
     slippage = 0.5;
     swapService = new SwapService(
         ethService: locator<EthereumService>(),
-        privateKey: locator<ConfigurationService>().getPrivateKey());
+        // privateKey: locator<ConfigurationService>().getPrivateKey());
+        privateKey: "0x394b2559d9e727734001346346e311d3bba6a0a2d566d8cb79647c755e41355d");
     swapService.init();
     fromFieldController = new TextEditingController();
     toFieldController = new TextEditingController();
@@ -141,4 +142,8 @@ class SwapInitial extends SwapState {
 
 class SwapLoading extends SwapState {
   SwapLoading(SwapState state) : super.copy(state);
+}
+
+class SwapError extends SwapState {
+  SwapError(SwapState state) : super.copy(state);
 }

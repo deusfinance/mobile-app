@@ -97,8 +97,8 @@ abstract class XDaiStockData {
       Map<String, XDaiContractInputData> contractInputData = new Map();
       var map = json.decode(response.body);
       map.forEach((key, value) {
-        XDaiContractInputData c = XDaiContractInputData.fromJson(value);
-        contractInputData.addEntries([new MapEntry(key, c)]);
+        // XDaiContractInputData c = XDaiContractInputData.fromJson(value);
+        // contractInputData.addEntries([new MapEntry(key, c)]);
       });
       return contractInputData;
     } else {
@@ -113,8 +113,8 @@ abstract class XDaiStockData {
       Map<String, XDaiContractInputData> contractInputData = new Map();
       var map = json.decode(response.body);
       map.forEach((key, value) {
-        XDaiContractInputData c = XDaiContractInputData.fromJson(value);
-        contractInputData.addEntries([new MapEntry(key, c)]);
+        // XDaiContractInputData c = XDaiContractInputData.fromJson(value);
+        // contractInputData.addEntries([new MapEntry(key, c)]);
       });
       return contractInputData;
     } else {
@@ -129,8 +129,8 @@ abstract class XDaiStockData {
       Map<String, XDaiContractInputData> contractInputData = new Map();
       var map = json.decode(response.body);
       map.forEach((key, value) {
-        XDaiContractInputData c = XDaiContractInputData.fromJson(value);
-        contractInputData.addEntries([new MapEntry(key, c)]);
+        // XDaiContractInputData c = XDaiContractInputData.fromJson(value);
+        // contractInputData.addEntries([new MapEntry(key, c)]);
       });
       return contractInputData;
     } else {

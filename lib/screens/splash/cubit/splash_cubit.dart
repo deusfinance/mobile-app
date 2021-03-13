@@ -27,18 +27,17 @@ class SplashCubit extends Cubit<SplashState> {
       await locator<OmniServices>().createOmniServices(sharedPrefs: sharedPrefs);
       debugPrint("Created providers.");
 
-      /// get data from server
-      final bool gotStockData = await StockData.getData();
-      debugPrint("got Stock data.");
-      final bool gotStockAddresses = await StockData.getStockAddresses();
-      debugPrint("got Stock addresses.");
-
-      if (!gotStockData || !gotStockAddresses) {
-        emit(SplashError());
-        return false;
-      }
+      // /// get data from server
+      // final bool gotStockData = await StockData.getData();
+      // debugPrint("got Stock data.");
+      // final bool gotStockAddresses = await StockData.getStockAddresses();
+      // debugPrint("got Stock addresses.");
+      //
+      // if (!gotStockData || !gotStockAddresses) {
+      //   emit(SplashError());
+      //   return false;
+      // }
     } catch (e) {
-      print(e);
       emit(SplashError());
       return false;
     }

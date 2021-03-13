@@ -138,7 +138,7 @@ class EthereumService {
     if (dotIndex >= 0) {
       while (value.endsWith("0")) {
         if (value.length > 2) {
-          value = value.substring(0, value.length - 2);
+          value = value.substring(0, value.length - 1);
         }
       }
       int float = value.length - dotIndex - 1;

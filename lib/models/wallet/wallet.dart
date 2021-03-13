@@ -4,10 +4,10 @@ import 'package:built_value/built_value.dart';
 part 'wallet.g.dart';
 
 abstract class Wallet implements Built<Wallet, WalletBuilder> {
-  @nullable
+  // @nullable
   String get address;
 
-  @nullable
+  // @nullable
   String get privateKey;
 
   BigInt get tokenBalance;
@@ -16,7 +16,7 @@ abstract class Wallet implements Built<Wallet, WalletBuilder> {
 
   bool get loading;
 
-  @nullable
+  // @nullable
   BuiltList<String> get errors;
 
   Wallet._();
