@@ -5,12 +5,10 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:deus_mobile/provider_service.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_test/flutter_test.dart';
 
 import 'package:deus_mobile/main.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   // testWidgets('Counter increments smoke test', (WidgetTester tester) async {

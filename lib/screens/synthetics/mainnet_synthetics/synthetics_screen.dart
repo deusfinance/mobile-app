@@ -50,7 +50,7 @@ class _SyntheticsScreenState extends State<SyntheticsScreen> {
   }
 
   fetchBalance(){
-    getTokenBalance(syntheticModel.from);
+    // getTokenBalance(syntheticModel.from);
     syntheticModel.syntheticState = SyntheticState.openMarket;
   }
 

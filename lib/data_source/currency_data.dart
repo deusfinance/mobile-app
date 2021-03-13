@@ -27,4 +27,7 @@ abstract class CurrencyData {
 
   static CryptoCurrency weth = CryptoCurrency(
       name: 'WETH', symbol: 'WETH', logoPath: '$_basePath/eth-logo.svg');
+
+  static CryptoCurrency xdai = CryptoCurrency(
+      name: 'xDAI', symbol: 'xDAI', logoPath: '$_basePath/xdai.svg');
 }

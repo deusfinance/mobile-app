@@ -25,7 +25,6 @@ class SplashCubit extends Cubit<SplashState> {
       await locator<OmniServices>().createOmniServices();
       debugPrint("Created providers.");
     } catch (e) {
-      print(e);
       emit(SplashError());
       return false;
     }

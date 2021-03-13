@@ -15,8 +15,6 @@ dependencies:
   # BACKEND
   http: ^0.12.2
   json_annotation: ^3.1.0
-  #  firebase_dynamic_links: ^0.7.0+1
-  #  js: ^0.6.2
   equatable: ^1.2.6
   web3dart: ^2.0.0-dev.9
   bip39: ^1.0.3
@@ -32,7 +30,7 @@ dependencies:
   flutter_hooks: ^0.9.0
   flutter_svg: ^0.19.3
   shimmer_animation: ^0.0.9+1
-  shared_preferences: ^0.5.8
+  shared_preferences: ^2.0.4
   flutter_icons: ^1.1.0
   flushbar: ^1.10.4
   page_transition: ^1.1.5
@@ -77,10 +75,7 @@ flutter_icons: # flutter pub run flutter_launcher_icons:main
       fonts:
         - asset: assets/fonts/monument-regular.ttf
           weight: 300
-    - family: EduMonument
-      fonts:
-        - asset: assets/fonts/edumonument-regular.ttf
-          weight: 300
+
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf

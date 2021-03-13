@@ -25,11 +25,11 @@ class _$WalletSetup extends WalletSetup {
 
   _$WalletSetup._(
       {this.mnemonic,
-      this.privateKey,
-      this.step,
-      this.method,
-      this.loading,
-      this.errors})
+        this.privateKey,
+        this.step,
+        this.method,
+        this.loading,
+        this.errors})
       : super._() {
     if (step == null) {
       throw new BuiltValueNullFieldError('WalletSetup', 'step');
@@ -76,12 +76,12 @@ class _$WalletSetup extends WalletSetup {
   @override
   String toString() {
     return (newBuiltValueToStringHelper('WalletSetup')
-          ..add('mnemonic', mnemonic)
-          ..add('privateKey', privateKey)
-          ..add('step', step)
-          ..add('method', method)
-          ..add('loading', loading)
-          ..add('errors', errors))
+      ..add('mnemonic', mnemonic)
+      ..add('privateKey', privateKey)
+      ..add('step', step)
+      ..add('method', method)
+      ..add('loading', loading)
+      ..add('errors', errors))
         .toString();
   }
 }
