@@ -1,4 +1,7 @@
+import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:flutter/material.dart';
+
+import '../../../locator.dart';
 
 Future<bool> showWillPopDialog(BuildContext context) async {
   final Widget dialog = AlertDialog(
@@ -6,11 +9,11 @@ Future<bool> showWillPopDialog(BuildContext context) async {
     content: Text('Do you want to exit the DEUS App_'),
     actions: <Widget>[
       FlatButton(
-        onPressed: () => Navigator.of(context).pop(false),
+        onPressed: () => locator<NavigationService>().goBack(context, false),
         child: Text('No'),
       ),
       FlatButton(
-        onPressed: () => Navigator.of(context).pop(true),
+        onPressed: () => locator<NavigationService>().goBack(context, true),
         child: Text('Yes'),
       ),
     ],

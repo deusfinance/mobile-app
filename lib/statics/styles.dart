@@ -13,6 +13,7 @@ class MyStyles {
   );
 
   // font sizes
+
   static const S6 = 13.0;
   static const S5 = 16.0;
   static const S4 = 18.0;
@@ -24,6 +25,7 @@ class MyStyles {
   static const mainPadding = 8.0;
 
   static const String kFontFamily = "Monument";
+
 
   // decorations
   static final lightBlackBorderDecoration = BoxDecoration(
@@ -69,6 +71,13 @@ class MyStyles {
     fontSize: S6,
     color: MyColors.Black,
   );
+
+  static final greenSmallTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    fontSize: S6,
+    color: MyColors.ToastGreen,
+  );
   static final blackMediumTextStyle = TextStyle(
     fontFamily: kFontFamily,
     fontWeight: FontWeight.w300,
@@ -81,6 +90,30 @@ class MyStyles {
     fontSize: S4,
     color: MyColors.White,
   );
+  static final whiteBigTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    fontSize: S2,
+    color: MyColors.White,
+  );
+
+  static final selectedToggleButtonTextStyle = TextStyle(
+    fontFamily: kFontFamily,
+    fontWeight: FontWeight.w300,
+    fontSize: S5,
+    color: Colors.transparent,
+    decoration: TextDecoration.underline,
+    decorationColor: MyColors.White,
+    shadows: [Shadow(color: MyColors.White, offset: Offset(0, -5))]
+  );
+
+  static final unselectedToggleButtonTextStyle = TextStyle(
+      fontFamily: kFontFamily,
+      fontWeight: FontWeight.w300,
+      fontSize: S5,
+      color: Colors.transparent,
+      shadows: [Shadow(color: MyColors.HalfWhite, offset: Offset(0, -5))]
+  );
 
   static TextStyle gradientMediumTextStyle = TextStyle(
       fontFamily: kFontFamily,
@@ -90,6 +123,7 @@ class MyStyles {
         ..shader = LinearGradient(
           colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
         ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
+
 
   static final whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,

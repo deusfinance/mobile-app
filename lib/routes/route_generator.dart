@@ -1,7 +1,10 @@
+import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
+import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'file:///D:/flutter%20projects/mobile-app/deus_mobile/lib/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -58,11 +61,17 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     },
     SwapScreen.route: (_) => BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen()),
     LockScreen.url: (_) => LockScreen(),
-    SyntheticsScreen.url: (_) => SyntheticsScreen()
+    SyntheticsScreen.url: (_) => SyntheticsScreen(),
+    StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
+    //blurred screens (coming soon)
+    BlurredStakeLockScreen.url: (_) => BlurredStakeLockScreen(),
+    BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen()
   };
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);
-  return _getPageRoute(screenChild, settings);
+  //TODO (@CodingDavid8): Replace hooks with cubit :)
+  final Widget screenWithWallet = WalletProvider(builder: (_, __) => screenChild);
+  return _getPageRoute(screenWithWallet, settings);
 }
 
 PageRoute _getPageRoute(Widget child, RouteSettings settings) {

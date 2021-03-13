@@ -27,7 +27,7 @@ class WalletCreatePage extends HookWidget {
         title: title,
         // leading: BackButtonWithText(
         //   onPressed: store.state.step == WalletCreateSteps.display
-        //       ? () => Navigator.pop(context)
+        //       ? () => locator<NavigationService>().goBack(context)
         //       : () => store.goto(WalletCreateSteps.display),
         // ),
       ),
