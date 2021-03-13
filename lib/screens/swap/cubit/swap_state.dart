@@ -37,8 +37,7 @@ abstract class SwapState extends Equatable {
     slippage = 0.5;
     swapService = new SwapService(
         ethService: locator<EthereumService>(),
-        // privateKey: locator<ConfigurationService>().getPrivateKey());
-        privateKey: "0x394b2559d9e727734001346346e311d3bba6a0a2d566d8cb79647c755e41355d");
+        privateKey: locator<ConfigurationService>().getPrivateKey());
     swapService.init();
     fromFieldController = new TextEditingController();
     toFieldController = new TextEditingController();
