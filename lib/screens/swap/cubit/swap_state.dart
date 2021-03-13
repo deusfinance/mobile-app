@@ -142,3 +142,7 @@ class SwapInitial extends SwapState {
 class SwapLoading extends SwapState {
   SwapLoading(SwapState state) : super.copy(state);
 }
+
+class SwapError extends SwapState {
+  SwapError(SwapState state) : super.copy(state);
+}
