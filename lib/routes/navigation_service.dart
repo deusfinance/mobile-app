@@ -8,9 +8,11 @@ class NavigationService {
 
   bool isSelected(NavigationItem item) => selectedNavItem == item;
 
-  void navigateTo(String routeName, BuildContext context, {bool replace = false}) {
+  void navigateTo(String routeName, BuildContext context, {bool replace = false, bool replaceAll = false}) {
     if (replace)
       Navigator.pushReplacementNamed(context, routeName);
+    else if (replaceAll)
+      Navigator.pushNamedAndRemoveUntil(context, routeName, (route) => false);
     else
       Navigator.pushNamed(context, routeName);
   }

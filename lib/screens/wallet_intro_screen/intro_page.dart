@@ -1,10 +1,13 @@
 import 'dart:ui';
 
+import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/wallet_create_page.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/wallet_import_page.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
+
+import '../../locator.dart';
 
 class IntroPage extends StatelessWidget {
   static const String url = '/intro';
@@ -78,7 +81,7 @@ class IntroPage extends StatelessWidget {
           style: TextStyle(fontSize: 20),
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed(WalletImportPage.url);
+          locator<NavigationService>().navigateTo(WalletImportPage.url, context);
         },
       ),
     );
@@ -86,7 +89,8 @@ class IntroPage extends StatelessWidget {
 
   Container _buildCreateNewWallet(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(gradient: button_gradient, borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
+      decoration:
+          BoxDecoration(gradient: button_gradient, borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
       height: 55,
       width: double.infinity,
       child: RaisedButton(
@@ -97,7 +101,7 @@ class IntroPage extends StatelessWidget {
           style: TextStyle(fontSize: 20, color: Colors.black),
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed(WalletCreatePage.url);
+          locator<NavigationService>().navigateTo(WalletCreatePage.url, context);
         },
       ),
     );
