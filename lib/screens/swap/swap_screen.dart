@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
+import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +52,12 @@ class _SwapScreenState extends State<SwapScreen> {
         return DefaultScreen(
           child: Center(
             child: CircularProgressIndicator(),
+          ),
+        );
+      } else if (state is SwapError) {
+        return DefaultScreen(
+          child: Center(
+            child: Icon(Icons.refresh, color: MyColors.White),
           ),
         );
       } else {
@@ -136,6 +144,7 @@ class _SwapScreenState extends State<SwapScreen> {
     SwapField fromField = new SwapField(
       direction: Direction.from,
       initialToken: state.fromToken,
+      selectAssetRoute: MaterialPageRoute<CryptoCurrency>(builder: (BuildContext _) => CurrencySelectorScreen()),
       controller: state.fromFieldController,
       tokenSelected: (selectedToken) {
         context.read<SwapCubit>().fromTokenChanged(selectedToken);
@@ -147,6 +156,7 @@ class _SwapScreenState extends State<SwapScreen> {
     SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
+      selectAssetRoute: MaterialPageRoute<CryptoCurrency>(builder: (BuildContext _) => CurrencySelectorScreen()),
       controller: state.toFieldController,
       tokenSelected: (selectedToken) {
         context.read<SwapCubit>().toTokenChanged(selectedToken);

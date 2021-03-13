@@ -24,6 +24,7 @@ class SwapField<T extends Token> extends StatefulWidget {
   void Function(T selectedToken) tokenSelected;
   final TextEditingController controller;
   final TabPage page;
+  MaterialPageRoute selectAssetRoute;
 
   final T initialToken;
 
@@ -34,6 +35,7 @@ class SwapField<T extends Token> extends StatefulWidget {
     this.initialToken,
     this.tokenSelected,
     this.page,
+    this.selectAssetRoute
   }) : super(key: key);
 
   @override
@@ -79,7 +81,9 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
     return GestureDetector(
         onTap: () async {
           MaterialPageRoute<Token> pushTo;
-          if (widget.page != null && widget.page == TabPage.synthetics) {
+          if(widget.selectAssetRoute!=null){
+            pushTo = widget.selectAssetRoute;
+          } else if (widget.page != null && widget.page == TabPage.synthetics) {
             pushTo = MaterialPageRoute<Stock>(builder: (BuildContext _) => StockSelectorScreen());
           } else if (selectedToken == null) {
             pushTo = MaterialPageRoute<Stock>(builder: (BuildContext _) => StockSelectorScreen());

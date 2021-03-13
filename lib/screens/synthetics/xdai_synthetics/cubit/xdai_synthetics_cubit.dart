@@ -1,4 +1,5 @@
 
+import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/data_source/stock_data.dart';
 import 'package:deus_mobile/data_source/xdai_stock_data.dart';
 import 'package:deus_mobile/models/synthetics/stock_address.dart';
@@ -19,7 +20,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState>{
     bool res1 = await XDaiStockData.getData();
     bool res2 = await XDaiStockData.getStockAddresses();
     if(res1 && res2) {
-      getTokenBalance(state.from);
+      getTokenBalance(state.fromToken);
       state.streamController.stream
           .transform(debounce(Duration(milliseconds: 500)))
           .listen((s) async {
@@ -36,7 +37,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState>{
         }
       });
     }else{
-      emit(XDaiSyntheticsErrorState());
+      emit(XDaiSyntheticsErrorState(state));
     }
   }
 
@@ -58,24 +59,110 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState>{
   Future getAllowances() async {
     emit(XDaiSyntheticsAssetSelectedState(state, approved: false, isInProgress: true));
     String tokenAddress;
-    if(state.from.getTokenName() == "xdai"){
+    if(state.fromToken.getTokenName() == "xdai"){
       tokenAddress = "0x0000000000000000000000000000000000000001";
     }else{
-      StockAddress stockAddress = XDaiStockData.getStockAddress(state.from);
+      StockAddress stockAddress = XDaiStockData.getStockAddress(state.fromToken);
       if(state.mode == Mode.LONG){
         tokenAddress = stockAddress.long;
       }else if(state.mode == Mode.SHORT){
         tokenAddress = stockAddress.short;
       }
     }
-    state.from.allowances = await state.service.getAllowances(tokenAddress);
-    if (state.from.getAllowances() > BigInt.zero)
+    state.fromToken.allowances = await state.service.getAllowances(tokenAddress);
+    if (state.fromToken.getAllowances() > BigInt.zero)
       emit(XDaiSyntheticsAssetSelectedState(state, approved: true, isInProgress: false));
     else
       emit(XDaiSyntheticsAssetSelectedState(state, approved: false, isInProgress: false));
   }
 
-  // Future approve() async {
+  String getPriceRatio() {
+    double a = double.tryParse(state.fromFieldController.text) ?? 0;
+    double b = double.tryParse(state.toFieldController.text) ?? 0;
+    if (a != 0 && b != 0) {
+      if (state.isPriceRatioForward)
+        return EthereumService.formatDouble((a / b).toString(), 5);
+      return EthereumService.formatDouble((b / a).toString(), 5);
+    }
+    return "0.0";
+  }
+
+  fromTokenChanged(Token selectedToken) async {
+    state.toToken = CurrencyData.xdai;
+    state.fromToken = selectedToken;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
+
+    emit(XDaiSyntheticsAssetSelectedState(state, fromToken: selectedToken));
+
+    await getAllowances();
+    selectedToken.balance = await getTokenBalance(selectedToken);
+
+    emit(XDaiSyntheticsAssetSelectedState(state, fromToken: selectedToken));
+  }
+
+  toTokenChanged(Token selectedToken) async {
+    state.fromToken = CurrencyData.xdai;
+    state.toToken = selectedToken;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
+
+    emit(XDaiSyntheticsAssetSelectedState(state, toToken: selectedToken));
+
+    await getAllowances();
+    selectedToken.balance = await getTokenBalance(selectedToken);
+
+    emit(XDaiSyntheticsAssetSelectedState(state, toToken: selectedToken));
+  }
+
+  addListenerToFromField() {
+    if (!state.fromFieldController.hasListeners) {
+      state.fromFieldController.addListener(() {
+        listenInput();
+      });
+    }
+  }
+
+  listenInput() async {
+    String input = state.fromFieldController.text;
+    if (input == null || input.isEmpty) {
+      input = "0.0";
+    }
+    if (state.fromToken.getAllowances() >= EthereumService.getWei(input, state.fromToken.getTokenName())) {
+      state.streamController.add(input);
+      emit(XDaiSyntheticsAssetSelectedState(state, approved: true));
+    } else {
+      state.streamController.add(input);
+      emit(XDaiSyntheticsAssetSelectedState(state, approved: false));
+    }
+  }
+
+  reverseSwap() {
+    Token a = state.fromToken;
+    state.fromToken = state.toToken;
+    state.toToken = a;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
+    getAllowances();
+  }
+
+  reversePriceRatio() {
+    emit(XDaiSyntheticsAssetSelectedState(state, isPriceRatioForward: !state.isPriceRatioForward));
+  }
+
+  void setMode(Mode mode) {
+    if(state is XDaiSyntheticsAssetSelectedState)
+      emit(XDaiSyntheticsAssetSelectedState(state, mode:mode));
+  }
+
+  void closeToast() {
+    if (state is XDaiSyntheticsTransactionPendingState)
+      emit(XDaiSyntheticsTransactionPendingState(state, showingToast: false));
+    else if (state is XDaiSyntheticsTransactionFinishedState)
+      emit(XDaiSyntheticsTransactionFinishedState(state, showingToast: false));
+  }
+
+// Future approve() async {
   //   if (!isInProgress) {
   //     setState(() {
   //       isInProgress = true;

@@ -12,11 +12,10 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../../locator.dart';
 
-enum Mode { LONG, SHORT }
-
+enum Mode {LONG, SHORT}
 abstract class XDaiSyntheticsState extends Equatable {
-  Token from;
-  Token to;
+  Token fromToken;
+  Token toToken;
   bool approved;
   bool isInProgress;
   bool isPriceRatioForward;
@@ -30,7 +29,7 @@ abstract class XDaiSyntheticsState extends Equatable {
 
   XDaiSyntheticsState.init()
       : isInProgress = false,
-        from = CurrencyData.xdai,
+        fromToken = CurrencyData.xdai,
         approved = true,
         fromFieldController = new TextEditingController(),
         toFieldController = new TextEditingController(),
@@ -41,8 +40,8 @@ abstract class XDaiSyntheticsState extends Equatable {
             privateKey: locator<ConfigurationService>().getPrivateKey());
 
   XDaiSyntheticsState.copy(XDaiSyntheticsState state)
-      : this.from = state.from,
-        this.to = state.to,
+      : this.fromToken = state.fromToken,
+        this.toToken = state.toToken,
         this.isInProgress = state.isInProgress,
         this.approved = state.approved,
         this.service = state.service,
@@ -53,7 +52,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         this.toFieldController = state.toFieldController;
 
   @override
-  List<Object> get props => [from, to, approved, isInProgress, mode];
+  List<Object> get props => [fromToken, toToken, approved, isInProgress, mode];
 }
 
 class XDaiSyntheticsInitialState extends XDaiSyntheticsState {
@@ -69,7 +68,7 @@ class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
 }
 
 class XDaiSyntheticsErrorState extends XDaiSyntheticsState {
-  XDaiSyntheticsErrorState() : super();
+  XDaiSyntheticsErrorState(XDaiSyntheticsState state) : super.copy(state);
 }
 
 class XDaiSyntheticsSelectAssetState extends XDaiSyntheticsState {
@@ -78,10 +77,12 @@ class XDaiSyntheticsSelectAssetState extends XDaiSyntheticsState {
 
 class XDaiSyntheticsAssetSelectedState extends XDaiSyntheticsState {
   XDaiSyntheticsAssetSelectedState(XDaiSyntheticsState state,
-      {bool isInProgress, bool approved})
+      {bool isInProgress, bool approved, Token fromToken, Token toToken, bool isPriceRatioForward, Mode mode})
       : super.copy(state) {
     if (isInProgress != null) this.isInProgress = isInProgress;
     if (approved != null) this.approved = approved;
+    if (mode != null) this.mode = mode;
+    if (isPriceRatioForward != null) this.isPriceRatioForward = isPriceRatioForward;
   }
 }
 
@@ -89,12 +90,34 @@ class XDaiSyntheticsTransactionPendingState extends XDaiSyntheticsState {
   bool showingToast;
   TransactionStatus transactionStatus;
 
-  XDaiSyntheticsTransactionPendingState() : super();
+  XDaiSyntheticsTransactionPendingState(XDaiSyntheticsState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+    if (transactionStatus != null) {
+      this.transactionStatus = transactionStatus;
+      this.showingToast = true;
+    } else {
+      this.showingToast = false;
+    }
+    if(showingToast!=null) this.showingToast = showingToast;
+    this.isInProgress = true;
+  }
+  @override
+  List<Object> get props => [showingToast, transactionStatus];
 }
 
 class XDaiSyntheticsTransactionFinishedState extends XDaiSyntheticsState {
   bool showingToast;
   TransactionStatus transactionStatus;
 
-  XDaiSyntheticsTransactionFinishedState() : super();
+  XDaiSyntheticsTransactionFinishedState(XDaiSyntheticsState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+    if (transactionStatus != null) {
+      this.transactionStatus = transactionStatus;
+      this.showingToast = true;
+    } else {
+      this.showingToast = false;
+    }
+    if(showingToast!=null) this.showingToast = showingToast;
+    this.isInProgress = false;
+  }
+  @override
+  List<Object> get props => [showingToast, transactionStatus];
 }

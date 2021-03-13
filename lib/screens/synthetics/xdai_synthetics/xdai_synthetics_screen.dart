@@ -2,12 +2,17 @@
 import 'dart:async';
 
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/toast.dart';
+import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/widgets/xdai_stock_selector.dart';
+import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
+import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../../core/widgets/filled_gradient_selection_button.dart';
@@ -48,32 +53,56 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
   void initState() {
     super.initState();
     context.read<XDaiSyntheticsCubit>().init();
-    _init();
-    fetchBalance();
   }
 
-  fetchBalance(){
-    getTokenBalance(syntheticModel.from);
-    syntheticModel.syntheticState = SyntheticState.openMarket;
+  Widget _buildTransactionPending(TransactionStatus transactionStatus) {
+    return Container(
+      child: Toast(
+        label: 'Transaction Pending',
+        message: transactionStatus.message,
+        color: MyColors.ToastGrey,
+        onPressed: () {
+          if (transactionStatus.hash != "") {
+            _launchInBrowser(transactionStatus.transactionUrl);
+          }
+        },
+        onClosed: () {
+          context.read<XDaiSyntheticsCubit>().closeToast();
+        },
+      ),
+    );
   }
 
-  _init() {
-    stockService = new StockService(
-        ethService: new EthereumService(4),
-        privateKey:
-            "0xefadf3f48a2fd1c1815b153a7e134451df88c70e54630eb36323f2a0a555eaa3");
-    syntheticModel = new SyntheticModel();
-    streamController.stream
-        .transform(debounce(Duration(milliseconds: 500)))
-        .listen((s) async {
-      if (double.tryParse(s) != null && double.tryParse(s) > 0) {
-        StockData.getPrices();
-      } else {
-        setState(() {
-          toFieldController.text = "0.0";
-        });
-      }
-    });
+  Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
+    return Container(
+      child: Toast(
+        label: 'Transaction Successful',
+        message: transactionStatus.message,
+        color: MyColors.ToastGreen,
+        onPressed: () {
+          _launchInBrowser(transactionStatus.transactionUrl);
+        },
+        onClosed: () {
+          context.read<XDaiSyntheticsCubit>().closeToast();
+        },
+      ),
+    );
+  }
+
+  Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
+    return Container(
+      child: Toast(
+        label: 'Transaction Failed',
+        message: transactionStatus.message,
+        color: MyColors.ToastRed,
+        onPressed: () {
+          _launchInBrowser(transactionStatus.transactionUrl);
+        },
+        onClosed: () {
+          context.read<XDaiSyntheticsCubit>().closeToast();
+        },
+      ),
+    );
   }
 
   @override
@@ -85,6 +114,12 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
             child: CircularProgressIndicator(),
           ),
         );
+      } else if (state is XDaiSyntheticsErrorState) {
+        return DefaultScreen(
+          child: Center(
+            child: Icon(Icons.refresh, color: MyColors.White),
+          ),
+        );
       } else {
         return DefaultScreen(child: _buildBody(state));
       }
@@ -92,90 +127,61 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
   }
 
   Widget _buildBody(XDaiSyntheticsState state) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(MyStyles.mainPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [_buildUserInput(context), _buildMarketTimer()],
-        ),
+    return Container(
+      padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+      decoration: BoxDecoration(color: MyColors.Main_BG_Black),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [_buildUserInput(state), _buildMarketTimer(state)],
+            ),
+          ),
+          _buildToastWidget(state),
+        ],
       ),
     );
   }
 
-  String _getPriceRatio() {
-    double a = double.tryParse(fromFieldController.text) ?? 0;
-    double b = double.tryParse(toFieldController.text) ?? 0;
-    if (a != 0 && b != 0) {
-      if (isPriceRatioForward)
-        return EthereumService.formatDouble((a / b).toString(), 5);
-      return EthereumService.formatDouble((b / a).toString(), 5);
-    }
-    return "0.0";
-  }
-
-  Widget _buildUserInput(BuildContext context) {
+  Widget _buildUserInput(XDaiSyntheticsState state) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: syntheticModel.from,
         page: TabPage.synthetics,
+        selectAssetRoute: MaterialPageRoute<Stock>(builder: (BuildContext _) => XDaiStockSelectorScreen()),
         controller: fromFieldController,
         tokenSelected: (selectedToken) async {
-          setState(() {
-            syntheticModel.to = CurrencyData.dai;
-            syntheticModel.from = selectedToken;
-            if (syntheticModel.selectionMode == SelectionMode.none) {
-              syntheticModel.selectionMode = SelectionMode.long;
-            }
-            fromFieldController.text = "";
-            toFieldController.text = "";
-          });
-          // await getAllowances();
-          getTokenBalance(syntheticModel.from);
+          context.read<XDaiSyntheticsCubit>().fromTokenChanged(selectedToken);
         });
-    if (!fromFieldController.hasListeners) {
-      fromFieldController.addListener(() {
-        listenInput();
-      });
-    }
+
+    context.read<XDaiSyntheticsCubit>().addListenerToFromField();
+
     SwapField toField = new SwapField(
       direction: Direction.to,
       controller: toFieldController,
       initialToken: syntheticModel.to,
       page: TabPage.synthetics,
+      selectAssetRoute: MaterialPageRoute<Stock>(builder: (BuildContext _) => XDaiStockSelectorScreen()),
       tokenSelected: (selectedToken) {
-        setState(() {
-          syntheticModel.to = selectedToken;
-          syntheticModel.from = CurrencyData.dai;
-          if (syntheticModel.selectionMode == SelectionMode.none) {
-            syntheticModel.selectionMode = SelectionMode.long;
-          }
-          fromFieldController.text = "";
-          toFieldController.text = "";
-        });
-        getTokenBalance(syntheticModel.to);
+        context.read<XDaiSyntheticsCubit>().toTokenChanged(selectedToken);
       },
     );
+
     return Column(
       children: [
         fromField,
         const SizedBox(height: 12),
         GestureDetector(
             onTap: () {
-              setState(() {
-                var a = syntheticModel.from;
-                syntheticModel.from = syntheticModel.to;
-                syntheticModel.to = a;
-                fromFieldController.text = "";
-                toFieldController.text = "";
-              });
+              context.read<XDaiSyntheticsCubit>().reverseSwap();
             },
             child: Center(
                 child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
         const SizedBox(height: 12),
         toField,
         const SizedBox(height: 18),
-        _buildModeButtons(),
+        _buildModeButtons(state),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,42 +193,33 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
             Row(
               children: [
                 Text(
-                  isPriceRatioForward
-                      ? "${_getPriceRatio()} ${syntheticModel.from != null ? syntheticModel.from.symbol : "asset name"} per ${syntheticModel.to != null ? syntheticModel.to.symbol : "asset name"}"
-                      : "${_getPriceRatio()} ${syntheticModel.to != null ? syntheticModel.to.symbol : "asset name"} per ${syntheticModel.from != null ? syntheticModel.from.symbol : "asset name"}",
+                  state.isPriceRatioForward
+                      ? "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
+                      : "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 GestureDetector(
-                  onTap: (){
-                    setState(() {
-                      isPriceRatioForward = !isPriceRatioForward;
-                    });
+                  onTap: () {
+                    context.read<XDaiSyntheticsCubit>().reversePriceRatio();
                   },
                   child: Container(
                     margin: EdgeInsets.only(left: 4.0),
-                    child:
-                        PlatformSvg.asset("images/icons/exchange.svg", width: 15),
+                    child: PlatformSvg.asset("images/icons/exchange.svg", width: 15),
                   ),
                 ),
               ],
             ),
           ],
         ),
-//        KeyValueString('Price', '0.0038 ETH per DEUS ',
-//            keyColor: MyColors.primary.withOpacity(0.75),
-//            valueColor: MyColors.primary.withOpacity(0.75),
-//            valueSuffix: PlatformSvg.asset('images/icons/exchange.svg',
-//                height: 16, width: 16)),
         const SizedBox(
           height: 16,
         ),
-
-        Opacity(opacity: isInProgress ? 0.5 : 1.0, child: _buildMainButton()),
+        Opacity(opacity: isInProgress ? 0.5 : 1.0, child: _buildMainButton(state)),
       ],
     );
   }
 
-  Widget _buildMainButton() {
+  Widget _buildMainButton(XDaiSyntheticsState state) {
     if (!stockService.checkWallet()) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -322,17 +319,17 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Container _buildModeButtons() {
+  Container _buildModeButtons(XDaiSyntheticsState state) {
     return Container(
       child: Row(children: [
-        Expanded(child: _buildLongButton()),
+        Expanded(child: _buildLongButton(state)),
         const SizedBox(width: 8),
-        Expanded(child: _buildShortButton()),
+        Expanded(child: _buildShortButton(state)),
       ]),
     );
   }
 
-  Widget _buildMarketTimer() {
+  Widget _buildMarketTimer(XDaiSyntheticsState state) {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
@@ -355,58 +352,52 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildShortButton() {
+  Widget _buildShortButton(XDaiSyntheticsState state) {
     return SelectionButton(
       label: 'SHORT',
       onPressed: (bool selected) {
-        setState(() {
-          syntheticModel.selectionMode = SelectionMode.short;
-        });
+        context.read<XDaiSyntheticsCubit>().setMode(Mode.SHORT);
       },
-      selected: syntheticModel.selectionMode == SelectionMode.short,
+      selected: state.mode == Mode.SHORT,
       gradient: MyColors.blueToPurpleGradient,
     );
   }
 
-  Widget _buildLongButton() {
+  Widget _buildLongButton(XDaiSyntheticsState state) {
     return SelectionButton(
       label: 'LONG',
       onPressed: (bool selected) {
-        setState(() {
-          syntheticModel.selectionMode = SelectionMode.long;
-        });
+        context.read<XDaiSyntheticsCubit>().setMode(Mode.LONG);
       },
-      selected: syntheticModel.selectionMode == SelectionMode.long,
+      selected: state.mode == Mode.LONG,
       gradient: MyColors.blueToPurpleGradient,
     );
   }
 
-  void listenInput() {
-    String input = fromFieldController.text;
-    if (input == null || input.isEmpty) {
-      input = "0.0";
-    }
-    if (syntheticModel.from.getAllowances() >= EthereumService.getWei(input)) {
-      syntheticModel.approved = true;
+  Future<void> _launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+      );
     } else {
-      syntheticModel.approved = false;
+      throw 'Could not launch $url';
     }
-    setState(() {});
-    streamController.add(input);
   }
 
-  void getTokenBalance(Token token) async {
-    String tokenAddress;
-    if(token.getTokenName() == "dai"){
-      tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
-    }else{
-      StockAddress stockAddress = StockData.getStockAddress(token);
-      tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
+  Widget _buildToastWidget(XDaiSyntheticsState state) {
+    if (state is XDaiSyntheticsTransactionPendingState && state.showingToast) {
+      return Align(alignment: Alignment.bottomCenter, child: _buildTransactionPending(state.transactionStatus));
+    } else if (state is XDaiSyntheticsTransactionFinishedState && state.showingToast) {
+      if (state.transactionStatus.status == Status.PENDING) {
+        return Align(alignment: Alignment.bottomCenter, child: _buildTransactionPending(state.transactionStatus));
+      } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
+        return Align(alignment: Alignment.bottomCenter, child: _buildTransactionSuccessFul(state.transactionStatus));
+      } else if (state.transactionStatus.status == Status.FAILED) {
+        return Align(alignment: Alignment.bottomCenter, child: _buildTransactionFailed(state.transactionStatus));
+      }
     }
-    stockService.getTokenBalance(tokenAddress).then((value) {
-      token.balance = value;
-      setState(() {});
-    });
-
+    return Container();
   }
 }
