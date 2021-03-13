@@ -44,7 +44,7 @@ class WalletCreatePage extends HookWidget {
               onConfirm: !store.state.loading
                   ? (confirmedMnemonic) async {
                       if (await store.confirmMnemonic(confirmedMnemonic)) {
-                        locator<NavigationService>().navigateTo(kInitialRoute, context);
+                        locator<NavigationService>().navigateTo(kInitialRoute, context, replaceAll: true);
                       }
                     }
                   : null,

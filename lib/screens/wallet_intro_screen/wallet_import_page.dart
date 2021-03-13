@@ -37,7 +37,7 @@ class WalletImportPage extends HookWidget {
                   default:
                     break;
                 }
-                locator<NavigationService>().navigateTo(kInitialRoute, context);
+                locator<NavigationService>().navigateTo(kInitialRoute, context, replaceAll: true);
               }
             : null,
       ),
