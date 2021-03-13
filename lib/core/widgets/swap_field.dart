@@ -1,4 +1,5 @@
 import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/services.dart';
 import '../../models/swap/crypto_currency.dart';
 import '../../models/synthetics/stock.dart';
 import '../../models/token.dart';
-import '../../statics/old_my_colors.dart';
 import 'svg.dart';
 import 'token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'token_selector/stock_selector_screen/stock_selector_screen.dart';
@@ -132,7 +132,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                 const Color(0xFF55BCC8).withOpacity(0.149),
                 const Color(0xFF69CFB8).withOpacity(0.149)
               ]),
-              border: Border.all(color: MyColors.primary),
+              border: Border.all(color: MyColors.White),
               borderRadius: BorderRadius.circular(8)),
           child: Align(
               alignment: Alignment.center,

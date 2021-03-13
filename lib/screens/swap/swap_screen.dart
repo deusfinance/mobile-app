@@ -430,7 +430,7 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       );
     }
-    if (state.approved && state.fromToken.getBalance() < EthereumService.getWei(state.fromFieldController.text)) {
+    if (state.approved && state.fromToken.getBalance() < EthereumService.getWei(state.fromFieldController.text, state.fromToken.getTokenName())) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -454,7 +454,7 @@ class _SwapScreenState extends State<SwapScreen> {
         await context.read<SwapCubit>().swapTokens(gas);
       },
       selected: true,
-      gradient: MyColors.blueToGreenGradient,
+      gradient: MyColors.blueToGreenSwapScreenGradient,
       textStyle: MyStyles.blackMediumTextStyle,
     );
   }

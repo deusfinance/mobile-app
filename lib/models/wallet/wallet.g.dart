@@ -31,12 +31,6 @@ class _$Wallet extends Wallet {
       this.loading,
       this.errors})
       : super._() {
-    if (address == null) {
-      throw new BuiltValueNullFieldError('Wallet', 'address');
-    }
-    if (privateKey == null) {
-      throw new BuiltValueNullFieldError('Wallet', 'privateKey');
-    }
     if (tokenBalance == null) {
       throw new BuiltValueNullFieldError('Wallet', 'tokenBalance');
     }
@@ -45,9 +39,6 @@ class _$Wallet extends Wallet {
     }
     if (loading == null) {
       throw new BuiltValueNullFieldError('Wallet', 'loading');
-    }
-    if (errors == null) {
-      throw new BuiltValueNullFieldError('Wallet', 'errors');
     }
   }
 
@@ -162,12 +153,12 @@ class WalletBuilder implements Builder<Wallet, WalletBuilder> {
               tokenBalance: tokenBalance,
               ethBalance: ethBalance,
               loading: loading,
-              errors: errors.build());
+              errors: _errors?.build());
     } catch (_) {
       String _$failedField;
       try {
         _$failedField = 'errors';
-        errors.build();
+        _errors?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'Wallet', _$failedField, e.toString());

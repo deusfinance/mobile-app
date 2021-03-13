@@ -1,6 +1,6 @@
+import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../../statics/old_my_colors.dart';
 
 
 

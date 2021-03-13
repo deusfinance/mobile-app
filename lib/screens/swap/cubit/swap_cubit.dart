@@ -50,7 +50,7 @@ class SwapCubit extends Cubit<SwapState> {
     emit(SwapLoaded(state, fromToken: selectedToken));
 
     await getAllowances();
-    selectedToken.balance = await getTokenBalance(selectedToken);
+    state.fromToken.balance = await getTokenBalance(selectedToken);
 
     emit(SwapLoaded(state, fromToken: selectedToken));
   }
@@ -68,7 +68,7 @@ class SwapCubit extends Cubit<SwapState> {
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
     emit(SwapLoaded(state, toToken: selectedToken));
-    selectedToken.balance = await getTokenBalance(selectedToken);
+    state.toToken.balance = await getTokenBalance(selectedToken);
     emit(SwapLoaded(state, toToken: selectedToken));
     if (fromTokenChanged) getAllowances();
   }
@@ -250,7 +250,7 @@ class SwapCubit extends Cubit<SwapState> {
     if (input == null || input.isEmpty) {
       input = "0.0";
     }
-    if (state.fromToken.getAllowances() >= EthereumService.getWei(input)) {
+    if (state.fromToken.getAllowances() >= EthereumService.getWei(input, state.fromToken.getTokenName())) {
       state.streamController.add(input);
       emit(SwapLoaded(state, approved: true));
     } else {

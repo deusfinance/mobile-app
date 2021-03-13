@@ -31,12 +31,6 @@ class _$WalletSetup extends WalletSetup {
       this.loading,
       this.errors})
       : super._() {
-    if (mnemonic == null) {
-      throw new BuiltValueNullFieldError('WalletSetup', 'mnemonic');
-    }
-    if (privateKey == null) {
-      throw new BuiltValueNullFieldError('WalletSetup', 'privateKey');
-    }
     if (step == null) {
       throw new BuiltValueNullFieldError('WalletSetup', 'step');
     }
@@ -45,9 +39,6 @@ class _$WalletSetup extends WalletSetup {
     }
     if (loading == null) {
       throw new BuiltValueNullFieldError('WalletSetup', 'loading');
-    }
-    if (errors == null) {
-      throw new BuiltValueNullFieldError('WalletSetup', 'errors');
     }
   }
 
@@ -162,12 +153,12 @@ class WalletSetupBuilder implements Builder<WalletSetup, WalletSetupBuilder> {
               step: step,
               method: method,
               loading: loading,
-              errors: errors.build());
+              errors: _errors?.build());
     } catch (_) {
       String _$failedField;
       try {
         _$failedField = 'errors';
-        errors.build();
+        _errors?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'WalletSetup', _$failedField, e.toString());
