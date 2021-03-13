@@ -310,7 +310,7 @@ class _SwapScreenState extends State<SwapScreen> {
         await context.read<SwapCubit>().approve();
       },
       selected: true,
-      gradient: MyColors.greenToBlueGradient,
+      gradient: MyColors.blueToGreenSwapScreenGradient,
       textStyle: MyStyles.blackMediumTextStyle,
     );
   }
@@ -454,7 +454,7 @@ class _SwapScreenState extends State<SwapScreen> {
         await context.read<SwapCubit>().swapTokens(gas);
       },
       selected: true,
-      gradient: MyColors.greenToBlueGradient,
+      gradient: MyColors.blueToGreenGradient,
       textStyle: MyStyles.blackMediumTextStyle,
     );
   }
@@ -471,7 +471,7 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 0.1 ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
+            decoration: state.slippage == 0.1 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
@@ -491,12 +491,16 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 0.5 ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
+            decoration: state.slippage == 0.5
+                ? MyStyles.blueToGreenSwapScreenDecoration
+                : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "0.5%",
-                style: state.slippage == 0.5 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
+                style: state.slippage == 0.5
+                    ? MyStyles.blackSmallTextStyle
+                    : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
@@ -511,7 +515,9 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 1.0 ? MyStyles.greenToBlueDecoration : MyStyles.lightBlackBorderDecoration,
+            decoration: state.slippage == 1.0
+                ? MyStyles.blueToGreenSwapScreenDecoration
+                : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(

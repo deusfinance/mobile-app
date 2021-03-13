@@ -64,22 +64,17 @@ flutter:
     - assets/blur_screens/
     # BACKEND
     - assets/deus_data/ # data of tokens, contract ABI/functions etc.
-  
-flutter_icons: # flutter pub run flutter_launcher_icons:main
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/launcher_icon/deus_dea.png"
-
   fonts:
     - family: Monument
       fonts:
         - asset: assets/fonts/monument-regular.ttf
           weight: 300
+    - family: EduMonument
+      fonts:
+        - asset: assets/fonts/edumonument-regular.ttf
+          weight: 300
 
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+flutter_icons: # flutter pub run flutter_launcher_icons:main
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher_icon/deus_dea.png"
