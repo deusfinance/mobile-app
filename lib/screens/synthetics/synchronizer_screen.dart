@@ -11,7 +11,6 @@
 //import '../../core/widgets/svg.dart';
 //import '../../core/widgets/key_value_string.dart';
 //import '../../core/widgets/swap_field.dart';
-//import '../../statics/old_my_colors.dart';
 //import 'market_timer.dart';
 //
 ////TODO (@CodingDavid8) use Cubit instead of StatefulWidget

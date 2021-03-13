@@ -20,6 +20,7 @@ abstract class MyColors {
     return MaterialColor(hex, data);
   }
 
+  static const Color primary = Color(0xFFFFFFFF);
   static MaterialColor White = _getMaterialColor(208, 208, 208, 0xFFFFFFFF);
   static MaterialColor HalfWhite = _getMaterialColor(255, 255, 255, 0xAAFFFFFF);
   static MaterialColor Black = _getMaterialColor(0, 0, 0, 0xFF000000);

@@ -14,7 +14,7 @@ GWei _$GWeiFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$GWeiToJson(GWei instance) => <String, dynamic>{
-  'safeLow': instance.slow,
-  'average': instance.average,
-  'fast': instance.fast,
-};
+      'safeLow': instance.slow,
+      'average': instance.average,
+      'fast': instance.fast,
+    };

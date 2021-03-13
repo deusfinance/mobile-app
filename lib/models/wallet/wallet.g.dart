@@ -25,11 +25,11 @@ class _$Wallet extends Wallet {
 
   _$Wallet._(
       {this.address,
-        this.privateKey,
-        this.tokenBalance,
-        this.ethBalance,
-        this.loading,
-        this.errors})
+      this.privateKey,
+      this.tokenBalance,
+      this.ethBalance,
+      this.loading,
+      this.errors})
       : super._() {
     if (tokenBalance == null) {
       throw new BuiltValueNullFieldError('Wallet', 'tokenBalance');
@@ -76,12 +76,12 @@ class _$Wallet extends Wallet {
   @override
   String toString() {
     return (newBuiltValueToStringHelper('Wallet')
-      ..add('address', address)
-      ..add('privateKey', privateKey)
-      ..add('tokenBalance', tokenBalance)
-      ..add('ethBalance', ethBalance)
-      ..add('loading', loading)
-      ..add('errors', errors))
+          ..add('address', address)
+          ..add('privateKey', privateKey)
+          ..add('tokenBalance', tokenBalance)
+          ..add('ethBalance', ethBalance)
+          ..add('loading', loading)
+          ..add('errors', errors))
         .toString();
   }
 }

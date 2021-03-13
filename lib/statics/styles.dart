@@ -14,7 +14,7 @@ class MyStyles {
 
   // font sizes
 
-  static const S6 = 13.0;
+  static const S6 = 11.0;
   static const S5 = 16.0;
   static const S4 = 18.0;
   static const S3 = 20.0;

@@ -10,16 +10,16 @@ enum WalletCreateSteps { display, confirm }
 enum WalletImportType { mnemonic, privateKey }
 
 abstract class WalletSetup implements Built<WalletSetup, WalletSetupBuilder> {
-  // @nullable
+  @nullable
   String get mnemonic;
 
-  // @nullable
+  @nullable
   String get privateKey;
 
   WalletCreateSteps get step;
   WalletSetupMethod get method;
   bool get loading;
-  // @nullable
+  @nullable
   BuiltList<String> get errors;
 
   WalletSetup._();
