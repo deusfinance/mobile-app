@@ -6,6 +6,8 @@ If this is your first time launching the app, create a new wallet or import one.
 
 Once you finished the wallet setup, you should be redirected to the swap screen. You can press & hold on your wallet adress in the upper left corner in order to copy your public address to your clipboard.
 
+> The test APK is running only on the rinkeby **TEST** network - no real ETH will be used!
+
 Use https://faucet.rinkeby.io to get some test ether and switch back to the app and try around to swap between different coins. You can also customize the gas limit etc.
 
 For feedback, write us in Telegram or send us an e-mail to deus@app-innovators.de.
