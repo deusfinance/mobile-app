@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "285175306956",
+    "project_id": "deus-finance-mobile",
+    "storage_bucket": "deus-finance-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285175306956:android:a501cb6a5328317c0c8069",
+        "android_client_info": {
+          "package_name": "finance.deus.deus_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "285175306956-gd40f7ok56chk2kl0vv71h9klnt02cu0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApb803-G9Po0XShUAdFqC-somUR-PVMIo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "285175306956-gd40f7ok56chk2kl0vv71h9klnt02cu0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

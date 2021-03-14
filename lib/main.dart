@@ -1,3 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:deus_mobile/service/analytics_service.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +26,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  // await Firebase.initializeApp();
 
   setupLocator();
   runApp(BlocProvider<SplashCubit>(create: (_) => SplashCubit(), child: DEUSApp()));
@@ -43,6 +47,7 @@ class _DEUSAppState extends State<DEUSApp> {
   @override
   void initState() {
     super.initState();
+
     initializeData = context.read<SplashCubit>().initializeData();
   }
 
@@ -53,12 +58,13 @@ class _DEUSAppState extends State<DEUSApp> {
       return FutureBuilder(
         future: initializeData,
         builder: (context, snapshot) {
-          if ( !(state is SplashSuccess))
+          if (!(state is SplashSuccess))
             return MaterialApp(
                 key: _loadingKey, debugShowCheckedModeBanner: false, theme: MyStyles.theme, home: SplashScreen());
 
           return MaterialApp(
             key: _appKey,
+            navigatorObservers: [locator<AnalyticsService>().observer],
             title: 'Deus Finance',
             debugShowCheckedModeBanner: false,
             theme: MyStyles.theme,
