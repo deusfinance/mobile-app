@@ -40,8 +40,8 @@ class AddressService implements IAddressService {
   @override
   Future<EthereumAddress> getPublicAddress([String privateKey]) async {
     //if the privateKey wasn't passed, read it from the config (local device).
-    privateKey??= locator<ConfigurationService>().getPrivateKey();
-    
+    privateKey ??= locator<ConfigurationService>().getPrivateKey();
+
     final private = EthPrivateKey.fromHex(privateKey);
 
     final address = await private.extractAddress();
