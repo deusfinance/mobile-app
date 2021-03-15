@@ -16,4 +16,8 @@ class XDaiContractInputData{
 
   factory XDaiContractInputData.fromJson(Map<String, dynamic> json) => _$XDaiContractInputDataFromJson(json);
   Map<String, dynamic> toJson() => _$XDaiContractInputDataToJson(this);
+
+  BigInt getPrice(){
+    return BigInt.parse(price);
+  }
 }

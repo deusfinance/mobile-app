@@ -65,13 +65,14 @@ class XDaiStockService {
     return res;
   }
 
-  Future<String> getTokenBalance(tokenAddress) async {
+  Future<String> getTokenBalance(String tokenAddress) async {
     if (!checkWallet())
       return "0";
 
-    if (tokenAddress == this.xdaiTokenAddress)
-      return ethService.getEtherBalance(await credentials).toString();
-
+    if (tokenAddress == this.xdaiTokenAddress) {
+     var res = await ethService.getEtherBalance(await credentials);
+     return EthereumService.fromWei(res.getInWei);
+    }
     DeployedContract tokenContract = await ethService.loadContractWithGivenAddress("token", EthereumAddress.fromHex(tokenAddress));
 
     final res =
@@ -81,7 +82,7 @@ class XDaiStockService {
 
   Future<String> buy(tokenAddress, String amount, List<XDaiContractInputData> oracles, maxPrice) async {
     if (!checkWallet()) return "0";
-    //TODO
+
     DeployedContract contract =
     await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
     XDaiContractInputData info = oracles[0];

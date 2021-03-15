@@ -211,6 +211,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.3"
+  flappy_search_bar:
+    dependency: "direct main"
+    description:
+      name: flappy_search_bar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.4.1"
   flushbar:
     dependency: "direct main"
     description:
@@ -272,6 +279,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.1.0"
+  flutter_staggered_grid_view:
+    dependency: transitive
+    description:
+      name: flutter_staggered_grid_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.4"
   flutter_svg:
     dependency: "direct main"
     description:

@@ -137,12 +137,8 @@ class SwapCubit extends Cubit<SwapState> {
             if (event.status) {
               String fromBalance = await getTokenBalance(state.fromToken);
               String toBalance = await getTokenBalance(state.toToken);
-              Token from = state.fromToken;
-              Token to = state.toToken;
-              from.balance = fromBalance;
-              to.balance = toBalance;
-              state.fromToken = from;
-              state.toToken = to;
+              state.fromToken.balance = fromBalance;
+              state.toToken.balance = toBalance;
               emit(TransactionFinishedState(state,
                   transactionStatus: TransactionStatus(
                       "Swapped ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",

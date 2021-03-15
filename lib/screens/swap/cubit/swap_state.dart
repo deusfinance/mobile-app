@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/config_service.dart';
@@ -14,8 +15,8 @@ import '../../../locator.dart';
 abstract class SwapState extends Equatable {
   SwapService swapService;
 
-  Token fromToken;
-  Token toToken;
+  CryptoCurrency fromToken;
+  CryptoCurrency toToken;
   double slippage;
 
   var fromFieldController;

@@ -9,25 +9,13 @@ class Token extends Equatable {
   final String name;
   final String symbol;
   final String logoPath;
-  String balance;
-  String allowances;
-  int chainId;
 
-  Token(this.name, this.symbol, this.logoPath){
-    balance = "0";
-    allowances = "0";
-  }
+
+  Token(this.name, this.symbol, this.logoPath);
 
   @override
   List<Object> get props => [symbol];
 
-  BigInt getBalance(){
-    return EthereumService.getWei(balance, symbol.toLowerCase());
-  }
-
-  BigInt getAllowances(){
-    return EthereumService.getWei(allowances, symbol.toLowerCase());
-  }
 
   String getTokenName(){
     return symbol.toLowerCase();

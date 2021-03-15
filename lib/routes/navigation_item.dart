@@ -3,6 +3,8 @@ import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:equatable/equatable.dart';
@@ -32,6 +34,12 @@ class NavigationItem extends Equatable {
       routeUrl: SwapScreen.route,
       style: NavigationStyle.GreenBlue);
 
+  static final NavigationItem synthethics = NavigationItem(
+      page: BlocProvider<XDaiSyntheticsCubit>(create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
+      title: "Synthetics",
+      routeUrl: XDaiSyntheticsScreen.route,
+      style: NavigationStyle.BluePurple);
+
 
   static final NavigationItem stakeAndLockOverview = NavigationItem(
       page: BlurredStakeLockScreen(),
@@ -45,10 +53,10 @@ class NavigationItem extends Equatable {
       page: LockScreen(), title: "Vaults", routeUrl: LockScreen.url);
 
 
-  static final NavigationItem synthethics = NavigationItem(
-      page: BlurredSyntheticsScreen(), //SynchronizerScreen(),
-      title: "Synthetics",
-      routeUrl: BlurredSyntheticsScreen.url);
+  // static final NavigationItem synthethics = NavigationItem(
+  //     page: BlurredSyntheticsScreen(), //SynchronizerScreen(),
+  //     title: "Synthetics",
+  //     routeUrl: BlurredSyntheticsScreen.url);
 
   static List<NavigationItem> get items =>
       [swap, synthethics, stakeAndLockOverview];

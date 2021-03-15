@@ -144,7 +144,7 @@ class _SwapScreenState extends State<SwapScreen> {
     SwapField fromField = new SwapField(
       direction: Direction.from,
       initialToken: state.fromToken,
-      selectAssetRoute: MaterialPageRoute<CryptoCurrency>(builder: (BuildContext _) => CurrencySelectorScreen()),
+      selectAssetRoute: CurrencySelectorScreen.url,
       controller: state.fromFieldController,
       tokenSelected: (selectedToken) {
         context.read<SwapCubit>().fromTokenChanged(selectedToken);
@@ -156,7 +156,7 @@ class _SwapScreenState extends State<SwapScreen> {
     SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
-      selectAssetRoute: MaterialPageRoute<CryptoCurrency>(builder: (BuildContext _) => CurrencySelectorScreen()),
+      selectAssetRoute: CurrencySelectorScreen.url,
       controller: state.toFieldController,
       tokenSelected: (selectedToken) {
         context.read<SwapCubit>().toTokenChanged(selectedToken);

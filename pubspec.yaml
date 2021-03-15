@@ -43,6 +43,7 @@ dependencies:
   stream_transform: ^0.0.19
   fl_chart: ^0.12.3
   vibration: ^1.7.2
+  flappy_search_bar: 1.4.1
 
 dependency_overrides:
   analyzer: ^0.41.2

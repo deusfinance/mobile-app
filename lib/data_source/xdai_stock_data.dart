@@ -18,7 +18,7 @@ abstract class XDaiStockData {
 
   static StockAddress getStockAddress(Token stock) {
     for (var i = 0; i < addresses.length; i++) {
-      if (addresses[i].id == stock.getTokenName()) {
+      if (addresses[i].id.toLowerCase() == stock.getTokenName()) {
         return addresses[i];
       }
     }
@@ -43,10 +43,13 @@ abstract class XDaiStockData {
   }
 
   static Future<bool> getData() async {
+    if(values.isNotEmpty)
+      return true;
     final response =
         await http.get("https://oracle1.deus.finance/xdai/registrar.json");
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
+      values.clear();
       map.forEach((key, value) {
         values.add(Stock.fromJson(value));
       });
@@ -57,11 +60,14 @@ abstract class XDaiStockData {
   }
 
   static Future<bool> getStockAddresses() async {
+    if(addresses.isNotEmpty)
+      return true;
     var response =
         await http.get("https://oracle1.deus.finance/xdai/conducted.json");
     if (response.statusCode == 200) {
       var js = json.decode(response.body);
       var map = js['tokens'];
+      addresses.clear();
       map.forEach((value) {
         addresses.add(StockAddress.fromJson(value));
       });
