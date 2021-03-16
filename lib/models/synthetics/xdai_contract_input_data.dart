@@ -6,7 +6,7 @@ part 'xdai_contract_input_data.g.dart';
 @JsonSerializable(nullable: true)
 class XDaiContractInputData{
   int multiplier;
-  List<Sign> signs;
+  Map<String, Sign> signs;
   String price;
   int fee;
   int blockNo;
@@ -19,5 +19,17 @@ class XDaiContractInputData{
 
   BigInt getPrice(){
     return BigInt.parse(price);
+  }
+
+  getBlockNo(){
+    return BigInt.from(blockNo);
+  }
+
+  getFee(){
+    return BigInt.from(fee);
+  }
+
+  getMultiplier(){
+    return BigInt.from(multiplier);
   }
 }

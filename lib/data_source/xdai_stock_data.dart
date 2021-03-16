@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:deus_mobile/models/synthetics/stock_price.dart';
+import 'package:deus_mobile/models/synthetics/stock_price_detail.dart';
 import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
 import 'package:http/http.dart' as http;
 
-import '../models/synthetics/contract_input_data.dart';
 import '../models/synthetics/stock.dart';
 import '../models/synthetics/stock_address.dart';
 import '../models/token.dart';
@@ -27,14 +27,13 @@ abstract class XDaiStockData {
 
   static Future<Map> getPrices() async {
     var response =
-        await http.get("https://sync.deus.finance/oracle-files/price.json");
+        await http.get("https://oracle1.deus.finance/xdai/price.json");
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
       Map<String,StockPrice> prices = new Map();
       map.forEach((key, value) {
-        StockPrice p = new StockPrice(new StockPriceDetail(value["Long"]["price"], value["Long"]["fee"]), new StockPriceDetail(
-            value["Short"]["price"], value["Short"]["fee"]));
-        prices.addEntries([new MapEntry(key, p)]);
+        StockPrice p = new StockPrice(new StockPriceDetail.fromJson(value["Long"]), new StockPriceDetail.fromJson(value['Short']));
+        prices.addEntries([new MapEntry(key.toLowerCase(), p)]);
       });
       return prices;
     } else {

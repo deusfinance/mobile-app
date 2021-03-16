@@ -10,23 +10,30 @@ class Token extends Equatable {
   final String symbol;
   final String logoPath;
 
-
   Token(this.name, this.symbol, this.logoPath);
 
   @override
   List<Object> get props => [symbol];
 
-
-  String getTokenName(){
+  String getTokenName() {
     return symbol.toLowerCase();
   }
 }
 
 extension PathCheck on String {
   bool get isSvg => this.endsWith('.svg');
+  bool get isNetwork => this.startsWith('http');
 
-  Widget showCircleImage({double radius = 20}) =>
-      CircleAvatar(radius: radius, backgroundImage: isSvg ? provider.Svg('assets/$this') : AssetImage('assets/$this'));
+  Widget showCircleImage({double radius = 20}) => isNetwork
+      ? showCircleNetworkImage()
+      : CircleAvatar(
+          radius: radius,
+          backgroundImage: isSvg
+              ? provider.Svg('assets/$this')
+              : AssetImage('assets/$this'));
+
+  Widget showCircleNetworkImage({double radius = 20}) =>
+      CircleAvatar(radius: radius, backgroundImage: NetworkImage(this));
 
   Widget showImage({double size}) => isSvg
       ? PlatformSvg.asset(this, height: size, width: size)

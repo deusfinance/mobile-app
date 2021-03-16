@@ -81,34 +81,41 @@ class XDaiStockService {
   }
 
   Future<String> buy(tokenAddress, String amount, List<XDaiContractInputData> oracles, maxPrice) async {
-    if (!checkWallet()) return "0";
+    try {
+      if (!checkWallet()) return "0";
 
-    DeployedContract contract =
-    await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
-    XDaiContractInputData info = oracles[0];
+      DeployedContract contract =
+      await ethService.loadContractWithGivenAddress(
+          "wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
+      XDaiContractInputData info = oracles[0];
 
-    String xdaiAmount = await ethService.submit(await credentials, contract, "calculateXdaiAmount", [
-      maxPrice,
-      info.fee.toString(),
-      EthereumService.getWei(amount)
-    ]);
+      var res = await ethService.query(contract, "calculateXdaiAmount", [
+        BigInt.parse(maxPrice),
+        BigInt.from(info.fee),
+        EthereumService.getWei(amount)
+      ]);
 
-    return ethService.submit(await credentials, contract, "buy", [
-      info.multiplier,
-      address.toString(),
-      EthereumService.getWei(amount),
-      info.fee.toString(),
-      [oracles[0].blockNo.toString(), oracles[1].blockNo.toString()],
-      [oracles[0].price, oracles[1].price],
-      [oracles[0].signs[0].v.toString(), oracles[1].signs[0].v.toString()],
-      [oracles[0].signs[0].r.toString(), oracles[1].signs[0].r.toString()],
-      [oracles[0].signs[0].s.toString(), oracles[1].signs[0].s.toString()],
-    ],value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount));
+      BigInt xdaiAmount = BigInt.parse(res.single.toString());
+
+      return await ethService.submit(await credentials, contract, "buy", [
+        info.getMultiplier(),
+        await address,
+        EthereumService.getWei(amount),
+        info.getFee(),
+        [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
+        [oracles[0].getPrice(), oracles[1].getPrice()],
+        [oracles[0].signs['buy'].getV(), oracles[1].signs['buy'].getV()],
+        [oracles[0].signs['buy'].getR(), oracles[1].signs['buy'].getR()],
+        [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
+      ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount));
+    }on Exception catch(error){
+      print(error);
+      return "";
+    }
   }
 
   Future<String> sell(tokenAddress, String amount, List<XDaiContractInputData> oracles) async {
     if (!checkWallet()) return "0";
-    //TODO
     DeployedContract contract =
     await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
     XDaiContractInputData info = oracles[0];
@@ -117,12 +124,12 @@ class XDaiStockService {
       info.multiplier,
       address.toString(),
       EthereumService.getWei(amount),
-      info.fee.toString(),
+      info.fee,
       [oracles[0].blockNo.toString(), oracles[1].blockNo.toString()],
       [oracles[0].price, oracles[1].price],
-      [oracles[0].signs[1].v.toString(), oracles[1].signs[1].v.toString()],
-      [oracles[0].signs[1].r.toString(), oracles[1].signs[1].r.toString()],
-      [oracles[0].signs[1].s.toString(), oracles[1].signs[1].s.toString()],
+      [oracles[0].signs['sell'].v.toString(), oracles[1].signs['sell'].v.toString()],
+      [oracles[0].signs['sell'].r.toString(), oracles[1].signs['sell'].r.toString()],
+      [oracles[0].signs['sell'].s.toString(), oracles[1].signs['sell'].s.toString()],
     ]);
   }
 

@@ -30,11 +30,18 @@ class XDaiSyntheticsScreen extends StatefulWidget {
 }
 
 class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
+
   @override
   void initState() {
     context.read<XDaiSyntheticsCubit>().init();
     super.initState();
   }
+   @override
+  void deactivate() {
+    context.read<XDaiSyntheticsCubit>().dispose();
+    super.deactivate();
+  }
+
 
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
@@ -154,7 +161,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         const SizedBox(height: 12),
         GestureDetector(
             onTap: () {
-              context.read<XDaiSyntheticsCubit>().reverseSwap();
+              context.read<XDaiSyntheticsCubit>().reverseSync();
             },
             child: Center(
                 child: PlatformSvg.asset('images/icons/arrow_down.svg'))),

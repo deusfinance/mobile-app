@@ -31,17 +31,17 @@ class Stock extends Token {
 
   BigInt getBalance() {
     if(mode == Mode.LONG)
-      return EthereumService.getWei(longBalance);
+      return EthereumService.getWei(longBalance??"0");
     else if (mode == Mode.SHORT)
-      return EthereumService.getWei(shortBalance);
+      return EthereumService.getWei(shortBalance??"0");
     return null;
   }
 
   BigInt getAllowances() {
     if(mode == Mode.LONG)
-      return EthereumService.getWei(longAllowances);
+      return EthereumService.getWei(longAllowances??"0");
     else if (mode == Mode.SHORT)
-      return EthereumService.getWei(shortAllowances);
+      return EthereumService.getWei(shortAllowances??"0");
     return null;
   }
 

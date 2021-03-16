@@ -101,7 +101,6 @@ class _StakeScreenState extends State<StakeScreen> {
     if (!(state is StakePendingApproveDividedButton) && !(state is StakePendingApproveMergedButton)) {
       return _buildTransactionSuccessToast();
     } else {
-      print(state);
       return _buildTransactionPending();
     }
   }
