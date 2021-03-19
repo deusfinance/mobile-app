@@ -5,6 +5,7 @@ import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:web3dart/web3dart.dart' as web3;
 
+import '../../locator.dart';
 import 'wallet_state.dart';
 
 //TODO: Use cubit instead of Hooks.

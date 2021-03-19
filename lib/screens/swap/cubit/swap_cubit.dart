@@ -141,14 +141,14 @@ class SwapCubit extends Cubit<SwapState> {
               state.toToken.balance = toBalance;
               emit(TransactionFinishedState(state,
                   transactionStatus: TransactionStatus(
-                      "Swapped ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                      "Swapped your ${state.fromFieldController.text} ${state.fromToken.getTokenName()} for ${state.toFieldController.text} ${state.toToken.getTokenName()}",
                       Status.SUCCESSFUL,
                       "Transaction Successful",
                       res)));
             } else {
               emit(TransactionFinishedState(state,
                   transactionStatus: TransactionStatus(
-                      "Not Swapped ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                      "Not Swapped your ${state.fromFieldController.text} ${state.fromToken.getTokenName()} for ${state.toFieldController.text} ${state.toToken.getTokenName()}",
                       Status.FAILED,
                       "Transaction Failed",
                       res)));
@@ -157,7 +157,7 @@ class SwapCubit extends Cubit<SwapState> {
         } on Exception catch (error) {
           emit(TransactionFinishedState(state,
               transactionStatus: TransactionStatus(
-                  "Not Swapped ${state.toFieldController.text} ${state.toToken.getTokenName()} for ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                  "Not Swapped your ${state.fromFieldController.text} ${state.fromToken.getTokenName()} for ${state.toFieldController.text} ${state.toToken.getTokenName()}",
                   Status.FAILED,
                   "Transaction Failed")));
         }
