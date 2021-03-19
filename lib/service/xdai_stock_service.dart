@@ -121,15 +121,15 @@ class XDaiStockService {
     XDaiContractInputData info = oracles[0];
 
     return ethService.submit(await credentials, contract, "sell", [
-      info.multiplier,
-      address.toString(),
+      info.getMultiplier(),
+      await address,
       EthereumService.getWei(amount),
-      info.fee,
-      [oracles[0].blockNo.toString(), oracles[1].blockNo.toString()],
-      [oracles[0].price, oracles[1].price],
-      [oracles[0].signs['sell'].v.toString(), oracles[1].signs['sell'].v.toString()],
-      [oracles[0].signs['sell'].r.toString(), oracles[1].signs['sell'].r.toString()],
-      [oracles[0].signs['sell'].s.toString(), oracles[1].signs['sell'].s.toString()],
+      info.getFee(),
+      [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
+      [oracles[0].getPrice(), oracles[1].getPrice()],
+      [oracles[0].signs['sell'].getV(), oracles[1].signs['sell'].getV()],
+      [oracles[0].signs['sell'].getR(), oracles[1].signs['sell'].getR()],
+      [oracles[0].signs['sell'].getS(), oracles[1].signs['sell'].getS()],
     ]);
   }
 

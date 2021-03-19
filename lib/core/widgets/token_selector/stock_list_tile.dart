@@ -37,7 +37,7 @@ class StockListTile extends StatelessWidget {
       ),
       trailing: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.baseline,
+        crossAxisAlignment: CrossAxisAlignment.end,
         textBaseline: TextBaseline.alphabetic,
         children: [
           Row(

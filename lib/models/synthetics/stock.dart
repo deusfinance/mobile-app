@@ -26,38 +26,37 @@ class Stock extends Token {
   String longBalance = "0";
   String shortAllowances = "0";
   String longAllowances = "0";
+
   //Mode is Long or Short
   Mode mode;
 
   BigInt getBalance() {
-    if(mode == Mode.LONG)
-      return EthereumService.getWei(longBalance??"0");
+    if (mode == Mode.LONG)
+      return EthereumService.getWei(longBalance ?? "0");
     else if (mode == Mode.SHORT)
-      return EthereumService.getWei(shortBalance??"0");
+      return EthereumService.getWei(shortBalance ?? "0");
     return null;
   }
 
   BigInt getAllowances() {
-    if(mode == Mode.LONG)
-      return EthereumService.getWei(longAllowances??"0");
+    if (mode == Mode.LONG)
+      return EthereumService.getWei(longAllowances ?? "0");
     else if (mode == Mode.SHORT)
-      return EthereumService.getWei(shortAllowances??"0");
+      return EthereumService.getWei(shortAllowances ?? "0");
     return null;
   }
 
-
   Stock(String name, String symbol, String logo)
-      : super(name, symbol, logo){
-        this.name = name;
-        this.symbol = symbol;
-        this.logo = logo;
-  this.mode = Mode.LONG;
+      : super(name, symbol, "https://app.deus.finance/" + logo) {
+    this.name = name;
+    this.symbol = symbol;
+    this.logo = logo;
+    this.mode = Mode.LONG;
   }
 
   factory Stock.fromJson(Map<String, dynamic> json) => _$StockFromJson(json);
+
   Map<String, dynamic> toJson() => _$StockToJson(this);
 
-  String getLogo() {
-    return logo;
-  }
+  get logoPath => "https://app.deus.finance/" + logo;
 }

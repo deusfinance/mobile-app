@@ -95,9 +95,9 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // selectedToken != null
-            //     ? selectedToken.logoPath.showCircleImage(radius: 15)
-            //     : CircleAvatar(radius: 15.0, backgroundColor: Colors.white70),
+            selectedToken != null
+                ? selectedToken.logoPath.showCircleImage(radius: 15)
+                : CircleAvatar(radius: 15.0, backgroundColor: Colors.white70),
             const SizedBox(width: 5),
             _buildTokenName(),
             const SizedBox(width: 10),

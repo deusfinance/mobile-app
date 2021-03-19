@@ -6,7 +6,7 @@ import '../../../locator.dart';
 Future<bool> showWillPopDialog(BuildContext context) async {
   final Widget dialog = AlertDialog(
     title: Text('Are you sure?'),
-    content: Text('Do you want to exit the DEUS App_'),
+    content: Text('Do you want to exit the DEUS App?'),
     actions: <Widget>[
       FlatButton(
         onPressed: () => locator<NavigationService>().goBack(context, false),

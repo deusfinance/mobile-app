@@ -30,18 +30,17 @@ class XDaiSyntheticsScreen extends StatefulWidget {
 }
 
 class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
-
   @override
   void initState() {
     context.read<XDaiSyntheticsCubit>().init();
     super.initState();
   }
-   @override
+
+  @override
   void deactivate() {
     context.read<XDaiSyntheticsCubit>().dispose();
     super.deactivate();
   }
-
 
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
@@ -121,11 +120,12 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
       child: Stack(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [_buildUserInput(state), _buildMarketTimer(state)],
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SingleChildScrollView(child: _buildUserInput(state)),
+              _buildMarketTimer(state)
+            ],
           ),
           _buildToastWidget(state),
         ],
@@ -154,7 +154,6 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         context.read<XDaiSyntheticsCubit>().toTokenChanged(selectedToken);
       },
     );
-
     return Column(
       children: [
         fromField,
@@ -205,6 +204,10 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         Opacity(
             opacity: state.isInProgress ? 0.5 : 1,
             child: _buildMainButton(state)),
+        SizedBox(
+          height: 16,
+        ),
+        _buildRemainingCapacity(state),
       ],
     );
   }
@@ -284,9 +287,9 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     }
 
     BigInt balance = BigInt.zero;
-    if(state.fromToken is CryptoCurrency){
+    if (state.fromToken is CryptoCurrency) {
       balance = (state.fromToken as CryptoCurrency).getBalance();
-    }else {
+    } else {
       balance = (state.fromToken as Stock).getBalance();
     }
     if (balance <
@@ -403,5 +406,43 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       }
     }
     return Container();
+  }
+
+  _buildRemainingCapacity(XDaiSyntheticsState state) {
+    return Row(children: [
+      Text(
+        "Remaining Synchronize Capacity",
+        style: MyStyles.lightWhiteSmallTextStyle,
+      ),
+      Spacer(),
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            "assets/images/currencies/dai.png",
+            height: 20,
+          ),
+          SizedBox(
+            width: 6,
+          ),
+          FutureBuilder(
+              future: context.read<XDaiSyntheticsCubit>().getRemCap(),
+              builder: (context, snapshot) {
+                if (snapshot.data != null) {
+                  return Text(
+                    EthereumService.formatDouble(snapshot.data, 2),
+                    overflow: TextOverflow.clip,
+                    style: MyStyles.lightWhiteSmallTextStyle,
+                  );
+                } else {
+                  return Text(
+                    "---",
+                    style: MyStyles.lightWhiteSmallTextStyle,
+                  );
+                }
+              })
+        ],
+      ),
+    ]);
   }
 }

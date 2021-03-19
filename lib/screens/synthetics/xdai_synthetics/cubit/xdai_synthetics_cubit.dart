@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/data_source/stock_data.dart';
 import 'package:deus_mobile/data_source/xdai_stock_data.dart';
@@ -21,24 +23,29 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     //TODO check market closed
     bool res1 = await XDaiStockData.getData();
     bool res2 = await XDaiStockData.getStockAddresses();
-    if (res1 && res2) {
+    state.prices = await XDaiStockData.getPrices();
+    if (res1 && res2 && state.prices != null) {
       (state.fromToken as CryptoCurrency).balance =
           await getTokenBalance(state.fromToken);
       emit(XDaiSyntheticsSelectAssetState(state));
-      state.streamController.stream
+      state.inputController.stream
           .transform(debounce(Duration(milliseconds: 500)))
           .listen((s) async {
         if (state is XDaiSyntheticsAssetSelectedState) {
           emit(XDaiSyntheticsAssetSelectedState(state, isInProgress: true));
           if (double.tryParse(s) != null && double.tryParse(s) > 0) {
-            //TODO get price
-            String value = "0.0";
-            state.toFieldController.text = EthereumService.formatDouble(value);
+            double value = computeToPrice(s);
+            state.toValue = value;
+            state.toFieldController.text =
+                EthereumService.formatDouble(value.toStringAsFixed(20));
           } else {
+            state.toValue = 0;
             state.toFieldController.text = "0.0";
           }
           emit(XDaiSyntheticsAssetSelectedState(state, isInProgress: false));
         }
+        state.timer =
+            Timer.periodic(Duration(seconds: 14), (Timer t) => getPrices());
       });
     } else {
       emit(XDaiSyntheticsErrorState(state));
@@ -64,7 +71,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     emit(XDaiSyntheticsAssetSelectedState(state,
         approved: false, isInProgress: true));
     String tokenAddress = getTokenAddress(state.fromToken);
-    if (state.fromToken.getTokenName() == "xdai") {
+    if (isBuy()) {
       (state.fromToken as CryptoCurrency).allowances =
           await state.service.getAllowances(tokenAddress);
       if ((state.fromToken as CryptoCurrency).getAllowances() > BigInt.zero)
@@ -98,7 +105,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
   String getPriceRatio() {
     double a = double.tryParse(state.fromFieldController.text) ?? 0;
-    double b = double.tryParse(state.toFieldController.text) ?? 0;
+    double b = state.toValue;
     if (a != 0 && b != 0) {
       if (state.isPriceRatioForward)
         return EthereumService.formatDouble((a / b).toString(), 5);
@@ -128,13 +135,20 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     (state.fromToken as Stock).mode = Mode.LONG;
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
+    state.toValue = 0;
 
-    emit(XDaiSyntheticsAssetSelectedState(state,
-        fromToken: selectedToken, mode: Mode.LONG));
+    if (checkMarketClosed(selectedToken, Mode.LONG)) {
+      emit(XDaiSyntheticsMarketClosedState(state, mode: Mode.LONG));
+    } else {
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          fromToken: selectedToken, mode: Mode.LONG, isInProgress: true));
 
-    await getAllowances();
-    (selectedToken as Stock).longBalance = await getTokenBalance(selectedToken);
-    emit(XDaiSyntheticsAssetSelectedState(state, fromToken: selectedToken));
+      await getAllowances();
+      (selectedToken as Stock).longBalance =
+          await getTokenBalance(selectedToken);
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          fromToken: selectedToken, isInProgress: false));
+    }
   }
 
   toTokenChanged(Token selectedToken) async {
@@ -143,14 +157,21 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     (state.toToken as Stock).mode = Mode.LONG;
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
+    state.toValue = 0;
 
-    emit(XDaiSyntheticsAssetSelectedState(state,
-        toToken: selectedToken, mode: Mode.LONG));
+    if (checkMarketClosed(selectedToken, Mode.LONG)) {
+      emit(XDaiSyntheticsMarketClosedState(state, mode: Mode.LONG));
+    } else {
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          toToken: selectedToken, mode: Mode.LONG, isInProgress: true));
 
-    await getAllowances();
-    (selectedToken as Stock).longBalance = await getTokenBalance(selectedToken);
+      await getAllowances();
+      (selectedToken as Stock).longBalance =
+          await getTokenBalance(selectedToken);
 
-    emit(XDaiSyntheticsAssetSelectedState(state, toToken: selectedToken));
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          toToken: selectedToken, isInProgress: false));
+    }
   }
 
   addListenerToFromField() {
@@ -167,50 +188,64 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       if (input == null || input.isEmpty) {
         input = "0.0";
       }
-      if (state.fromToken is CryptoCurrency) {
+      if (isBuy()) {
         if ((state.fromToken as CryptoCurrency).getAllowances() >=
             EthereumService.getWei(input, state.fromToken.getTokenName())) {
-          state.streamController.add(input);
+          state.inputController.add(input);
           emit(XDaiSyntheticsAssetSelectedState(state, approved: true));
         } else {
-          state.streamController.add(input);
+          state.inputController.add(input);
           emit(XDaiSyntheticsAssetSelectedState(state, approved: false));
         }
       } else {
         if ((state.fromToken as Stock).getAllowances() >=
             EthereumService.getWei(input, state.fromToken.getTokenName())) {
-          state.streamController.add(input);
+          state.inputController.add(input);
           emit(XDaiSyntheticsAssetSelectedState(state, approved: true));
         } else {
-          state.streamController.add(input);
+          state.inputController.add(input);
           emit(XDaiSyntheticsAssetSelectedState(state, approved: false));
         }
       }
     }
   }
 
-  reverseSwap() {
+  reverseSync() {
     Token a = state.fromToken;
     state.fromToken = state.toToken;
     state.toToken = a;
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
+    state.toValue = 0;
     getAllowances();
   }
 
   reversePriceRatio() {
-    emit(XDaiSyntheticsAssetSelectedState(state,
-        isPriceRatioForward: !state.isPriceRatioForward));
+    if (state is XDaiSyntheticsAssetSelectedState) {
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          isPriceRatioForward: !state.isPriceRatioForward));
+    }
   }
 
   void setMode(Mode mode) {
-    if (state is XDaiSyntheticsAssetSelectedState) {
-      if (state.toToken is Stock) {
+    if (!state.isInProgress && state.toToken != null) {
+      if (mode != state.mode) {
+        state.toFieldController.text = "";
+        state.fromFieldController.text = "";
+        state.toValue = 0;
+        state.approved = false;
+      }
+      if (isBuy()) {
         (state.toToken as Stock).mode = mode;
       } else {
         (state.fromToken as Stock).mode = mode;
       }
-      emit(XDaiSyntheticsAssetSelectedState(state, mode: mode));
+      if (checkMarketClosed(isBuy() ? state.toToken : state.fromToken, mode)) {
+        emit(XDaiSyntheticsMarketClosedState(state, mode: mode));
+      } else {
+        emit(XDaiSyntheticsAssetSelectedState(state, mode: mode));
+        getAllowances();
+      }
     }
   }
 
@@ -267,7 +302,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     if (state.approved && !state.isInProgress) {
       emit(XDaiSyntheticsTransactionPendingState(state,
           transactionStatus: TransactionStatus(
-              "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}}",
+              "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
               Status.PENDING,
               "Transaction Pending")));
       String tokenAddress = getTokenAddress(state.fromToken);
@@ -276,9 +311,22 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
           await XDaiStockData.getContractInputData(tokenAddress);
       if (oracles.length >= 2) {
         try {
-          oracles.sort((a, b) => b.getPrice().compareTo(a.getPrice()));
+          //sort oracles on price and then on oracle number
+          List arr = [];
+          oracles.asMap().forEach((index, element) {
+            arr.add([index, element.getPrice()]);
+          });
+          arr.sort((a, b) => a[1].compareTo(b[1]));
+
+          List<XDaiContractInputData> inputOracles;
+          if(arr[0][0] < arr[1][0]){
+            inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
+          }else{
+            inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+          }
+
           var res = await state.service.sell(tokenAddress,
-              state.fromFieldController.text, oracles.sublist(0, 1));
+              state.fromFieldController.text, inputOracles);
           Stream<TransactionReceipt> result =
               state.service.ethService.pollTransactionReceipt(res);
           result.listen((event) {
@@ -326,11 +374,26 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
           await XDaiStockData.getContractInputData(tokenAddress);
       if (oracles.length >= 2) {
         try {
-          //get to gerantar
-          oracles.sort((a, b) => a.getPrice().compareTo(b.getPrice()));
-          String maxPrice = oracles[0].price;
-          var res = await state.service.buy(tokenAddress,
-              state.toFieldController.text, oracles.sublist(0, 1), maxPrice);
+          //sort oracles on price and then on oracle number
+          List arr = [];
+          oracles.asMap().forEach((index, element) {
+            arr.add([index, element.getPrice()]);
+          });
+          arr.sort((a, b) => b[1].compareTo(a[1]));
+
+          List<XDaiContractInputData> inputOracles;
+          if(arr[0][0] < arr[1][0]){
+            inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
+          }else{
+            inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+          }
+          String maxPrice = arr[0][1].toString();
+
+          var res = await state.service.buy(
+              tokenAddress,
+              state.toValue.toStringAsFixed(20),
+              inputOracles,
+              maxPrice);
 
           Stream<TransactionReceipt> result =
               state.service.ethService.pollTransactionReceipt(res);
@@ -365,4 +428,52 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       }
     }
   }
+
+  void dispose() {
+    state.timer?.cancel();
+  }
+
+  Future<Map> getPrices() async {
+    print("get prices");
+    print(state.prices[0].long.price);
+    state.prices = await XDaiStockData.getPrices();
+  }
+
+  bool checkMarketClosed(Token selectedToken, Mode mode) {
+    if (state.prices != null) {
+      if (mode == Mode.LONG)
+        return state.prices[selectedToken.getTokenName()].long.isClosed ??
+            false;
+      else
+        return state.prices[selectedToken.getTokenName()].short.isClosed ??
+            false;
+    }
+    return true;
+  }
+
+  double computeToPrice(String s) {
+    double res;
+    if (isBuy()) {
+      if (state.mode == Mode.LONG)
+        res = double.tryParse(s) /
+            state.prices[state.toToken.getTokenName()].long.price;
+      else
+        res = double.tryParse(s) /
+            state.prices[state.toToken.getTokenName()].short.price;
+    } else {
+      if (state.mode == Mode.LONG)
+        res = double.tryParse(s) *
+            state.prices[state.fromToken.getTokenName()].long.price;
+      else
+        res = double.tryParse(s) *
+            state.prices[state.fromToken.getTokenName()].short.price;
+    }
+    return res;
+  }
+
+  Future<String> getRemCap() async {
+    return await state.service.getUsedCap();
+  }
+
+  bool isBuy() => state.fromToken.getTokenName() == "xdai";
 }

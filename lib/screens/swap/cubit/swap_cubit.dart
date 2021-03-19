@@ -27,9 +27,11 @@ class SwapCubit extends Cubit<SwapState> {
             .getAmountsOut(
                 state.fromToken.getTokenName(), state.toToken.getTokenName(), s)
             .then((value) {
+              state.toValue = double.tryParse(value);
           state.toFieldController.text = EthereumService.formatDouble(value);
         });
       } else {
+        state.toValue = 0;
         state.toFieldController.text = "0.0";
       }
       emit(SwapLoaded(state, isInProgress: false));
@@ -46,6 +48,7 @@ class SwapCubit extends Cubit<SwapState> {
     }
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
+    state.toValue = 0;
 
     emit(SwapLoaded(state, fromToken: selectedToken));
 
@@ -67,6 +70,7 @@ class SwapCubit extends Cubit<SwapState> {
     }
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
+    state.toValue = 0;
     emit(SwapLoaded(state, toToken: selectedToken));
     state.toToken.balance = await getTokenBalance(selectedToken);
     emit(SwapLoaded(state, toToken: selectedToken));
@@ -128,7 +132,7 @@ class SwapCubit extends Cubit<SwapState> {
               state.fromToken.getTokenName(),
               state.toToken.getTokenName(),
               state.fromFieldController.text,
-              ((1 - getSlippage()) * double.parse(state.toFieldController.text))
+              ((1 - getSlippage()) * state.toValue)
                   .toString(),
               gas);
           Stream<TransactionReceipt> result =
@@ -179,6 +183,7 @@ class SwapCubit extends Cubit<SwapState> {
     state.toToken = a;
     state.fromFieldController.text = "";
     state.toFieldController.text = "";
+    state.toValue = 0;
     getAllowances();
   }
 
@@ -193,7 +198,7 @@ class SwapCubit extends Cubit<SwapState> {
 
   String getPriceRatio() {
     double a = double.tryParse(state.fromFieldController.text) ?? 0;
-    double b = double.tryParse(state.toFieldController.text) ?? 0;
+    double b = state.toValue;
     if (a != 0 && b != 0) {
       if (state.isPriceRatioForward)
         return EthereumService.formatDouble((a / b).toString(), 5);
@@ -229,7 +234,7 @@ class SwapCubit extends Cubit<SwapState> {
           state.fromToken.getTokenName(), state.toToken.getTokenName(), "0.1"));
       double r = 0.1;
       double input = double.tryParse(state.fromFieldController.text) ?? 0;
-      double y = double.tryParse(state.toFieldController.text) ?? 0;
+      double y = state.toValue;
 
       double v = 1.0;
       if (input != 0) {
@@ -260,7 +265,7 @@ class SwapCubit extends Cubit<SwapState> {
         state.fromToken.getTokenName(),
         state.toToken.getTokenName(),
         state.fromFieldController.text,
-        ((1 - getSlippage()) * double.parse(state.toFieldController.text))
+        ((1 - getSlippage()) * state.toValue)
             .toString());
     return transaction;
   }

@@ -14,11 +14,12 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../../locator.dart';
 
-enum Mode { LONG, SHORT }
+enum Mode { LONG, SHORT, NONE }
 
 abstract class XDaiSyntheticsState extends Equatable {
   Token fromToken;
   Token toToken;
+  double toValue;
   bool approved;
   bool isInProgress;
   bool isPriceRatioForward;
@@ -37,6 +38,7 @@ abstract class XDaiSyntheticsState extends Equatable {
       : isInProgress = false,
         fromToken = CurrencyData.xdai,
         approved = true,
+        toValue = 0,
         fromFieldController = new TextEditingController(),
         toFieldController = new TextEditingController(),
         isPriceRatioForward = true,
@@ -54,6 +56,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         this.service = state.service,
         this.prices = state.prices,
         this.timer = state.timer,
+        this.toValue = state.toValue,
         this.isPriceRatioForward = state.isPriceRatioForward,
         this.inputController = state.inputController,
         this.fromFieldController = state.fromFieldController,
@@ -61,7 +64,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         this.toFieldController = state.toFieldController;
 
   @override
-  List<Object> get props => [fromToken, toToken, approved, isInProgress, mode];
+  List<Object> get props => [fromToken, toToken, approved, isInProgress, mode, isPriceRatioForward, service, prices, timer, toValue];
 }
 
 class XDaiSyntheticsInitialState extends XDaiSyntheticsState {
@@ -73,7 +76,10 @@ class XDaiSyntheticsLoadingState extends XDaiSyntheticsState {
 }
 
 class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
-  XDaiSyntheticsMarketClosedState() : super();
+  XDaiSyntheticsMarketClosedState(XDaiSyntheticsState state,{Mode mode}) : super.copy(state){
+    if(mode!=null)
+      this.mode = mode;
+  }
 }
 
 class XDaiSyntheticsErrorState extends XDaiSyntheticsState {
