@@ -1,4 +1,5 @@
 import 'package:deus_mobile/models/synthetics/sign.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'xdai_contract_input_data.g.dart';

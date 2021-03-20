@@ -96,10 +96,9 @@ class XDaiStockService {
       ]);
 
       BigInt xdaiAmount = BigInt.parse(res.single.toString());
-
       return await ethService.submit(await credentials, contract, "buy", [
         info.getMultiplier(),
-        await address,
+        EthereumAddress.fromHex(tokenAddress),
         EthereumService.getWei(amount),
         info.getFee(),
         [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
@@ -122,7 +121,7 @@ class XDaiStockService {
 
     return ethService.submit(await credentials, contract, "sell", [
       info.getMultiplier(),
-      await address,
+      EthereumAddress.fromHex(tokenAddress),
       EthereumService.getWei(amount),
       info.getFee(),
       [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
