@@ -27,6 +27,7 @@ abstract class XDaiSyntheticsState extends Equatable {
   var toFieldController;
   XDaiStockService service;
   Mode mode;
+  bool marketClosed;
   StreamController<String> inputController;
 
   Map<String, StockPrice> prices;
@@ -39,6 +40,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         fromToken = CurrencyData.xdai,
         approved = true,
         toValue = 0,
+        marketClosed = false,
         fromFieldController = new TextEditingController(),
         toFieldController = new TextEditingController(),
         isPriceRatioForward = true,
@@ -55,6 +57,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         this.approved = state.approved,
         this.service = state.service,
         this.prices = state.prices,
+        this.marketClosed = state.marketClosed,
         this.timer = state.timer,
         this.toValue = state.toValue,
         this.isPriceRatioForward = state.isPriceRatioForward,
@@ -75,12 +78,12 @@ class XDaiSyntheticsLoadingState extends XDaiSyntheticsState {
   XDaiSyntheticsLoadingState(XDaiSyntheticsState state) : super.copy(state);
 }
 
-class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
-  XDaiSyntheticsMarketClosedState(XDaiSyntheticsState state,{Mode mode}) : super.copy(state){
-    if(mode!=null)
-      this.mode = mode;
-  }
-}
+// class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
+//   XDaiSyntheticsMarketClosedState(XDaiSyntheticsState state,{Mode mode}) : super.copy(state){
+//     if(mode!=null)
+//       this.mode = mode;
+//   }
+// }
 
 class XDaiSyntheticsErrorState extends XDaiSyntheticsState {
   XDaiSyntheticsErrorState(XDaiSyntheticsState state) : super.copy(state);

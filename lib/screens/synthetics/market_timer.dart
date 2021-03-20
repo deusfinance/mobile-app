@@ -12,18 +12,19 @@ class MarketTimer extends StatelessWidget {
   final String label;
   final Color timerColor;
 
-  final DateTime end = DateTime.now().add(Duration(hours: 10));
+  final DateTime end;
 
   MarketTimer({
     Key key,
     @required this.onEnd,
     @required this.label,
     @required this.timerColor,
+    this.end,
   }) : super(key: key);
 
   int get endTimeInMs {
     //TODO (@CodingDavid8): Move into cubit
-    final DateTime now = DateTime.now();
+    final DateTime now = DateTime.now().toUtc();
 
     final int difference = end.difference(now).inMilliseconds;
     final int endTime = now.millisecondsSinceEpoch + difference;

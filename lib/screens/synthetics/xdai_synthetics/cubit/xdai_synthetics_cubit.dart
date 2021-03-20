@@ -14,16 +14,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:intl/intl.dart';
+
 
 class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
   XDaiSyntheticsCubit() : super(XDaiSyntheticsInitialState());
 
   init() async {
     emit(XDaiSyntheticsLoadingState(state));
+
     bool res1 = await XDaiStockData.getData();
     bool res2 = await XDaiStockData.getStockAddresses();
     state.prices = await XDaiStockData.getPrices();
     if (res1 && res2 && state.prices != null) {
+      state.marketClosed = checkMarketStatus();
       (state.fromToken as CryptoCurrency).balance =
           await getTokenBalance(state.fromToken);
       state.inputController.stream
@@ -49,6 +53,34 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       emit(XDaiSyntheticsSelectAssetState(state));
     } else {
       emit(XDaiSyntheticsErrorState(state));
+    }
+  }
+
+  DateTime marketStatusChanged(){
+    List closedDays = ['Sat', 'Sun'];
+    var f = DateFormat('EEE,HH,mm,ss');
+    var date = f.format(DateTime.now().toUtc());
+    List arr = date.split(',');
+    if(!closedDays.contains(arr[0]) && ( (int.parse(arr[1]) == 6 && int.parse(arr[2]) > 30 && int.parse(arr[1]) < 20) || (int.parse(arr[1]) > 6 && int.parse(arr[1]) < 20))){
+      return DateTime.now().toUtc().add(Duration(hours: 20 - int.parse(arr[1]) - 1, minutes: 60 - int.parse(arr[2])-1 , seconds: 60 - int.parse(arr[3])));
+    }
+    //TODO compute when market opens
+    if(arr[0] == "Fri"){
+      if(int.parse(arr[1]) < 7){
+        return DateTime.now().toUtc().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
+      }else{
+        return DateTime.now().toUtc().add(Duration(days: 2 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+      }
+    }else if(arr[0] == "Sat"){
+      return DateTime.now().toUtc().add(Duration(days: 1 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+    }else if(arr[0] == "Sun"){
+      return DateTime.now().toUtc().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+    }else{
+      if(int.parse(arr[1]) < 7){
+        return DateTime.now().toUtc().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
+      }else{
+        return DateTime.now().toUtc().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+      }
     }
   }
 
@@ -138,8 +170,10 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     state.toValue = 0;
 
     if (checkMarketClosed(selectedToken, Mode.LONG)) {
-      emit(XDaiSyntheticsMarketClosedState(state, mode: Mode.LONG));
+      state.marketClosed = true;
+      emit(XDaiSyntheticsAssetSelectedState(state, mode: Mode.LONG));
     } else {
+      state.marketClosed = false;
       emit(XDaiSyntheticsAssetSelectedState(state,
           fromToken: selectedToken, mode: Mode.LONG, isInProgress: true));
 
@@ -160,8 +194,10 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     state.toValue = 0;
 
     if (checkMarketClosed(selectedToken, Mode.LONG)) {
-      emit(XDaiSyntheticsMarketClosedState(state, mode: Mode.LONG));
+      state.marketClosed = true;
+      emit(XDaiSyntheticsAssetSelectedState(state, mode: Mode.LONG));
     } else {
+      state.marketClosed = false;
       emit(XDaiSyntheticsAssetSelectedState(state,
           toToken: selectedToken, mode: Mode.LONG, isInProgress: true));
 
@@ -241,8 +277,10 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
         (state.fromToken as Stock).mode = mode;
       }
       if (checkMarketClosed(isBuy() ? state.toToken : state.fromToken, mode)) {
-        emit(XDaiSyntheticsMarketClosedState(state, mode: mode));
+        state.marketClosed = true;
+        emit(XDaiSyntheticsAssetSelectedState(state, mode: mode));
       } else {
+        state.marketClosed = false;
         emit(XDaiSyntheticsAssetSelectedState(state, mode: mode));
         await getAllowances();
         listenInput();
@@ -489,4 +527,19 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
   }
 
   bool isBuy() => state.fromToken.getTokenName() == "xdai";
+
+  bool checkMarketStatus() {
+    List closedDays = ['Sat', 'Sun'];
+    var f = DateFormat('EEE,HH,mm');
+    var date = f.format(DateTime.now().toUtc());
+    List arr = date.split(',');
+    if(!closedDays.contains(arr[0]) && ( (int.parse(arr[1]) == 6 && int.parse(arr[2]) > 30 && int.parse(arr[1]) < 20) || (int.parse(arr[1]) > 6 && int.parse(arr[1]) < 20))){
+      return false;
+    }
+    return true;
+  }
+
+  marketTimerFinished() {
+    init();
+  }
 }

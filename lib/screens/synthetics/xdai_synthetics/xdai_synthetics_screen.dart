@@ -228,7 +228,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         ),
       );
     }
-    if (state is XDaiSyntheticsMarketClosedState) {
+    if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -339,13 +339,14 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       child: MarketTimer(
         timerColor:
             //TODO: add colors to my_colors.dart (.red and .green)
-            state is XDaiSyntheticsMarketClosedState
+            state.marketClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
-        onEnd: () {},
-        label: state is XDaiSyntheticsMarketClosedState
+        onEnd: context.read<XDaiSyntheticsCubit>().marketTimerFinished(),
+        label: state.marketClosed
             ? 'UNTIL TRADING OPENS'
             : 'UNTIL TRADING CLOSES',
+        end: context.read<XDaiSyntheticsCubit>().marketStatusChanged(),
       ),
     );
   }
