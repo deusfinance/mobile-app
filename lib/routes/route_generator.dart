@@ -5,6 +5,9 @@ import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overvie
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
+import 'package:deus_mobile/screens/wallet_screen/wallet_detailed_asset_screen.dart';
+import 'package:deus_mobile/screens/wallet_screen/wallet_screen.dart';
+import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -29,7 +32,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
   final Map<String, WidgetBuilder> routes = {
     kInitialRoute: (BuildContext _) {
       if (locator<ConfigurationService>().didSetupWallet()) {
-        return BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen());
+        return BlocProvider<SwapCubit>(
+            create: (_) => SwapCubit(), child: SwapScreen());
       } else {
         return WalletProvider(builder: (_, __) {
           return IntroPage();
@@ -46,7 +50,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         return WalletCreatePage("Create wallet");
       });
     },
-    WalletImportPage.url: (_) => WalletSetupProvider(builder: (_, __) => WalletImportPage("Import wallet")),
+    WalletImportPage.url: (_) => WalletSetupProvider(
+        builder: (_, __) => WalletImportPage("Import wallet")),
     IntroPage.url: (_) => IntroPage(),
     // SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
     SplashScreen.route: (_) => SplashScreen(),
@@ -59,18 +64,24 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         child: StakeScreen(),
       );
     },
-    SwapScreen.route: (_) => BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen()),
+    SwapScreen.route: (_) => BlocProvider<SwapCubit>(
+        create: (_) => SwapCubit(), child: SwapScreen()),
     LockScreen.url: (_) => LockScreen(),
     SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
     //blurred screens (coming soon)
     BlurredStakeLockScreen.url: (_) => BlurredStakeLockScreen(),
-    BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen()
+    BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen(),
+    //Wallet screens
+    WalletSettingsScreen.url: (_) => WalletSettingsScreen(),
+    WalletScreen.url: (_) => WalletScreen(),
+    WalletDetailedAssetScreen.url: (_) => WalletDetailedAssetScreen()
   };
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);
   //TODO (@CodingDavid8): Replace hooks with cubit :)
-  final Widget screenWithWallet = WalletProvider(builder: (_, __) => screenChild);
+  final Widget screenWithWallet =
+      WalletProvider(builder: (_, __) => screenChild);
   return _getPageRoute(screenWithWallet, settings);
 }
 
