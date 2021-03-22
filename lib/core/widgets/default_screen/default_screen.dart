@@ -18,6 +18,7 @@ class DefaultScreen extends StatelessWidget {
     return WillPopScope(
         onWillPop: () async => await showWillPopDialog(context),
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: MyColors.Main_BG_Black,
           appBar: showHeading ? CustomAppBar() : null,
           body: Column(

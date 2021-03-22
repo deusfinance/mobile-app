@@ -1,3 +1,4 @@
+import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
 import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
 import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
@@ -5,6 +6,8 @@ import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overvie
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,7 +18,6 @@ import '../infrastructure/wallet_provider/wallet_provider.dart';
 import '../infrastructure/wallet_setup/wallet_setup_provider.dart';
 import '../locator.dart';
 import '../screens/lock/lock_screen.dart';
-import '../core/widgets/default_screen/default_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/stake_screen/stake_screen.dart';
 import '../screens/wallet_intro_screen/intro_page.dart';
@@ -52,6 +54,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     SplashScreen.route: (_) => SplashScreen(),
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
+    XDaiStockSelectorScreen.url: (_) => XDaiStockSelectorScreen(),
     //main screens
     StakeScreen.url: (_) {
       return BlocProvider(
@@ -60,8 +63,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
       );
     },
     SwapScreen.route: (_) => BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen()),
+    XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
     LockScreen.url: (_) => LockScreen(),
-    SyntheticsScreen.url: (_) => SyntheticsScreen(),
+    // SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
     //blurred screens (coming soon)
     BlurredStakeLockScreen.url: (_) => BlurredStakeLockScreen(),

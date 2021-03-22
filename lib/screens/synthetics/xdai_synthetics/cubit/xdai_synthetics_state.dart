@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/data_source/xdai_stock_data.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
+import 'package:deus_mobile/models/synthetics/stock_price.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/config_service.dart';
@@ -12,11 +14,12 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../../locator.dart';
 
-enum Mode { LONG, SHORT }
+enum Mode { LONG, SHORT, NONE }
 
 abstract class XDaiSyntheticsState extends Equatable {
-  Token from;
-  Token to;
+  Token fromToken;
+  Token toToken;
+  double toValue;
   bool approved;
   bool isInProgress;
   bool isPriceRatioForward;
@@ -24,36 +27,47 @@ abstract class XDaiSyntheticsState extends Equatable {
   var toFieldController;
   XDaiStockService service;
   Mode mode;
-  StreamController<String> streamController;
+  bool marketClosed;
+  StreamController<String> inputController;
+
+  Map<String, StockPrice> prices;
+  Timer timer;
 
   XDaiSyntheticsState();
 
   XDaiSyntheticsState.init()
       : isInProgress = false,
-        from = CurrencyData.xdai,
+        fromToken = CurrencyData.xdai,
         approved = true,
+        toValue = 0,
+        marketClosed = false,
         fromFieldController = new TextEditingController(),
         toFieldController = new TextEditingController(),
         isPriceRatioForward = true,
-        streamController = StreamController(),
+        prices = new Map(),
+        inputController = StreamController(),
         service = new XDaiStockService(
             ethService: new EthereumService(100),
             privateKey: locator<ConfigurationService>().getPrivateKey());
 
   XDaiSyntheticsState.copy(XDaiSyntheticsState state)
-      : this.from = state.from,
-        this.to = state.to,
+      : this.fromToken = state.fromToken,
+        this.toToken = state.toToken,
         this.isInProgress = state.isInProgress,
         this.approved = state.approved,
         this.service = state.service,
+        this.prices = state.prices,
+        this.marketClosed = state.marketClosed,
+        this.timer = state.timer,
+        this.toValue = state.toValue,
         this.isPriceRatioForward = state.isPriceRatioForward,
-        this.streamController = state.streamController,
+        this.inputController = state.inputController,
         this.fromFieldController = state.fromFieldController,
         this.mode = state.mode,
         this.toFieldController = state.toFieldController;
 
   @override
-  List<Object> get props => [from, to, approved, isInProgress, mode];
+  List<Object> get props => [fromToken, toToken, approved, isInProgress, mode, isPriceRatioForward, service, prices, timer, toValue];
 }
 
 class XDaiSyntheticsInitialState extends XDaiSyntheticsState {
@@ -64,12 +78,15 @@ class XDaiSyntheticsLoadingState extends XDaiSyntheticsState {
   XDaiSyntheticsLoadingState(XDaiSyntheticsState state) : super.copy(state);
 }
 
-class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
-  XDaiSyntheticsMarketClosedState() : super();
-}
+// class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
+//   XDaiSyntheticsMarketClosedState(XDaiSyntheticsState state,{Mode mode}) : super.copy(state){
+//     if(mode!=null)
+//       this.mode = mode;
+//   }
+// }
 
 class XDaiSyntheticsErrorState extends XDaiSyntheticsState {
-  XDaiSyntheticsErrorState() : super();
+  XDaiSyntheticsErrorState(XDaiSyntheticsState state) : super.copy(state);
 }
 
 class XDaiSyntheticsSelectAssetState extends XDaiSyntheticsState {
@@ -78,10 +95,18 @@ class XDaiSyntheticsSelectAssetState extends XDaiSyntheticsState {
 
 class XDaiSyntheticsAssetSelectedState extends XDaiSyntheticsState {
   XDaiSyntheticsAssetSelectedState(XDaiSyntheticsState state,
-      {bool isInProgress, bool approved})
+      {bool isInProgress,
+      bool approved,
+      Token fromToken,
+      Token toToken,
+      bool isPriceRatioForward,
+      Mode mode})
       : super.copy(state) {
     if (isInProgress != null) this.isInProgress = isInProgress;
     if (approved != null) this.approved = approved;
+    if (mode != null) this.mode = mode;
+    if (isPriceRatioForward != null)
+      this.isPriceRatioForward = isPriceRatioForward;
   }
 }
 
@@ -89,12 +114,40 @@ class XDaiSyntheticsTransactionPendingState extends XDaiSyntheticsState {
   bool showingToast;
   TransactionStatus transactionStatus;
 
-  XDaiSyntheticsTransactionPendingState() : super();
+  XDaiSyntheticsTransactionPendingState(XDaiSyntheticsState state,
+      {TransactionStatus transactionStatus, showingToast})
+      : super.copy(state) {
+    if (transactionStatus != null) {
+      this.transactionStatus = transactionStatus;
+      this.showingToast = true;
+    } else {
+      this.showingToast = false;
+    }
+    if (showingToast != null) this.showingToast = showingToast;
+    this.isInProgress = true;
+  }
+
+  @override
+  List<Object> get props => [showingToast, transactionStatus];
 }
 
 class XDaiSyntheticsTransactionFinishedState extends XDaiSyntheticsState {
   bool showingToast;
   TransactionStatus transactionStatus;
 
-  XDaiSyntheticsTransactionFinishedState() : super();
+  XDaiSyntheticsTransactionFinishedState(XDaiSyntheticsState state,
+      {TransactionStatus transactionStatus, showingToast})
+      : super.copy(state) {
+    if (transactionStatus != null) {
+      this.transactionStatus = transactionStatus;
+      this.showingToast = true;
+    } else {
+      this.showingToast = false;
+    }
+    if (showingToast != null) this.showingToast = showingToast;
+    this.isInProgress = false;
+  }
+
+  @override
+  List<Object> get props => [showingToast, transactionStatus];
 }

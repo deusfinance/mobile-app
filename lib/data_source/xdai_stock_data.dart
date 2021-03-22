@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:deus_mobile/models/synthetics/stock_price.dart';
+import 'package:deus_mobile/models/synthetics/stock_price_detail.dart';
 import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
 import 'package:http/http.dart' as http;
 
-import '../models/synthetics/contract_input_data.dart';
 import '../models/synthetics/stock.dart';
 import '../models/synthetics/stock_address.dart';
 import '../models/token.dart';
@@ -18,7 +18,7 @@ abstract class XDaiStockData {
 
   static StockAddress getStockAddress(Token stock) {
     for (var i = 0; i < addresses.length; i++) {
-      if (addresses[i].id == stock.getTokenName()) {
+      if (addresses[i].id.toLowerCase() == stock.getTokenName()) {
         return addresses[i];
       }
     }
@@ -27,14 +27,13 @@ abstract class XDaiStockData {
 
   static Future<Map> getPrices() async {
     var response =
-        await http.get("https://sync.deus.finance/oracle-files/price.json");
+        await http.get("https://oracle1.deus.finance/xdai/price.json");
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
       Map<String,StockPrice> prices = new Map();
       map.forEach((key, value) {
-        StockPrice p = new StockPrice(new StockPriceDetail(value["Long"]["price"], value["Long"]["fee"]), new StockPriceDetail(
-            value["Short"]["price"], value["Short"]["fee"]));
-        prices.addEntries([new MapEntry(key, p)]);
+        StockPrice p = new StockPrice(new StockPriceDetail.fromJson(value["Long"]), new StockPriceDetail.fromJson(value['Short']));
+        prices.addEntries([new MapEntry(key.toLowerCase(), p)]);
       });
       return prices;
     } else {
@@ -43,10 +42,13 @@ abstract class XDaiStockData {
   }
 
   static Future<bool> getData() async {
+    if(values.isNotEmpty)
+      return true;
     final response =
         await http.get("https://oracle1.deus.finance/xdai/registrar.json");
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
+      values.clear();
       map.forEach((key, value) {
         values.add(Stock.fromJson(value));
       });
@@ -57,11 +59,14 @@ abstract class XDaiStockData {
   }
 
   static Future<bool> getStockAddresses() async {
+    if(addresses.isNotEmpty)
+      return true;
     var response =
         await http.get("https://oracle1.deus.finance/xdai/conducted.json");
     if (response.statusCode == 200) {
       var js = json.decode(response.body);
       var map = js['tokens'];
+      addresses.clear();
       map.forEach((value) {
         addresses.add(StockAddress.fromJson(value));
       });

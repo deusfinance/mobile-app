@@ -1,181 +1,547 @@
+import 'dart:async';
 
+import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/data_source/stock_data.dart';
 import 'package:deus_mobile/data_source/xdai_stock_data.dart';
+import 'package:deus_mobile/models/swap/crypto_currency.dart';
+import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/models/synthetics/stock_address.dart';
+import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
 import 'package:deus_mobile/models/token.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:stream_transform/stream_transform.dart';
+import 'package:web3dart/web3dart.dart';
+import 'package:intl/intl.dart';
 
-class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState>{
 
+class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
   XDaiSyntheticsCubit() : super(XDaiSyntheticsInitialState());
 
-
-  init() async{
+  init() async {
     emit(XDaiSyntheticsLoadingState(state));
-    //TODO check market closed
+
     bool res1 = await XDaiStockData.getData();
     bool res2 = await XDaiStockData.getStockAddresses();
-    if(res1 && res2) {
-      getTokenBalance(state.from);
-      state.streamController.stream
+    state.prices = await XDaiStockData.getPrices();
+    if (res1 && res2 && state.prices != null) {
+      state.marketClosed = checkMarketStatus();
+      (state.fromToken as CryptoCurrency).balance =
+          await getTokenBalance(state.fromToken);
+      state.inputController.stream
           .transform(debounce(Duration(milliseconds: 500)))
-          .listen((s) async {
-        if(state is XDaiSyntheticsAssetSelectedState){
+          .listen((s) {
+        if (state is XDaiSyntheticsSelectAssetState) {
+        } else {
           emit(XDaiSyntheticsAssetSelectedState(state, isInProgress: true));
           if (double.tryParse(s) != null && double.tryParse(s) > 0) {
-              //TODO get price
-              String value = "00";
-              state.toFieldController.text = EthereumService.formatDouble(value);
+            double value = computeToPrice(s);
+            state.toValue = value;
+            state.toFieldController.text =
+                EthereumService.formatDouble(value.toStringAsFixed(20));
           } else {
+            state.toValue = 0;
             state.toFieldController.text = "0.0";
           }
           emit(XDaiSyntheticsAssetSelectedState(state, isInProgress: false));
         }
       });
-    }else{
-      emit(XDaiSyntheticsErrorState());
+      state.timer =
+          Timer.periodic(Duration(seconds: 14), (Timer t) => getPrices());
+      emit(XDaiSyntheticsSelectAssetState(state));
+    } else {
+      emit(XDaiSyntheticsErrorState(state));
     }
   }
 
-  getTokenBalance(Token token) async {
-    String tokenAddress;
-    if(token.getTokenName() == "xdai"){
-      tokenAddress = "0x0000000000000000000000000000000000000001";
+  DateTime marketStatusChanged(){
+    DateTime now = DateTime.now().toUtc().subtract(Duration(hours: 4));
+    List closedDays = ['Sat', 'Sun'];
+    var f = DateFormat('EEE,HH,mm,ss');
+    var date = f.format(now);
+    List arr = date.split(',');
+    if(!closedDays.contains(arr[0]) && ( (int.parse(arr[1]) == 6 && int.parse(arr[2]) > 30 && int.parse(arr[1]) < 20) || (int.parse(arr[1]) > 6 && int.parse(arr[1]) < 20))){
+      return DateTime.now().add(Duration(hours: 20 - int.parse(arr[1]) - 1, minutes: 60 - int.parse(arr[2])-1 , seconds: 60 - int.parse(arr[3])));
+    }
+    //TODO compute when market opens
+    if(arr[0] == "Fri"){
+      if(int.parse(arr[1]) < 7){
+        return DateTime.now().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
+      }else{
+        return DateTime.now().add(Duration(days: 2 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+      }
+    }else if(arr[0] == "Sat"){
+      print(arr);
+      return DateTime.now().add(Duration(days: 1 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+    }else if(arr[0] == "Sun"){
+      return DateTime.now().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
     }else{
+      if(int.parse(arr[1]) < 7){
+        return DateTime.now().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
+      }else{
+        return DateTime.now().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+      }
+    }
+  }
+
+  Future getTokenBalance(Token token) async {
+    String tokenAddress;
+    if (token.getTokenName() == "xdai") {
+      tokenAddress = "0x0000000000000000000000000000000000000001";
+    } else {
       StockAddress stockAddress = XDaiStockData.getStockAddress(token);
-      if(state.mode == Mode.LONG){
+      if (state.mode == Mode.LONG) {
         tokenAddress = stockAddress.long;
-      }else if(state.mode == Mode.SHORT){
+      } else if (state.mode == Mode.SHORT) {
         tokenAddress = stockAddress.short;
       }
     }
-    token.balance = await state.service.getTokenBalance(tokenAddress);
+    return await state.service.getTokenBalance(tokenAddress);
   }
 
   Future getAllowances() async {
-    emit(XDaiSyntheticsAssetSelectedState(state, approved: false, isInProgress: true));
+    emit(XDaiSyntheticsAssetSelectedState(state,
+        approved: false, isInProgress: true));
+    String tokenAddress = getTokenAddress(state.fromToken);
+    if (isBuy()) {
+      (state.fromToken as CryptoCurrency).allowances =
+          await state.service.getAllowances(tokenAddress);
+      if ((state.fromToken as CryptoCurrency).getAllowances() > BigInt.zero)
+        emit(XDaiSyntheticsAssetSelectedState(state,
+            approved: true, isInProgress: false));
+      else
+        emit(XDaiSyntheticsAssetSelectedState(state,
+            approved: false, isInProgress: false));
+    } else {
+      if (state.mode == null || state.mode == Mode.LONG) {
+        (state.fromToken as Stock).longAllowances =
+            await state.service.getAllowances(tokenAddress);
+        if ((state.fromToken as Stock).getAllowances() > BigInt.zero)
+          emit(XDaiSyntheticsAssetSelectedState(state,
+              approved: true, isInProgress: false));
+        else
+          emit(XDaiSyntheticsAssetSelectedState(state,
+              approved: false, isInProgress: false));
+      } else if (state.mode == Mode.SHORT) {
+        (state.fromToken as Stock).shortAllowances =
+            await state.service.getAllowances(tokenAddress);
+        if ((state.fromToken as Stock).getAllowances() > BigInt.zero)
+          emit(XDaiSyntheticsAssetSelectedState(state,
+              approved: true, isInProgress: false));
+        else
+          emit(XDaiSyntheticsAssetSelectedState(state,
+              approved: false, isInProgress: false));
+      }
+    }
+  }
+
+  String getPriceRatio() {
+    double a = double.tryParse(state.fromFieldController.text) ?? 0;
+    double b = state.toValue;
+    if (a != 0 && b != 0) {
+      if (state.isPriceRatioForward)
+        return EthereumService.formatDouble((a / b).toString(), 5);
+      return EthereumService.formatDouble((b / a).toString(), 5);
+    }
+    return "0.0";
+  }
+
+  String getTokenAddress(Token token) {
     String tokenAddress;
-    if(state.from.getTokenName() == "xdai"){
+    if (token.getTokenName() == "xdai") {
       tokenAddress = "0x0000000000000000000000000000000000000001";
-    }else{
-      StockAddress stockAddress = XDaiStockData.getStockAddress(state.from);
-      if(state.mode == Mode.LONG){
+    } else {
+      StockAddress stockAddress = XDaiStockData.getStockAddress(token);
+      if (state.mode == Mode.LONG) {
         tokenAddress = stockAddress.long;
-      }else if(state.mode == Mode.SHORT){
+      } else if (state.mode == Mode.SHORT) {
         tokenAddress = stockAddress.short;
       }
     }
-    state.from.allowances = await state.service.getAllowances(tokenAddress);
-    if (state.from.getAllowances() > BigInt.zero)
-      emit(XDaiSyntheticsAssetSelectedState(state, approved: true, isInProgress: false));
-    else
-      emit(XDaiSyntheticsAssetSelectedState(state, approved: false, isInProgress: false));
+    return tokenAddress;
   }
 
-  // Future approve() async {
-  //   if (!isInProgress) {
-  //     setState(() {
-  //       isInProgress = true;
-  //     });
-  //     showToast(
-  //         context,
-  //         TransactionStatus(
-  //             "Approve ${syntheticModel.from.name}", Status.PENDING, "Pending"));
-  //
-  //     var res = await stockService.approve(syntheticModel.from.getTokenName());
-  //     Stream<TransactionReceipt> result =
-  //     stockService.ethService.pollTransactionReceipt(res);
-  //     result.listen((event) {
-  //       setState(() {
-  //         isInProgress = false;
-  //         syntheticModel.approved = event.status;
-  //       });
-  //       if (event.status) {
-  //         showToast(
-  //             context,
-  //             TransactionStatus("Approved ${syntheticModel.from.name}",
-  //                 Status.SUCCESSFUL, "Successful"));
-  //       } else {
-  //         showToast(
-  //             context,
-  //             TransactionStatus("Approve of ${syntheticModel.from.name}",
-  //                 Status.FAILED, "Failed"));
-  //       }
-  //     });
-  //   }
-  // }
-  //
-  // Future sell() async {
-  //   if (!isInProgress) {
-  //     setState(() {
-  //       isInProgress = true;
-  //     });
-  //     String tokenAddress;
-  //     if(syntheticModel.from.getTokenName() == "dai"){
-  //       tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
-  //     }else{
-  //       StockAddress stockAddress = StockData.getStockAddress(syntheticModel.from);
-  //       tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
-  //     }
-  //     var res = await stockService.sell(tokenAddress, fromFieldController.text, null);
-  //     Stream<TransactionReceipt> result =
-  //     stockService.ethService.pollTransactionReceipt(res);
-  //     result.listen((event) {
-  //       setState(() {
-  //         isInProgress = false;
-  //         syntheticModel.approved = event.status;
-  //       });
-  //       if (event.status) {
-  //         showToast(
-  //             context,
-  //             TransactionStatus("Sell ${syntheticModel.from.name}",
-  //                 Status.SUCCESSFUL, "Failed"));
-  //       } else {
-  //         showToast(
-  //             context,
-  //             TransactionStatus("Sell of ${syntheticModel.from.name}",
-  //                 Status.FAILED, "Failed"));
-  //       }
-  //     });
-  //   }
-  // }
-  //
-  // Future buy() async {
-  //   if (!isInProgress) {
-  //     setState(() {
-  //       isInProgress = true;
-  //     });
-  //     String tokenAddress;
-  //     if(syntheticModel.from.getTokenName() == "dai"){
-  //       tokenAddress = await stockService.ethService.getTokenAddrHex("dai", "token");
-  //     }else{
-  //       StockAddress stockAddress = StockData.getStockAddress(syntheticModel.from);
-  //       tokenAddress = syntheticModel.selectionMode == SelectionMode.long? stockAddress.long: stockAddress.short;
-  //     }
-  //
-  //     var res = await stockService.buy(tokenAddress, fromFieldController.text, null);
-  //     Stream<TransactionReceipt> result =
-  //     stockService.ethService.pollTransactionReceipt(res);
-  //     result.listen((event) {
-  //       setState(() {
-  //         isInProgress = false;
-  //         syntheticModel.approved = event.status;
-  //       });
-  //       if (event.status) {
-  //         showToast(
-  //             context,
-  //             TransactionStatus("Buy ${syntheticModel.from.name}",
-  //                 Status.SUCCESSFUL, "Successful"));
-  //       } else {
-  //         showToast(
-  //             context,
-  //             TransactionStatus("Buy of ${syntheticModel.from.name}",
-  //                 Status.FAILED, "Failed"));
-  //       }
-  //     });
-  //   }
-  // }
+  fromTokenChanged(Token selectedToken) async {
+    state.toToken = CurrencyData.xdai;
+    state.fromToken = selectedToken;
+    (state.fromToken as Stock).mode = Mode.LONG;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
+    state.toValue = 0;
+
+    if (checkMarketClosed(selectedToken, Mode.LONG)) {
+      state.marketClosed = true;
+      emit(XDaiSyntheticsAssetSelectedState(state, mode: Mode.LONG));
+    } else {
+      state.marketClosed = false;
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          fromToken: selectedToken, mode: Mode.LONG, isInProgress: true));
+
+      await getAllowances();
+      (selectedToken as Stock).longBalance =
+          await getTokenBalance(selectedToken);
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          fromToken: selectedToken, isInProgress: false));
+    }
+  }
+
+  toTokenChanged(Token selectedToken) async {
+    state.fromToken = CurrencyData.xdai;
+    state.toToken = selectedToken;
+    (state.toToken as Stock).mode = Mode.LONG;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
+    state.toValue = 0;
+
+    if (checkMarketClosed(selectedToken, Mode.LONG)) {
+      state.marketClosed = true;
+      emit(XDaiSyntheticsAssetSelectedState(state, mode: Mode.LONG));
+    } else {
+      state.marketClosed = false;
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          toToken: selectedToken, mode: Mode.LONG, isInProgress: true));
+
+      await getAllowances();
+      (selectedToken as Stock).longBalance =
+          await getTokenBalance(selectedToken);
+
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          toToken: selectedToken, isInProgress: false));
+    }
+  }
+
+  addListenerToFromField() {
+    if (!state.fromFieldController.hasListeners) {
+      state.fromFieldController.addListener(() {
+        listenInput();
+      });
+    }
+  }
+
+  listenInput() async {
+    if (state is XDaiSyntheticsAssetSelectedState) {
+      String input = state.fromFieldController.text;
+      if (input == null || input.isEmpty) {
+        input = "0.0";
+      }
+      if (isBuy()) {
+        if ((state.fromToken as CryptoCurrency).getAllowances() >=
+            EthereumService.getWei(input, state.fromToken.getTokenName())) {
+          state.inputController.add(input);
+          emit(XDaiSyntheticsAssetSelectedState(state, approved: true));
+        } else {
+          state.inputController.add(input);
+          emit(XDaiSyntheticsAssetSelectedState(state, approved: false));
+        }
+      } else {
+        if ((state.fromToken as Stock).getAllowances() >=
+            EthereumService.getWei(input, state.fromToken.getTokenName())) {
+          state.inputController.add(input);
+          emit(XDaiSyntheticsAssetSelectedState(state, approved: true));
+        } else {
+          state.inputController.add(input);
+          emit(XDaiSyntheticsAssetSelectedState(state, approved: false));
+        }
+      }
+    }
+  }
+
+  reverseSync() {
+    Token a = state.fromToken;
+    state.fromToken = state.toToken;
+    state.toToken = a;
+    state.fromFieldController.text = "";
+    state.toFieldController.text = "";
+    state.toValue = 0;
+    getAllowances();
+  }
+
+  reversePriceRatio() {
+    if (state is XDaiSyntheticsAssetSelectedState) {
+      emit(XDaiSyntheticsAssetSelectedState(state,
+          isPriceRatioForward: !state.isPriceRatioForward));
+    }
+  }
+
+  Future<void> setMode(Mode mode) async {
+    if (!state.isInProgress && state.toToken != null) {
+      if (mode != state.mode) {
+        state.toFieldController.text = "";
+        // state.fromFieldController.text = "";
+        state.toValue = 0;
+        state.approved = false;
+      }
+      if (isBuy()) {
+        (state.toToken as Stock).mode = mode;
+      } else {
+        (state.fromToken as Stock).mode = mode;
+      }
+      if (checkMarketClosed(isBuy() ? state.toToken : state.fromToken, mode)) {
+        state.marketClosed = true;
+        emit(XDaiSyntheticsAssetSelectedState(state, mode: mode));
+      } else {
+        state.marketClosed = false;
+        emit(XDaiSyntheticsAssetSelectedState(state, mode: mode));
+        await getAllowances();
+        listenInput();
+      }
+    }
+  }
+
+  void closeToast() {
+    if (state is XDaiSyntheticsTransactionPendingState)
+      emit(XDaiSyntheticsTransactionPendingState(state, showingToast: false));
+    else if (state is XDaiSyntheticsTransactionFinishedState)
+      emit(XDaiSyntheticsTransactionFinishedState(state, showingToast: false));
+  }
+
+  Future approve() async {
+    if (!state.isInProgress) {
+      emit(XDaiSyntheticsTransactionPendingState(state,
+          transactionStatus: TransactionStatus(
+              "Approve ${state.fromToken.name}",
+              Status.PENDING,
+              "Transaction Pending")));
+
+      try {
+        var res = await state.service.approve(getTokenAddress(state.fromToken));
+        Stream<TransactionReceipt> result =
+            state.service.ethService.pollTransactionReceipt(res);
+        result.listen((event) {
+          state.approved = event.status;
+          if (event.status) {
+            state.approved = true;
+            emit(XDaiSyntheticsTransactionFinishedState(state,
+                transactionStatus: TransactionStatus(
+                    "Approve ${state.fromToken.name}",
+                    Status.SUCCESSFUL,
+                    "Transaction Successfull",
+                    res)));
+          } else {
+            emit(XDaiSyntheticsTransactionFinishedState(state,
+                transactionStatus: TransactionStatus(
+                    "Approve ${state.fromToken.name}",
+                    Status.FAILED,
+                    "Transaction Failed",
+                    res)));
+          }
+        });
+      } on Exception catch (value) {
+        state.approved = false;
+        emit(XDaiSyntheticsTransactionFinishedState(state,
+            transactionStatus: TransactionStatus(
+                "Approve ${state.fromToken.name}",
+                Status.FAILED,
+                "Transaction Failed")));
+      }
+    }
+  }
+
+  Future sell() async {
+    if (state.approved && !state.isInProgress) {
+      emit(XDaiSyntheticsTransactionPendingState(state,
+          transactionStatus: TransactionStatus(
+              "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+              Status.PENDING,
+              "Transaction Pending")));
+      String tokenAddress = getTokenAddress(state.fromToken);
+
+      List<XDaiContractInputData> oracles =
+          await XDaiStockData.getContractInputData(tokenAddress);
+      if (oracles.length >= 2) {
+        try {
+          //sort oracles on price and then on oracle number
+          List arr = [];
+          oracles.asMap().forEach((index, element) {
+            arr.add([index, element.getPrice()]);
+          });
+          arr.sort((a, b) => a[1].compareTo(b[1]));
+
+          List<XDaiContractInputData> inputOracles;
+          if (arr[0][0] < arr[1][0]) {
+            inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
+          } else {
+            inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+          }
+
+          var res = await state.service
+              .sell(tokenAddress, state.fromFieldController.text, inputOracles);
+          Stream<TransactionReceipt> result =
+              state.service.ethService.pollTransactionReceipt(res);
+          result.listen((event) async {
+            if (event.status) {
+              String fromBalance = await getTokenBalance(state.fromToken);
+              String toBalance = await getTokenBalance(state.toToken);
+              if (state.mode == Mode.LONG)
+                (state.fromToken as Stock).longBalance = fromBalance;
+              else
+                (state.fromToken as Stock).shortBalance = fromBalance;
+
+              (state.toToken as CryptoCurrency).balance = toBalance;
+              emit(XDaiSyntheticsTransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                      Status.SUCCESSFUL,
+                      "Transaction Successfull",
+                      res)));
+            } else {
+              emit(XDaiSyntheticsTransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                      Status.FAILED,
+                      "Transaction Failed",
+                      res)));
+            }
+          });
+        } on Exception catch (_) {
+          emit(XDaiSyntheticsTransactionFinishedState(state,
+              transactionStatus: TransactionStatus(
+                  "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                  Status.FAILED,
+                  "Transaction Failed")));
+        }
+      } else {
+        emit(XDaiSyntheticsTransactionFinishedState(state,
+            transactionStatus: TransactionStatus(
+                "oracles not available", Status.FAILED, "Transaction Failed")));
+      }
+    }
+  }
+
+  Future buy() async {
+    if (!state.isInProgress) {
+      emit(XDaiSyntheticsTransactionPendingState(state,
+          transactionStatus: TransactionStatus(
+              "Buy ${state.toFieldController.text} ${state.toToken.getTokenName()}",
+              Status.PENDING,
+              "Transaction Pending")));
+      String tokenAddress = getTokenAddress(state.toToken);
+
+      List<XDaiContractInputData> oracles =
+          await XDaiStockData.getContractInputData(tokenAddress);
+      if (oracles.length >= 2) {
+        try {
+          //sort oracles on price and then on oracle number
+          List arr = [];
+          oracles.asMap().forEach((index, element) {
+            arr.add([index, element.getPrice()]);
+          });
+          arr.sort((a, b) => b[1].compareTo(a[1]));
+
+          List<XDaiContractInputData> inputOracles;
+          if (arr[0][0] < arr[1][0]) {
+            inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
+          } else {
+            inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+          }
+          String maxPrice = arr[0][1].toString();
+
+          var res = await state.service.buy(tokenAddress,
+              state.toValue.toStringAsFixed(20), inputOracles, maxPrice);
+
+          Stream<TransactionReceipt> result =
+              state.service.ethService.pollTransactionReceipt(res);
+          result.listen((event) async {
+            if (event.status) {
+              String fromBalance = await getTokenBalance(state.fromToken);
+              String toBalance = await getTokenBalance(state.toToken);
+              if (state.mode == Mode.LONG)
+                (state.toToken as Stock).longBalance = toBalance;
+              else
+                (state.toToken as Stock).shortBalance = toBalance;
+
+              (state.fromToken as CryptoCurrency).balance = fromBalance;
+              emit(XDaiSyntheticsTransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "Buy ${state.toFieldController.text} ${state.toToken.getTokenName()}",
+                      Status.SUCCESSFUL,
+                      "Transaction Successfull",
+                      res)));
+            } else {
+              emit(XDaiSyntheticsTransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "Buy ${state.toFieldController.text} ${state.toToken.getTokenName()}",
+                      Status.FAILED,
+                      "Transaction Failed",
+                      res)));
+            }
+          });
+        } on Exception catch (_) {
+          emit(XDaiSyntheticsTransactionFinishedState(state,
+              transactionStatus: TransactionStatus(
+                  "Buy ${state.toFieldController.text} ${state.toToken.getTokenName()}",
+                  Status.FAILED,
+                  "Transaction Failed")));
+        }
+      } else {
+        emit(XDaiSyntheticsTransactionFinishedState(state,
+            transactionStatus: TransactionStatus(
+                "oracles not available", Status.FAILED, "Transaction Failed")));
+      }
+    }
+  }
+
+  void dispose() {
+    state.timer?.cancel();
+  }
+
+  void getPrices() async {
+    state.prices = await XDaiStockData.getPrices();
+    listenInput();
+  }
+
+  bool checkMarketClosed(Token selectedToken, Mode mode) {
+    if (state.prices != null) {
+      if (mode == Mode.LONG)
+        return state.prices[selectedToken.getTokenName()].long.isClosed ??
+            false;
+      else
+        return state.prices[selectedToken.getTokenName()].short.isClosed ??
+            false;
+    }
+    return true;
+  }
+
+  double computeToPrice(String s) {
+    double res;
+    if (isBuy()) {
+      if (state.mode == Mode.LONG)
+        res = double.tryParse(s) /
+            state.prices[state.toToken.getTokenName()].long.price;
+      else
+        res = double.tryParse(s) /
+            state.prices[state.toToken.getTokenName()].short.price;
+    } else {
+      if (state.mode == Mode.LONG)
+        res = double.tryParse(s) *
+            state.prices[state.fromToken.getTokenName()].long.price;
+      else
+        res = double.tryParse(s) *
+            state.prices[state.fromToken.getTokenName()].short.price;
+    }
+    return res;
+  }
+
+  Future<String> getRemCap() async {
+    return await state.service.getUsedCap();
+  }
+
+  bool isBuy() => state.fromToken.getTokenName() == "xdai";
+
+  bool checkMarketStatus() {
+    List closedDays = ['Sat', 'Sun'];
+    var f = DateFormat('EEE,HH,mm');
+    var date = f.format(DateTime.now().toUtc());
+    List arr = date.split(',');
+    if(!closedDays.contains(arr[0]) && ( (int.parse(arr[1]) == 6 && int.parse(arr[2]) > 30 && int.parse(arr[1]) < 20) || (int.parse(arr[1]) > 6 && int.parse(arr[1]) < 20))){
+      return false;
+    }
+    return true;
+  }
+
+  marketTimerFinished() {
+    // init();
+  }
 }
