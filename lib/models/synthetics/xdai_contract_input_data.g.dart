@@ -10,10 +10,10 @@ XDaiContractInputData _$XDaiContractInputDataFromJson(
     Map<String, dynamic> json) {
   return XDaiContractInputData()
     ..multiplier = json['multiplier'] as int
-    ..signs = (json['signs'] as List)
-        ?.map(
-            (e) => e == null ? null : Sign.fromJson(e as Map<String, dynamic>))
-        ?.toList()
+    ..signs = (json['signs'] as Map<String, dynamic>)?.map(
+      (k, e) => MapEntry(
+          k, e == null ? null : Sign.fromJson(e as Map<String, dynamic>)),
+    )
     ..price = json['price'] as String
     ..fee = json['fee'] as int
     ..blockNo = json['blockNo'] as int;
