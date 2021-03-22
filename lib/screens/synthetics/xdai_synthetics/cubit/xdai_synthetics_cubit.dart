@@ -57,29 +57,31 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
   }
 
   DateTime marketStatusChanged(){
+    DateTime now = DateTime.now().toUtc().subtract(Duration(hours: 4));
     List closedDays = ['Sat', 'Sun'];
     var f = DateFormat('EEE,HH,mm,ss');
-    var date = f.format(DateTime.now().toUtc());
+    var date = f.format(now);
     List arr = date.split(',');
     if(!closedDays.contains(arr[0]) && ( (int.parse(arr[1]) == 6 && int.parse(arr[2]) > 30 && int.parse(arr[1]) < 20) || (int.parse(arr[1]) > 6 && int.parse(arr[1]) < 20))){
-      return DateTime.now().toUtc().add(Duration(hours: 20 - int.parse(arr[1]) - 1, minutes: 60 - int.parse(arr[2])-1 , seconds: 60 - int.parse(arr[3])));
+      return DateTime.now().add(Duration(hours: 20 - int.parse(arr[1]) - 1, minutes: 60 - int.parse(arr[2])-1 , seconds: 60 - int.parse(arr[3])));
     }
     //TODO compute when market opens
     if(arr[0] == "Fri"){
       if(int.parse(arr[1]) < 7){
-        return DateTime.now().toUtc().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
+        return DateTime.now().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
       }else{
-        return DateTime.now().toUtc().add(Duration(days: 2 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+        return DateTime.now().add(Duration(days: 2 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
       }
     }else if(arr[0] == "Sat"){
-      return DateTime.now().toUtc().add(Duration(days: 1 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+      print(arr);
+      return DateTime.now().add(Duration(days: 1 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
     }else if(arr[0] == "Sun"){
-      return DateTime.now().toUtc().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+      return DateTime.now().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
     }else{
       if(int.parse(arr[1]) < 7){
-        return DateTime.now().toUtc().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
+        return DateTime.now().add(Duration(hours: 6 - int.parse(arr[1]), minutes: 30 - int.parse(arr[2])));
       }else{
-        return DateTime.now().toUtc().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
+        return DateTime.now().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
       }
     }
   }
@@ -540,6 +542,6 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
   }
 
   marketTimerFinished() {
-    init();
+    // init();
   }
 }

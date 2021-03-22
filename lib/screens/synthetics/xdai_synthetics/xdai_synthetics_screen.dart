@@ -50,7 +50,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl);
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
           }
         },
         onClosed: () {
@@ -67,7 +67,8 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl);
+          https://blockscout.com/xdai/mainnet/tx/
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
         },
         onClosed: () {
           context.read<XDaiSyntheticsCubit>().closeToast();
@@ -83,7 +84,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl);
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
         },
         onClosed: () {
           context.read<XDaiSyntheticsCubit>().closeToast();

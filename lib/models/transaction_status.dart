@@ -19,10 +19,16 @@ class TransactionStatus {
     return message;
   }
 
-  String get transactionUrl {
-    String prefix = '';
-    final int currentChainId = AppConfig.selectedConfig.params.chainId;
-    if (currentChainId != 1) prefix = EthereumService.NETWORK_NAMES[currentChainId].toLowerCase() + '.';
-    return "https://${prefix}etherscan.io/tx/" + hash;
+  String transactionUrl({int chainId}) {
+    if(chainId != null){
+      if(chainId == 100)
+        return "https://blockscout.com/xdai/mainnet/tx/" + hash;
+    }else {
+      String prefix = '';
+      final int currentChainId = AppConfig.selectedConfig.params.chainId;
+      if (currentChainId != 1) prefix =
+          EthereumService.NETWORK_NAMES[currentChainId].toLowerCase() + '.';
+      return "https://${prefix}etherscan.io/tx/" + hash;
+    }
   }
 }

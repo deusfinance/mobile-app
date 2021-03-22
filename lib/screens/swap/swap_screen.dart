@@ -98,7 +98,7 @@ class _SwapScreenState extends State<SwapScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl);
+            _launchInBrowser(transactionStatus.transactionUrl());
           }
         },
         onClosed: () {
@@ -115,7 +115,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl);
+          _launchInBrowser(transactionStatus.transactionUrl());
         },
         onClosed: () {
           context.read<SwapCubit>().closeToast();
@@ -131,7 +131,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl);
+          _launchInBrowser(transactionStatus.transactionUrl());
         },
         onClosed: () {
           context.read<SwapCubit>().closeToast();

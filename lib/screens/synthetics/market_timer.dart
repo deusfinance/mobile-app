@@ -24,7 +24,7 @@ class MarketTimer extends StatelessWidget {
 
   int get endTimeInMs {
     //TODO (@CodingDavid8): Move into cubit
-    final DateTime now = DateTime.now().toUtc();
+    final DateTime now = DateTime.now();
 
     final int difference = end.difference(now).inMilliseconds;
     final int endTime = now.millisecondsSinceEpoch + difference;
@@ -69,6 +69,7 @@ class MarketTimer extends StatelessWidget {
             textStyle:
                 TextStyle(fontSize: 25, height: 1, color: this.timerColor),
           ),
+          SizedBox(height: 8,),
           Text(
             this.label,
             style: const TextStyle(fontSize: 12.5, height: 1),
