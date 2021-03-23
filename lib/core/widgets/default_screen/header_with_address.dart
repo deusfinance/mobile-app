@@ -5,6 +5,7 @@ import 'package:deus_mobile/infrastructure/wallet_provider/wallet_handler.dart';
 import 'package:deus_mobile/infrastructure/wallet_provider/wallet_provider.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/intro_page.dart';
+import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
@@ -48,34 +49,13 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
 
   GestureDetector _buildWalletLogout(WalletHandler walletStore) {
     return GestureDetector(
-        onTap: () async {
-          final bool confirm = await showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                      title: Text("Warning"),
-                      content: Text("Without your seed phrase or private key you cannot restore your wallet balance!"),
-                      actions: [
-                        FlatButton(
-                          child: Text("Cancel"),
-                          onPressed: () => locator<NavigationService>().goBack(context, false),
-                        ),
-                        FlatButton(
-                          child: Text("Reset Wallet"),
-                          onPressed: () {
-                            locator<NavigationService>().goBack(context, true);
-                          },
-                        )
-                      ]);
-                },
-              ) ??
-              false;
-          if (confirm) {
-            await walletStore.resetWallet();
-            locator<NavigationService>().navigateTo(IntroPage.url, context);
-          }
+        onTap: () {
+          locator<NavigationService>()
+              .navigateTo(WalletSettingsScreen.url, context);
         },
-        child: Container(margin: EdgeInsets.symmetric(horizontal: 6), child: PlatformSvg.asset('images/logout.svg')));
+        child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 6),
+            child: PlatformSvg.asset('images/logout.svg')));
   }
 
   Container _buildAddressContainer() {
@@ -83,7 +63,8 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
-          border: Border.all(color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
+          border: Border.all(
+              color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
           color: Color(MyColors.kAddressBackground).withOpacity(0.25),
           borderRadius: BorderRadius.all(Radius.circular(6))),
       child: this.widget.walletAddress != null
@@ -101,6 +82,10 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
 
   Widget _buildAddress(String address) {
     return GestureDetector(
+        onTap: () {
+          locator<NavigationService>()
+              .navigateTo(WalletSettingsScreen.url, context);
+        },
         onLongPress: () async => await copyToClipBoard(address),
         child: Center(
           child: Text(
