@@ -5,8 +5,6 @@ import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overvie
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
-import 'package:deus_mobile/screens/wallet_screen/wallet_detailed_asset_screen.dart';
-import 'package:deus_mobile/screens/wallet_screen/wallet_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,8 +72,6 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen(),
     //Wallet screens
     WalletSettingsScreen.url: (_) => WalletSettingsScreen(),
-    WalletScreen.url: (_) => WalletScreen(),
-    WalletDetailedAssetScreen.url: (_) => WalletDetailedAssetScreen()
   };
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);

@@ -1,9 +1,12 @@
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/infrastructure/wallet_provider/wallet_handler.dart';
+import 'package:deus_mobile/infrastructure/wallet_provider/wallet_provider.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/intro_page.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
@@ -11,35 +14,25 @@ import 'package:flutter/material.dart';
 class WalletSettingsScreen extends StatefulWidget {
   static const url = '/wallet-settings';
 
-  static const List<String> _testWalletAddresses = [
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-    '93475zadfjbvökadsfjbv',
-  ];
-
   @override
   _WalletSettingsScreenState createState() => _WalletSettingsScreenState();
 }
 
 class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
-  bool _walletSelected = false;
+  bool _showLogOutDialogue = false;
   int _selectedWalletIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final WalletHandler walletStore = useWallet(context);
     return DefaultScreen(
-      child: _walletSelected ? _buildLogOutWalletBody() : _buildListBody(),
+      child: _showLogOutDialogue
+          ? _buildLogOutWalletBody(walletStore)
+          : _buildListBody(),
     );
   }
 
-  Container _buildLogOutWalletBody() {
+  Container _buildLogOutWalletBody(WalletHandler walletStore) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 45),
       margin: EdgeInsets.symmetric(horizontal: 15, vertical: 40),
@@ -63,7 +56,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             height: 20,
           ),
           Text(
-            'Without your seed phrase or private key you can\'restore your wallet balance!',
+            "Without your seed phrase or private key you cannot restore your wallet balance!",
             style: MyStyles.whiteMediumTextStyle
                 .copyWith(color: MyColors.ToastRed),
             textAlign: TextAlign.center,
@@ -76,7 +69,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    _walletSelected = false;
+                    _showLogOutDialogue = false;
                   });
                 },
                 child: Container(
@@ -98,8 +91,11 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    setState(() {
-                      _walletSelected = false;
+                    setState(() async {
+                      await walletStore.resetWallet();
+                      locator<NavigationService>()
+                          .navigateTo(IntroPage.url, context);
+                      _showLogOutDialogue = false;
                     });
                   },
                   child: Container(
@@ -142,7 +138,8 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           ),
           SizedBox(height: 20),
           GestureDetector(
-            onTap:() => locator<NavigationService>().navigateTo(IntroPage.url, context),
+            onTap: () =>
+                locator<NavigationService>().navigateTo(IntroPage.url, context),
             child: Container(
               height: 50,
               margin: EdgeInsets.symmetric(horizontal: 15),
@@ -150,30 +147,37 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               decoration: BoxDecoration(
                   color: MyColors.Button_BG_Black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(5),
-                  border:
-                  Border.all(color: MyColors.Light_Grey.withOpacity(0.4))),
+                  border: Border.all(color: MyColors.Selected_Grey)),
               child: Row(
                 children: [
-                  PlatformSvg.asset('icons/addWalletIcon.svg'),
+                  // PlatformSvg.asset('icons/addWalletIcon.svg'),
                   SizedBox(
                     width: 12,
                   ),
-                  Text('Add Wallet'),
+                  Text('Multiple Wallets coming soon!'),
                 ],
               ),
             ),
           ),
-          SizedBox(height: 10,),
-          ListView.separated(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (ctx, ind) => _buildWalletListTile(
-                  WalletSettingsScreen._testWalletAddresses[ind],
-                  _selectedWalletIndex == ind),
-              separatorBuilder: (_, __) => SizedBox(
-                    height: 10,
-                  ),
-              itemCount: WalletSettingsScreen._testWalletAddresses.length),
+          SizedBox(
+            height: 10,
+          ),
+          FutureBuilder(
+              future: locator<AddressService>().getPublicAddress(),
+              builder: (_, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.separated(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (ctx, ind) => _buildWalletListTile(
+                          snapshot.data.hex, _selectedWalletIndex == ind),
+                      separatorBuilder: (_, __) => SizedBox(
+                            height: 10,
+                          ),
+                      itemCount: 1);
+                }
+                return Center(child: CircularProgressIndicator());
+              }),
           SizedBox(height: 10),
         ],
       ),
@@ -187,7 +191,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
       padding: EdgeInsets.only(left: 16, right: 10, top: 8, bottom: 8),
       decoration: BoxDecoration(
         color: selected ? MyColors.Selected_Grey : MyColors.Button_BG_Black,
-        border: Border.all(color: MyColors.Light_Grey),
+        border: Border.all(color: MyColors.Selected_Grey),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
@@ -207,7 +211,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           GestureDetector(
             onTap: () {
               setState(() {
-                _walletSelected = true;
+                _showLogOutDialogue = true;
               });
             },
             child: Container(
