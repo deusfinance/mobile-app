@@ -40,7 +40,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
             double value = computeToPrice(s);
             state.toValue = value;
             state.toFieldController.text =
-                EthereumService.formatDouble(value.toStringAsFixed(20));
+                EthereumService.formatDouble(value.toStringAsFixed(18));
           } else {
             state.toValue = 0;
             state.toFieldController.text = "0.0";
@@ -221,7 +221,10 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
   }
 
   listenInput() async {
-    if (state is XDaiSyntheticsAssetSelectedState) {
+    if(state is XDaiSyntheticsSelectAssetState){
+
+    }
+    else {
       String input = state.fromFieldController.text;
       if (input == null || input.isEmpty) {
         input = "0.0";
@@ -439,7 +442,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
           String maxPrice = arr[0][1].toString();
 
           var res = await state.service.buy(tokenAddress,
-              state.toValue.toStringAsFixed(20), inputOracles, maxPrice);
+              state.toValue.toStringAsFixed(18), inputOracles, maxPrice);
 
           Stream<TransactionReceipt> result =
               state.service.ethService.pollTransactionReceipt(res);

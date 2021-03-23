@@ -3,10 +3,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 abstract class IConfigurationService {
   Future<void> setMnemonic(String value);
   Future<void> setupDone(bool value);
+  Future<void> setupPasswordDone(bool value);
   Future<void> setPrivateKey(String value);
+  Future<void> setPassword(String value);
   String getMnemonic();
+  String getPassword();
   String getPrivateKey();
   bool didSetupWallet();
+  bool didSetupPassword();
 }
 
 /// Service for saving configuration and wallet access on the local device.
@@ -22,6 +26,8 @@ class ConfigurationService implements IConfigurationService {
   static const _kMnemonicKey = "mnemonic";
   static const _kPrivateKey = "privateKey";
   static const _kWalletSetup = "didSetupWallet";
+  static const _passwordSetup = "didSetupPassword";
+  static const _password = "password";
 
   /// initially sets all the data saved in the secure storage.
   ///
@@ -63,5 +69,25 @@ class ConfigurationService implements IConfigurationService {
   @override
   bool didSetupWallet() {
     return (_values[_kWalletSetup]?.toLowerCase() ?? 'false') == 'true';
+  }
+
+  @override
+  bool didSetupPassword() {
+    return (_values[_passwordSetup]?.toLowerCase() ?? 'false') == 'true';
+  }
+
+  @override
+  String getPassword() {
+    return _values[_password];
+  }
+
+  @override
+  Future<void> setPassword(String value) async {
+    await _write(_password, value);
+  }
+
+  @override
+  Future<void> setupPasswordDone(bool value) async {
+    await _write(_passwordSetup, value.toString());
   }
 }

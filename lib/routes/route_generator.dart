@@ -1,6 +1,8 @@
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
 import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
 import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
+import 'package:deus_mobile/screens/password/password_screen.dart';
+import 'package:deus_mobile/screens/password/set_password_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
@@ -30,12 +32,18 @@ const kInitialRoute = '/';
 Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
   final Map<String, WidgetBuilder> routes = {
     kInitialRoute: (BuildContext _) {
-      if (locator<ConfigurationService>().didSetupWallet()) {
-        return BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen());
-      } else {
-        return WalletProvider(builder: (_, __) {
-          return IntroPage();
-        });
+      // if (locator<ConfigurationService>().didSetupWallet()) {
+      //   return BlocProvider<SwapCubit>(
+      //       create: (_) => SwapCubit(), child: SwapScreen());
+      // } else {
+      //   return WalletProvider(builder: (_, __) {
+      //     return IntroPage();
+      //   });
+      // }
+      if (!locator<ConfigurationService>().didSetupPassword()) {
+        return SetPasswordScreen();
+      }else{
+        return PasswordScreen();
       }
     },
     WalletCreatePage.url: (_) {
@@ -48,9 +56,13 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         return WalletCreatePage("Create wallet");
       });
     },
-    WalletImportPage.url: (_) => WalletSetupProvider(builder: (_, __) => WalletImportPage("Import wallet")),
-    IntroPage.url: (_) => IntroPage(),
-    // SwapBackendTestScreen.url: (_) => SwapBackendTestScreen(),
+    WalletImportPage.url: (_) => WalletSetupProvider(
+        builder: (_, __) => WalletImportPage("Import wallet")),
+    IntroPage.url: (_) => WalletProvider(builder: (_, __) {
+          return IntroPage();
+        }),
+    SetPasswordScreen.url: (_) => SetPasswordScreen(),
+    PasswordScreen.url: (_) => PasswordScreen(),
     SplashScreen.route: (_) => SplashScreen(),
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
@@ -62,8 +74,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         child: StakeScreen(),
       );
     },
-    SwapScreen.route: (_) => BlocProvider<SwapCubit>(create: (_) => SwapCubit(), child: SwapScreen()),
-    XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
+    SwapScreen.route: (_) => BlocProvider<SwapCubit>(
+        create: (_) => SwapCubit(), child: SwapScreen()),
+    XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(
+        create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
     LockScreen.url: (_) => LockScreen(),
     // SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
@@ -74,7 +88,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
   // print("Fading to ${settings.name}");
   final Widget screenChild = routes[settings.name](context);
   //TODO (@CodingDavid8): Replace hooks with cubit :)
-  final Widget screenWithWallet = WalletProvider(builder: (_, __) => screenChild);
+  final Widget screenWithWallet =
+      WalletProvider(builder: (_, __) => screenChild);
   return _getPageRoute(screenWithWallet, settings);
 }
 
