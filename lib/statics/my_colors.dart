@@ -27,6 +27,8 @@ abstract class MyColors {
   static MaterialColor HalfBlack = _getMaterialColor(0, 0, 0, 0xFF000000);
   static MaterialColor Main_BG_Black =
       _getMaterialColor(13, 13, 13, 0xFF0D0D0D);
+  static MaterialColor Selected_Grey =
+      _getMaterialColor(57, 57, 57, 0xFF393939);
   static MaterialColor Gray = _getMaterialColor(44, 44, 44, 0xFF2C2C2C);
   static MaterialColor Button_BG_Black =
       _getMaterialColor(28, 28, 28, 0xFF1C1C1C);

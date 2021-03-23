@@ -23,16 +23,29 @@ class WalletImportPage extends HookWidget {
     final store = useWalletSetup(context);
     return Scaffold(
       appBar: CustomAppBar(title: title),
-      body: ImportWalletForm(
-        errors: store.state.errors.toList(),
-        onImport: !store.state.loading
-            ? (type, value) async {
-                switch (type) {
-                  case WalletImportType.mnemonic:
-                    if (!await store.importFromMnemonic(value)) return;
-                    break;
-                  case WalletImportType.privateKey:
-                    if (!await store.importFromPrivateKey(value)) return;
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: Container(
+            padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 30),
+            child: Text(
+              "You can choose if you want to import your wallet with your seed phrase or with your private key. These will be securely stored on your device, which enables you to send transactions.",
+              textAlign: TextAlign.center,
+              style:
+                  TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 15),
+            ),
+          ),
+        ),
+        ImportWalletForm(
+          errors: store.state.errors.toList(),
+          onImport: !store.state.loading
+              ? (type, value) async {
+                  switch (type) {
+                    case WalletImportType.mnemonic:
+                      if (!await store.importFromMnemonic(value)) return;
+                      break;
+                    case WalletImportType.privateKey:
+                      if (!await store.importFromPrivateKey(value)) return;
 
                     break;
                   default:
