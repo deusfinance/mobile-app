@@ -492,7 +492,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
   void getPrices() async {
     state.prices = await XDaiStockData.getPrices();
-    listenInput();
+    // listenInput();
   }
 
   bool checkMarketClosed(Token selectedToken, Mode mode) {
