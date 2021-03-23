@@ -28,7 +28,7 @@ class WalletImportPage extends HookWidget {
           child: Container(
             padding: EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 30),
             child: Text(
-              "You can choose if you want to import your wallet with your seed phrase or with your private key. These will be securely stored on your device, and enable you to send transactions.",
+              "You can choose if you want to import your wallet with your seed phrase or with your private key. These will be securely stored on your device, which enables you to send transactions.",
               textAlign: TextAlign.center,
               style:
                   TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 15),
