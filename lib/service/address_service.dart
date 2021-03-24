@@ -38,6 +38,12 @@ class AddressService implements IAddressService {
   }
 
   @override
+  String getMnemonic() {
+    return bip39
+        .entropyToMnemonic(locator<ConfigurationService>().getMnemonic());
+  }
+
+  @override
   Future<EthereumAddress> getPublicAddress([String privateKey]) async {
     //if the privateKey wasn't passed, read it from the config (local device).
     privateKey ??= locator<ConfigurationService>().getPrivateKey();
