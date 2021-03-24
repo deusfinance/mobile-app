@@ -1,6 +1,7 @@
 import 'package:deus_mobile/core/widgets/default_screen/custom_app_bar.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/routes/route_generator.dart';
+import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -44,7 +45,7 @@ class WalletCreatePage extends HookWidget {
               onConfirm: !store.state.loading
                   ? (confirmedMnemonic) async {
                       if (await store.confirmMnemonic(confirmedMnemonic)) {
-                        locator<NavigationService>().navigateTo(kInitialRoute, context, replaceAll: true);
+                        locator<NavigationService>().navigateTo(SwapScreen.route, context, replaceAll: true);
                       }
                     }
                   : null,
