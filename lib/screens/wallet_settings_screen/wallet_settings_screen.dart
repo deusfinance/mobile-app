@@ -179,6 +179,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                 return Center(child: CircularProgressIndicator());
               }),
           SizedBox(height: 10),
+          _buildWalletListTile('9238öasjdkbvsaökjdb', false)
         ],
       ),
     );
@@ -195,8 +196,6 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
         borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
-        mainAxisAlignment:
-            selected ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
         children: [
           if (selected) Icon(Icons.check),
           if (selected)
@@ -207,7 +206,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             '${walletAddress.substring(0, 8)}...${walletAddress.substring(walletAddress.length - 4)}',
             style: MyStyles.whiteSmallTextStyle,
           ),
-          if (selected) Spacer(),
+          Spacer(),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -226,7 +225,33 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                     .copyWith(fontSize: 12.5, color: MyColors.ToastRed),
               ),
             ),
-          )
+          ),
+          PopupMenuButton(
+              color: MyColors.Button_BG_Black,
+              icon: Icon(Icons.more_vert_rounded),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              itemBuilder: (context) {
+                List<PopupMenuEntry<Object>> list=[];
+                list.add(
+                  PopupMenuItem(
+                      child: Text(
+                    'Copy wallet address',
+                    style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 15),
+                  )),
+                );
+                list.add(PopupMenuDivider(
+                  height: 10,
+                ));
+                list.add(
+                  PopupMenuItem(
+                      child: Text(
+                    'Copy seed phrase',
+                    style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 15),
+                  )),
+                );
+                return list;
+              })
         ],
       ),
     );
