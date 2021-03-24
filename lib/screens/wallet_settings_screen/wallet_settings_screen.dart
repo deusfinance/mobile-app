@@ -10,6 +10,9 @@ import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:deus_mobile/core/util/clipboard.dart';
+
+enum copyMenu { walletAdress, seedPhrase }
 
 class WalletSettingsScreen extends StatefulWidget {
   static const url = '/wallet-settings';
@@ -195,8 +198,6 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
         borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
-        mainAxisAlignment:
-            selected ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
         children: [
           if (selected) Icon(Icons.check),
           if (selected)
@@ -207,7 +208,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             '${walletAddress.substring(0, 8)}...${walletAddress.substring(walletAddress.length - 4)}',
             style: MyStyles.whiteSmallTextStyle,
           ),
-          if (selected) Spacer(),
+          Spacer(),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -226,7 +227,47 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                     .copyWith(fontSize: 12.5, color: MyColors.ToastRed),
               ),
             ),
-          )
+          ),
+          PopupMenuButton<copyMenu>(
+              padding: EdgeInsets.only(top: 5, bottom: 5, right: 0, left: 5),
+              color: MyColors.Button_BG_Black,
+              icon: Icon(Icons.more_vert_rounded),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              onSelected: (copyMenu result) async {
+                String content;
+                if (result == copyMenu.walletAdress) {
+                  content = walletAddress;
+                } else if (result == copyMenu.seedPhrase) {
+                  content = locator<AddressService>().getMnemonic();
+                }
+                await copyToClipBoard(content);
+              },
+              itemBuilder: (context) {
+                List<PopupMenuEntry<copyMenu>> list = [];
+                list.add(
+                  PopupMenuItem<copyMenu>(
+                      value: copyMenu.walletAdress,
+                      child: Text(
+                        'Copy wallet address',
+                        style: MyStyles.whiteMediumTextStyle
+                            .copyWith(fontSize: 15),
+                      )),
+                );
+                list.add(PopupMenuDivider(
+                  height: 10,
+                ));
+                list.add(
+                  PopupMenuItem<copyMenu>(
+                      value: copyMenu.seedPhrase,
+                      child: Text(
+                        'Copy seed phrase',
+                        style: MyStyles.whiteMediumTextStyle
+                            .copyWith(fontSize: 15),
+                      )),
+                );
+                return list;
+              })
         ],
       ),
     );
