@@ -12,13 +12,14 @@ class MarketTimer extends StatelessWidget {
   final String label;
   final Color timerColor;
 
-  final DateTime end = DateTime.now().add(Duration(hours: 10));
+  final DateTime end;
 
   MarketTimer({
     Key key,
     @required this.onEnd,
     @required this.label,
     @required this.timerColor,
+    this.end,
   }) : super(key: key);
 
   int get endTimeInMs {
@@ -68,6 +69,7 @@ class MarketTimer extends StatelessWidget {
             textStyle:
                 TextStyle(fontSize: 25, height: 1, color: this.timerColor),
           ),
+          SizedBox(height: 8,),
           Text(
             this.label,
             style: const TextStyle(fontSize: 12.5, height: 1),
