@@ -179,7 +179,6 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                 return Center(child: CircularProgressIndicator());
               }),
           SizedBox(height: 10),
-          _buildWalletListTile('9238öasjdkbvsaökjdb', false)
         ],
       ),
     );
