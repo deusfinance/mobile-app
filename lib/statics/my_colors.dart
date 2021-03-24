@@ -32,6 +32,8 @@ abstract class MyColors {
   static MaterialColor Gray = _getMaterialColor(44, 44, 44, 0xFF2C2C2C);
   static MaterialColor Button_BG_Black =
       _getMaterialColor(28, 28, 28, 0xFF1C1C1C);
+  static MaterialColor Selected_Grey =
+      _getMaterialColor(57, 57, 57, 0xFF393939);
   static const Color Blue = Color(0xFF0779E4);
   static const Color Purple = Color(0xFFEA2C62);
   static MaterialColor Cyan = _getMaterialColor(21, 43, 27, 0xFF152b1b);

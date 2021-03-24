@@ -49,9 +49,34 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
 
   GestureDetector _buildWalletLogout(WalletHandler walletStore) {
     return GestureDetector(
-        onTap: () {
-          locator<NavigationService>()
-              .navigateTo(WalletSettingsScreen.url, context);
+        onTap: () async {
+          final bool confirm = await showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                      title: Text("Warning"),
+                      content: Text(
+                          "Without your seed phrase or private key you cannot restore your wallet balance!"),
+                      actions: [
+                        FlatButton(
+                          child: Text("Cancel"),
+                          onPressed: () => locator<NavigationService>()
+                              .goBack(context, false),
+                        ),
+                        FlatButton(
+                          child: Text("Reset Wallet"),
+                          onPressed: () {
+                            locator<NavigationService>().goBack(context, true);
+                          },
+                        )
+                      ]);
+                },
+              ) ??
+              false;
+          if (confirm) {
+            await walletStore.resetWallet();
+            locator<NavigationService>().navigateTo(IntroPage.url, context);
+          }
         },
         child: Container(
             margin: EdgeInsets.symmetric(horizontal: 6),

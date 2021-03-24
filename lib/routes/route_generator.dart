@@ -33,18 +33,13 @@ const kInitialRoute = '/';
 Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
   final Map<String, WidgetBuilder> routes = {
     kInitialRoute: (BuildContext _) {
-      // if (locator<ConfigurationService>().didSetupWallet()) {
-      //   return BlocProvider<SwapCubit>(
-      //       create: (_) => SwapCubit(), child: SwapScreen());
-      // } else {
-      //   return WalletProvider(builder: (_, __) {
-      //     return IntroPage();
-      //   });
-      // }
-      if (!locator<ConfigurationService>().didSetupPassword()) {
-        return SetPasswordScreen();
-      }else{
-        return PasswordScreen();
+      if (locator<ConfigurationService>().didSetupWallet()) {
+        return BlocProvider<SwapCubit>(
+            create: (_) => SwapCubit(), child: SwapScreen());
+      } else {
+        return WalletProvider(builder: (_, __) {
+          return IntroPage();
+        });
       }
     },
     WalletCreatePage.url: (_) {
