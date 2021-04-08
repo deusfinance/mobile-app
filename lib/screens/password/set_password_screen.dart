@@ -39,15 +39,16 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Column(
-          children: [
-            _buildHeader(),
-            SizedBox(height: 150,),
-            _buildInput(),
+      body: SingleChildScrollView(
+        child: Column(
+            children: [
+              _buildHeader(),
+              SizedBox(height: 150,),
+              _buildInput(),
 
-          ],
-        ),
+            ],
+          ),
+      ),
     );
   }
 

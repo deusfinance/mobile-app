@@ -7,10 +7,18 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../../locator.dart';
+
+enum _SupportState {
+  unknown,
+  supported,
+  unsupported,
+}
 
 class PasswordScreen extends StatefulWidget {
   static var url = '/password';
@@ -24,6 +32,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
   ConfigurationService configurationService;
   bool error;
 
+  final LocalAuthentication auth = LocalAuthentication();
+  _SupportState _supportState = _SupportState.unknown;
+
   final darkGrey = Color(0xFF1C1C1C);
   final LinearGradient button_gradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
 
@@ -32,6 +43,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
     error = false;
     passwordController = new TextEditingController();
     configurationService = locator<ConfigurationService>();
+
+    auth.isDeviceSupported().then(
+          (isSupported) => setState(() => _supportState = isSupported
+          ? _SupportState.supported
+          : _SupportState.unsupported),
+    );
     super.initState();
   }
 
@@ -45,6 +62,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
             _buildHeader(),
             SizedBox(height: 100,),
             _buildInput(),
+            SizedBox(height: 60,),
+            _buildFingerPrint(),
           ],
         ),
     );
@@ -141,4 +160,91 @@ class _PasswordScreenState extends State<PasswordScreen> {
       ),
     );
   }
+
+  Future<bool> _checkBiometrics() async {
+    bool canCheckBiometrics;
+    try {
+      canCheckBiometrics = await auth.canCheckBiometrics;
+    } on PlatformException catch (e) {
+      canCheckBiometrics = false;
+      print(e);
+    }
+    if (!mounted) return false;
+
+    return canCheckBiometrics;
+  }
+
+  Future<bool> _canCheckFingerPrint() async {
+    if(await _checkBiometrics()){
+      List<BiometricType> availableBiometrics;
+      try {
+        availableBiometrics = await auth.getAvailableBiometrics();
+      } on PlatformException catch (e) {
+        return false;
+      }
+      if (!mounted) return false;
+
+      if(availableBiometrics.contains(BiometricType.fingerprint)){
+        return true;
+      }
+      return false;
+    }
+    else
+      return false;
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    bool authenticated = false;
+    try {
+
+      authenticated = await auth.authenticate(
+          localizedReason:
+          'Scan your fingerprint (or face or whatever) to authenticate',
+          useErrorDialogs: true,
+          stickyAuth: true,
+          biometricOnly: true);
+    } on PlatformException catch (e) {
+      print(e);
+      return;
+    }
+    if (!mounted) return;
+
+    if(authenticated){
+      if (locator<ConfigurationService>().didSetupWallet()){
+        locator<NavigationService>().navigateTo(SwapScreen.route, context,replaceAll: true);
+      }else{
+        locator<NavigationService>().navigateTo(IntroPage.url, context,replaceAll: true);
+      }
+    }
+  }
+
+  _buildFingerPrint() {
+    if(_supportState == _SupportState.unknown){
+      return Center(child: CircularProgressIndicator(),);
+    }else if(_supportState == _SupportState.supported){
+      return FutureBuilder(
+          future: _canCheckFingerPrint(),
+          builder: (context, snapshot){
+        if(snapshot.hasData && snapshot.data!=null){
+          if(snapshot.data){
+            return GestureDetector(
+              onTap: _authenticateWithBiometrics,
+              child: Column(children: [
+                Icon(Icons.fingerprint,size: 60,),
+                SizedBox(height: 20,),
+                Text("Authenticate by fingerPrint", style: TextStyle(fontSize: 12),)
+              ],),
+            );
+          }else{
+            return Container();
+          }
+        }else{
+          return CircularProgressIndicator();
+        }
+      });
+    }else{
+      return Container();
+    }
+  }
+
 }
