@@ -50,12 +50,9 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
   GestureDetector _buildWalletLogout(WalletHandler walletStore) {
     return GestureDetector(
         onTap: () {
-          locator<NavigationService>()
-              .navigateTo(WalletSettingsScreen.url, context);
+          locator<NavigationService>().navigateTo(WalletSettingsScreen.url, context);
         },
-        child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 6),
-            child: PlatformSvg.asset('images/logout.svg')));
+        child: Container(margin: EdgeInsets.symmetric(horizontal: 6), child: PlatformSvg.asset('images/logout.svg')));
   }
 
   Container _buildAddressContainer() {
@@ -63,8 +60,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
-          border: Border.all(
-              color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
+          border: Border.all(color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
           color: Color(MyColors.kAddressBackground).withOpacity(0.25),
           borderRadius: BorderRadius.all(Radius.circular(6))),
       child: this.widget.walletAddress != null
@@ -83,8 +79,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
   Widget _buildAddress(String address) {
     return GestureDetector(
         onTap: () {
-          locator<NavigationService>()
-              .navigateTo(WalletSettingsScreen.url, context);
+          locator<NavigationService>().navigateTo(WalletSettingsScreen.url, context);
         },
         onLongPress: () async => await copyToClipBoard(address),
         child: Center(
