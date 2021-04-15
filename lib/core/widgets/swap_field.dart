@@ -1,5 +1,6 @@
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
@@ -65,11 +66,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
               _buildTextField(),
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.direction == Direction.from)
-                    _buildMaxButton(),
-                  _buildTokenSelection()
-                ],
+                children: [if (widget.direction == Direction.from) _buildMaxButton(), _buildTokenSelection()],
               ),
             ],
           ),
@@ -81,8 +78,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   Widget _buildTokenSelection() {
     return GestureDetector(
         onTap: () async {
-          final _selectedToken = await locator<NavigationService>()
-              .navigateTo(widget.selectAssetRoute, context);
+          final _selectedToken = await locator<NavigationService>().navigateTo(widget.selectAssetRoute, context);
           if (_selectedToken != null) {
             setState(() {
               selectedToken = _selectedToken;
@@ -108,22 +104,17 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
 
   Widget _buildMaxButton() {
     String balance = "0.0";
-    if(selectedToken !=null){
-      if(selectedToken is CryptoCurrency){
+    if (selectedToken != null) {
+      if (selectedToken is CryptoCurrency) {
         balance = (selectedToken as CryptoCurrency).balance;
-      }else if(selectedToken is Stock){
+      } else if (selectedToken is Stock) {
         Stock stock = selectedToken as Stock;
-        if(stock.mode == Mode.SHORT){
-          balance = stock.shortBalance;
-        }
-        else{
-          balance = stock.longBalance;
-        }
+        balance = stock.mode == Mode.SHORT ? stock.shortBalance : stock.longBalance;
       }
     }
     return Flexible(
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           setState(() {
             widget.controller.text = balance;
           });
@@ -168,10 +159,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                 ),
-                inputFormatters: [
-                  WhitelistingTextInputFormatter(
-                      new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                ],
+                inputFormatters: [WhitelistingTextInputFormatter(new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))],
                 controller: widget.controller,
                 keyboardType: TextInputType.number,
                 style: MyStyles.whiteMediumTextStyle)));
@@ -179,15 +167,14 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
 
   Widget _buildDirectionAndBalance() {
     String balance = "0.0";
-    if(selectedToken !=null){
-      if(selectedToken is CryptoCurrency){
+    if (selectedToken != null) {
+      if (selectedToken is CryptoCurrency) {
         balance = (selectedToken as CryptoCurrency).balance;
-      }else if(selectedToken is Stock){
+      } else if (selectedToken is Stock) {
         Stock stock = selectedToken as Stock;
-        if(stock.mode == Mode.SHORT){
+        if (stock.mode == Mode.SHORT) {
           balance = stock.shortBalance;
-        }
-        else{
+        } else {
           balance = stock.longBalance;
         }
       }
@@ -200,7 +187,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           style: MyStyles.lightWhiteSmallTextStyle,
         ),
         Text(
-          'Balance: ${EthereumService.formatDouble(balance??"0.0")}',
+          'Balance: ${EthereumService.formatDouble(balance ?? "0.0")}',
           style: MyStyles.lightWhiteSmallTextStyle,
         ),
       ],
@@ -210,32 +197,20 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   Widget _buildTokenName() {
     if (selectedToken != null) {
       if (selectedToken is CryptoCurrency) {
-        return Text(
-            selectedToken.symbol,
-            style: MyStyles.whiteMediumTextStyle);
-      }else if(selectedToken is Stock){
+        return Text(selectedToken.symbol, style: MyStyles.whiteMediumTextStyle);
+      } else if (selectedToken is Stock) {
         Stock stock = selectedToken as Stock;
-        if(stock.mode == Mode.SHORT){
-          return Text(
-              stock.shortSymbol,
-              style: MyStyles.whiteMediumTextStyle);
+        if (stock.mode == Mode.SHORT) {
+          return Text(stock.shortSymbol, style: MyStyles.whiteMediumTextStyle);
+        } else {
+          return Text(stock.longSymbol, style: MyStyles.whiteMediumTextStyle);
         }
-        else{
-          return Text(
-              stock.longSymbol,
-              style: MyStyles.whiteMediumTextStyle);
-        }
-      }else{
-        return Text(
-            "---",
-            style: MyStyles.whiteMediumTextStyle);
+      } else {
+        return Text("---", style: MyStyles.whiteMediumTextStyle);
       }
-      Text(selectedToken != null ? selectedToken.symbol : "select asset",
-          style: MyStyles.whiteMediumTextStyle);
-    }else{
-      return Text(
-          "select asset",
-          style: MyStyles.whiteMediumTextStyle);
+      Text(selectedToken != null ? selectedToken.symbol : "select asset", style: MyStyles.whiteMediumTextStyle);
+    } else {
+      return Text("select asset", style: MyStyles.whiteMediumTextStyle);
     }
   }
 }

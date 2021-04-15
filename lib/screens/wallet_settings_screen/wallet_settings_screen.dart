@@ -29,9 +29,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
   Widget build(BuildContext context) {
     final WalletHandler walletStore = useWallet(context);
     return DefaultScreen(
-      child: _showLogOutDialogue
-          ? _buildLogOutWalletBody(walletStore)
-          : _buildListBody(),
+      child: _showLogOutDialogue ? _buildLogOutWalletBody(walletStore) : _buildListBody(),
     );
   }
 
@@ -52,16 +50,14 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           ),
           Text(
             'WARNING',
-            style:
-                MyStyles.whiteBigTextStyle.copyWith(color: MyColors.ToastRed),
+            style: MyStyles.whiteBigTextStyle.copyWith(color: MyColors.ToastRed),
           ),
           SizedBox(
             height: 20,
           ),
           Text(
             "Without your seed phrase or private key you cannot restore your wallet balance!",
-            style: MyStyles.whiteMediumTextStyle
-                .copyWith(color: MyColors.ToastRed),
+            style: MyStyles.whiteMediumTextStyle.copyWith(color: MyColors.ToastRed),
             textAlign: TextAlign.center,
           ),
           Spacer(),
@@ -84,8 +80,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   child: Center(
                     child: Text(
                       'CANCEL',
-                      style: MyStyles.whiteSmallTextStyle
-                          .copyWith(color: MyColors.ToastGreen),
+                      style: MyStyles.whiteSmallTextStyle.copyWith(color: MyColors.ToastGreen),
                     ),
                   ),
                 ),
@@ -93,13 +88,10 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               SizedBox(width: 20),
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    setState(() async {
-                      await walletStore.resetWallet();
-                      locator<NavigationService>()
-                          .navigateTo(IntroPage.url, context);
-                      _showLogOutDialogue = false;
-                    });
+                  onTap: () async {
+                    await walletStore.resetWallet();
+                    _showLogOutDialogue = false;
+                    locator<NavigationService>().navigateTo(IntroPage.url, context);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -110,8 +102,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                     child: Center(
                       child: Text(
                         'RESET WALLET',
-                        style: MyStyles.whiteSmallTextStyle
-                            .copyWith(color: MyColors.ToastRed),
+                        style: MyStyles.whiteSmallTextStyle.copyWith(color: MyColors.ToastRed),
                       ),
                     ),
                   ),
@@ -141,8 +132,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
           ),
           SizedBox(height: 20),
           GestureDetector(
-            onTap: () =>
-                locator<NavigationService>().navigateTo(IntroPage.url, context),
+            onTap: () => locator<NavigationService>().navigateTo(IntroPage.url, context),
             child: Container(
               height: 50,
               margin: EdgeInsets.symmetric(horizontal: 15),
@@ -172,8 +162,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   return ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemBuilder: (ctx, ind) => _buildWalletListTile(
-                          snapshot.data.hex, _selectedWalletIndex == ind),
+                      itemBuilder: (ctx, ind) => _buildWalletListTile(snapshot.data.hex, _selectedWalletIndex == ind),
                       separatorBuilder: (_, __) => SizedBox(
                             height: 10,
                           ),
@@ -223,8 +212,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   border: Border.all(color: MyColors.ToastRed)),
               child: Text(
                 'LOG OUT',
-                style: MyStyles.whiteMediumTextStyle
-                    .copyWith(fontSize: 12.5, color: MyColors.ToastRed),
+                style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 12.5, color: MyColors.ToastRed),
               ),
             ),
           ),
@@ -232,8 +220,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               padding: EdgeInsets.only(top: 5, bottom: 5, right: 0, left: 5),
               color: MyColors.Button_BG_Black,
               icon: Icon(Icons.more_vert_rounded),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
               onSelected: (copyMenu result) async {
                 String content;
                 if (result == copyMenu.walletAdress) {
@@ -250,8 +237,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                       value: copyMenu.walletAdress,
                       child: Text(
                         'Copy wallet address',
-                        style: MyStyles.whiteMediumTextStyle
-                            .copyWith(fontSize: 15),
+                        style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 15),
                       )),
                 );
                 list.add(PopupMenuDivider(
@@ -262,8 +248,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                       value: copyMenu.seedPhrase,
                       child: Text(
                         'Copy seed phrase',
-                        style: MyStyles.whiteMediumTextStyle
-                            .copyWith(fontSize: 15),
+                        style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 15),
                       )),
                 );
                 return list;

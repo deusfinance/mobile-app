@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import '../../core/widgets/selection_button.dart';
 import '../../core/widgets/svg.dart';
 import '../../core/widgets/swap_field.dart';
 import '../../core/widgets/toast.dart';
+import '../../locator.dart';
 import '../../models/swap/gas.dart';
 import '../../models/token.dart';
 import '../../models/transaction_status.dart';
@@ -440,7 +442,9 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       );
     }
-    if (state.approved && state.fromToken.getBalance() < EthereumService.getWei(state.fromFieldController.text, state.fromToken.getTokenName())) {
+    if (state.approved &&
+        state.fromToken.getBalance() <
+            EthereumService.getWei(state.fromFieldController.text, state.fromToken.getTokenName())) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -481,7 +485,8 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 0.1 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
+            decoration:
+                state.slippage == 0.1 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
@@ -501,16 +506,13 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 0.5
-                ? MyStyles.blueToGreenSwapScreenDecoration
-                : MyStyles.lightBlackBorderDecoration,
+            decoration:
+                state.slippage == 0.5 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
                 "0.5%",
-                style: state.slippage == 0.5
-                    ? MyStyles.blackSmallTextStyle
-                    : MyStyles.whiteSmallTextStyle,
+                style: state.slippage == 0.5 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
               ),
             ),
           ),
@@ -525,9 +527,8 @@ class _SwapScreenState extends State<SwapScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
             margin: EdgeInsets.all(4.0),
-            decoration: state.slippage == 1.0
-                ? MyStyles.blueToGreenSwapScreenDecoration
-                : MyStyles.lightBlackBorderDecoration,
+            decoration:
+                state.slippage == 1.0 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
             child: Align(
               alignment: Alignment.center,
               child: Text(
