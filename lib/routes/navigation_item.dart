@@ -44,7 +44,7 @@ class NavigationItem extends Equatable {
   static final NavigationItem stakeAndLockOverview = NavigationItem(
       page: BlurredStakeLockScreen(),
       title: "Lock and Stake",
-      routeUrl: BlurredStakeLockScreen.url);
+      routeUrl: StakingVaultOverviewScreen.url);
 
   static final NavigationItem staking = NavigationItem(
       page: StakeScreen(), title: "Staking", routeUrl: StakeScreen.url);

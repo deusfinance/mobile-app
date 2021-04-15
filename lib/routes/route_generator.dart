@@ -4,6 +4,8 @@ import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics
 import 'package:deus_mobile/screens/password/password_screen.dart';
 import 'package:deus_mobile/screens/password/set_password_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_overview_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_overview_state.dart';
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
@@ -31,6 +33,7 @@ import '../service/config_service.dart';
 const kInitialRoute = '/';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
+  final Map<String, dynamic> arguments = settings.arguments;
   final Map<String, WidgetBuilder> routes = {
     kInitialRoute: (BuildContext _) {
       // if (locator<ConfigurationService>().didSetupWallet()) {
@@ -43,7 +46,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
       // }
       if (!locator<ConfigurationService>().didSetupPassword()) {
         return SetPasswordScreen();
-      }else{
+      } else {
         return PasswordScreen();
       }
     },
@@ -71,7 +74,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     //main screens
     StakeScreen.url: (_) {
       return BlocProvider(
-        create: (context) => StakeCubit(),
+        create: (context) => StakeCubit(arguments["token_object"]),
         child: StakeScreen(),
       );
     },
@@ -81,7 +84,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
     LockScreen.url: (_) => LockScreen(),
     // SyntheticsScreen.url: (_) => SyntheticsScreen(),
-    StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
+    StakingVaultOverviewScreen.url: (_) =>
+        BlocProvider<StakingVaultOverviewCubit>(
+            create: (_) => StakingVaultOverviewCubit(),
+            child: StakingVaultOverviewScreen()),
     //blurred screens (coming soon)
     BlurredStakeLockScreen.url: (_) => BlurredStakeLockScreen(),
     BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen(),

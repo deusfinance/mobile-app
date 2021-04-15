@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:deus_mobile/core/widgets/chart/util.dart';
 import 'package:deus_mobile/core/widgets/custom_chart.dart';
 import 'package:deus_mobile/models/chart_data_point.dart';
@@ -6,6 +8,7 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 class ChartContainer extends StatefulWidget {
   final Future<List<ChartDataPoint>> chartPoints;
@@ -49,6 +52,18 @@ class _ChartContainerState extends State<ChartContainer> {
     return _randomTestData;
   }
 
+  getTvl() async {
+    double tvl = 0;
+    var response = await http.get("https://app.deus.finance/tvl.json");
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> map = json.decode(response.body);
+      map.forEach((key, value) {
+        tvl += value;
+      });
+    }
+    return tvl;
+  }
+
   void _onTimeSelected(Duration dur) {
     setState(() {
       _displayedChartDuration = dur;
@@ -65,15 +80,15 @@ class _ChartContainerState extends State<ChartContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ValueLockedChartData>(
-        future: futureData,
-        builder: (context, snap) {
-          return Column(children: [
-            _buildChangeIndicator(snap),
-            _midHeightDivider,
-            _buildBody(snap),
-          ]);
-        });
+    return Column(children: [
+      _buildChangeIndicator(),
+      _midHeightDivider,
+      FutureBuilder<ValueLockedChartData>(
+          future: futureData,
+          builder: (context, snap) {
+            return _buildBody(snap);
+          })
+    ]);
   }
 
   Container _buildBody(AsyncSnapshot<ValueLockedChartData> snap) {
@@ -106,25 +121,29 @@ class _ChartContainerState extends State<ChartContainer> {
     );
   }
 
-  Container _buildChangeIndicator(AsyncSnapshot<ValueLockedChartData> snap) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 15),
-      width: double.infinity,
-      padding: EdgeInsets.only(top: 10, bottom: 10, left: 40),
-      decoration: BoxDecoration(
-          color: Color(MyColors.kWalletFillChart),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: MyColors.HalfBlack)),
-      child: Center(
-        child: Text(
-          snap.connectionState == ConnectionState.done
-              ? 'TVL: ${snap.data.lockedInCrypto} ETH (\$${snap.data.lockedInCash})'
-              : 'TVL: --------- ETH(\$---------)', //TODO: Crypto kürzel
+  Widget _buildChangeIndicator() {
+    return FutureBuilder(
+        future: getTvl(),
+        builder: (context, snap) {
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 15),
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 10, bottom: 10, left: 40),
+            decoration: BoxDecoration(
+                color: Color(MyColors.kWalletFillChart),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: MyColors.HalfBlack)),
+            child: Center(
+              child: Text(
+                snap.connectionState == ConnectionState.done
+                    ? 'TVL: \$${snap.data}'
+                    : 'TVL: \$-------', //TODO: Crypto kürzel
 
-          style: MyStyles.whiteSmallTextStyle,
-        ),
-      ),
-    );
+                style: MyStyles.whiteSmallTextStyle,
+              ),
+            ),
+          );
+        });
   }
 
   Column _buildHeader(double lockedInCash, double lockedInCrypto,
