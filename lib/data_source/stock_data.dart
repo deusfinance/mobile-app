@@ -6,6 +6,7 @@ import '../models/synthetics/contract_input_data.dart';
 import '../models/synthetics/stock.dart';
 import '../models/synthetics/stock_address.dart';
 import '../models/token.dart';
+import 'backend_endpoints.dart';
 
 //TODO (@CodingDavid8) fetch all supported stocks from server
 abstract class StockData {
@@ -68,6 +69,7 @@ abstract class StockData {
   }
 
   static Future<bool> getPrices() async {
+    // TODO: Replace URL with BackendEndpoints.NAME_OF_ENDPOINT
     var response = await http.get("https://sync.deus.finance/oracle-files/price.json");
     if (response.statusCode == 200) {
 //      contractInputData.clear();
@@ -81,6 +83,4 @@ abstract class StockData {
       return false;
     }
   }
-
-
 }
