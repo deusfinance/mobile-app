@@ -89,7 +89,7 @@ class _StakeScreenState extends State<StakeScreen> {
                       kSmallSpacer,
                       _buildStakeApproveButton(state),
                       kMediumSpacer,
-                      if (state is StakeHasToApprove) Steps(),
+                      if (state is StakeHasToApprove || state is StakePendingApprove) Steps(),
                       Spacer(),
                       _buildToastWidget(state),
                       Spacer(),
@@ -151,24 +151,46 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Widget _buildToastWidget(StakeState state) {
-    if (state is StakeTransactionPendingState && state.showingToast) {
-      return Align(
-          alignment: Alignment.bottomCenter,
-          child: _buildTransactionPending(state.transactionStatus));
-    } else if (state is StakeTransactionFinishedState &&
-        state.showingToast) {
-      if (state.transactionStatus.status == Status.PENDING) {
+    if(state.showingToast){
+      if (state is StakePendingApprove){
         return Align(
             alignment: Alignment.bottomCenter,
             child: _buildTransactionPending(state.transactionStatus));
-      } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
+      }
+      if (state is StakePendingStake){
         return Align(
             alignment: Alignment.bottomCenter,
-            child: _buildTransactionSuccessFul(state.transactionStatus));
-      } else if (state.transactionStatus.status == Status.FAILED) {
-        return Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildTransactionFailed(state.transactionStatus));
+            child: _buildTransactionPending(state.transactionStatus));
+      }
+      if (state is StakeHasToApprove){
+        if (state.transactionStatus.status == Status.PENDING) {
+          return Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildTransactionPending(state.transactionStatus));
+        } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
+          return Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildTransactionSuccessFul(state.transactionStatus));
+        } else if (state.transactionStatus.status == Status.FAILED) {
+          return Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildTransactionFailed(state.transactionStatus));
+        }
+      }
+      if (state is StakeIsApproved){
+        if (state.transactionStatus.status == Status.PENDING) {
+          return Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildTransactionPending(state.transactionStatus));
+        } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
+          return Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildTransactionSuccessFul(state.transactionStatus));
+        } else if (state.transactionStatus.status == Status.FAILED) {
+          return Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildTransactionFailed(state.transactionStatus));
+        }
       }
     }
     return Container();
@@ -214,11 +236,10 @@ class _StakeScreenState extends State<StakeScreen> {
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
-      showBothButtons: !state.approved,
-      showLoading: state.isInProgress,
+      showBothButtons: state is StakeHasToApprove || state is StakePendingApprove,
+      showLoading: state is StakePendingApprove || state is StakePendingStake,
       onPressed: () async {
-        print(state.isInProgress);
-        if (state.isInProgress) return;
+        if (state is StakePendingApprove || state is StakePendingStake) return;
         if (state is StakeIsApproved) context.read<StakeCubit>().stake();
         if (state is StakeHasToApprove) context.read<StakeCubit>().approve();
       },

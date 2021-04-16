@@ -29,56 +29,50 @@ class StakeCubit extends Cubit<StakeState> {
   }
 
   Future getAllowances() async {
-    emit(StakeHasToApprove(state,
-        isInProgress: true));
-      state.stakeTokenObject.allowances =
-      await state.stakeService.getAllowances(state.stakeTokenObject.tokenName);
-      if (state.stakeTokenObject.getAllowances() > BigInt.zero)
-        emit(StakeIsApproved(state, isInProgress: false));
-      else
-        emit(StakeHasToApprove(state,
-            isInProgress: false));
-      print(state.isInProgress);
+    emit(StakePendingApprove(state));
+    state.stakeTokenObject.allowances = await state.stakeService
+        .getAllowances(state.stakeTokenObject.tokenName);
+    if (state.stakeTokenObject.getAllowances() > BigInt.zero)
+      emit(StakeIsApproved(state));
+    else
+      emit(StakeHasToApprove(state));
   }
 
   Future<void> approve() async {
-    if (!state.isInProgress) {
-      emit(StakeTransactionPendingState(state,
+    emit(StakePendingApprove(state,
+        transactionStatus: TransactionStatus(
+            "Approve ${state.stakeTokenObject.name}",
+            Status.PENDING,
+            "Transaction Pending")));
+
+    try {
+      var res =
+          await state.stakeService.approve(state.stakeTokenObject.tokenName);
+      Stream<TransactionReceipt> result =
+          state.stakeService.ethService.pollTransactionReceipt(res);
+      result.listen((event) {
+        if (event.status) {
+          emit(StakeIsApproved(state,
+              transactionStatus: TransactionStatus(
+                  "Approve ${state.stakeTokenObject.name}",
+                  Status.SUCCESSFUL,
+                  "Transaction Successful",
+                  res)));
+        } else {
+          emit(StakeHasToApprove(state,
+              transactionStatus: TransactionStatus(
+                  "Approve ${state.stakeTokenObject.name}",
+                  Status.FAILED,
+                  "Transaction Failed",
+                  res)));
+        }
+      });
+    } on Exception catch (value) {
+      emit(StakeHasToApprove(state,
           transactionStatus: TransactionStatus(
               "Approve ${state.stakeTokenObject.name}",
-              Status.PENDING,
-              "Transaction Pending")));
-
-      try {
-        var res =
-            await state.stakeService.approve(state.stakeTokenObject.tokenName);
-        Stream<TransactionReceipt> result =
-            state.stakeService.ethService.pollTransactionReceipt(res);
-        result.listen((event) {
-          if (event.status) {
-            emit(StakeTransactionFinishedState(state,
-                transactionStatus: TransactionStatus(
-                    "Approve ${state.stakeTokenObject.name}",
-                    Status.SUCCESSFUL,
-                    "Transaction Successful",
-                    res)));
-            emit(StakeIsApproved(state, isInProgress: false));
-          } else {
-            emit(StakeTransactionFinishedState(state,
-                transactionStatus: TransactionStatus(
-                    "Approve ${state.stakeTokenObject.name}",
-                    Status.FAILED,
-                    "Transaction Failed",
-                    res)));
-          }
-        });
-      } on Exception catch (value) {
-        emit(StakeTransactionFinishedState(state,
-            transactionStatus: TransactionStatus(
-                "Approve ${state.stakeTokenObject.name}",
-                Status.FAILED,
-                "Transaction Failed")));
-      }
+              Status.FAILED,
+              "Transaction Failed")));
     }
   }
 
@@ -104,51 +98,54 @@ class StakeCubit extends Cubit<StakeState> {
   }
 
   Future<void> stake() async {
-    if (!state.isInProgress) {
-      emit(StakeTransactionPendingState(state,
+    assert(state is StakeIsApproved || state is StakePendingStake);
+    emit(StakePendingStake(state,
+        transactionStatus: TransactionStatus(
+            "Stake ${state.stakeTokenObject.name}",
+            Status.PENDING,
+            "Transaction Pending")));
+
+    try {
+      var res = await state.stakeService
+          .stake(state.stakeTokenObject.tokenName, state.fieldController.text);
+      Stream<TransactionReceipt> result =
+          state.stakeService.ethService.pollTransactionReceipt(res);
+      result.listen((event) {
+        if (event.status) {
+          emit(StakeIsApproved(state,
+              transactionStatus: TransactionStatus(
+                  "Stake ${state.fieldController.text} ${state.stakeTokenObject.name}",
+                  Status.SUCCESSFUL,
+                  "Transaction Successful",
+                  res)));
+          emit(StakeIsApproved(state));
+        } else {
+          emit(StakeIsApproved(state,
+              transactionStatus: TransactionStatus(
+                  "Stake ${state.stakeTokenObject.name}",
+                  Status.FAILED,
+                  "Transaction Failed",
+                  res)));
+        }
+      });
+    } on Exception catch (value) {
+      emit(StakeIsApproved(state,
           transactionStatus: TransactionStatus(
               "Stake ${state.stakeTokenObject.name}",
-              Status.PENDING,
-              "Transaction Pending")));
-
-      try {
-        var res =
-        await state.stakeService.stake(state.stakeTokenObject.tokenName, state.fieldController.text);
-        Stream<TransactionReceipt> result =
-        state.stakeService.ethService.pollTransactionReceipt(res);
-        result.listen((event) {
-          if (event.status) {
-            emit(StakeTransactionFinishedState(state,
-                transactionStatus: TransactionStatus(
-                    "Stake ${state.fieldController.text} ${state.stakeTokenObject.name}",
-                    Status.SUCCESSFUL,
-                    "Transaction Successful",
-                    res)));
-            emit(StakeIsApproved(state));
-          } else {
-            emit(StakeTransactionFinishedState(state,
-                transactionStatus: TransactionStatus(
-                    "Stake ${state.stakeTokenObject.name}",
-                    Status.FAILED,
-                    "Transaction Failed",
-                    res)));
-          }
-        });
-      } on Exception catch (value) {
-        emit(StakeTransactionFinishedState(state,
-            transactionStatus: TransactionStatus(
-                "Stake ${state.stakeTokenObject.name}",
-                Status.FAILED,
-                "Transaction Failed")));
-      }
+              Status.FAILED,
+              "Transaction Failed")));
     }
     // assert(state is StakeIsApproved || state is StakePendingApproveMergedButton);
   }
 
   void closeToast() {
-    if (state is StakeTransactionPendingState)
-      emit(StakeTransactionPendingState(state, showingToast: false));
-    else if (state is StakeTransactionFinishedState)
-      emit(StakeTransactionFinishedState(state, showingToast: false));
+    if (state is StakeIsApproved)
+      emit(StakeIsApproved(state, showingToast: false));
+    else if (state is StakePendingApprove)
+      emit(StakePendingApprove(state, showingToast: false));
+    else if (state is StakeHasToApprove)
+      emit(StakeHasToApprove(state, showingToast: false));
+    else if (state is StakePendingStake)
+      emit(StakePendingStake(state, showingToast: false));
   }
 }
