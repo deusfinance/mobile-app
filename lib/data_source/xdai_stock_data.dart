@@ -44,7 +44,7 @@ abstract class XDaiStockData {
 
   static Future<bool> getData() async {
     if (values.isNotEmpty) return true;
-    final response = await http.get("https://oracle1.deus.finance/xdai/registrar.json");
+    final response = await http.get("https://oracle1.deus.finance/registrar-detail.json");
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
       values.clear();

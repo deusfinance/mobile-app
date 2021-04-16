@@ -1,6 +1,7 @@
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
 import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
 import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
+import 'package:deus_mobile/screens/lock/cubit/lock_cubit.dart';
 import 'package:deus_mobile/screens/password/password_screen.dart';
 import 'package:deus_mobile/screens/password/set_password_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
@@ -82,7 +83,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         create: (_) => SwapCubit(), child: SwapScreen()),
     XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(
         create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
-    LockScreen.url: (_) => LockScreen(),
+    LockScreen.url: (_) {
+      return BlocProvider(
+        create: (context) => LockCubit(arguments["token_object"]),
+        child: LockScreen(),
+      );
+    },
     // SyntheticsScreen.url: (_) => SyntheticsScreen(),
     StakingVaultOverviewScreen.url: (_) =>
         BlocProvider<StakingVaultOverviewCubit>(

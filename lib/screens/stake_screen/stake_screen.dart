@@ -43,69 +43,74 @@ class _StakeScreenState extends State<StakeScreen> {
   Widget build(BuildContext context) {
     return DefaultScreen(
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height - kToolbarHeight - kBottomNavigationBarHeight,
-            child: BlocBuilder<StakeCubit, StakeState>(
-              builder: (_, state) {
-                if(state is StakeLoading){
-                  return Center(child: CircularProgressIndicator(),);
-                }else{
-                  context.read<StakeCubit>().addListenerToFromField();
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      kSpacer,
-                      Text(
-                        'Stake your ${state.stakeTokenObject.name}',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      kSmallSpacer,
-                      Text(
-                        '${state.stakeTokenObject.apy}% APY',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      kSpacer,
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15),
-                        child: Text(
-                          'Balance: ${state.balance}',
-                          style: MyStyles.lightWhiteSmallTextStyle,
+        child: BlocBuilder<StakeCubit, StakeState>(builder: (_, state) {
+          if (state is StakeLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          else {
+            context.read<StakeCubit>().addListenerToFromField();
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height + 50,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        kSpacer,
+                        Text(
+                          'Stake your ${state.stakeTokenObject.stakeToken.name}',
+                          style: TextStyle(fontSize: 25),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      TextFieldWithMax(
-                        controller: state.fieldController,
-                        maxValue: state.balance,
-                      ),
-                      kSmallSpacer,
-                      DarkButton(
-                        label: 'Show me the contract',
-                        onPressed: () {},
-                        labelStyle: MyStyles.whiteMediumTextStyle,
-                      ),
-                      kSmallSpacer,
-                      _buildStakeApproveButton(state),
-                      kMediumSpacer,
-                      if (state is StakeHasToApprove || state is StakePendingApprove) Steps(),
-                      Spacer(),
-                      _buildToastWidget(state),
-                      Spacer(),
-                    ],
-                  );
-                }
-              },
-            ),
-          ),
-        ),
+                        kSmallSpacer,
+                        Text(
+                          '${state.stakeTokenObject.apy}% APY',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        kSpacer,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: Text(
+                            'Balance: ${state.balance}',
+                            style: MyStyles.lightWhiteSmallTextStyle,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        TextFieldWithMax(
+                          controller: state.fieldController,
+                          maxValue: state.balance,
+                        ),
+                        kSmallSpacer,
+                        DarkButton(
+                          label: 'Show me the contract',
+                          onPressed: () {},
+                          labelStyle: MyStyles.whiteMediumTextStyle,
+                        ),
+                        kSmallSpacer,
+                        _buildStakeApproveButton(state),
+                        kMediumSpacer,
+                        if (state is StakeHasToApprove || state is StakePendingApprove) Steps(),
+                        Spacer(),
+                      ],
+                    ),
+                  ),
+                ),
+                _buildToastWidget(state),
+              ],
+            );
+          }
+        }),
       ),
     );
   }
 
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
+      padding: EdgeInsets.all(16),
       child: Toast(
         label: 'Transaction Pending',
         message: transactionStatus.message,
@@ -122,6 +127,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
     return Container(
+      padding: EdgeInsets.all(16),
       child: Toast(
         label: 'Transaction Successful',
         message: transactionStatus.message,
@@ -137,6 +143,7 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
     return Container(
+      padding: EdgeInsets.all(16),
       child: Toast(
         label: 'Transaction Failed',
         message: transactionStatus.message,
@@ -197,23 +204,23 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Widget _buildStakeApproveButton(StakeState state) {
-    if (state.fieldController.text == "" ||
-        (double.tryParse(state.fieldController.text) != null &&
-            double.tryParse(state.fieldController.text) == 0)) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
-        decoration: MyStyles.darkWithNoBorderDecoration,
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "ENTER AN AMOUNT",
-            style: MyStyles.lightWhiteMediumTextStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+    // if (state.fieldController.text == "" ||
+    //     (double.tryParse(state.fieldController.text) != null &&
+    //         double.tryParse(state.fieldController.text) == 0)) {
+    //   return Container(
+    //     width: MediaQuery.of(context).size.width,
+    //     padding: EdgeInsets.all(16.0),
+    //     decoration: MyStyles.darkWithNoBorderDecoration,
+    //     child: Align(
+    //       alignment: Alignment.center,
+    //       child: Text(
+    //         "ENTER AN AMOUNT",
+    //         style: MyStyles.lightWhiteMediumTextStyle,
+    //         textAlign: TextAlign.center,
+    //       ),
+    //     ),
+    //   );
+    // }
 
     // else if (state.balance <
     //     double.parse(

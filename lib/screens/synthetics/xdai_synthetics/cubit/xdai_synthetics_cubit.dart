@@ -73,7 +73,6 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
         return DateTime.now().add(Duration(days: 2 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
       }
     }else if(arr[0] == "Sat"){
-      print(arr);
       return DateTime.now().add(Duration(days: 1 , hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));
     }else if(arr[0] == "Sun"){
       return DateTime.now().add(Duration(hours: 6 +  24 - int.parse(arr[1]) - 1, minutes: 30 + 60 - int.parse(arr[2]) - 1, seconds: 60 - int.parse(arr[3])));

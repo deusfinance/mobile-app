@@ -87,13 +87,13 @@ class VaultsService {
     return this.fromWei(result.single, tokenName);
   }
 
-  Future<String> getAllowances(tokenName, contractName) async {
+  Future<String> getAllowances(tokenName) async {
     if(!checkWallet()){
       return "0";
     }
     if (tokenName == "eth") return "9999";
     DeployedContract tokenContract = await ethService.loadTokenContract(tokenName);
-    final res = await ethService.query(tokenContract, "allowance", [await address, ethService.getTokenAddrHex(contractName, "vaults")]);
+    final res = await ethService.query(tokenContract, "allowance", [await address, await ethService.getTokenAddr(tokenName, "vaults")]);
     return fromWei(res.single, tokenName);
   }
 
@@ -119,14 +119,14 @@ class VaultsService {
     return [this.fromWei(result[0], 'ether'), this.fromWei(result[1], 'ether')];
   }
 
-  Future<String> approve(tokenName, contractName) async {
+  Future<String> approve(tokenName) async {
     if(!checkWallet()){
       return "0";
     }
     if (tokenName == "eth") return "9999999";
     var amount = BigInt.from(pow(10, 25));
     DeployedContract tokenContract = await ethService.loadTokenContract(tokenName);
-    var res = await ethService.submit(await credentials, tokenContract, "approve", [ethService.getTokenAddrHex(contractName, "vaults"), getWei(amount, contractName)]);
+    var res = await ethService.submit(await credentials, tokenContract, "approve", [await ethService.getTokenAddr(tokenName, "vaults"), getWei(amount, tokenName)]);
     return res;
   }
 

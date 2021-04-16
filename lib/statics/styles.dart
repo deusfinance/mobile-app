@@ -154,4 +154,4 @@ class MyStyles {
   );
 }
 
-enum NavigationStyle { BluePurple, GreenBlue }
+enum NavigationStyle { BluePurple, GreenBlue, BlueGreen }

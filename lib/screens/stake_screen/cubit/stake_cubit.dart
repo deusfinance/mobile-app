@@ -23,16 +23,15 @@ class StakeCubit extends Cubit<StakeState> {
   }
 
   getTokenBalance() async {
-    print(state.stakeTokenObject.tokenName);
     return await state.stakeService
-        .getTokenBalance(state.stakeTokenObject.tokenName);
+        .getTokenBalance(state.stakeTokenObject.stakeToken.getTokenName());
   }
 
   Future getAllowances() async {
     emit(StakePendingApprove(state));
-    state.stakeTokenObject.allowances = await state.stakeService
-        .getAllowances(state.stakeTokenObject.tokenName);
-    if (state.stakeTokenObject.getAllowances() > BigInt.zero)
+    state.stakeTokenObject.stakeToken.allowances = await state.stakeService
+        .getAllowances(state.stakeTokenObject.stakeToken.getTokenName());
+    if (state.stakeTokenObject.stakeToken.getAllowances() > BigInt.zero)
       emit(StakeIsApproved(state));
     else
       emit(StakeHasToApprove(state));
@@ -41,27 +40,27 @@ class StakeCubit extends Cubit<StakeState> {
   Future<void> approve() async {
     emit(StakePendingApprove(state,
         transactionStatus: TransactionStatus(
-            "Approve ${state.stakeTokenObject.name}",
+            "Approve ${state.stakeTokenObject.stakeToken.name}",
             Status.PENDING,
             "Transaction Pending")));
 
     try {
       var res =
-          await state.stakeService.approve(state.stakeTokenObject.tokenName);
+          await state.stakeService.approve(state.stakeTokenObject.stakeToken.getTokenName());
       Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
         if (event.status) {
           emit(StakeIsApproved(state,
               transactionStatus: TransactionStatus(
-                  "Approve ${state.stakeTokenObject.name}",
+                  "Approve ${state.stakeTokenObject.stakeToken.name}",
                   Status.SUCCESSFUL,
                   "Transaction Successful",
                   res)));
         } else {
           emit(StakeHasToApprove(state,
               transactionStatus: TransactionStatus(
-                  "Approve ${state.stakeTokenObject.name}",
+                  "Approve ${state.stakeTokenObject.stakeToken.name}",
                   Status.FAILED,
                   "Transaction Failed",
                   res)));
@@ -70,7 +69,7 @@ class StakeCubit extends Cubit<StakeState> {
     } on Exception catch (value) {
       emit(StakeHasToApprove(state,
           transactionStatus: TransactionStatus(
-              "Approve ${state.stakeTokenObject.name}",
+              "Approve ${state.stakeTokenObject.stakeToken.name}",
               Status.FAILED,
               "Transaction Failed")));
     }
@@ -89,9 +88,12 @@ class StakeCubit extends Cubit<StakeState> {
     if (input == null || input.isEmpty) {
       input = "0.0";
     }
-    if (state.stakeTokenObject.getAllowances() >=
+    if (state.stakeTokenObject.stakeToken.getAllowances() >=
         EthereumService.getWei(input)) {
-      emit(StakeIsApproved(state));
+      if(state.stakeTokenObject.stakeToken.getAllowances() == BigInt.zero)
+        emit(StakeHasToApprove(state));
+      else
+        emit(StakeIsApproved(state));
     } else {
       emit(StakeHasToApprove(state));
     }
@@ -101,20 +103,20 @@ class StakeCubit extends Cubit<StakeState> {
     assert(state is StakeIsApproved || state is StakePendingStake);
     emit(StakePendingStake(state,
         transactionStatus: TransactionStatus(
-            "Stake ${state.stakeTokenObject.name}",
+            "Stake ${state.stakeTokenObject.stakeToken.name}",
             Status.PENDING,
             "Transaction Pending")));
 
     try {
       var res = await state.stakeService
-          .stake(state.stakeTokenObject.tokenName, state.fieldController.text);
+          .stake(state.stakeTokenObject.stakeToken.getTokenName(), state.fieldController.text);
       Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
         if (event.status) {
           emit(StakeIsApproved(state,
               transactionStatus: TransactionStatus(
-                  "Stake ${state.fieldController.text} ${state.stakeTokenObject.name}",
+                  "Stake ${state.fieldController.text} ${state.stakeTokenObject.stakeToken.name}",
                   Status.SUCCESSFUL,
                   "Transaction Successful",
                   res)));
@@ -122,7 +124,7 @@ class StakeCubit extends Cubit<StakeState> {
         } else {
           emit(StakeIsApproved(state,
               transactionStatus: TransactionStatus(
-                  "Stake ${state.stakeTokenObject.name}",
+                  "Stake ${state.stakeTokenObject.stakeToken.name}",
                   Status.FAILED,
                   "Transaction Failed",
                   res)));
@@ -131,7 +133,7 @@ class StakeCubit extends Cubit<StakeState> {
     } on Exception catch (value) {
       emit(StakeIsApproved(state,
           transactionStatus: TransactionStatus(
-              "Stake ${state.stakeTokenObject.name}",
+              "Stake ${state.stakeTokenObject.stakeToken.name}",
               Status.FAILED,
               "Transaction Failed")));
     }
