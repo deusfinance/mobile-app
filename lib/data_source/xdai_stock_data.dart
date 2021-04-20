@@ -5,6 +5,7 @@ import 'package:deus_mobile/models/synthetics/stock_price.dart';
 import 'package:deus_mobile/models/synthetics/stock_price_detail.dart';
 import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:web3dart/web3dart.dart';
 
 import '../models/synthetics/stock.dart';
 import '../models/synthetics/stock_address.dart';
@@ -12,7 +13,6 @@ import '../models/token.dart';
 import 'backend_endpoints.dart';
 
 abstract class XDaiStockData {
-  static const _basePath = 'images/stocks';
 
   static List<Stock> values = [];
   static List<StockAddress> addresses = [];
@@ -73,19 +73,19 @@ abstract class XDaiStockData {
     }
   }
 
-  static Future<List<XDaiContractInputData>> getContractInputData(String address) async {
+  static Future<List<XDaiContractInputData>> getContractInputData(String address, int blockNum) async {
     Map<String, XDaiContractInputData> oracle1 = await getInfoOracle1();
     Map<String, XDaiContractInputData> oracle2 = await getInfoOracle2();
     Map<String, XDaiContractInputData> oracle3 = await getInfoOracle3();
 
     List<XDaiContractInputData> list = [];
-    if (oracle1 != null && oracle1.containsKey(address)) {
+    if (oracle1 != null && oracle1.containsKey(address) && oracle1[address].blockNo > blockNum) {
       list.add(oracle1[address]);
     }
-    if (oracle2 != null && oracle2.containsKey(address)) {
+    if (oracle2 != null && oracle2.containsKey(address) && oracle2[address].blockNo > blockNum) {
       list.add(oracle2[address]);
     }
-    if (oracle3 != null && oracle3.containsKey(address)) {
+    if (oracle3 != null && oracle3.containsKey(address) && oracle3[address].blockNo > blockNum) {
       list.add(oracle3[address]);
     }
     return list;

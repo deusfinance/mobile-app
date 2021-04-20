@@ -177,7 +177,8 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
     if (checkMarketClosed(selectedToken, Mode.LONG)) {
       state.marketClosed = true;
-      emit(XDaiSyntheticsAssetSelectedState(state, mode: Mode.LONG));
+      emit(XDaiSyntheticsLoadingState(state));
+      emit(XDaiSyntheticsAssetSelectedState(state, fromToken: selectedToken, mode: Mode.LONG));
     } else {
       state.marketClosed = false;
       emit(XDaiSyntheticsAssetSelectedState(state,
@@ -201,7 +202,8 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
     if (checkMarketClosed(selectedToken, Mode.LONG)) {
       state.marketClosed = true;
-      emit(XDaiSyntheticsAssetSelectedState(state, mode: Mode.LONG));
+      emit(XDaiSyntheticsLoadingState(state));
+      emit(XDaiSyntheticsAssetSelectedState(state, toToken: selectedToken, mode: Mode.LONG));
     } else {
       state.marketClosed = false;
       emit(XDaiSyntheticsAssetSelectedState(state,
@@ -355,7 +357,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       String tokenAddress = getTokenAddress(state.fromToken);
 
       List<XDaiContractInputData> oracles =
-      await XDaiStockData.getContractInputData(tokenAddress);
+      await XDaiStockData.getContractInputData(tokenAddress, await state.service.ethService.ethClient.getBlockNumber());
       if (oracles.length >= 2) {
         try {
           //sort oracles on price and then on oracle number
@@ -436,7 +438,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
               "Transaction Pending")));
       String tokenAddress = getTokenAddress(state.toToken);
       List<XDaiContractInputData> oracles =
-      await XDaiStockData.getContractInputData(tokenAddress);
+      await XDaiStockData.getContractInputData(tokenAddress, await state.service.ethService.ethClient.getBlockNumber());
       if (oracles.length >= 2) {
         try {
           //sort oracles on price and then on oracle number
@@ -453,7 +455,6 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
             inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
           }
           String maxPrice = arr[0][1].toString();
-
           var res = await state.service.buy(tokenAddress,
               state.toValue.toStringAsFixed(18), inputOracles, maxPrice);
           emit(XDaiSyntheticsTransactionPendingState(state,
@@ -491,7 +492,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
                       res)));
             }
           });
-        } on Exception catch (_) {
+        } on Exception catch (error) {
           emit(XDaiSyntheticsTransactionFinishedState(state,
               transactionStatus: TransactionStatus(
                   "Buy ${state.toFieldController.text} ${state.toToken

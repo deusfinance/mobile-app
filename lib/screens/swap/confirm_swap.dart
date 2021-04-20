@@ -59,11 +59,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
     if (response.statusCode == 200) {
       var map = json.decode(response.body);
       GWei g = GWei.fromJson(map["data"]);
-      print(map["data"]["slow"]);
-      print(g.getFast());
-      print(g.getAverage());
-      print(g.getSlow());
-      return GWei.fromJson(map["data"]);
+      return g;
     } else {
       return null;
     }
@@ -756,12 +752,14 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
     }
     if ( widget.transaction.value != null)
       map['value'] = widget.transaction.value.getInWei.toInt();
+    else
+      map['value'] = 0;
     var response = await http.post("https://app.deus.finance/app/mainnet/swap/estimate", body: json.encode(map), headers: {"Content-Type": "application/json"});
     if (response.statusCode == 200) {
       var js = json.decode(response.body);
       return js['gas_fee'];
     } else {
-      return 0;
+      return 650000;
     }
   }
 

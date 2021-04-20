@@ -162,7 +162,6 @@ class SwapCubit extends Cubit<SwapState> {
             }
           });
         } on Exception catch (error) {
-          print(error.toString());
           emit(TransactionFinishedState(state,
               transactionStatus: TransactionStatus(
                   "Not Swapped your ${state.fromFieldController.text} ${state.fromToken.getTokenName()} for ${state.toFieldController.text} ${state.toToken.getTokenName()}",

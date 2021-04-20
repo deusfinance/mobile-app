@@ -211,7 +211,7 @@ class SwapService {
     int deusIndex = path.indexOf(deusAddress);
     if (deusIndex == -1) {
       if (path[0] == await ethService.getTokenAddrHex("weth", "token")) {
-        var deadLine = (DateTime.now().millisecond / 1000).floor() + 60 * 5000;
+        var deadLine = (DateTime.now().second).floor() + 60 * 5000;
         List<EthereumAddress> addressPath = _pathListToAddresses(path);
         return await ethService.submit(await credentials, uniswapRouter, "swapExactETHForTokens",
             [minAmountOut, addressPath, await address, BigInt.from(deadLine)],
