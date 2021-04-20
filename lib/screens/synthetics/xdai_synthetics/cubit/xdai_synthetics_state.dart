@@ -28,6 +28,7 @@ abstract class XDaiSyntheticsState extends Equatable {
   XDaiStockService service;
   Mode mode;
   bool marketClosed;
+  bool marketTimerClosed;
   StreamController<String> inputController;
 
   Map<String, StockPrice> prices;
@@ -41,6 +42,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         approved = true,
         toValue = 0,
         marketClosed = false,
+        marketTimerClosed = false,
         fromFieldController = new TextEditingController(),
         toFieldController = new TextEditingController(),
         isPriceRatioForward = true,
@@ -58,6 +60,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         this.service = state.service,
         this.prices = state.prices,
         this.marketClosed = state.marketClosed,
+        this.marketTimerClosed = state.marketTimerClosed,
         this.timer = state.timer,
         this.toValue = state.toValue,
         this.isPriceRatioForward = state.isPriceRatioForward,
@@ -67,7 +70,7 @@ abstract class XDaiSyntheticsState extends Equatable {
         this.toFieldController = state.toFieldController;
 
   @override
-  List<Object> get props => [fromToken, toToken, approved, isInProgress, mode, isPriceRatioForward, service, prices, timer, toValue];
+  List<Object> get props => [fromToken, toToken, approved, isInProgress, mode, isPriceRatioForward, service, prices, timer, toValue, marketClosed, marketTimerClosed];
 }
 
 class XDaiSyntheticsInitialState extends XDaiSyntheticsState {

@@ -340,11 +340,11 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       child: MarketTimer(
         timerColor:
             //TODO: add colors to my_colors.dart (.red and .green)
-            state.marketClosed
+            state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
         onEnd: context.read<XDaiSyntheticsCubit>().marketTimerFinished(),
-        label: state.marketClosed
+        label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'
             : 'UNTIL TRADING CLOSES',
         end: context.read<XDaiSyntheticsCubit>().marketStatusChanged(),

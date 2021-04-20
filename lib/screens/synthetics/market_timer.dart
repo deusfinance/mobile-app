@@ -12,7 +12,7 @@ class MarketTimer extends StatelessWidget {
   final String label;
   final Color timerColor;
 
-  final DateTime end;
+  DateTime end;
 
   MarketTimer({
     Key key,
@@ -23,13 +23,17 @@ class MarketTimer extends StatelessWidget {
   }) : super(key: key);
 
   int get endTimeInMs {
-    //TODO (@CodingDavid8): Move into cubit
-    final DateTime now = DateTime.now();
+    DateTime now = getNYC();
 
     final int difference = end.difference(now).inMilliseconds;
-    final int endTime = now.millisecondsSinceEpoch + difference;
+    final int endTime = now.millisecondsSinceEpoch + difference + (4*60*60*1000);
     return endTime;
   }
+
+  DateTime getNYC() {
+    return DateTime.now().toUtc().subtract(Duration(hours: 4));
+  }
+
 
   @override
   Widget build(BuildContext context) {
