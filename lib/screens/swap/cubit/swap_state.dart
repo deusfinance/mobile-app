@@ -39,7 +39,7 @@ abstract class SwapState extends Equatable {
     slippage = 0.5;
     toValue = 0;
     swapService = new SwapService(
-        ethService: locator<EthereumService>(),
+        ethService: new EthereumService(1),
         privateKey: locator<ConfigurationService>().getPrivateKey());
     swapService.init();
     fromFieldController = new TextEditingController();
@@ -56,7 +56,7 @@ abstract class SwapState extends Equatable {
         this.slippage = swapState.slippage,
         this.fromToken = swapState.fromToken,
         this.toToken = swapState.toToken,
-  this.toValue = swapState.toValue,
+        this.toValue = swapState.toValue,
         this.fromFieldController = swapState.fromFieldController,
         this.toFieldController = swapState.toFieldController,
         this.slippageController = swapState.slippageController,

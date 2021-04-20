@@ -8,13 +8,13 @@ part of 'GWei.dart';
 
 GWei _$GWeiFromJson(Map<String, dynamic> json) {
   return GWei()
-    ..slow = (json['safeLow'] as num)?.toDouble()
-    ..average = (json['average'] as num)?.toDouble()
+    ..slow = (json['slow'] as num)?.toDouble()
+    ..average = (json['standard'] as num)?.toDouble()
     ..fast = (json['fast'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$GWeiToJson(GWei instance) => <String, dynamic>{
-      'safeLow': instance.slow,
-      'average': instance.average,
-      'fast': instance.fast,
-    };
+  'slow': instance.slow,
+  'standard': instance.average,
+  'fast': instance.fast,
+};

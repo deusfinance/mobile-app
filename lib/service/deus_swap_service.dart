@@ -10,7 +10,7 @@ import 'package:web3dart/web3dart.dart';
 import 'ethereum_service.dart';
 
 class SwapService {
-  static const GRAPH_PATH = "assets/deus_data/rinkbey_graph.json";
+  static const GRAPH_PATH = "assets/deus_data/graph.json";
 
   final EthereumService ethService;
   final String privateKey;

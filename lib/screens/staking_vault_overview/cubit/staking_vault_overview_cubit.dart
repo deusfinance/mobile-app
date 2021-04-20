@@ -63,4 +63,8 @@ class StakingVaultOverviewCubit extends Cubit<StakingVaultOverviewState>{
     else
       emit(StakingVaultOverviewLiquidityState(state));
   }
+
+  void claim(){
+
+  }
 }

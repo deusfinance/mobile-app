@@ -240,26 +240,48 @@ class EthereumService {
     final ethFunction = contract.function(functionName);
     Transaction transaction;
     if (gas != null && gas.nonce > 0) {
-      transaction = Transaction.callContract(
-          from: await credentials.extractAddress(),
-          contract: contract,
-          function: ethFunction,
-          parameters: args,
-          gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
-          maxGas: gas.gasLimit > 0 ? gas.gasLimit : 5000000,
-          nonce: gas.nonce,
-          value: value);
+      if(value!=null)
+        transaction = Transaction.callContract(
+            from: await credentials.extractAddress(),
+            contract: contract,
+            function: ethFunction,
+            parameters: args,
+            gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
+            maxGas: gas.gasLimit > 0 ? gas.gasLimit : 650000,
+            nonce: gas.nonce,
+            value: value);
+      else
+        transaction = Transaction.callContract(
+            from: await credentials.extractAddress(),
+            contract: contract,
+            function: ethFunction,
+            parameters: args,
+            gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
+            maxGas: gas.gasLimit > 0 ? gas.gasLimit : 650000,
+            nonce: gas.nonce);
+
     } else {
-      transaction = Transaction.callContract(
-          from: await credentials.extractAddress(),
-          contract: contract,
-          function: ethFunction,
-          parameters: args,
-          gasPrice: gas != null
-              ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
-              : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
-          maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 5000000,
-          value: value);
+      if(value!=null)
+        transaction = Transaction.callContract(
+            from: await credentials.extractAddress(),
+            contract: contract,
+            function: ethFunction,
+            parameters: args,
+            gasPrice: gas != null
+                ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
+                : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
+            maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 650000,
+            value: value);
+      else
+        transaction = Transaction.callContract(
+            from: await credentials.extractAddress(),
+            contract: contract,
+            function: ethFunction,
+            parameters: args,
+            gasPrice: gas != null
+                ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
+                : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
+            maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 650000);
     }
 
     return transaction;

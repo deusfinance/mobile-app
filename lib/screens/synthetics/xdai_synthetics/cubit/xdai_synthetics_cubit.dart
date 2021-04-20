@@ -205,7 +205,6 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       await getAllowances();
       (selectedToken as Stock).longBalance =
           await getTokenBalance(selectedToken);
-
       emit(XDaiSyntheticsAssetSelectedState(state,
           toToken: selectedToken, isInProgress: false));
     }
@@ -301,14 +300,13 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
   Future approve() async {
     if (!state.isInProgress) {
-      emit(XDaiSyntheticsTransactionPendingState(state,
-          transactionStatus: TransactionStatus(
-              "Approve ${state.fromToken.name}",
-              Status.PENDING,
-              "Transaction Pending")));
-
       try {
         var res = await state.service.approve(getTokenAddress(state.fromToken));
+        emit(XDaiSyntheticsTransactionPendingState(state,
+            transactionStatus: TransactionStatus(
+                "Approve ${state.fromToken.name}",
+                Status.PENDING,
+                "Transaction Pending", res)));
         Stream<TransactionReceipt> result =
             state.service.ethService.pollTransactionReceipt(res);
         result.listen((event) {
@@ -370,6 +368,12 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
           var res = await state.service
               .sell(tokenAddress, state.fromFieldController.text, inputOracles);
+          emit(XDaiSyntheticsTransactionPendingState(state,
+              transactionStatus: TransactionStatus(
+                  "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
+                  Status.PENDING,
+                  "Transaction Pending", res)));
+
           Stream<TransactionReceipt> result =
               state.service.ethService.pollTransactionReceipt(res);
           result.listen((event) async {
@@ -420,7 +424,6 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
               Status.PENDING,
               "Transaction Pending")));
       String tokenAddress = getTokenAddress(state.toToken);
-
       List<XDaiContractInputData> oracles =
           await XDaiStockData.getContractInputData(tokenAddress);
       if (oracles.length >= 2) {
@@ -442,7 +445,11 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
           var res = await state.service.buy(tokenAddress,
               state.toValue.toStringAsFixed(18), inputOracles, maxPrice);
-
+          emit(XDaiSyntheticsTransactionPendingState(state,
+              transactionStatus: TransactionStatus(
+                  "Buy ${state.toFieldController.text} ${state.toToken.getTokenName()}",
+                  Status.PENDING,
+                  "Transaction Pending", res)));
           Stream<TransactionReceipt> result =
               state.service.ethService.pollTransactionReceipt(res);
           result.listen((event) async {
@@ -496,12 +503,22 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
 
   bool checkMarketClosed(Token selectedToken, Mode mode) {
     if (state.prices != null) {
-      if (mode == Mode.LONG)
-        return state.prices[selectedToken.getTokenName()].long.isClosed ??
-            false;
-      else
-        return state.prices[selectedToken.getTokenName()].short.isClosed ??
-            false;
+      if (mode == Mode.LONG) {
+        if(state.prices[selectedToken.getTokenName()].long.isClosed != null && state.prices[selectedToken.getTokenName()].long.isClosed)
+          return true;
+        if(state.prices[selectedToken.getTokenName()].long.price == 0)
+          return true;
+        return false;
+      }
+      else{
+        if(state.prices[selectedToken.getTokenName()].short.isClosed != null && state.prices[selectedToken.getTokenName()].short.isClosed)
+          return true;
+        if(state.prices[selectedToken.getTokenName()].short.price == 0)
+          return true;
+        return false;
+      }
+        // return state.prices[selectedToken.getTokenName()].short.isClosed ??
+        //     false;
     }
     return true;
   }

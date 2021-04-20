@@ -5,9 +5,14 @@ part 'GWei.g.dart';
 
 @JsonSerializable(nullable: true)
 class GWei{
-  @JsonKey(name:"safeLow")
+  // @JsonKey(name:"safeLow")
+  // double slow;
+  // @JsonKey(name:"average")
+  // double average;
+  // double fast;
+
   double slow;
-  @JsonKey(name:"average")
+  @JsonKey(name:"standard")
   double average;
   double fast;
 
@@ -15,15 +20,15 @@ class GWei{
   GWei();
 
   double getSlow(){
-    return slow/10;
+    return slow/1000000000;
   }
 
   double getAverage(){
-    return average/10;
+    return average/1000000000;
   }
 
   double getFast(){
-    return fast/10;
+    return fast/1000000000;
   }
 
   factory GWei.fromJson(Map<String, dynamic> json) => _$GWeiFromJson(json);

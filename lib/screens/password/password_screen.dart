@@ -167,7 +167,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
       canCheckBiometrics = await auth.canCheckBiometrics;
     } on PlatformException catch (e) {
       canCheckBiometrics = false;
-      print(e);
     }
     if (!mounted) return false;
 
@@ -204,7 +203,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
           stickyAuth: true,
           biometricOnly: true);
     } on PlatformException catch (e) {
-      print(e);
       return;
     }
     if (!mounted) return;

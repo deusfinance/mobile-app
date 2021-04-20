@@ -108,7 +108,6 @@ class XDaiStockService {
         [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
       ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount));
     }on Exception catch(error){
-      print(error);
       return "";
     }
   }
