@@ -9,13 +9,17 @@ import 'package:deus_mobile/core/widgets/stake_and_lock/steps.dart';
 import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/default_screen/bottom_nav_bar.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:web3dart/web3dart.dart';
 
+import 'confirm_stake.dart';
 import 'cubit/stake_cubit.dart';
 
 class StakeScreen extends StatefulWidget {
@@ -203,6 +207,30 @@ class _StakeScreenState extends State<StakeScreen> {
     return Container();
   }
 
+  Future<Gas> showConfirmGasFeeDialog(StakeState state, Transaction transaction) async {
+    Gas res = await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black38,
+      barrierLabel: "Barrier",
+      pageBuilder: (_, __, ___) => Align(
+          alignment: Alignment.center,
+          child: ConfirmStakeScreen(
+            transaction: transaction,
+          )),
+      barrierDismissible: true,
+      transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        child: FadeTransition(
+          child: child,
+          opacity: anim1,
+        ),
+      ),
+      transitionDuration: Duration(milliseconds: 10),
+    );
+    return res;
+  }
+
+
   Widget _buildStakeApproveButton(StakeState state) {
     // if (state.fieldController.text == "" ||
     //     (double.tryParse(state.fieldController.text) != null &&
@@ -247,7 +275,11 @@ class _StakeScreenState extends State<StakeScreen> {
       showLoading: state is StakePendingApprove || state is StakePendingStake,
       onPressed: () async {
         if (state is StakePendingApprove || state is StakePendingStake) return;
-        if (state is StakeIsApproved) context.read<StakeCubit>().stake();
+        if (state is StakeIsApproved) {
+          Transaction transaction = await context.read<StakeCubit>().makeTransaction();
+          Gas gas = await showConfirmGasFeeDialog(state, transaction);
+          await context.read<StakeCubit>().stake(gas);
+        }
         if (state is StakeHasToApprove) context.read<StakeCubit>().approve();
       },
     );

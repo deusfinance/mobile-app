@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -61,12 +62,20 @@ class StakeService {
     return res;
   }
 
-  Future<String> stake(stakedToken, amount) async{
+  Future<String> stake(stakedToken, amount, Gas gas) async{
     if(!checkWallet()){
       return "0";
     }
     DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddrHex(stakedToken,"staking"));
-    return await ethService.submit(await credentials, contract, "deposit", [EthereumService.getWei(amount)]);
+    return await ethService.submit(await credentials, contract, "deposit", [EthereumService.getWei(amount)], gas: gas);
+  }
+
+  Future<Transaction> makeStakeTransaction(stakedToken, amount) async{
+    if(!checkWallet()){
+      return null;
+    }
+    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddrHex(stakedToken,"staking"));
+    return await ethService.makeTransaction(await credentials, contract, "deposit", [EthereumService.getWei(amount)]);
   }
 
   Future<String> getUserWalletStakedTokenBalance(stakedToken) async{

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/stake/stake_token_object.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
@@ -45,8 +46,8 @@ class StakeCubit extends Cubit<StakeState> {
             "Transaction Pending")));
 
     try {
-      var res =
-          await state.stakeService.approve(state.stakeTokenObject.stakeToken.getTokenName());
+      var res = await state.stakeService
+          .approve(state.stakeTokenObject.stakeToken.getTokenName());
       Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
@@ -75,6 +76,13 @@ class StakeCubit extends Cubit<StakeState> {
     }
   }
 
+  makeTransaction() async {
+    Transaction transaction = await state.stakeService.makeStakeTransaction(
+        state.stakeTokenObject.stakeToken.getTokenName(),
+        state.fieldController.text);
+    return transaction;
+  }
+
   addListenerToFromField() {
     if (!state.fieldController.hasListeners) {
       state.fieldController.addListener(() {
@@ -90,7 +98,7 @@ class StakeCubit extends Cubit<StakeState> {
     }
     if (state.stakeTokenObject.stakeToken.getAllowances() >=
         EthereumService.getWei(input)) {
-      if(state.stakeTokenObject.stakeToken.getAllowances() == BigInt.zero)
+      if (state.stakeTokenObject.stakeToken.getAllowances() == BigInt.zero)
         emit(StakeHasToApprove(state));
       else
         emit(StakeIsApproved(state));
@@ -99,7 +107,7 @@ class StakeCubit extends Cubit<StakeState> {
     }
   }
 
-  Future<void> stake() async {
+  Future<void> stake(Gas gas) async {
     assert(state is StakeIsApproved || state is StakePendingStake);
     emit(StakePendingStake(state,
         transactionStatus: TransactionStatus(
@@ -108,8 +116,9 @@ class StakeCubit extends Cubit<StakeState> {
             "Transaction Pending")));
 
     try {
-      var res = await state.stakeService
-          .stake(state.stakeTokenObject.stakeToken.getTokenName(), state.fieldController.text);
+      var res = await state.stakeService.stake(
+          state.stakeTokenObject.stakeToken.getTokenName(),
+          state.fieldController.text, gas);
       Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
