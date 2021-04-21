@@ -8,6 +8,7 @@ import 'package:deus_mobile/models/swap/GWei.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/service/deus_swap_service.dart';
+import 'package:deus_mobile/service/stake_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,23 +19,22 @@ import 'package:http/http.dart' as http;
 
 import '../../locator.dart';
 
-enum ConfirmSwapMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
+enum ConfirmMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
 enum Mode { LOADING, NONE }
 enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
 
-class ConfirmSwapScreen extends StatefulWidget {
-  static const route = '/confirm_swap';
-  SwapService service;
+class ConfirmGasScreen extends StatefulWidget {
+  static const route = '/confirm_gas';
   Transaction transaction;
 
-  ConfirmSwapScreen({this.service, this.transaction});
+  ConfirmGasScreen({this.transaction});
 
   @override
-  _ConfirmSwapScreenState createState() => _ConfirmSwapScreenState();
+  _ConfirmGasScreenState createState() => _ConfirmGasScreenState();
 }
 
-class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
-  ConfirmSwapMode confirmSwapMode;
+class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
+  ConfirmMode confirmSwapMode;
   GWei gWei;
   bool showingError;
   double ethPrice;
@@ -46,14 +46,6 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
   TextEditingController gWeiController = new TextEditingController();
 
   Future<GWei> getGWei() async {
-    // var response =
-    //     await http.get("https://ethgasstation.info/json/ethgasAPI.json");
-    // if (response.statusCode == 200) {
-    //   var map = json.decode(response.body);
-    //   return GWei.fromJson(map);
-    // } else {
-    //   return null;
-    // }
     var response =
     await http.get("https://www.gasnow.org/api/v3/gas/price?utm_source=:deusApp");
     if (response.statusCode == 200) {
@@ -79,7 +71,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
   @override
   void initState() {
     super.initState();
-    confirmSwapMode = ConfirmSwapMode.CONFIRM;
+    confirmSwapMode = ConfirmMode.CONFIRM;
     gasFee = GasFee.AVERAGE;
     getData();
   }
@@ -90,16 +82,16 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
       color: Colors.transparent,
       child: mode == Mode.LOADING
           ? Center(
-              child: CircularProgressIndicator(),
-            )
+        child: CircularProgressIndicator(),
+      )
           : Container(
-              margin: EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
-              padding: EdgeInsets.all(12.0),
-              decoration: MyStyles.darkWithBorderDecoration,
-              child: confirmSwapMode == ConfirmSwapMode.CONFIRM
-                  ? confirmScreen()
-                  : customizeScreen(),
-            ),
+        margin: EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
+        padding: EdgeInsets.all(12.0),
+        decoration: MyStyles.darkWithBorderDecoration,
+        child: confirmSwapMode == ConfirmMode.CONFIRM
+            ? confirmScreen()
+            : customizeScreen(),
+      ),
     );
   }
 
@@ -128,7 +120,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    confirmSwapMode = ConfirmSwapMode.BASIC_CUSTOMIZE;
+                    confirmSwapMode = ConfirmMode.BASIC_CUSTOMIZE;
                   });
                 },
                 child: Text("EDIT",
@@ -171,21 +163,21 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
             thickness: 1,
             color: Colors.black,
           ),
-        Visibility(
-          visible: showingError == true,
-          child: GestureDetector(
-            onTap: (){
-              getData();
-            },
-            child: Text("can not estimate gas fee. Tap this to try again",
-                style: TextStyle(
-                  fontFamily: MyStyles.kFontFamily,
-                  fontWeight: FontWeight.w300,
-                  fontSize: MyStyles.S6,
-                  color: MyColors.ToastRed,
-                )),
+          Visibility(
+            visible: showingError == true,
+            child: GestureDetector(
+              onTap: (){
+                getData();
+              },
+              child: Text("can not estimate gas fee. Tap this to try again",
+                  style: TextStyle(
+                    fontFamily: MyStyles.kFontFamily,
+                    fontWeight: FontWeight.w300,
+                    fontSize: MyStyles.S6,
+                    color: MyColors.ToastRed,
+                  )),
+            ),
           ),
-        ),
           SizedBox(
             height: 250,
           ),
@@ -193,50 +185,50 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
             children: [
               Expanded(
                   child: GestureDetector(
-                onTap: () {
-                  locator<NavigationService>().goBack(context);
-                },
-                child: Container(
-                  margin: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                      color: Color(0xFFC4C4C4),
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.all(16.0),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "REJECT",
-                      style: TextStyle(
-                        fontFamily: MyStyles.kFontFamily,
-                        fontWeight: FontWeight.w300,
-                        fontSize: MyStyles.S4,
-                        color: MyColors.HalfBlack,
+                    onTap: () {
+                      locator<NavigationService>().goBack(context);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                          color: Color(0xFFC4C4C4),
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.all(16.0),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "REJECT",
+                          style: TextStyle(
+                            fontFamily: MyStyles.kFontFamily,
+                            fontWeight: FontWeight.w300,
+                            fontSize: MyStyles.S4,
+                            color: MyColors.HalfBlack,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
               Expanded(
                   child: Container(
-                margin: EdgeInsets.all(8.0),
-                child: SelectionButton(
-                  label: 'CONFIRM',
-                  onPressed: (bool selected) async {
-                    Gas gas = new Gas();
-                    gas.gasPrice = _computeGasPrice();
-                    if (gasFee == GasFee.CUSTOM) {
-                      gas.nonce = int.tryParse(nonceController.text) ?? 0;
-                      gas.gasLimit = int.tryParse(gasLimitController.text) ?? 0;
-                    }else{
-                      gas.gasLimit = estimatedGasNumber;
-                    }
-                    locator<NavigationService>().goBack(context, gas);
-                  },
-                  selected: true,
-                  gradient: MyColors.greenToBlueGradient,
-                  textStyle: MyStyles.blackMediumTextStyle,
-                ),
-              ))
+                    margin: EdgeInsets.all(8.0),
+                    child: SelectionButton(
+                      label: 'CONFIRM',
+                      onPressed: (bool selected) async {
+                        Gas gas = new Gas();
+                        gas.gasPrice = _computeGasPrice();
+                        if (gasFee == GasFee.CUSTOM) {
+                          gas.nonce = int.tryParse(nonceController.text) ?? 0;
+                          gas.gasLimit = int.tryParse(gasLimitController.text) ?? 0;
+                        }else{
+                          gas.gasLimit = estimatedGasNumber;
+                        }
+                        locator<NavigationService>().goBack(context, gas);
+                      },
+                      selected: true,
+                      gradient: MyColors.greenToBlueGradient,
+                      textStyle: MyStyles.blackMediumTextStyle,
+                    ),
+                  ))
             ],
           ),
         ],
@@ -263,7 +255,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   GestureDetector(
                       onTap: () {
                         setState(() {
-                          confirmSwapMode = ConfirmSwapMode.BASIC_CUSTOMIZE;
+                          confirmSwapMode = ConfirmMode.BASIC_CUSTOMIZE;
                         });
                       },
                       child: Container(
@@ -273,20 +265,20 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                             Text(
                               "BASIC",
                               style: confirmSwapMode ==
-                                      ConfirmSwapMode.BASIC_CUSTOMIZE
+                                  ConfirmMode.BASIC_CUSTOMIZE
                                   ? TextStyle(
-                                      fontFamily: MyStyles.kFontFamily,
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: MyStyles.S6,
-                                      foreground: Paint()
-                                        ..shader = MyColors.greenToBlueGradient
-                                            .createShader(
-                                                Rect.fromLTRB(0, 0, 50, 30)))
+                                  fontFamily: MyStyles.kFontFamily,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: MyStyles.S6,
+                                  foreground: Paint()
+                                    ..shader = MyColors.greenToBlueGradient
+                                        .createShader(
+                                        Rect.fromLTRB(0, 0, 50, 30)))
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
                               visible: confirmSwapMode ==
-                                  ConfirmSwapMode.BASIC_CUSTOMIZE,
+                                  ConfirmMode.BASIC_CUSTOMIZE,
                               child: Container(
                                   margin: EdgeInsets.only(top: 3),
                                   height: 2.0,
@@ -302,7 +294,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                   GestureDetector(
                       onTap: () {
                         setState(() {
-                          confirmSwapMode = ConfirmSwapMode.ADVANCED_CUSTOMIZE;
+                          confirmSwapMode = ConfirmMode.ADVANCED_CUSTOMIZE;
                         });
                       },
                       child: Container(
@@ -312,20 +304,20 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
                             Text(
                               "ADVANCED",
                               style: confirmSwapMode ==
-                                      ConfirmSwapMode.ADVANCED_CUSTOMIZE
+                                  ConfirmMode.ADVANCED_CUSTOMIZE
                                   ? TextStyle(
-                                      fontFamily: MyStyles.kFontFamily,
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: MyStyles.S6,
-                                      foreground: Paint()
-                                        ..shader = MyColors.greenToBlueGradient
-                                            .createShader(
-                                                Rect.fromLTRB(0, 0, 50, 30)))
+                                  fontFamily: MyStyles.kFontFamily,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: MyStyles.S6,
+                                  foreground: Paint()
+                                    ..shader = MyColors.greenToBlueGradient
+                                        .createShader(
+                                        Rect.fromLTRB(0, 0, 50, 30)))
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
                               visible: confirmSwapMode ==
-                                  ConfirmSwapMode.ADVANCED_CUSTOMIZE,
+                                  ConfirmMode.ADVANCED_CUSTOMIZE,
                               child: Container(
                                   margin: EdgeInsets.only(top: 3),
                                   height: 2.0,
@@ -345,7 +337,7 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
           thickness: 1,
           color: Colors.black,
         ),
-        confirmSwapMode == ConfirmSwapMode.ADVANCED_CUSTOMIZE
+        confirmSwapMode == ConfirmMode.ADVANCED_CUSTOMIZE
             ? advancedCustomize()
             : basicCustomize(),
         SizedBox(
@@ -357,10 +349,10 @@ class _ConfirmSwapScreenState extends State<ConfirmSwapScreen> {
             label: 'SAVE',
             onPressed: (bool selected) {
               setState(() {
-                if (confirmSwapMode == ConfirmSwapMode.ADVANCED_CUSTOMIZE) {
+                if (confirmSwapMode == ConfirmMode.ADVANCED_CUSTOMIZE) {
                   gasFee = GasFee.CUSTOM;
                 }
-                confirmSwapMode = ConfirmSwapMode.CONFIRM;
+                confirmSwapMode = ConfirmMode.CONFIRM;
               });
             },
             selected: true,

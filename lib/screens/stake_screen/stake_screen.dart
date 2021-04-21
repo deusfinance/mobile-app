@@ -11,6 +11,7 @@ import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/default_screen/bottom_nav_bar.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
@@ -18,8 +19,6 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web3dart/web3dart.dart';
-
-import 'confirm_stake.dart';
 import 'cubit/stake_cubit.dart';
 
 class StakeScreen extends StatefulWidget {
@@ -207,14 +206,14 @@ class _StakeScreenState extends State<StakeScreen> {
     return Container();
   }
 
-  Future<Gas> showConfirmGasFeeDialog(StakeState state, Transaction transaction) async {
+  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
     Gas res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
-          child: ConfirmStakeScreen(
+          child: ConfirmGasScreen(
             transaction: transaction,
           )),
       barrierDismissible: true,
@@ -277,8 +276,8 @@ class _StakeScreenState extends State<StakeScreen> {
         if (state is StakePendingApprove || state is StakePendingStake) return;
         if (state is StakeIsApproved) {
           Transaction transaction = await context.read<StakeCubit>().makeTransaction();
-          Gas gas = await showConfirmGasFeeDialog(state, transaction);
-          await context.read<StakeCubit>().stake(gas);
+          Gas gas = await showConfirmGasFeeDialog(transaction);
+          context.read<StakeCubit>().stake(gas);
         }
         if (state is StakeHasToApprove) context.read<StakeCubit>().approve();
       },

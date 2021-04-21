@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -130,17 +131,28 @@ class VaultsService {
     return res;
   }
 
-  Future<String> lock(contractName, amount) async {
+  Future<Transaction> makeLockTransaction(contractName, amount) async {
+    if(!checkWallet()){
+      return null;
+    }
+    if (contractName == "eth") {
+      DeployedContract contract = await ethService.loadContractWithGivenAddress("vaultsEth", await ethService.getTokenAddrHex(contractName, "vaults"));
+      return await ethService.makeTransaction(await credentials, contract, "lock", [], value: amount);
+    }
+    DeployedContract contract = await ethService.loadContractWithGivenAddress("vaults", await ethService.getTokenAddrHex(contractName, "vaults"));
+    return await ethService.makeTransaction(await credentials, contract, "lock", [this.getWei(amount, contractName)]);
+  }
+
+  Future<String> lock(contractName, amount, Gas gas) async {
     if(!checkWallet()){
       return "0";
     }
     if (contractName == "eth") {
       DeployedContract contract = await ethService.loadContractWithGivenAddress("vaultsEth", await ethService.getTokenAddrHex(contractName, "vaults"));
-      return await ethService.submit(await credentials, contract, "lock", [], value: amount);
+      return await ethService.submit(await credentials, contract, "lock", [], value: amount, gas: gas);
     }
     DeployedContract contract = await ethService.loadContractWithGivenAddress("vaults", await ethService.getTokenAddrHex(contractName, "vaults"));
-    var res = await ethService.submit(await credentials, contract, "lock", [this.getWei(amount, contractName)]);
-    return res;
+    return await ethService.submit(await credentials, contract, "lock", [this.getWei(amount, contractName)], gas: gas);
   }
 
 }

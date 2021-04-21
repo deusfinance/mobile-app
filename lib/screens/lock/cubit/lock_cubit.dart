@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/stake/stake_token_object.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
@@ -45,10 +46,10 @@ class LockCubit extends Cubit<LockState> {
             "Transaction Pending")));
 
     try {
-      var res =
-      await state.vaultsService.approve(state.stakeTokenObject.lockToken.getTokenName());
+      var res = await state.vaultsService
+          .approve(state.stakeTokenObject.lockToken.getTokenName());
       Stream<TransactionReceipt> result =
-      state.vaultsService.ethService.pollTransactionReceipt(res);
+          state.vaultsService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
         if (event.status) {
           emit(LockIsApproved(state,
@@ -90,7 +91,7 @@ class LockCubit extends Cubit<LockState> {
     }
     if (state.stakeTokenObject.lockToken.getAllowances() >=
         EthereumService.getWei(input)) {
-      if(state.stakeTokenObject.lockToken.getAllowances() == BigInt.zero)
+      if (state.stakeTokenObject.lockToken.getAllowances() == BigInt.zero)
         emit(LockHasToApprove(state));
       else
         emit(LockIsApproved(state));
@@ -99,43 +100,59 @@ class LockCubit extends Cubit<LockState> {
     }
   }
 
-  Future<void> lock() async {
-    assert(state is LockIsApproved || state is LockPendingLock);
-    emit(LockPendingLock(state,
-        transactionStatus: TransactionStatus(
-            "Lock ${state.stakeTokenObject.lockToken.name}",
-            Status.PENDING,
-            "Transaction Pending")));
+  makeTransaction() async {
+    Transaction transaction = await state.vaultsService.makeLockTransaction(
+        state.stakeTokenObject.lockToken.getTokenName(),
+        state.fieldController.text);
+    return transaction;
+  }
 
-    try {
-      var res = await state.vaultsService
-          .lock(state.stakeTokenObject.lockToken.getTokenName(), state.fieldController.text);
-      Stream<TransactionReceipt> result =
-      state.vaultsService.ethService.pollTransactionReceipt(res);
-      result.listen((event) {
-        if (event.status) {
-          emit(LockIsApproved(state,
-              transactionStatus: TransactionStatus(
-                  "Lock ${state.fieldController.text} ${state.stakeTokenObject.lockToken.name}",
-                  Status.SUCCESSFUL,
-                  "Transaction Successful",
-                  res)));
-          emit(LockIsApproved(state));
-        } else {
-          emit(LockIsApproved(state,
-              transactionStatus: TransactionStatus(
-                  "Lock ${state.stakeTokenObject.lockToken.name}",
-                  Status.FAILED,
-                  "Transaction Failed",
-                  res)));
-        }
-      });
-    } on Exception catch (value) {
+  Future<void> lock(Gas gas) async {
+    assert(state is LockIsApproved || state is LockPendingLock);
+    if (gas != null) {
+      emit(LockPendingLock(state,
+          transactionStatus: TransactionStatus(
+              "Lock ${state.stakeTokenObject.lockToken.name}",
+              Status.PENDING,
+              "Transaction Pending")));
+      try {
+        var res = await state.vaultsService.lock(
+            state.stakeTokenObject.lockToken.getTokenName(),
+            state.fieldController.text,
+            gas);
+        Stream<TransactionReceipt> result =
+            state.vaultsService.ethService.pollTransactionReceipt(res);
+        result.listen((event) {
+          if (event.status) {
+            emit(LockIsApproved(state,
+                transactionStatus: TransactionStatus(
+                    "Lock ${state.fieldController.text} ${state.stakeTokenObject.lockToken.name}",
+                    Status.SUCCESSFUL,
+                    "Transaction Successful",
+                    res)));
+            emit(LockIsApproved(state));
+          } else {
+            emit(LockIsApproved(state,
+                transactionStatus: TransactionStatus(
+                    "Lock ${state.stakeTokenObject.lockToken.name}",
+                    Status.FAILED,
+                    "Transaction Failed",
+                    res)));
+          }
+        });
+      } on Exception catch (value) {
+        emit(LockIsApproved(state,
+            transactionStatus: TransactionStatus(
+                "Lock ${state.stakeTokenObject.lockToken.name}",
+                Status.FAILED,
+                "Transaction Failed")));
+      }
+    } else {
       emit(LockIsApproved(state,
           transactionStatus: TransactionStatus(
               "Lock ${state.stakeTokenObject.lockToken.name}",
               Status.FAILED,
-              "Transaction Failed")));
+              "Rejected")));
     }
   }
 

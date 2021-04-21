@@ -11,12 +11,15 @@ import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/core/widgets/stake_and_lock/steps.dart';
 import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
+import 'package:web3dart/web3dart.dart';
 
 import 'cubit/lock_cubit.dart';
 
@@ -234,6 +237,29 @@ class _LockScreenState extends State<LockScreen> {
     );
   }
 
+  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas res = await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black38,
+      barrierLabel: "Barrier",
+      pageBuilder: (_, __, ___) => Align(
+          alignment: Alignment.center,
+          child: ConfirmGasScreen(
+            transaction: transaction,
+          )),
+      barrierDismissible: true,
+      transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        child: FadeTransition(
+          child: child,
+          opacity: anim1,
+        ),
+      ),
+      transitionDuration: Duration(milliseconds: 10),
+    );
+    return res;
+  }
+
   Widget _buildLockApproveButton(LockState state) {
     return CrossFadeDuoButton(
       gradientButtonLabel: 'APPROVE',
@@ -243,7 +269,11 @@ class _LockScreenState extends State<LockScreen> {
       showLoading: state is LockPendingApprove || state is LockPendingLock,
       onPressed: () async {
         if (state is LockPendingApprove || state is LockPendingLock) return;
-        if (state is LockIsApproved) context.read<LockCubit>().lock();
+        if (state is LockIsApproved) {
+          Transaction transaction = await context.read<LockCubit>().makeTransaction();
+          Gas gas = await showConfirmGasFeeDialog(transaction);
+          context.read<LockCubit>().lock(gas);
+        }
         if (state is LockHasToApprove) context.read<LockCubit>().approve();
       },
     );
