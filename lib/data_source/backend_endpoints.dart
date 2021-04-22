@@ -19,5 +19,5 @@ class BackendEndpoints {
   static const PRICE_JSON_MAINNET_2 = "https://oracle2.deus.finance/mainnet/price.json";
   static const PRICE_JSON_MAINNET_3 = "https://oracle3.deus.finance/mainnet/price.json";
 
-  static const REGISTRAR_JSON_MAINNET_1 = "https://oracle1.deus.finance/registrar-detail.json";
+  static const REGISTRAR_JSON_1 = "https://oracle1.deus.finance/registrar-detail.json";
 }

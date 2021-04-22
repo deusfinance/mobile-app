@@ -10,6 +10,8 @@ import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_o
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/cubit/mainnet_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
@@ -83,6 +85,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         create: (_) => SwapCubit(), child: SwapScreen()),
     XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(
         create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
+    MainnetSyntheticsScreen.route: (_) => BlocProvider<MainnetSyntheticsCubit>(
+        create: (_) => MainnetSyntheticsCubit(), child: MainnetSyntheticsScreen()),
     LockScreen.url: (_) {
       return BlocProvider(
         create: (context) => LockCubit(arguments["token_object"]),

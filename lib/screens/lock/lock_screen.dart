@@ -132,7 +132,7 @@ class _LockScreenState extends State<LockScreen> {
     return Container(
       padding: EdgeInsets.all(16),
       child: Toast(
-        label: 'Transaction Pending',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGrey,
         onPressed: () {},
@@ -147,7 +147,7 @@ class _LockScreenState extends State<LockScreen> {
     return Container(
       padding: EdgeInsets.all(16),
       child: Toast(
-        label: 'Transaction Successful',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {},
@@ -162,7 +162,7 @@ class _LockScreenState extends State<LockScreen> {
     return Container(
       padding: EdgeInsets.all(16),
       child: Toast(
-        label: 'Transaction Failed',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {},

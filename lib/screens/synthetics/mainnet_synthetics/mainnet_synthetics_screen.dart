@@ -1,16 +1,19 @@
 import 'dart:async';
+import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
+import 'package:deus_mobile/core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:web3dart/web3dart.dart';
 
 import '../../../core/widgets/filled_gradient_selection_button.dart';
 import '../../../core/widgets/selection_button.dart';
@@ -22,24 +25,27 @@ import '../../../service/ethereum_service.dart';
 import '../../../statics/my_colors.dart';
 import '../../../statics/styles.dart';
 import '../market_timer.dart';
+import 'cubit/mainnet_synthetics_cubit.dart';
+import 'cubit/mainnet_synthetics_state.dart';
 
-class XDaiSyntheticsScreen extends StatefulWidget {
-  static const route = '/xdai_synthethics';
+class MainnetSyntheticsScreen extends StatefulWidget {
+  static const route = '/mainnet_synthethics';
 
   @override
-  _XDaiSyntheticsScreenState createState() => _XDaiSyntheticsScreenState();
+  _MainnetSyntheticsScreenState createState() =>
+      _MainnetSyntheticsScreenState();
 }
 
-class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
+class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   @override
   void initState() {
-    context.read<XDaiSyntheticsCubit>().init();
+    context.read<MainnetSyntheticsCubit>().init();
     super.initState();
   }
 
   @override
   void deactivate() {
-    context.read<XDaiSyntheticsCubit>().dispose();
+    context.read<MainnetSyntheticsCubit>().dispose();
     super.deactivate();
   }
 
@@ -55,7 +61,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
           }
         },
         onClosed: () {
-          context.read<XDaiSyntheticsCubit>().closeToast();
+          context.read<MainnetSyntheticsCubit>().closeToast();
         },
       ),
     );
@@ -72,7 +78,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
           _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
         },
         onClosed: () {
-          context.read<XDaiSyntheticsCubit>().closeToast();
+          context.read<MainnetSyntheticsCubit>().closeToast();
         },
       ),
     );
@@ -88,7 +94,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
           _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
         },
         onClosed: () {
-          context.read<XDaiSyntheticsCubit>().closeToast();
+          context.read<MainnetSyntheticsCubit>().closeToast();
         },
       ),
     );
@@ -97,24 +103,48 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<XDaiSyntheticsCubit, XDaiSyntheticsState>(
+      child: BlocBuilder<MainnetSyntheticsCubit, MainnetSyntheticsState>(
           builder: (context, state) {
-        if (state is XDaiSyntheticsLoadingState) {
+        if (state is MainnetSyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is XDaiSyntheticsErrorState) {
+        } else if (state is MainnetSyntheticsErrorState) {
           return Center(
             child: Icon(Icons.refresh, color: MyColors.White),
           );
         }
         return _buildBody(state);
       }),
-      // chainSelector: SyncChainSelector(SyncChains.xDAI),
+      chainSelector: SyncChainSelector(SyncChains.MAINNET),
     );
   }
 
-  Widget _buildBody(XDaiSyntheticsState state) {
+  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas res = await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black38,
+      barrierLabel: "Barrier",
+      pageBuilder: (_, __, ___) => Align(
+          alignment: Alignment.center,
+          child: ConfirmGasScreen(
+            transaction: transaction,
+          )),
+      barrierDismissible: true,
+      transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+        filter:
+            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        child: FadeTransition(
+          child: child,
+          opacity: anim1,
+        ),
+      ),
+      transitionDuration: Duration(milliseconds: 10),
+    );
+    return res;
+  }
+
+  Widget _buildBody(MainnetSyntheticsState state) {
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
@@ -133,25 +163,27 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildUserInput(XDaiSyntheticsState state) {
+  Widget _buildUserInput(MainnetSyntheticsState state) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
-        selectAssetRoute: XDaiStockSelectorScreen.url,
+        selectAssetRoute: StockSelectorScreen.url,
         controller: state.fromFieldController,
         tokenSelected: (selectedToken) async {
-          context.read<XDaiSyntheticsCubit>().fromTokenChanged(selectedToken);
+          context
+              .read<MainnetSyntheticsCubit>()
+              .fromTokenChanged(selectedToken);
         });
 
-    context.read<XDaiSyntheticsCubit>().addListenerToFromField();
+    context.read<MainnetSyntheticsCubit>().addListenerToFromField();
 
     SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
       controller: state.toFieldController,
-      selectAssetRoute: XDaiStockSelectorScreen.url,
+      selectAssetRoute: StockSelectorScreen.url,
       tokenSelected: (selectedToken) {
-        context.read<XDaiSyntheticsCubit>().toTokenChanged(selectedToken);
+        context.read<MainnetSyntheticsCubit>().toTokenChanged(selectedToken);
       },
     );
     return Column(
@@ -160,7 +192,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         const SizedBox(height: 12),
         GestureDetector(
             onTap: () {
-              context.read<XDaiSyntheticsCubit>().reverseSync();
+              context.read<MainnetSyntheticsCubit>().reverseSync();
             },
             child: Center(
                 child: PlatformSvg.asset('images/icons/arrow_down.svg'))),
@@ -180,13 +212,13 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
-                      ? "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
-                      : "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
+                      ? "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
+                      : "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 GestureDetector(
                   onTap: () {
-                    context.read<XDaiSyntheticsCubit>().reversePriceRatio();
+                    context.read<MainnetSyntheticsCubit>().reversePriceRatio();
                   },
                   child: Container(
                     margin: EdgeInsets.only(left: 4.0),
@@ -212,7 +244,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildMainButton(XDaiSyntheticsState state) {
+  Widget _buildMainButton(MainnetSyntheticsState state) {
     if (!state.service.checkWallet()) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -243,7 +275,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         ),
       );
     }
-    if (state is XDaiSyntheticsSelectAssetState) {
+    if (state is MainnetSyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -262,7 +294,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          context.read<XDaiSyntheticsCubit>().approve();
+          context.read<MainnetSyntheticsCubit>().approve();
         },
         gradient: MyColors.blueToPurpleGradient,
       );
@@ -310,20 +342,32 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       );
     }
     return FilledGradientSelectionButton(
-      label: state.fromToken == CurrencyData.xdai ? 'Buy' : 'Sell',
+      label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
-        if (state.fromToken == CurrencyData.xdai) {
-          context.read<XDaiSyntheticsCubit>().buy();
+        if (state.fromToken == CurrencyData.dai) {
+          Transaction transaction =
+              await context.read<MainnetSyntheticsCubit>().makeBuyTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if (transaction != null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<MainnetSyntheticsCubit>().buy(gas);
+          }
         } else {
-          context.read<XDaiSyntheticsCubit>().sell();
+          Transaction transaction = await context
+              .read<MainnetSyntheticsCubit>()
+              .makeSellTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if (transaction != null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<MainnetSyntheticsCubit>().sell(gas);
+          }
         }
-        ;
       },
       gradient: MyColors.blueToPurpleGradient,
     );
   }
 
-  Container _buildModeButtons(XDaiSyntheticsState state) {
+  Container _buildModeButtons(MainnetSyntheticsState state) {
     return Container(
       child: Row(children: [
         Expanded(child: _buildLongButton(state)),
@@ -333,7 +377,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildMarketTimer(XDaiSyntheticsState state) {
+  Widget _buildMarketTimer(MainnetSyntheticsState state) {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
@@ -342,31 +386,31 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
             state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
-        onEnd: context.read<XDaiSyntheticsCubit>().marketTimerFinished(),
+        onEnd: context.read<MainnetSyntheticsCubit>().marketTimerFinished(),
         label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'
             : 'UNTIL TRADING CLOSES',
-        end: context.read<XDaiSyntheticsCubit>().marketStatusChanged(),
+        end: context.read<MainnetSyntheticsCubit>().marketStatusChanged(),
       ),
     );
   }
 
-  Widget _buildShortButton(XDaiSyntheticsState state) {
+  Widget _buildShortButton(MainnetSyntheticsState state) {
     return SelectionButton(
       label: 'SHORT',
       onPressed: (bool selected) {
-        context.read<XDaiSyntheticsCubit>().setMode(Mode.SHORT);
+        context.read<MainnetSyntheticsCubit>().setMode(Mode.SHORT);
       },
       selected: state.mode == Mode.SHORT,
       gradient: MyColors.blueToPurpleGradient,
     );
   }
 
-  Widget _buildLongButton(XDaiSyntheticsState state) {
+  Widget _buildLongButton(MainnetSyntheticsState state) {
     return SelectionButton(
       label: 'LONG',
       onPressed: (bool selected) {
-        context.read<XDaiSyntheticsCubit>().setMode(Mode.LONG);
+        context.read<MainnetSyntheticsCubit>().setMode(Mode.LONG);
       },
       selected: state.mode == Mode.LONG,
       gradient: MyColors.blueToPurpleGradient,
@@ -385,12 +429,13 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     }
   }
 
-  Widget _buildToastWidget(XDaiSyntheticsState state) {
-    if (state is XDaiSyntheticsTransactionPendingState && state.showingToast) {
+  Widget _buildToastWidget(MainnetSyntheticsState state) {
+    if (state is MainnetSyntheticsTransactionPendingState &&
+        state.showingToast) {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));
-    } else if (state is XDaiSyntheticsTransactionFinishedState &&
+    } else if (state is MainnetSyntheticsTransactionFinishedState &&
         state.showingToast) {
       if (state.transactionStatus.status == Status.PENDING) {
         return Align(
@@ -409,7 +454,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     return Container();
   }
 
-  _buildRemainingCapacity(XDaiSyntheticsState state) {
+  _buildRemainingCapacity(MainnetSyntheticsState state) {
     return Row(children: [
       Text(
         "Remaining Synchronize Capacity",
@@ -427,7 +472,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
             width: 6,
           ),
           FutureBuilder(
-              future: context.read<XDaiSyntheticsCubit>().getRemCap(),
+              future: context.read<MainnetSyntheticsCubit>().getRemCap(),
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
                   return Text(

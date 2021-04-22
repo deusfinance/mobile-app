@@ -19,8 +19,8 @@ import 'package:http/http.dart' as http;
 
 import '../../locator.dart';
 
-enum ConfirmMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
-enum Mode { LOADING, NONE }
+enum ConfirmShowingMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
+enum ShowingMode { LOADING, NONE }
 enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
 
 class ConfirmGasScreen extends StatefulWidget {
@@ -34,11 +34,11 @@ class ConfirmGasScreen extends StatefulWidget {
 }
 
 class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
-  ConfirmMode confirmSwapMode;
+  ConfirmShowingMode confirmSwapShowingMode;
   GWei gWei;
   bool showingError;
   double ethPrice;
-  Mode mode;
+  ShowingMode mode;
   int estimatedGasNumber;
   GasFee gasFee;
   TextEditingController nonceController = new TextEditingController();
@@ -71,7 +71,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   @override
   void initState() {
     super.initState();
-    confirmSwapMode = ConfirmMode.CONFIRM;
+    confirmSwapShowingMode = ConfirmShowingMode.CONFIRM;
     gasFee = GasFee.AVERAGE;
     getData();
   }
@@ -80,7 +80,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: mode == Mode.LOADING
+      child: mode == ShowingMode.LOADING
           ? Center(
         child: CircularProgressIndicator(),
       )
@@ -88,7 +88,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         margin: EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
         padding: EdgeInsets.all(12.0),
         decoration: MyStyles.darkWithBorderDecoration,
-        child: confirmSwapMode == ConfirmMode.CONFIRM
+        child: confirmSwapShowingMode == ConfirmShowingMode.CONFIRM
             ? confirmScreen()
             : customizeScreen(),
       ),
@@ -120,7 +120,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    confirmSwapMode = ConfirmMode.BASIC_CUSTOMIZE;
+                    confirmSwapShowingMode = ConfirmShowingMode.BASIC_CUSTOMIZE;
                   });
                 },
                 child: Text("EDIT",
@@ -255,7 +255,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   GestureDetector(
                       onTap: () {
                         setState(() {
-                          confirmSwapMode = ConfirmMode.BASIC_CUSTOMIZE;
+                          confirmSwapShowingMode = ConfirmShowingMode.BASIC_CUSTOMIZE;
                         });
                       },
                       child: Container(
@@ -264,8 +264,8 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                           children: [
                             Text(
                               "BASIC",
-                              style: confirmSwapMode ==
-                                  ConfirmMode.BASIC_CUSTOMIZE
+                              style: confirmSwapShowingMode ==
+                                  ConfirmShowingMode.BASIC_CUSTOMIZE
                                   ? TextStyle(
                                   fontFamily: MyStyles.kFontFamily,
                                   fontWeight: FontWeight.w300,
@@ -277,8 +277,8 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
-                              visible: confirmSwapMode ==
-                                  ConfirmMode.BASIC_CUSTOMIZE,
+                              visible: confirmSwapShowingMode ==
+                                  ConfirmShowingMode.BASIC_CUSTOMIZE,
                               child: Container(
                                   margin: EdgeInsets.only(top: 3),
                                   height: 2.0,
@@ -294,7 +294,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   GestureDetector(
                       onTap: () {
                         setState(() {
-                          confirmSwapMode = ConfirmMode.ADVANCED_CUSTOMIZE;
+                          confirmSwapShowingMode = ConfirmShowingMode.ADVANCED_CUSTOMIZE;
                         });
                       },
                       child: Container(
@@ -303,8 +303,8 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                           children: [
                             Text(
                               "ADVANCED",
-                              style: confirmSwapMode ==
-                                  ConfirmMode.ADVANCED_CUSTOMIZE
+                              style: confirmSwapShowingMode ==
+                                  ConfirmShowingMode.ADVANCED_CUSTOMIZE
                                   ? TextStyle(
                                   fontFamily: MyStyles.kFontFamily,
                                   fontWeight: FontWeight.w300,
@@ -316,8 +316,8 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
-                              visible: confirmSwapMode ==
-                                  ConfirmMode.ADVANCED_CUSTOMIZE,
+                              visible: confirmSwapShowingMode ==
+                                  ConfirmShowingMode.ADVANCED_CUSTOMIZE,
                               child: Container(
                                   margin: EdgeInsets.only(top: 3),
                                   height: 2.0,
@@ -337,7 +337,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           thickness: 1,
           color: Colors.black,
         ),
-        confirmSwapMode == ConfirmMode.ADVANCED_CUSTOMIZE
+        confirmSwapShowingMode == ConfirmShowingMode.ADVANCED_CUSTOMIZE
             ? advancedCustomize()
             : basicCustomize(),
         SizedBox(
@@ -349,10 +349,10 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
             label: 'SAVE',
             onPressed: (bool selected) {
               setState(() {
-                if (confirmSwapMode == ConfirmMode.ADVANCED_CUSTOMIZE) {
+                if (confirmSwapShowingMode == ConfirmShowingMode.ADVANCED_CUSTOMIZE) {
                   gasFee = GasFee.CUSTOM;
                 }
-                confirmSwapMode = ConfirmMode.CONFIRM;
+                confirmSwapShowingMode = ConfirmShowingMode.CONFIRM;
               });
             },
             selected: true,
@@ -708,7 +708,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
 
   void getData() async {
     setState(() {
-      mode = Mode.LOADING;
+      mode = ShowingMode.LOADING;
     });
     gWei = await getGWei();
     ethPrice = await getEthPrice();
@@ -723,7 +723,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
       });
     }
     setState(() {
-      mode = Mode.NONE;
+      mode = ShowingMode.NONE;
     });
   }
 

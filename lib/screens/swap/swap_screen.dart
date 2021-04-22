@@ -94,7 +94,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
       child: Toast(
-        label: 'Transaction Pending',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGrey,
         onPressed: () {
@@ -112,7 +112,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
     return Container(
       child: Toast(
-        label: 'Transaction Successful',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
@@ -128,7 +128,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
     return Container(
       child: Toast(
-        label: 'Transaction Failed',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {

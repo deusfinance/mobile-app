@@ -5,6 +5,7 @@ import 'package:deus_mobile/core/widgets/svg.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
@@ -62,7 +63,7 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
       case SyncChains.MAINNET:
         return "Mainnet";
       case SyncChains.BSC:
-        return "BSC";
+        return "BSC (Coming Soon)";
     }
   }
 
@@ -88,8 +89,20 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(8),
+                    child:Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Select your Network',
+                          style: MyStyles.whiteSmallTextStyle,
+                        ),
+                      ),
+                  ),
+                  SizedBox(height: 20,),
+                  Container(
+                    padding: EdgeInsets.all(8),
                     child: GestureDetector(
                       onTap: (){
+                        locator<NavigationService>().goBack(context);
                         locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
@@ -106,7 +119,8 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(
                       onTap: (){
-                        locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
+                        locator<NavigationService>().goBack(context);
+                        locator<NavigationService>().navigateTo(MainnetSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
                         alignment: Alignment.center,
@@ -122,7 +136,8 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(
                       onTap: (){
-                        locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
+                        // locator<NavigationService>().goBack(context);
+                        // locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
                         alignment: Alignment.center,

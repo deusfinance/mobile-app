@@ -6,7 +6,7 @@ import 'package:deus_mobile/data_source/xdai_stock_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/models/synthetics/stock_address.dart';
-import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
+import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
@@ -25,9 +25,8 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
     emit(XDaiSyntheticsLoadingState(state));
 
     bool res1 = await XDaiStockData.getData();
-    bool res2 = await XDaiStockData.getStockAddresses();
     state.prices = await XDaiStockData.getPrices();
-    if (res1 && res2 && state.prices != null) {
+    if (res1 && state.prices != null) {
       state.marketTimerClosed = await checkMarketStatus();
       (state.fromToken as CryptoCurrency).balance =
       await getTokenBalance(state.fromToken);
@@ -187,6 +186,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       await getAllowances();
       (selectedToken as Stock).longBalance =
       await getTokenBalance(selectedToken);
+      emit(XDaiSyntheticsLoadingState(state));
       emit(XDaiSyntheticsAssetSelectedState(state,
           fromToken: selectedToken, isInProgress: false));
     }
@@ -212,6 +212,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
       await getAllowances();
       (selectedToken as Stock).longBalance =
       await getTokenBalance(selectedToken);
+      emit(XDaiSyntheticsLoadingState(state));
       emit(XDaiSyntheticsAssetSelectedState(state,
           toToken: selectedToken, isInProgress: false));
     }
@@ -324,7 +325,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
                 transactionStatus: TransactionStatus(
                     "Approve ${state.fromToken.name}",
                     Status.SUCCESSFUL,
-                    "Transaction Successfull",
+                    "Transaction Successful",
                     res)));
           } else {
             emit(XDaiSyntheticsTransactionFinishedState(state,
@@ -335,7 +336,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
                     res)));
           }
         });
-      } on Exception catch (value) {
+      } on Exception catch (_) {
         state.approved = false;
         emit(XDaiSyntheticsTransactionFinishedState(state,
             transactionStatus: TransactionStatus(
@@ -356,7 +357,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
               "Transaction Pending")));
       String tokenAddress = getTokenAddress(state.fromToken);
 
-      List<XDaiContractInputData> oracles =
+      List<ContractInputData> oracles =
       await XDaiStockData.getContractInputData(tokenAddress, await state.service.ethService.ethClient.getBlockNumber());
       if (oracles.length >= 2) {
         try {
@@ -367,7 +368,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
           });
           arr.sort((a, b) => a[1].compareTo(b[1]));
 
-          List<XDaiContractInputData> inputOracles;
+          List<ContractInputData> inputOracles;
           if (arr[0][0] < arr[1][0]) {
             inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
           } else {
@@ -400,7 +401,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
                       "Sell ${state.fromFieldController.text} ${state.fromToken
                           .getTokenName()}",
                       Status.SUCCESSFUL,
-                      "Transaction Successfull",
+                      "Transaction Successful",
                       res)));
             } else {
               emit(XDaiSyntheticsTransactionFinishedState(state,
@@ -437,7 +438,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
               Status.PENDING,
               "Transaction Pending")));
       String tokenAddress = getTokenAddress(state.toToken);
-      List<XDaiContractInputData> oracles =
+      List<ContractInputData> oracles =
       await XDaiStockData.getContractInputData(tokenAddress, await state.service.ethService.ethClient.getBlockNumber());
       if (oracles.length >= 2) {
         try {
@@ -448,7 +449,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
           });
           arr.sort((a, b) => b[1].compareTo(a[1]));
 
-          List<XDaiContractInputData> inputOracles;
+          List<ContractInputData> inputOracles;
           if (arr[0][0] < arr[1][0]) {
             inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
           } else {
@@ -480,7 +481,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
                       "Buy ${state.toFieldController.text} ${state.toToken
                           .getTokenName()}",
                       Status.SUCCESSFUL,
-                      "Transaction Successfull",
+                      "Transaction Successful",
                       res)));
             } else {
               emit(XDaiSyntheticsTransactionFinishedState(state,
@@ -492,7 +493,7 @@ class XDaiSyntheticsCubit extends Cubit<XDaiSyntheticsState> {
                       res)));
             }
           });
-        } on Exception catch (error) {
+        } on Exception catch (_) {
           emit(XDaiSyntheticsTransactionFinishedState(state,
               transactionStatus: TransactionStatus(
                   "Buy ${state.toFieldController.text} ${state.toToken

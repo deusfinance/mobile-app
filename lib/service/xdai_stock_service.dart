@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
-import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
+import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
@@ -80,14 +80,14 @@ class XDaiStockService {
     return EthereumService.fromWei(res.single);
   }
 
-  Future<String> buy(tokenAddress, String amount, List<XDaiContractInputData> oracles, maxPrice) async {
+  Future<String> buy(tokenAddress, String amount, List<ContractInputData> oracles, maxPrice) async {
     try {
       if (!checkWallet()) return "0";
 
       DeployedContract contract =
       await ethService.loadContractWithGivenAddress(
           "wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
-      XDaiContractInputData info = oracles[0];
+      ContractInputData info = oracles[0];
 
       var res = await ethService.query(contract, "calculateXdaiAmount", [
         BigInt.parse(maxPrice),
@@ -112,11 +112,11 @@ class XDaiStockService {
     }
   }
 
-  Future<String> sell(tokenAddress, String amount, List<XDaiContractInputData> oracles) async {
+  Future<String> sell(tokenAddress, String amount, List<ContractInputData> oracles) async {
     if (!checkWallet()) return "0";
     DeployedContract contract =
     await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
-    XDaiContractInputData info = oracles[0];
+    ContractInputData info = oracles[0];
 
     return ethService.submit(await credentials, contract, "sell", [
       info.getMultiplier(),
@@ -133,7 +133,7 @@ class XDaiStockService {
 
   Future getUsedCap() async {
     DeployedContract contract =
-        await ethService.loadContractWithGivenAddress("xdai_synchronizer", EthereumAddress.fromHex(this.marketMaker));
+        await ethService.loadContractWithGivenAddress("synchronizer", EthereumAddress.fromHex(this.marketMaker));
     final res = await ethService.query(contract, "remainingDollarCap", []);
     return EthereumService.fromWei(res.single, "ether");
   }

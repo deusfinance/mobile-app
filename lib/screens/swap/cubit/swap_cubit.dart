@@ -99,7 +99,7 @@ class SwapCubit extends Cubit<SwapState> {
                 transactionStatus: TransactionStatus(
                     "Approve ${state.fromToken.name}",
                     Status.SUCCESSFUL,
-                    "Transaction Successfull",
+                    "Transaction Successful",
                     res)));
           } else {
             emit(TransactionFinishedState(state,
