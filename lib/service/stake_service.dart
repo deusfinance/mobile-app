@@ -66,7 +66,7 @@ class StakeService {
     if(!checkWallet()){
       return "0";
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddrHex(stakedToken,"staking"));
+    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
     return await ethService.submit(await credentials, contract, "deposit", [EthereumService.getWei(amount)], gas: gas);
   }
 
@@ -74,7 +74,7 @@ class StakeService {
     if(!checkWallet()){
       return null;
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddrHex(stakedToken,"staking"));
+    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
     return await ethService.makeTransaction(await credentials, contract, "deposit", [EthereumService.getWei(amount)]);
   }
 

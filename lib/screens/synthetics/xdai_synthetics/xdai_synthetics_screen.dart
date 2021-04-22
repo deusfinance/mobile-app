@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
@@ -67,7 +68,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          https://blockscout.com/xdai/mainnet/tx/
+          https: //blockscout.com/xdai/mainnet/tx/
           _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
         },
         onClosed: () {
@@ -95,24 +96,22 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<XDaiSyntheticsCubit, XDaiSyntheticsState>(
-        builder: (context, state) {
-      if (state is XDaiSyntheticsLoadingState) {
-        return DefaultScreen(
-          child: Center(
+    return DefaultScreen(
+      child: BlocBuilder<XDaiSyntheticsCubit, XDaiSyntheticsState>(
+          builder: (context, state) {
+        if (state is XDaiSyntheticsLoadingState) {
+          return Center(
             child: CircularProgressIndicator(),
-          ),
-        );
-      } else if (state is XDaiSyntheticsErrorState) {
-        return DefaultScreen(
-          child: Center(
+          );
+        } else if (state is XDaiSyntheticsErrorState) {
+          return Center(
             child: Icon(Icons.refresh, color: MyColors.White),
-          ),
-        );
-      } else {
-        return DefaultScreen(child: _buildBody(state));
-      }
-    });
+          );
+        }
+        return _buildBody(state);
+      }),
+      // chainSelector: SyncChainSelector(SyncChains.xDAI),
+    );
   }
 
   Widget _buildBody(XDaiSyntheticsState state) {

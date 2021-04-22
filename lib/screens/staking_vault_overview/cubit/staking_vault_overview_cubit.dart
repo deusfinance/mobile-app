@@ -67,4 +67,8 @@ class StakingVaultOverviewCubit extends Cubit<StakingVaultOverviewState>{
   void claim(){
 
   }
+
+  void withdrawAndClaim(){
+
+  }
 }

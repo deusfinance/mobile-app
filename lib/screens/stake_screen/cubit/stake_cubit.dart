@@ -108,18 +108,18 @@ class StakeCubit extends Cubit<StakeState> {
   }
 
   Future<void> stake(Gas gas) async {
-    assert(state is StakeIsApproved || state is StakePendingStake);
+    assert(state is StakeIsApproved);
     if(gas!=null) {
-      emit(StakePendingStake(state,
-          transactionStatus: TransactionStatus(
-              "Stake ${state.stakeTokenObject.stakeToken.name}",
-              Status.PENDING,
-              "Transaction Pending")));
-
       try {
         var res = await state.stakeService.stake(
             state.stakeTokenObject.stakeToken.getTokenName(),
             state.fieldController.text, gas);
+        emit(StakePendingStake(state,
+            transactionStatus: TransactionStatus(
+                "Stake ${state.stakeTokenObject.stakeToken.name}",
+                Status.PENDING,
+                "Transaction Pending", res)));
+
         Stream<TransactionReceipt> result =
         state.stakeService.ethService.pollTransactionReceipt(res);
         result.listen((event) {

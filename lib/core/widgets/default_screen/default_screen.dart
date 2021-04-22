@@ -10,9 +10,13 @@ import 'header_with_address.dart';
 
 class DefaultScreen extends StatelessWidget {
   final Widget child;
+  Widget chainSelector;
   final bool showHeading;
 
-  const DefaultScreen({Key key, @required this.child, this.showHeading = true}) : super(key: key);
+  DefaultScreen({Key key, @required this.child, this.showHeading = true, this.chainSelector}) : super(key: key){
+    if(chainSelector == null)
+      this.chainSelector = Container();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +35,7 @@ class DefaultScreen extends StatelessWidget {
             children: [
               // const SizedBox(height: 50),
               //TODO: Move into AppBar?
-              if (showHeading) Container(margin: EdgeInsets.only(right: 8, left: 8), child: HeaderWithAddress()),
+              if (showHeading) Container(margin: EdgeInsets.only(right: 8, left: 8), child: HeaderWithAddress(chainSelector: chainSelector,)),
               Expanded(child: child),
             ],
           ),

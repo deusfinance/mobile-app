@@ -328,8 +328,13 @@ class _StakingVaultOverviewScreenState
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(object.stakeToken.name, style: MyStyles.whiteBigTextStyle),
-            Text('you own ${object.percOfPool}% of the pool',
-                style: MyStyles.whiteSmallTextStyle)
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text('you own ${object.percOfPool()}% of the pool',
+                    style: MyStyles.whiteSmallTextStyle),
+              ),
+            )
           ]),
           _smallHeightDivider,
           Text('${object.apy}% APY', style: MyStyles.whiteMediumTextStyle)
@@ -382,7 +387,11 @@ class _StakingVaultOverviewScreenState
                 border: Border.all(color: MyColors.HalfBlack)),
           ),
           const SizedBox(height: 8),
-          DarkButton(label: 'CLAIM'),
+          DarkButton(
+              onPressed: (){
+                context.read<StakingVaultOverviewCubit>().claim();
+              },
+              label: 'CLAIM'),
         ],
       ),
     );
@@ -403,7 +412,11 @@ class _StakingVaultOverviewScreenState
                 border: Border.all(color: MyColors.HalfBlack)),
           ),
           const SizedBox(height: 8),
-          DarkButton(label: 'WITHDRAW & CLAIM'),
+          DarkButton(
+              onPressed: (){
+                context.read<StakingVaultOverviewCubit>().withdrawAndClaim();
+              },
+              label: 'WITHDRAW & CLAIM'),
         ],
       ),
     );

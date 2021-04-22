@@ -48,7 +48,7 @@ class _ChartContainerState extends State<ChartContainer> {
     // _randomTestData.chartDataPoints.removeWhere((value) {
     //   return DateTime.now().difference(value.dateTime) >= duration;
     // });
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(Duration(seconds: 1));
     return _randomTestData;
   }
 

@@ -108,18 +108,18 @@ class LockCubit extends Cubit<LockState> {
   }
 
   Future<void> lock(Gas gas) async {
-    assert(state is LockIsApproved || state is LockPendingLock);
+    assert(state is LockIsApproved);
     if (gas != null) {
-      emit(LockPendingLock(state,
-          transactionStatus: TransactionStatus(
-              "Lock ${state.stakeTokenObject.lockToken.name}",
-              Status.PENDING,
-              "Transaction Pending")));
       try {
         var res = await state.vaultsService.lock(
             state.stakeTokenObject.lockToken.getTokenName(),
             state.fieldController.text,
             gas);
+        emit(LockPendingLock(state,
+            transactionStatus: TransactionStatus(
+                "Lock ${state.stakeTokenObject.lockToken.name}",
+                Status.PENDING,
+                "Transaction Pending", res)));
         Stream<TransactionReceipt> result =
             state.vaultsService.ethService.pollTransactionReceipt(res);
         result.listen((event) {
