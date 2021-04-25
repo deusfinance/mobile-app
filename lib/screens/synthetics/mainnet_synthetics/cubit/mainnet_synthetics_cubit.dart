@@ -303,10 +303,10 @@ class MainnetSyntheticsCubit extends Cubit<MainnetSyntheticsState> {
           showingToast: false));
   }
 
-  Future approve() async {
+  Future approve(Gas gas) async {
     if (!state.isInProgress) {
       try {
-        var res = await state.service.approve(getTokenAddress(state.fromToken));
+        var res = await state.service.approve(await getTokenAddress(state.fromToken), gas);
         emit(MainnetSyntheticsTransactionPendingState(state,
             transactionStatus: TransactionStatus(
                 "Approve ${state.fromToken.name}",
@@ -673,5 +673,9 @@ class MainnetSyntheticsCubit extends Cubit<MainnetSyntheticsState> {
             Status.FAILED,
             "Transaction Failed")));
     return null;
+  }
+
+  makeApproveTransaction() async{
+    return await state.service.makeApproveTransaction(await getTokenAddress(state.fromToken));
   }
 }

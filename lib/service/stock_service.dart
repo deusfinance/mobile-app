@@ -47,7 +47,7 @@ class StockService {
     return EthereumService.fromWei(res.single);
   }
 
-  Future<String> approve(tokenAddress) async {
+  Future<String> approve(tokenAddress, gas) async {
     if (!checkWallet()) {
       return "0";
     }
@@ -56,6 +56,19 @@ class StockService {
         await ethService.loadContractWithGivenAddress(
             "token", EthereumAddress.fromHex(tokenAddress));
     var res = ethService.submit(await credentials, tokenContract, "approve",
+        [EthereumAddress.fromHex(marketMaker), EthereumService.getWei(amount)], gas: gas);
+    return res;
+  }
+
+  Future<Transaction> makeApproveTransaction(tokenAddress) async {
+    if (!checkWallet()) {
+      return null;
+    }
+    var amount = "10000000000000000000000000000";
+    DeployedContract tokenContract =
+    await ethService.loadContractWithGivenAddress(
+        "token", EthereumAddress.fromHex(tokenAddress));
+    var res = ethService.makeTransaction(await credentials, tokenContract, "approve",
         [EthereumAddress.fromHex(marketMaker), EthereumService.getWei(amount)]);
     return res;
   }

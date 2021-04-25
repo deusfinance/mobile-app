@@ -277,7 +277,14 @@ class _LockScreenState extends State<LockScreen> {
             context.read<LockCubit>().lock(gas);
           }
         }
-        if (state is LockHasToApprove) context.read<LockCubit>().approve();
+        if (state is LockHasToApprove){
+          Transaction transaction = await context.read<LockCubit>().makeApproveTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if(transaction!=null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<LockCubit>().approve(gas);
+          }
+        }
       },
     );
   }

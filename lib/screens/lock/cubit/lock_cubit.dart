@@ -38,7 +38,7 @@ class LockCubit extends Cubit<LockState> {
       emit(LockHasToApprove(state));
   }
 
-  Future<void> approve() async {
+  Future<void> approve(Gas gas) async {
     emit(LockPendingApprove(state,
         transactionStatus: TransactionStatus(
             "Approve ${state.stakeTokenObject.lockToken.name}",
@@ -47,7 +47,7 @@ class LockCubit extends Cubit<LockState> {
 
     try {
       var res = await state.vaultsService
-          .approve(state.stakeTokenObject.lockToken.getTokenName());
+          .approve(state.stakeTokenObject.lockToken.getTokenName(), gas);
       Stream<TransactionReceipt> result =
           state.vaultsService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
@@ -165,5 +165,9 @@ class LockCubit extends Cubit<LockState> {
       emit(LockHasToApprove(state, showingToast: false));
     else if (state is LockPendingLock)
       emit(LockPendingLock(state, showingToast: false));
+  }
+
+  makeApproveTransaction() async {
+    return await state.vaultsService.makeApproveTransaction(state.stakeTokenObject.lockToken.getTokenName());
   }
 }

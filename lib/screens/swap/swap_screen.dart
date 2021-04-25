@@ -318,7 +318,12 @@ class _SwapScreenState extends State<SwapScreen> {
     return SelectionButton(
       label: 'Approve',
       onPressed: (bool selected) async {
-        await context.read<SwapCubit>().approve();
+        Transaction transaction = await context.read<SwapCubit>().makeApproveTransaction();
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+        if(transaction!=null) {
+          Gas gas = await showConfirmGasFeeDialog(transaction);
+          await context.read<SwapCubit>().approve(gas);
+        }
       },
       selected: true,
       gradient: MyColors.blueToGreenSwapScreenGradient,

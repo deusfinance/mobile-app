@@ -78,11 +78,11 @@ class SwapCubit extends Cubit<SwapState> {
     if (fromTokenChanged) getAllowances();
   }
 
-  approve() async {
+  approve(Gas gas) async {
     if (!state.isInProgress) {
       try {
         var res =
-            await state.swapService.approve(state.fromToken.getTokenName());
+            await state.swapService.approve(state.fromToken.getTokenName(), gas);
         emit(TransactionPendingState(state,
             transactionStatus: TransactionStatus(
                 "Approve ${state.fromToken.name}",
@@ -310,5 +310,10 @@ class SwapCubit extends Cubit<SwapState> {
       emit(TransactionPendingState(state, showingToast: false));
     else if (state is TransactionFinishedState)
       emit(TransactionFinishedState(state, showingToast: false));
+  }
+
+  makeApproveTransaction() async {
+    Transaction transaction = await state.swapService.makeApproveTransaction(state.fromToken.getTokenName());
+    return transaction;
   }
 }

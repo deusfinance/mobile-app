@@ -32,14 +32,13 @@ class StakeCubit extends Cubit<StakeState> {
     emit(StakePendingApprove(state));
     state.stakeTokenObject.stakeToken.allowances = await state.stakeService
         .getAllowances(state.stakeTokenObject.stakeToken.getTokenName());
-    print(state.stakeTokenObject.stakeToken.allowances);
     if (state.stakeTokenObject.stakeToken.getAllowances() > BigInt.zero)
       emit(StakeIsApproved(state));
     else
       emit(StakeHasToApprove(state));
   }
 
-  Future<void> approve() async {
+  Future<void> approve(Gas gas) async {
     emit(StakePendingApprove(state,
         transactionStatus: TransactionStatus(
             "Approve ${state.stakeTokenObject.stakeToken.name}",
@@ -47,10 +46,8 @@ class StakeCubit extends Cubit<StakeState> {
             "Transaction Pending")));
 
     try {
-      print(state.stakeTokenObject.stakeToken.getTokenName());
       var res = await state.stakeService
-          .approve(state.stakeTokenObject.stakeToken.getTokenName());
-      print(res);
+          .approve(state.stakeTokenObject.stakeToken.getTokenName(), gas);
       Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
@@ -170,5 +167,9 @@ class StakeCubit extends Cubit<StakeState> {
       emit(StakeHasToApprove(state, showingToast: false));
     else if (state is StakePendingStake)
       emit(StakePendingStake(state, showingToast: false));
+  }
+
+  makeApproveTransaction() async{
+    return await state.stakeService.makeApproveTransaction(state.stakeTokenObject.stakeToken.getTokenName());
   }
 }

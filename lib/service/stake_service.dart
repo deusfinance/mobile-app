@@ -18,7 +18,6 @@ class StakeService {
   Future<EthereumAddress> get address async =>
       (await credentials).extractAddress();
 
-
   bool checkWallet() {
     return ethService != null && this.privateKey != null;
   }
@@ -30,98 +29,124 @@ class StakeService {
       return this.getEtherBalance();
     }
     final tokenContract = await ethService.loadTokenContract(tokenName);
-    final result = await ethService.query(tokenContract, "balanceOf", [await address]);
+    final result =
+        await ethService.query(tokenContract, "balanceOf", [await address]);
 
     return EthereumService.fromWei(result.single);
   }
 
-  Future<String> getEtherBalance() async{
+  Future<String> getEtherBalance() async {
     if (!this.checkWallet()) return "0";
 
     return (await ethService.getEtherBalance(await credentials))
-    .getInEther
-    .toString();
+        .getInEther
+        .toString();
   }
 
   Future<String> getAllowances(stakedToken) async {
-    if(!checkWallet()){
+    if (!checkWallet()) {
       return "0";
     }
-    DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
-    final res = await ethService.query(tokenContract, "allowance", [await address, await ethService.getTokenAddr(stakedToken,"staking")]);
-    print("asc");
-    print(res);
-    print(res.single);
+    DeployedContract tokenContract =
+        await ethService.loadTokenContract(stakedToken);
+    final res = await ethService.query(tokenContract, "allowance",
+        [await address, await ethService.getTokenAddr(stakedToken, "staking")]);
     return EthereumService.fromWei(res.single);
   }
 
-  Future<String> approve(stakedToken) async {
-    if(!checkWallet()){
+  Future<String> approve(stakedToken, Gas gas) async {
+    if (!checkWallet()) {
       return "0";
     }
     var amount = "10000000000";
-    DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
-    var res = await ethService.submit(await credentials, tokenContract, "approve", [await ethService.getTokenAddr(stakedToken,"staking"), EthereumService.getWei(amount)]);
+    DeployedContract tokenContract =
+        await ethService.loadTokenContract(stakedToken);
+    var res =
+        await ethService.submit(await credentials, tokenContract, "approve", [
+      await ethService.getTokenAddr(stakedToken, "staking"),
+      EthereumService.getWei(amount)
+    ], gas: gas);
     return res;
   }
 
-  Future<String> stake(stakedToken, amount, Gas gas) async{
-    if(!checkWallet()){
-      return "0";
-    }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
-    return await ethService.submit(await credentials, contract, "deposit", [EthereumService.getWei(amount)], gas: gas);
-  }
-
-  Future<Transaction> makeStakeTransaction(stakedToken, amount) async{
+  Future<Transaction> makeApproveTransaction(stakedToken) async {
     if(!checkWallet()){
       return null;
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
-    return await ethService.makeTransaction(await credentials, contract, "deposit", [EthereumService.getWei(amount)]);
+    var amount = "10000000000";
+    DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
+    var res = await ethService.makeTransaction(await credentials, tokenContract, "approve", [await ethService.getTokenAddr(stakedToken,"staking"), EthereumService.getWei(amount)]);
+    return res;
   }
 
-  Future<String> getUserWalletStakedTokenBalance(stakedToken) async{
-    if(!checkWallet()){
+  Future<String> stake(stakedToken, amount, Gas gas) async {
+    if (!checkWallet()) {
       return "0";
     }
-    DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
-    var res = await ethService.query(tokenContract, "balanceOf", [await address]);
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "staking", await ethService.getTokenAddr(stakedToken, "staking"));
+    return await ethService.submit(await credentials, contract, "deposit",
+        [EthereumService.getWei(amount)],
+        gas: gas);
+  }
+
+  Future<Transaction> makeStakeTransaction(stakedToken, amount) async {
+    if (!checkWallet()) {
+      return null;
+    }
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "staking", await ethService.getTokenAddr(stakedToken, "staking"));
+    return await ethService.makeTransaction(await credentials, contract,
+        "deposit", [EthereumService.getWei(amount)]);
+  }
+
+  Future<String> getUserWalletStakedTokenBalance(stakedToken) async {
+    if (!checkWallet()) {
+      return "0";
+    }
+    DeployedContract tokenContract =
+        await ethService.loadTokenContract(stakedToken);
+    var res =
+        await ethService.query(tokenContract, "balanceOf", [await address]);
     return EthereumService.fromWei(res[0]);
   }
 
-  Future<String> withdraw(stakedToken, amount)async{
-    if(!checkWallet()){
+  Future<String> withdraw(stakedToken, amount) async {
+    if (!checkWallet()) {
       return "0";
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
-    return await ethService.submit(await credentials, contract, "withdraw", [EthereumService.getWei(amount)]);
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "staking", await ethService.getTokenAddr(stakedToken, "staking"));
+    return await ethService.submit(await credentials, contract, "withdraw",
+        [EthereumService.getWei(amount)]);
   }
 
-  Future<String> getNumberOfStakedTokens(stakedToken)async{
-    if(!checkWallet()){
+  Future<String> getNumberOfStakedTokens(stakedToken) async {
+    if (!checkWallet()) {
       return "0";
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "staking", await ethService.getTokenAddr(stakedToken, "staking"));
     var res = await ethService.query(contract, "users", [await address]);
 //    TODO depositAmount
     return EthereumService.fromWei(res[0]);
   }
 
-  Future<String> getNumberOfPendingRewardTokens(stakedToken)async{
-    if(!checkWallet()){
+  Future<String> getNumberOfPendingRewardTokens(stakedToken) async {
+    if (!checkWallet()) {
       return "0";
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("staking", await ethService.getTokenAddr(stakedToken,"staking"));
-    var res = await ethService.query(contract, "pendingReward", [await address]);
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "staking", await ethService.getTokenAddr(stakedToken, "staking"));
+    var res =
+        await ethService.query(contract, "pendingReward", [await address]);
     return EthereumService.fromWei(res[0]);
   }
 
-  Future<String> getTotalStakedToken(stakedToken)async{
-
+  Future<String> getTotalStakedToken(stakedToken) async {
     DeployedContract contract = await ethService.loadTokenContract(stakedToken);
-    var res = await ethService.query(contract, "balanceOf", [await ethService.getTokenAddr(stakedToken, "staking")]);
+    var res = await ethService.query(contract, "balanceOf",
+        [await ethService.getTokenAddr(stakedToken, "staking")]);
     return EthereumService.fromWei(res[0]);
   }
-
 }

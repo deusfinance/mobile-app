@@ -12,7 +12,6 @@ import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/cubit/mainnet_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
-import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';

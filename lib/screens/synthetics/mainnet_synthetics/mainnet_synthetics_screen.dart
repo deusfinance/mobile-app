@@ -293,7 +293,14 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          context.read<MainnetSyntheticsCubit>().approve();
+          Transaction transaction = await context
+              .read<MainnetSyntheticsCubit>()
+              .makeApproveTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if (transaction != null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<MainnetSyntheticsCubit>().approve(gas);
+          }
         },
         gradient: MyColors.blueToPurpleGradient,
       );

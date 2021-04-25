@@ -59,15 +59,26 @@ class SwapService {
     return EthereumService.fromWei(result.single, tokenName);
   }
 
-  Future<String> approve(String token) async {
+  Future<String> approve(String token, Gas gas) async {
     if (!this.checkWallet()) return "0";
 
     final tokenContract = await ethService.loadTokenContract(token);
-    var amount = "10000000";
+    var amount = "10000000000000000000000";
     final result = await ethService.submit(await credentials, tokenContract, "approve",
+        [await ethService.getAddr("multi_swap_contract"), EthereumService.getWei(amount, token)], gas: gas);
+    return result;
+  }
+
+  Future<Transaction> makeApproveTransaction(String token) async {
+    if (!this.checkWallet()) return null;
+
+    final tokenContract = await ethService.loadTokenContract(token);
+    var amount = "10000000000000";
+    final result = await ethService.makeTransaction(await credentials, tokenContract, "approve",
         [await ethService.getAddr("multi_swap_contract"), EthereumService.getWei(amount, token)]);
     return result;
   }
+
 
   Future<String> getAllowances(String tokenName) async {
     if (!this.checkWallet()) return "0";

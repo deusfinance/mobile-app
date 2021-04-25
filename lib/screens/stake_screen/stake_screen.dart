@@ -282,7 +282,14 @@ class _StakeScreenState extends State<StakeScreen> {
             context.read<StakeCubit>().stake(gas);
           }
         }
-        if (state is StakeHasToApprove) context.read<StakeCubit>().approve();
+        if (state is StakeHasToApprove) {
+          Transaction transaction = await context.read<StakeCubit>().makeApproveTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if(transaction!=null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<StakeCubit>().approve(gas);
+          }
+        }
       },
     );
   }
