@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/credentials.dart';
@@ -72,7 +73,7 @@ class StockService {
   }
 
   Future<String> buy(
-      tokenAddress, String amount, List<ContractInputData> oracles) async {
+      tokenAddress, String amount, List<ContractInputData> oracles, Gas gas) async {
     try {
       if (!checkWallet()) return "0";
 
@@ -96,6 +97,7 @@ class StockService {
           [oracles[0].signs['buy'].getR(), oracles[1].signs['buy'].getR()],
           [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
         ],
+        gas: gas
       );
     } on Exception catch (error) {
       return "";
@@ -103,7 +105,7 @@ class StockService {
   }
 
   Future<String> sell(
-      tokenAddress, String amount, List<ContractInputData> oracles) async {
+      tokenAddress, String amount, List<ContractInputData> oracles, Gas gas) async {
     if (!checkWallet()) return "0";
     DeployedContract contract = await ethService.loadContractWithGivenAddress(
         "synchronizer", EthereumAddress.fromHex(this.marketMaker));
@@ -120,7 +122,8 @@ class StockService {
       [oracles[0].signs['sell'].getV(), oracles[1].signs['sell'].getV()],
       [oracles[0].signs['sell'].getR(), oracles[1].signs['sell'].getR()],
       [oracles[0].signs['sell'].getS(), oracles[1].signs['sell'].getS()],
-    ]);
+    ],
+    gas: gas);
   }
 
   Future getUsedCap() async {

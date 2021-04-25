@@ -110,7 +110,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         }
         return _buildBody(state);
       }),
-      // chainSelector: SyncChainSelector(SyncChains.xDAI),
+      chainSelector: SyncChainSelector(SyncChains.xDAI),
     );
   }
 

@@ -376,7 +376,7 @@ class MainnetSyntheticsCubit extends Cubit<MainnetSyntheticsState> {
             }
 
             var res = await state.service.sell(
-                tokenAddress, state.fromFieldController.text, inputOracles);
+                tokenAddress, state.fromFieldController.text, inputOracles, gas);
             emit(MainnetSyntheticsTransactionPendingState(state,
                 transactionStatus: TransactionStatus(
                     "Sell ${state.fromFieldController.text} ${state.fromToken
@@ -467,7 +467,7 @@ class MainnetSyntheticsCubit extends Cubit<MainnetSyntheticsState> {
               inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
             }
             var res = await state.service.buy(
-                tokenAddress, state.toValue.toStringAsFixed(18), inputOracles);
+                tokenAddress, state.toValue.toStringAsFixed(18), inputOracles, gas);
             emit(MainnetSyntheticsTransactionPendingState(state,
                 transactionStatus: TransactionStatus(
                     "Buy ${state.toFieldController.text} ${state.toToken

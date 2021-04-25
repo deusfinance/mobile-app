@@ -49,6 +49,9 @@ class StakeService {
     }
     DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
     final res = await ethService.query(tokenContract, "allowance", [await address, await ethService.getTokenAddr(stakedToken,"staking")]);
+    print("asc");
+    print(res);
+    print(res.single);
     return EthereumService.fromWei(res.single);
   }
 
@@ -56,7 +59,7 @@ class StakeService {
     if(!checkWallet()){
       return "0";
     }
-    var amount = "10000000000000000000000000000";
+    var amount = "10000000000";
     DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
     var res = await ethService.submit(await credentials, tokenContract, "approve", [await ethService.getTokenAddr(stakedToken,"staking"), EthereumService.getWei(amount)]);
     return res;

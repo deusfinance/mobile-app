@@ -122,15 +122,15 @@ class LockCubit extends Cubit<LockState> {
                 "Transaction Pending", res)));
         Stream<TransactionReceipt> result =
             state.vaultsService.ethService.pollTransactionReceipt(res);
-        result.listen((event) {
+        result.listen((event) async {
           if (event.status) {
+            state.balance = double.tryParse(await getTokenBalance());
             emit(LockIsApproved(state,
                 transactionStatus: TransactionStatus(
                     "Lock ${state.fieldController.text} ${state.stakeTokenObject.lockToken.name}",
                     Status.SUCCESSFUL,
                     "Transaction Successful",
                     res)));
-            emit(LockIsApproved(state));
           } else {
             emit(LockIsApproved(state,
                 transactionStatus: TransactionStatus(
