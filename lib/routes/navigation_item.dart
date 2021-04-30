@@ -13,7 +13,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../screens/stake_screen/stake_screen.dart';
 import '../screens/swap/swap_screen.dart';
-import '../screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
 
 class NavigationItem extends Equatable {
   final Widget page;
@@ -44,7 +43,8 @@ class NavigationItem extends Equatable {
   static final NavigationItem stakeAndLockOverview = NavigationItem(
       page: BlurredStakeLockScreen(),
       title: "Lock and Stake",
-      routeUrl: BlurredStakeLockScreen.url);
+      routeUrl: StakingVaultOverviewScreen.url,
+      style: NavigationStyle.BlueGreen);
 
   static final NavigationItem staking = NavigationItem(
       page: StakeScreen(), title: "Staking", routeUrl: StakeScreen.url);

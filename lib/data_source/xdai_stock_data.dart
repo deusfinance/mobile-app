@@ -3,8 +3,9 @@ import 'dart:core';
 
 import 'package:deus_mobile/models/synthetics/stock_price.dart';
 import 'package:deus_mobile/models/synthetics/stock_price_detail.dart';
-import 'package:deus_mobile/models/synthetics/xdai_contract_input_data.dart';
+import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:web3dart/web3dart.dart';
 
 import '../models/synthetics/stock.dart';
 import '../models/synthetics/stock_address.dart';
@@ -12,9 +13,9 @@ import '../models/token.dart';
 import 'backend_endpoints.dart';
 
 abstract class XDaiStockData {
-  static const _basePath = 'images/stocks';
 
   static List<Stock> values = [];
+  static List<Stock> conductedStocks = [];
   static List<StockAddress> addresses = [];
 
   static StockAddress getStockAddress(Token stock) {
@@ -24,6 +25,26 @@ abstract class XDaiStockData {
       }
     }
     return null;
+  }
+
+  static getStockFromAddress(StockAddress stockAddress){
+    for (var i = 0; i < values.length; i++) {
+      if (stockAddress.id.toLowerCase() == values[i].getTokenName()) {
+        return values[i];
+      }
+    }
+    return null;
+  }
+
+  static Future<bool> getData() async {
+    bool res1 = await getStockAddresses();
+    bool res2 = await getValues();
+    if(res1 && res2){
+      getConductedData();
+      return true;
+    }
+    return false;
+
   }
 
   static Future<Map> getPrices() async {
@@ -42,9 +63,9 @@ abstract class XDaiStockData {
     }
   }
 
-  static Future<bool> getData() async {
+  static Future<bool> getValues() async {
     if (values.isNotEmpty) return true;
-    final response = await http.get(BackendEndpoints.REGISTRAR_JSON_MAINNET_1);
+    final response = await http.get(BackendEndpoints.REGISTRAR_JSON_1);
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
       values.clear();
@@ -54,6 +75,15 @@ abstract class XDaiStockData {
       return true;
     } else {
       return false;
+    }
+  }
+
+  static void getConductedData() {
+    if (conductedStocks.isNotEmpty) return;
+    for (var i = 0; i < addresses.length; i++) {
+      Stock stock = getStockFromAddress(addresses[i]);
+      if(stock!=null)
+        conductedStocks.add(stock);
     }
   }
 
@@ -73,19 +103,19 @@ abstract class XDaiStockData {
     }
   }
 
-  static Future<List<XDaiContractInputData>> getContractInputData(String address) async {
-    Map<String, XDaiContractInputData> oracle1 = await getInfoOracle1();
-    Map<String, XDaiContractInputData> oracle2 = await getInfoOracle2();
-    Map<String, XDaiContractInputData> oracle3 = await getInfoOracle3();
+  static Future<List<ContractInputData>> getContractInputData(String address, int blockNum) async {
+    Map<String, ContractInputData> oracle1 = await getInfoOracle1();
+    Map<String, ContractInputData> oracle2 = await getInfoOracle2();
+    Map<String, ContractInputData> oracle3 = await getInfoOracle3();
 
-    List<XDaiContractInputData> list = [];
-    if (oracle1 != null && oracle1.containsKey(address)) {
+    List<ContractInputData> list = [];
+    if (oracle1 != null && oracle1.containsKey(address) && oracle1[address].blockNo > blockNum) {
       list.add(oracle1[address]);
     }
-    if (oracle2 != null && oracle2.containsKey(address)) {
+    if (oracle2 != null && oracle2.containsKey(address) && oracle2[address].blockNo > blockNum) {
       list.add(oracle2[address]);
     }
-    if (oracle3 != null && oracle3.containsKey(address)) {
+    if (oracle3 != null && oracle3.containsKey(address) && oracle3[address].blockNo > blockNum) {
       list.add(oracle3[address]);
     }
     return list;
@@ -94,10 +124,10 @@ abstract class XDaiStockData {
   static Future<Map> getInfoOracle1() async {
     var response = await http.get(BackendEndpoints.SIGNATURES_JSON_XDAI_1);
     if (response.statusCode == 200) {
-      Map<String, XDaiContractInputData> contractInputData = new Map();
+      Map<String, ContractInputData> contractInputData = new Map();
       var map = json.decode(response.body);
       map.forEach((key, value) {
-        XDaiContractInputData c = XDaiContractInputData.fromJson(value);
+        ContractInputData c = ContractInputData.fromJson(value);
         contractInputData.addEntries([new MapEntry(key, c)]);
       });
       return contractInputData;
@@ -109,10 +139,10 @@ abstract class XDaiStockData {
   static Future<Map> getInfoOracle2() async {
     var response = await http.get(BackendEndpoints.SIGNATURES_JSON_XDAI_2);
     if (response.statusCode == 200) {
-      Map<String, XDaiContractInputData> contractInputData = new Map();
+      Map<String, ContractInputData> contractInputData = new Map();
       var map = json.decode(response.body);
       map.forEach((key, value) {
-        XDaiContractInputData c = XDaiContractInputData.fromJson(value);
+        ContractInputData c = ContractInputData.fromJson(value);
         contractInputData.addEntries([new MapEntry(key, c)]);
       });
       return contractInputData;
@@ -124,10 +154,10 @@ abstract class XDaiStockData {
   static Future<Map> getInfoOracle3() async {
     var response = await http.get(BackendEndpoints.SIGNATURES_JSON_XDAI_3);
     if (response.statusCode == 200) {
-      Map<String, XDaiContractInputData> contractInputData = new Map();
+      Map<String, ContractInputData> contractInputData = new Map();
       var map = json.decode(response.body);
       map.forEach((key, value) {
-        XDaiContractInputData c = XDaiContractInputData.fromJson(value);
+        ContractInputData c = ContractInputData.fromJson(value);
         contractInputData.addEntries([new MapEntry(key, c)]);
       });
       return contractInputData;

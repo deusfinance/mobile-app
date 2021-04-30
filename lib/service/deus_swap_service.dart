@@ -10,7 +10,7 @@ import 'package:web3dart/web3dart.dart';
 import 'ethereum_service.dart';
 
 class SwapService {
-  static const GRAPH_PATH = "assets/deus_data/rinkbey_graph.json";
+  static const GRAPH_PATH = "assets/deus_data/graph.json";
 
   final EthereumService ethService;
   final String privateKey;
@@ -59,15 +59,26 @@ class SwapService {
     return EthereumService.fromWei(result.single, tokenName);
   }
 
-  Future<String> approve(String token) async {
+  Future<String> approve(String token, Gas gas) async {
     if (!this.checkWallet()) return "0";
 
     final tokenContract = await ethService.loadTokenContract(token);
-    var amount = "10000000";
+    var amount = "10000000000000000000000";
     final result = await ethService.submit(await credentials, tokenContract, "approve",
+        [await ethService.getAddr("multi_swap_contract"), EthereumService.getWei(amount, token)], gas: gas);
+    return result;
+  }
+
+  Future<Transaction> makeApproveTransaction(String token) async {
+    if (!this.checkWallet()) return null;
+
+    final tokenContract = await ethService.loadTokenContract(token);
+    var amount = "10000000000000";
+    final result = await ethService.makeTransaction(await credentials, tokenContract, "approve",
         [await ethService.getAddr("multi_swap_contract"), EthereumService.getWei(amount, token)]);
     return result;
   }
+
 
   Future<String> getAllowances(String tokenName) async {
     if (!this.checkWallet()) return "0";
@@ -211,7 +222,7 @@ class SwapService {
     int deusIndex = path.indexOf(deusAddress);
     if (deusIndex == -1) {
       if (path[0] == await ethService.getTokenAddrHex("weth", "token")) {
-        var deadLine = (DateTime.now().millisecond / 1000).floor() + 60 * 5000;
+        var deadLine = (DateTime.now().second).floor() + 60 * 5000;
         List<EthereumAddress> addressPath = _pathListToAddresses(path);
         return await ethService.submit(await credentials, uniswapRouter, "swapExactETHForTokens",
             [minAmountOut, addressPath, await address, BigInt.from(deadLine)],

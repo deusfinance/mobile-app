@@ -29,14 +29,32 @@ class CrossFadeDuoButton extends StatelessWidget {
     return AnimatedCrossFade(
         firstChild: Row(
           children: [
-            Expanded(
-              child: FilledGradientSelectionButton(
-                onPressed: onPressed,
-                label: gradientButtonLabel,
-                textStyle: MyStyles.blackMediumTextStyle,
-                gradient: MyColors.blueToGreenGradient,
+            if (showLoading)
+              Expanded(
+                child: DisabledButton(
+                  label: gradientButtonLabel,
+                  child: showLoading
+                      ? SizedBox(
+                    height: 21,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      valueColor:
+                      AlwaysStoppedAnimation<Color>(Colors.white),
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : null,
+                ),
+              )
+            else
+              Expanded(
+                child: FilledGradientSelectionButton(
+                  onPressed: onPressed,
+                  label: gradientButtonLabel,
+                  textStyle: MyStyles.blackMediumTextStyle,
+                  gradient: MyColors.blueToGreenGradient,
+                ),
               ),
-            ),
             if (showBothButtons)
               SizedBox(
                 width: 10,

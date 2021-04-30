@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -28,37 +29,8 @@ class VaultsService {
   Future<EthereumAddress> get address async =>
       (await credentials).extractAddress();
 
-
   bool checkWallet() {
     return ethService != null && this.privateKey != null;
-  }
-
-  BigInt getWei(BigInt amount, [String token = "eth"]) {
-    var max =
-        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
-    // let value = typeof number === "string" ? parseFloat(number).toFixed(18) : number.toFixed(18)
-    var ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount)
-        .getInWei
-        .toString();
-    ans = ans.substring(0, ans.length - (18 - max));
-    return BigInt.parse(ans.toString());
-  }
-
-  String fromWei(BigInt value, String token) {
-    var max =
-        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
-    String ans = value.toString();
-
-    while (ans.length < max) {
-      ans = "0" + ans;
-    }
-    ans = ans.substring(0, ans.length - max) +
-        "." +
-        ans.substring(ans.length - max);
-    if (ans[0] == ".") {
-      ans = "0" + ans;
-    }
-    return ans;
   }
 
   Future<String> getTokenBalance(tokenName) async {
@@ -68,79 +40,128 @@ class VaultsService {
       return this.getEtherBalance();
     }
     final tokenContract = await ethService.loadTokenContract(tokenName);
-    final result = await ethService.query(tokenContract, "balanceOf", [await address]);
+    final result =
+        await ethService.query(tokenContract, "balanceOf", [await address]);
 
-    return this.fromWei(result.single, tokenName);
+    return EthereumService.fromWei(result.single, tokenName);
   }
 
-  Future<String> getEtherBalance() async{
+  Future<String> getEtherBalance() async {
     if (!this.checkWallet()) return "0";
 
     return (await ethService.getEtherBalance(await credentials))
-    .getInEther
-    .toString();
+        .getInEther
+        .toString();
   }
 
   Future<String> getTokenTotalSupply(tokenName) async {
     final tokenContract = await ethService.loadTokenContract(tokenName);
     final result = await ethService.query(tokenContract, "totalSupply", []);
-    return this.fromWei(result.single, tokenName);
+    return EthereumService.fromWei(result.single, tokenName);
   }
 
-  Future<String> getAllowances(tokenName, contractName) async {
-    if(!checkWallet()){
+  Future<String> getAllowances(tokenName) async {
+    if (!checkWallet()) {
       return "0";
     }
     if (tokenName == "eth") return "9999";
-    DeployedContract tokenContract = await ethService.loadTokenContract(tokenName);
-    final res = await ethService.query(tokenContract, "allowance", [await address, ethService.getTokenAddrHex(contractName, "vaults")]);
-    return fromWei(res.single, tokenName);
+    DeployedContract tokenContract =
+        await ethService.loadTokenContract(tokenName);
+    final res = await ethService.query(tokenContract, "allowance",
+        [await address, await ethService.getTokenAddr(tokenName, "vaults")]);
+    return EthereumService.fromWei(res.single, tokenName);
   }
 
   Future<String> getLockedAmount(contractName) async {
-    if(!checkWallet()){
+    if (!checkWallet()) {
       return "0";
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("vaults", await ethService.getTokenAddr(contractName, "vaults"));
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "vaults", await ethService.getTokenAddr(contractName, "vaults"));
 //    TODO
-
   }
 
   Future<String> getTotalStakedToken(stakedToken) async {
-    DeployedContract tokenContract = await ethService.loadTokenContract(stakedToken);
-    final result = await ethService.query(tokenContract, "balanceOf", [ethService.getTokenAddrHex(stakedToken, "staking")]);
-    return this.fromWei(result.single, stakedToken);
-
+    DeployedContract tokenContract =
+        await ethService.loadTokenContract(stakedToken);
+    final result = await ethService.query(tokenContract, "balanceOf",
+        [ethService.getTokenAddrHex(stakedToken, "staking")]);
+    return EthereumService.fromWei(result.single, stakedToken);
   }
 
   Future<List<String>> getSandAndTimeAmount(contractName, amount) async {
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("vaults", await ethService.getTokenAddrHex(contractName, "vaults"))  ;
-    final result = await ethService.query(contract, "sealedAndTimeAmount", [await address, getWei(amount, contractName)]);
-    return [this.fromWei(result[0], 'ether'), this.fromWei(result[1], 'ether')];
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "vaults", await ethService.getTokenAddrHex(contractName, "vaults"));
+    final result = await ethService.query(contract, "sealedAndTimeAmount",
+        [await address, EthereumService.getWei(amount, contractName)]);
+    return [
+      EthereumService.fromWei(result[0], 'ether'),
+      EthereumService.fromWei(result[1], 'ether')
+    ];
   }
 
-  Future<String> approve(tokenName, contractName) async {
-    if(!checkWallet()){
+  Future<String> approve(tokenName, Gas gas) async {
+    if (!checkWallet()) {
       return "0";
     }
     if (tokenName == "eth") return "9999999";
-    var amount = BigInt.from(pow(10, 25));
-    DeployedContract tokenContract = await ethService.loadTokenContract(tokenName);
-    var res = await ethService.submit(await credentials, tokenContract, "approve", [ethService.getTokenAddrHex(contractName, "vaults"), getWei(amount, contractName)]);
+    var amount = "10000000000000000000000000000";
+    DeployedContract tokenContract =
+        await ethService.loadTokenContract(tokenName);
+    var res =
+        await ethService.submit(await credentials, tokenContract, "approve", [
+      await ethService.getTokenAddr(tokenName, "vaults"),
+      EthereumService.getWei(amount, tokenName)
+    ], gas: gas);
     return res;
   }
 
-  Future<String> lock(contractName, amount) async {
-    if(!checkWallet()){
+  Future<Transaction> makeApproveTransaction(tokenName) async {
+    if (!checkWallet()) {
+      return null;
+    }
+    var amount = "10000000000000000000000000000";
+    DeployedContract tokenContract =
+    await ethService.loadTokenContract(tokenName);
+    var res =
+    await ethService.makeTransaction(await credentials, tokenContract, "approve", [
+      await ethService.getTokenAddr(tokenName, "vaults"),
+      EthereumService.getWei(amount, tokenName)
+    ]);
+    return res;
+  }
+
+  Future<Transaction> makeLockTransaction(contractName, amount) async {
+    if (!checkWallet()) {
+      return null;
+    }
+    if (contractName == "eth") {
+      DeployedContract contract = await ethService.loadContractWithGivenAddress(
+          "vaultsEth", await ethService.getTokenAddr(contractName, "vaults"));
+      return await ethService.makeTransaction(
+          await credentials, contract, "lock", [],
+          value: amount);
+    }
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "vaults", await ethService.getTokenAddr(contractName, "vaults"));
+    return await ethService.makeTransaction(await credentials, contract, "lock",
+        [EthereumService.getWei(amount, contractName)]);
+  }
+
+  Future<String> lock(contractName, amount, Gas gas) async {
+    if (!checkWallet()) {
       return "0";
     }
     if (contractName == "eth") {
-      DeployedContract contract = await ethService.loadContractWithGivenAddress("vaultsEth", await ethService.getTokenAddrHex(contractName, "vaults"));
-      return await ethService.submit(await credentials, contract, "lock", [], value: amount);
+      DeployedContract contract = await ethService.loadContractWithGivenAddress(
+          "vaultsEth", await ethService.getTokenAddr(contractName, "vaults"));
+      return await ethService.submit(await credentials, contract, "lock", [],
+          value: amount, gas: gas);
     }
-    DeployedContract contract = await ethService.loadContractWithGivenAddress("vaults", await ethService.getTokenAddrHex(contractName, "vaults"));
-    var res = await ethService.submit(await credentials, contract, "lock", [this.getWei(amount, contractName)]);
-    return res;
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "vaults", await ethService.getTokenAddr(contractName, "vaults"));
+    return await ethService.submit(await credentials, contract, "lock",
+        [EthereumService.getWei(amount, contractName)],
+        gas: gas);
   }
-
 }

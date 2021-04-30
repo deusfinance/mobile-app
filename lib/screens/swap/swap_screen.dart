@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
+import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,7 +28,6 @@ import '../../service/ethereum_service.dart';
 import '../../statics/my_colors.dart';
 import '../../statics/statics.dart';
 import '../../statics/styles.dart';
-import 'confirm_swap.dart';
 import 'cubit/swap_cubit.dart';
 import 'cubit/swap_state.dart';
 
@@ -68,15 +68,14 @@ class _SwapScreenState extends State<SwapScreen> {
     });
   }
 
-  Future<Gas> showConfirmGasFeeDialog(SwapState state, Transaction transaction) async {
+  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
     Gas res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
-          child: ConfirmSwapScreen(
-            service: state.swapService,
+          child: ConfirmGasScreen(
             transaction: transaction,
           )),
       barrierDismissible: true,
@@ -95,7 +94,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
       child: Toast(
-        label: 'Transaction Pending',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGrey,
         onPressed: () {
@@ -113,7 +112,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
     return Container(
       child: Toast(
-        label: 'Transaction Successful',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
@@ -129,7 +128,7 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
     return Container(
       child: Toast(
-        label: 'Transaction Failed',
+        label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
@@ -319,7 +318,12 @@ class _SwapScreenState extends State<SwapScreen> {
     return SelectionButton(
       label: 'Approve',
       onPressed: (bool selected) async {
-        await context.read<SwapCubit>().approve();
+        Transaction transaction = await context.read<SwapCubit>().makeApproveTransaction();
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+        if(transaction!=null) {
+          Gas gas = await showConfirmGasFeeDialog(transaction);
+          await context.read<SwapCubit>().approve(gas);
+        }
       },
       selected: true,
       gradient: MyColors.blueToGreenSwapScreenGradient,
@@ -464,8 +468,10 @@ class _SwapScreenState extends State<SwapScreen> {
       onPressed: (bool selected) async {
         Transaction transaction = await context.read<SwapCubit>().makeTransaction();
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
-        Gas gas = await showConfirmGasFeeDialog(state, transaction);
-        await context.read<SwapCubit>().swapTokens(gas);
+        if(transaction!=null) {
+          Gas gas = await showConfirmGasFeeDialog(transaction);
+          await context.read<SwapCubit>().swapTokens(gas);
+        }
       },
       selected: true,
       gradient: MyColors.blueToGreenSwapScreenGradient,

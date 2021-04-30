@@ -19,7 +19,8 @@ import '../../../locator.dart';
 
 class HeaderWithAddress extends StatefulWidget {
   final String walletAddress;
-  HeaderWithAddress({this.walletAddress});
+  final Widget chainSelector;
+  HeaderWithAddress({this.walletAddress, this.chainSelector});
 
   @override
   _HeaderWithAddressState createState() => _HeaderWithAddressState();
@@ -41,6 +42,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
     return Row(
       children: [
         _buildAddressContainer(),
+        widget.chainSelector,
         const Spacer(),
         _buildWalletLogout(walletStore),
       ],

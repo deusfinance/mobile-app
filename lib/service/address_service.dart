@@ -33,7 +33,6 @@ class AddressService implements IAddressService {
     String seed = bip39.mnemonicToSeedHex(mnemonic);
     KeyData master = HDKey.getMasterKeyFromSeed(seed);
     final privateKey = HEX.encode(master.key);
-    print("private: $privateKey");
     return privateKey;
   }
 
@@ -51,7 +50,6 @@ class AddressService implements IAddressService {
     final private = EthPrivateKey.fromHex(privateKey);
 
     final address = await private.extractAddress();
-    print("address: $address");
     return address;
   }
 

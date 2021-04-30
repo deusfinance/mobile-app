@@ -91,7 +91,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   onTap: () async {
                     await walletStore.resetWallet();
                     _showLogOutDialogue = false;
-                    locator<NavigationService>().navigateTo(IntroPage.url, context);
+                    locator<NavigationService>().navigateTo(IntroPage.url, context, replaceAll: true);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 10),

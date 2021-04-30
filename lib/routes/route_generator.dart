@@ -1,13 +1,17 @@
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
 import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
 import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
+import 'package:deus_mobile/screens/lock/cubit/lock_cubit.dart';
 import 'package:deus_mobile/screens/password/password_screen.dart';
 import 'package:deus_mobile/screens/password/set_password_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/cubit/stake_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_overview_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_overview_state.dart';
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/cubit/mainnet_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
@@ -31,15 +35,21 @@ import '../service/config_service.dart';
 const kInitialRoute = '/';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
+  final Map<String, dynamic> arguments = settings.arguments;
   final Map<String, WidgetBuilder> routes = {
     kInitialRoute: (BuildContext _) {
-      if (locator<ConfigurationService>().didSetupWallet()) {
-        return BlocProvider<SwapCubit>(
-            create: (_) => SwapCubit(), child: SwapScreen());
+      // if (locator<ConfigurationService>().didSetupWallet()) {
+      //   return BlocProvider<SwapCubit>(
+      //       create: (_) => SwapCubit(), child: SwapScreen());
+      // } else {
+      //   return WalletProvider(builder: (_, __) {
+      //     return IntroPage();
+      //   });
+      // }
+      if (!locator<ConfigurationService>().didSetupPassword()) {
+        return SetPasswordScreen();
       } else {
-        return WalletProvider(builder: (_, __) {
-          return IntroPage();
-        });
+        return PasswordScreen();
       }
     },
     WalletCreatePage.url: (_) {
@@ -66,7 +76,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     //main screens
     StakeScreen.url: (_) {
       return BlocProvider(
-        create: (context) => StakeCubit(),
+        create: (context) => StakeCubit(arguments["token_object"]),
         child: StakeScreen(),
       );
     },
@@ -74,9 +84,19 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         create: (_) => SwapCubit(), child: SwapScreen()),
     XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(
         create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
-    LockScreen.url: (_) => LockScreen(),
+    MainnetSyntheticsScreen.route: (_) => BlocProvider<MainnetSyntheticsCubit>(
+        create: (_) => MainnetSyntheticsCubit(), child: MainnetSyntheticsScreen()),
+    LockScreen.url: (_) {
+      return BlocProvider(
+        create: (context) => LockCubit(arguments["token_object"]),
+        child: LockScreen(),
+      );
+    },
     // SyntheticsScreen.url: (_) => SyntheticsScreen(),
-    StakingVaultOverviewScreen.url: (_) => StakingVaultOverviewScreen(),
+    StakingVaultOverviewScreen.url: (_) =>
+        BlocProvider<StakingVaultOverviewCubit>(
+            create: (_) => StakingVaultOverviewCubit(),
+            child: StakingVaultOverviewScreen()),
     //blurred screens (coming soon)
     BlurredStakeLockScreen.url: (_) => BlurredStakeLockScreen(),
     BlurredSyntheticsScreen.url: (_) => BlurredSyntheticsScreen(),

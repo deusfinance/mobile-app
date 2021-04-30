@@ -1,17 +1,24 @@
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/default_screen/header_with_address.dart';
+import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/locator.dart';
+import 'package:deus_mobile/models/stake/stake_token_object.dart';
 import 'package:deus_mobile/models/value_locked_chart_data.dart';
 import 'package:deus_mobile/models/value_locked_screen_data.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/lock/lock_screen.dart';
 import 'package:deus_mobile/screens/stake_screen/stake_screen.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_overview_cubit.dart';
+import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_overview_state.dart';
+import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/chart_container.dart';
 
@@ -31,42 +38,8 @@ class StakingVaultOverviewScreen extends StatefulWidget {
 
 class _StakingVaultOverviewScreenState
     extends State<StakingVaultOverviewScreen> {
-  final String address = '0x3a6dabD6B5C75291a3258C29B418f5805792a87e';
-
-
-  Future<ValueLockedScreenData> _testData() async {
-    await Future.delayed(Duration(seconds: 3));
-    return ValueLockedScreenData(
-        ethCount: 478.938,
-        ethInUSD: 563008.67,
-        nativeBalancerAPY: 99.98,
-        percOfPool: 0.12,
-        perfDEAns: 36.37,
-        perfsDEA: 36.37,
-        perfsDEUS: 36.37,
-        perfsUniDeusDea: 36.37,
-        perfsUniDeaUsdc: 36.37,
-        perfsUUniDeuusEth: 36.37,
-        timeTokenAPY: 199.98,
-        sDeusAPY: 99.98);
-  }
-
-  List<bool> _toggleButtonButtonsSingleLiquidity = [true, false];
-  StakingVaultOverviewScreenStates _screenState =
-      StakingVaultOverviewScreenStates.Single;
-
   void changeToggleButtonSingleLiquidity(int i) {
-    if (!_toggleButtonButtonsSingleLiquidity[i]) {
-      _toggleButtonButtonsSingleLiquidity = [false, false];
-      setState(() {
-        _toggleButtonButtonsSingleLiquidity[i] = true;
-      });
-      setState(() {
-        _screenState = _toggleButtonButtonsSingleLiquidity[0]
-            ? StakingVaultOverviewScreenStates.Single
-            : StakingVaultOverviewScreenStates.LiquidityClaim;
-      });
-    }
+    context.read<StakingVaultOverviewCubit>().changeSingleLiquidity(i);
   }
 
   static const Divider _divider = Divider(height: 40);
@@ -75,143 +48,156 @@ class _StakingVaultOverviewScreenState
   static const SizedBox _smallHeightDivider = SizedBox(height: 5);
 
   @override
+  void initState() {
+    context.read<StakingVaultOverviewCubit>().init();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultScreen(
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _midHeightDivider,
-              ChartContainer(),
-              _bigHeightDivider,
-              _buildToggleButton(),
-              _divider,
-              FutureBuilder(
-                  future: _testData(),
-                  builder: (context, snapshot) {
-                    return
-                      snapshot.connectionState == ConnectionState.done ?
-                      Column(
-                      children: [
-                        if (_screenState ==
-                            StakingVaultOverviewScreenStates.Single)
-                          _buildSingleBottom(snapshot.data),
-                        if (_screenState ==
-                            StakingVaultOverviewScreenStates.LiquidityClaim)
-                          _buildLiquidityClaim(snapshot.data),
-                        if (_screenState ==
-                            StakingVaultOverviewScreenStates.LiquidityLockStake)
-                          _buildLiquidityLockStake(snapshot.data),
-                      ],
-                    ): Center(child: CircularProgressIndicator(),);
-                  })
-            ],
-          ),
-        ),
-      ),
-    );
+    return BlocBuilder<StakingVaultOverviewCubit, StakingVaultOverviewState>(
+        builder: (context, state) {
+          if (state is StakingVaultOverviewLoadingState) {
+            return DefaultScreen(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else {
+            return DefaultScreen(
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _midHeightDivider,
+                      ChartContainer(),
+                      _bigHeightDivider,
+                      _buildToggleButton(state),
+                      _divider,
+                      _buildBottom(state),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        });
   }
 
-  void navigateToLockScreen(BuildContext ctx) {
-    locator<NavigationService>().navigateTo(LockScreen.url, ctx);
+  void navigateToLockScreen(BuildContext ctx,
+      StakeTokenObject stakeTokenObject) {
+    locator<NavigationService>().navigateTo(LockScreen.url, ctx,
+        arguments: {"token_object": stakeTokenObject});
   }
 
-  void navigateToStakeScreen(BuildContext ctx) {
-    locator<NavigationService>().navigateTo(StakeScreen.url, ctx);
+  void navigateToStakeScreen(BuildContext ctx,
+      StakeTokenObject stakeTokenObject) {
+    locator<NavigationService>().navigateTo(StakeScreen.url, ctx,
+        arguments: {"token_object": stakeTokenObject});
   }
 
-  Column _buildSingleBottom(ValueLockedScreenData data) {
+  Widget _buildSingleBottom(StakingVaultOverviewState state) {
+    return ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: state.stakeTokenObjects.length,
+        itemBuilder: (ctx, ind) {
+          if (state.stakeTokenObjects[ind].isValueStaked()) {
+            return _claimWidget(state.stakeTokenObjects[ind]);
+          } else {
+            return _lockStakeWidget(state.stakeTokenObjects[ind]);
+          }
+        });
+  }
+
+  Widget _buildLiquidityBottom(StakingVaultOverviewState state) {
+    if (state.nativeBalancer.isValueStaked()) {
+      return _buildLiquidityClaim(state.nativeBalancer);
+    } else {
+      return _buildLiquidityLockStake(state);
+    }
+  }
+
+  Column _buildLiquidityClaim(StakeTokenObject object) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLockStakeButton(),
-        _divider,
-        _buildAPYAndPool(sDeusAPY: data.sDeusAPY, percOfPool: data.percOfPool),
-        _buildClaimSection(),
+        _buildNativeBalancer(object),
+        _buildClaimSection(object),
         _bigHeightDivider,
-        _buildWithDrawClaim(),
+        _buildWithDrawClaim(object),
         _bigHeightDivider,
-        _buildStakeLockMoreButtons(),
+        _buildStakeLockMoreButtons(object),
         _divider,
-        _buildTimeToken()
       ],
     );
   }
 
-  Column _buildLiquidityClaim(ValueLockedScreenData data) {
+  Column _buildLiquidityLockStake(StakingVaultOverviewState state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildNativeBalancer(
-            nativeBalancerAPY: data.nativeBalancerAPY,
-            percOfPool: data.percOfPool),
-        _buildClaimSection(),
-        _bigHeightDivider,
-        _buildWithDrawClaim(),
-        _bigHeightDivider,
-        _buildStakeLockMoreButtons(),
-        _divider,
-      ],
-    );
-  }
-
-  Column _buildLiquidityLockStake(ValueLockedScreenData data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildNativeBalancer(
-            nativeBalancerAPY: data.nativeBalancerAPY,
-            percOfPool: data.percOfPool),
-        _buildNativeBalancerLockStake(
-            perfsUUniDeuusEth: data.perfsUUniDeuusEth,
-            perfsUniDeaUsdc: data.perfsUniDeaUsdc,
-            perfsUniDeusDea: data.perfsUniDeusDea,
-            perfsDEUS: data.perfsDEUS,
-            perfsDEA: data.perfsDEA,
-            perfDEAns: data.perfDEAns),
+        _buildNativeBalancer(state.nativeBalancer),
+        _buildNativeBalancerLockStake(state),
         _bigHeightDivider
       ],
     );
   }
 
-  _buildStakeButton(String label, BuildContext context) {
+  _buildStakeButton(String label, BuildContext context,
+      StakeTokenObject stakeTokenObject) {
     return DarkButton(
       label: label,
-      onPressed: () => navigateToStakeScreen(context),
+      onPressed: () => navigateToStakeScreen(context, stakeTokenObject),
     );
   }
 
-  _buildLockButton(String label, BuildContext context) {
+  _buildLockButton(String label, BuildContext context,
+      StakeTokenObject stakeTokenObject) {
     return DarkButton(
       label: label,
-      onPressed: () => navigateToLockScreen(context),
+      onPressed: () {
+        if (stakeTokenObject.lockToken == CurrencyData.bpt)
+          lockBpt();
+        else
+          navigateToLockScreen(context, stakeTokenObject);
+      },
     );
   }
 
-  Padding _buildStakeLockMoreButtons() {
+  void lockBpt() async {
+    String url = "https://pools.balancer.exchange/#/pool/0x1dc2948b6db34e38291090b825518c1e8346938b/";
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+
+  Padding _buildStakeLockMoreButtons(StakeTokenObject stakeTokenObject) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Row(
         children: [
           Expanded(
-            child: _buildLockButton('LOCK MORE', context),
+            child: _buildLockButton('LOCK MORE', context, stakeTokenObject),
           ),
           const SizedBox(width: 15),
-          Expanded(child: _buildStakeButton('STAKE MORE', context))
+          Expanded(
+              child: _buildStakeButton('STAKE MORE', context, stakeTokenObject))
         ],
       ),
     );
   }
 
-  Padding _buildNativeBalancerLockStake(
-      {perfDEAns,
-      perfsUniDeusDea,
-      perfsDEA,
-      perfsDEUS,
-      perfsUniDeaUsdc,
-      perfsUUniDeuusEth}) {
+  Padding _buildNativeBalancerLockStake(StakingVaultOverviewState state) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -228,7 +214,7 @@ class _StakingVaultOverviewScreenState
                 'DEA (not sealed)',
                 style: MyStyles.whiteSmallTextStyle,
               ),
-              Text('$perfDEAns%', style: MyStyles.whiteSmallTextStyle)
+              Text('38.78%', style: MyStyles.whiteSmallTextStyle)
             ],
           ),
           _smallHeightDivider,
@@ -239,7 +225,7 @@ class _StakingVaultOverviewScreenState
                 'sUNI DEUS-DEA',
                 style: MyStyles.whiteSmallTextStyle,
               ),
-              Text('$perfsUniDeusDea%', style: MyStyles.whiteSmallTextStyle)
+              Text('38.78%', style: MyStyles.whiteSmallTextStyle)
             ],
           ),
           _smallHeightDivider,
@@ -250,7 +236,7 @@ class _StakingVaultOverviewScreenState
                 'sDEA',
                 style: MyStyles.whiteSmallTextStyle,
               ),
-              Text('$perfsDEA%', style: MyStyles.whiteSmallTextStyle)
+              Text('7.14%', style: MyStyles.whiteSmallTextStyle)
             ],
           ),
           _smallHeightDivider,
@@ -261,7 +247,7 @@ class _StakingVaultOverviewScreenState
                 'sDEUS',
                 style: MyStyles.whiteSmallTextStyle,
               ),
-              Text('$perfsDEUS%', style: MyStyles.whiteSmallTextStyle)
+              Text('7.14%', style: MyStyles.whiteSmallTextStyle)
             ],
           ),
           _smallHeightDivider,
@@ -272,7 +258,7 @@ class _StakingVaultOverviewScreenState
                 'sUNI DEA-USDC',
                 style: MyStyles.whiteSmallTextStyle,
               ),
-              Text('$perfsUniDeaUsdc%', style: MyStyles.whiteSmallTextStyle)
+              Text('4.08%', style: MyStyles.whiteSmallTextStyle)
             ],
           ),
           _smallHeightDivider,
@@ -283,17 +269,19 @@ class _StakingVaultOverviewScreenState
                 'sUUNI DEUUS-ETH',
                 style: MyStyles.whiteSmallTextStyle,
               ),
-              Text('$perfsUUniDeuusEth%', style: MyStyles.whiteSmallTextStyle)
+              Text('4.08%', style: MyStyles.whiteSmallTextStyle)
             ],
           ),
           _bigHeightDivider,
           Row(
             children: [
               Expanded(
-                child: _buildLockButton('LOCK', context),
+                child: _buildLockButton('LOCK', context, state.nativeBalancer),
               ),
               const SizedBox(width: 15),
-              Expanded(child: _buildStakeButton('STAKE', context))
+              Expanded(
+                  child:
+                  _buildStakeButton('STAKE', context, state.nativeBalancer))
             ],
           )
         ],
@@ -301,7 +289,7 @@ class _StakingVaultOverviewScreenState
     );
   }
 
-  Padding _buildNativeBalancer({nativeBalancerAPY, percOfPool}) {
+  Padding _buildNativeBalancer(StakeTokenObject object) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -316,13 +304,12 @@ class _StakingVaultOverviewScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '$nativeBalancerAPY% APY',
+                '${object.apy}% APY',
                 style: MyStyles.whiteMediumTextStyle,
               ),
-              if (_screenState ==
-                  StakingVaultOverviewScreenStates.LiquidityClaim)
+              if (object.isValueStaked())
                 Text(
-                  'you own $percOfPool% of the pool',
+                  'you own ${object.percOfPool()}% of the pool',
                   style: MyStyles.whiteSmallTextStyle,
                 )
             ],
@@ -333,29 +320,132 @@ class _StakingVaultOverviewScreenState
     );
   }
 
-  Padding _buildTimeToken({timeTokenAPY}) {
+  Padding _buildAPYAndPool(StakeTokenObject object) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(object.stakeToken.name, style: MyStyles.whiteBigTextStyle),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text('you own ${object.percOfPool()}% of the pool',
+                    style: MyStyles.whiteSmallTextStyle),
+              ),
+            )
+          ]),
+          _smallHeightDivider,
+          Text('${object.apy}% APY', style: MyStyles.whiteMediumTextStyle)
+        ],
+      ),
+    );
+  }
+
+  Padding _buildToggleButton(StakingVaultOverviewState state) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: ToggleButtons(
+        fillColor: Colors.transparent,
+        onPressed: (int ind) => changeToggleButtonSingleLiquidity(ind),
+        renderBorder: false,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: Text(
+              'Single',
+              style: state is StakingVaultOverviewSingleState
+                  ? MyStyles.selectedToggleButtonTextStyle
+                  : MyStyles.unselectedToggleButtonTextStyle,
+            ),
+          ),
+          Text('Liquidity',
+              style: state is StakingVaultOverviewLiquidityState
+                  ? MyStyles.selectedToggleButtonTextStyle
+                  : MyStyles.unselectedToggleButtonTextStyle)
+        ],
+        isSelected: state is StakingVaultOverviewSingleState
+            ? [true, false]
+            : [false, true],
+      ),
+    );
+  }
+
+  Padding _buildClaimSection(StakeTokenObject object) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+            child:
+            Text(object.pendingReward, style: MyStyles.whiteSmallTextStyle),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: MyColors.HalfBlack)),
+          ),
+          const SizedBox(height: 8),
+          DarkButton(
+              onPressed: (){
+                context.read<StakingVaultOverviewCubit>().claim();
+              },
+              label: 'CLAIM'),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildWithDrawClaim(StakeTokenObject object) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+            child:
+            Text(object.pendingReward, style: MyStyles.whiteSmallTextStyle),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: MyColors.HalfBlack)),
+          ),
+          const SizedBox(height: 8),
+          DarkButton(
+              onPressed: (){
+                context.read<StakingVaultOverviewCubit>().withdrawAndClaim();
+              },
+              label: 'WITHDRAW & CLAIM'),
+        ],
+      ),
+    );
+  }
+
+  Widget _lockStakeWidget(StakeTokenObject stakeTokenObject) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'TIME TOKEN',
+            stakeTokenObject.stakeToken.name,
             style: MyStyles.whiteBigTextStyle,
           ),
           _smallHeightDivider,
           Text(
-            '$timeTokenAPY% APY',
+            '${stakeTokenObject.apy}% APY',
             style: MyStyles.whiteMediumTextStyle,
           ),
           _midHeightDivider,
           Row(
             children: [
               Expanded(
-                child: _buildLockButton('LOCK', context),
+                child: _buildLockButton('LOCK', context, stakeTokenObject),
               ),
               const SizedBox(width: 15),
-              Expanded(child: _buildStakeButton('STAKE', context))
+              Expanded(
+                  child: _buildStakeButton('STAKE', context, stakeTokenObject))
             ],
           ),
           const SizedBox(height: 30)
@@ -364,129 +454,27 @@ class _StakingVaultOverviewScreenState
     );
   }
 
-  Padding _buildAPYAndPool({percOfPool, sDeusAPY}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('sDEUS', style: MyStyles.whiteBigTextStyle),
-            Text('you own $percOfPool% of the pool',
-                style: MyStyles.whiteSmallTextStyle)
-          ]),
-          _smallHeightDivider,
-          Text('$sDeusAPY% APY', style: MyStyles.whiteMediumTextStyle)
-        ],
-      ),
+  Widget _claimWidget(StakeTokenObject object) {
+    return Column(
+      children: [
+        _buildAPYAndPool(object),
+        _buildClaimSection(object),
+        _bigHeightDivider,
+        _buildWithDrawClaim(object),
+        _bigHeightDivider,
+        _buildStakeLockMoreButtons(object),
+        const SizedBox(height: 30)
+      ],
     );
   }
 
-  Padding _buildToggleButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: ToggleButtons(
-          fillColor: Colors.transparent,
-          onPressed: (int ind) => changeToggleButtonSingleLiquidity(ind),
-          renderBorder: false,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: Text(
-                'Single',
-                style: _toggleButtonButtonsSingleLiquidity[0]
-                    ? MyStyles.selectedToggleButtonTextStyle
-                    : MyStyles.unselectedToggleButtonTextStyle,
-              ),
-            ),
-            Text('Liquidity',
-                style: _toggleButtonButtonsSingleLiquidity[1]
-                    ? MyStyles.selectedToggleButtonTextStyle
-                    : MyStyles.unselectedToggleButtonTextStyle)
-          ],
-          isSelected: _toggleButtonButtonsSingleLiquidity),
-    );
-  }
-
-  Padding _buildLockStakeButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'sDEA',
-            style: MyStyles.whiteBigTextStyle,
-          ),
-          _smallHeightDivider,
-          Text(
-            '99.93% APY',
-            style: MyStyles.whiteMediumTextStyle,
-          ),
-          _midHeightDivider,
-          Row(
-            children: [
-              Expanded(
-                child: _buildLockButton('LOCK', context),
-              ),
-              const SizedBox(width: 15),
-              Expanded(child: _buildStakeButton('STAKE', context))
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Padding _buildHeader() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          HeaderWithAddress(walletAddress: address),
-          _midHeightDivider,
-        ],
-      ),
-    );
-  }
-
-  Padding _buildClaimSection() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-            child: Text('1.345646', style: MyStyles.whiteSmallTextStyle),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: MyColors.HalfBlack)),
-          ),
-          const SizedBox(height: 8),
-          DarkButton(label: 'CLAIM'),
-        ],
-      ),
-    );
-  }
-
-  Padding _buildWithDrawClaim() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-            child: Text('1.345646', style: MyStyles.whiteSmallTextStyle),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: MyColors.HalfBlack)),
-          ),
-          const SizedBox(height: 8),
-          DarkButton(label: 'WITHDRAW & CLAIM'),
-        ],
-      ),
-    );
+  Widget _buildBottom(StakingVaultOverviewState state) {
+    if (state is StakingVaultOverviewSingleState) {
+      return _buildSingleBottom(state);
+    } else if (state is StakingVaultOverviewLiquidityState) {
+      return _buildLiquidityBottom(state);
+    } else {
+      return CircularProgressIndicator();
+    }
   }
 }

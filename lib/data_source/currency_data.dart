@@ -10,8 +10,14 @@ abstract class CurrencyData {
   static CryptoCurrency deus = CryptoCurrency(
       name: 'DEUS', symbol: 'DEUS', logoPath: '$_basePath/deus.svg');
 
+  static CryptoCurrency sand_deus = CryptoCurrency(
+      name: 'sDEUS', symbol: 'sand_deus', logoPath: '$_basePath/deus.svg');
+
   static CryptoCurrency dea = CryptoCurrency(
       name: 'DEA', symbol: 'DEA', logoPath: '$_basePath/dea.svg');
+
+  static CryptoCurrency sand_dea = CryptoCurrency(
+      name: 'sDEA', symbol: 'sand_dea', logoPath: '$_basePath/dea.svg');
 
   static CryptoCurrency dai = CryptoCurrency(
       name: 'DAI', symbol: 'DAI', logoPath: '$_basePath/dai.png');
@@ -30,4 +36,10 @@ abstract class CurrencyData {
 
   static CryptoCurrency xdai = CryptoCurrency(
       name: 'xDAI', symbol: 'xDAI', logoPath: '$_basePath/xdai.svg');
+
+  static CryptoCurrency timeToken = CryptoCurrency(
+      name: 'Time Token', symbol: 'timetoken', logoPath: '$_basePath/deus.svg');
+
+  static CryptoCurrency bpt = CryptoCurrency(
+      name: 'Native Balancer', symbol: 'bpt_native', logoPath: '$_basePath/deus.svg');
 }

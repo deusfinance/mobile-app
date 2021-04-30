@@ -1,8 +1,6 @@
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-import '../../screens/synthetics/synchronizer_screen.dart';
-
 class FilledGradientSelectionButton extends StatelessWidget {
   final bool selected;
   final VoidCallback onPressed;

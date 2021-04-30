@@ -1,22 +1,19 @@
 import 'dart:async';
 
 import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/data_source/xdai_stock_data.dart';
-import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/models/synthetics/stock_price.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/service/xdai_stock_service.dart';
+import 'package:deus_mobile/service/stock_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../../../locator.dart';
 
-enum Mode { LONG, SHORT, NONE }
-
-abstract class XDaiSyntheticsState extends Equatable {
+abstract class MainnetSyntheticsState extends Equatable {
   Token fromToken;
   Token toToken;
   double toValue;
@@ -25,7 +22,7 @@ abstract class XDaiSyntheticsState extends Equatable {
   bool isPriceRatioForward;
   var fromFieldController;
   var toFieldController;
-  XDaiStockService service;
+  StockService service;
   Mode mode;
   bool marketClosed;
   bool marketTimerClosed;
@@ -34,11 +31,11 @@ abstract class XDaiSyntheticsState extends Equatable {
   Map<String, StockPrice> prices;
   Timer timer;
 
-  XDaiSyntheticsState();
+  MainnetSyntheticsState();
 
-  XDaiSyntheticsState.init()
+  MainnetSyntheticsState.init()
       : isInProgress = false,
-        fromToken = CurrencyData.xdai,
+        fromToken = CurrencyData.dai,
         approved = true,
         toValue = 0,
         marketClosed = false,
@@ -48,11 +45,11 @@ abstract class XDaiSyntheticsState extends Equatable {
         isPriceRatioForward = true,
         prices = new Map(),
         inputController = StreamController(),
-        service = new XDaiStockService(
-            ethService: new EthereumService(100),
+        service = new StockService(
+            ethService: new EthereumService(1),
             privateKey: locator<ConfigurationService>().getPrivateKey());
 
-  XDaiSyntheticsState.copy(XDaiSyntheticsState state)
+  MainnetSyntheticsState.copy(MainnetSyntheticsState state)
       : this.fromToken = state.fromToken,
         this.toToken = state.toToken,
         this.isInProgress = state.isInProgress,
@@ -73,31 +70,24 @@ abstract class XDaiSyntheticsState extends Equatable {
   List<Object> get props => [fromToken, toToken, approved, isInProgress, mode, isPriceRatioForward, service, prices, timer, toValue, marketClosed, marketTimerClosed];
 }
 
-class XDaiSyntheticsInitialState extends XDaiSyntheticsState {
-  XDaiSyntheticsInitialState() : super.init();
+class MainnetSyntheticsInitialState extends MainnetSyntheticsState {
+  MainnetSyntheticsInitialState() : super.init();
 }
 
-class XDaiSyntheticsLoadingState extends XDaiSyntheticsState {
-  XDaiSyntheticsLoadingState(XDaiSyntheticsState state) : super.copy(state);
+class MainnetSyntheticsLoadingState extends MainnetSyntheticsState {
+  MainnetSyntheticsLoadingState(MainnetSyntheticsState state) : super.copy(state);
 }
 
-// class XDaiSyntheticsMarketClosedState extends XDaiSyntheticsState {
-//   XDaiSyntheticsMarketClosedState(XDaiSyntheticsState state,{Mode mode}) : super.copy(state){
-//     if(mode!=null)
-//       this.mode = mode;
-//   }
-// }
-
-class XDaiSyntheticsErrorState extends XDaiSyntheticsState {
-  XDaiSyntheticsErrorState(XDaiSyntheticsState state) : super.copy(state);
+class MainnetSyntheticsErrorState extends MainnetSyntheticsState {
+  MainnetSyntheticsErrorState(MainnetSyntheticsState state) : super.copy(state);
 }
 
-class XDaiSyntheticsSelectAssetState extends XDaiSyntheticsState {
-  XDaiSyntheticsSelectAssetState(XDaiSyntheticsState state) : super.copy(state);
+class MainnetSyntheticsSelectAssetState extends MainnetSyntheticsState {
+  MainnetSyntheticsSelectAssetState(MainnetSyntheticsState state) : super.copy(state);
 }
 
-class XDaiSyntheticsAssetSelectedState extends XDaiSyntheticsState {
-  XDaiSyntheticsAssetSelectedState(XDaiSyntheticsState state,
+class MainnetSyntheticsAssetSelectedState extends MainnetSyntheticsState {
+  MainnetSyntheticsAssetSelectedState(MainnetSyntheticsState state,
       {bool isInProgress,
       bool approved,
       Token fromToken,
@@ -113,11 +103,11 @@ class XDaiSyntheticsAssetSelectedState extends XDaiSyntheticsState {
   }
 }
 
-class XDaiSyntheticsTransactionPendingState extends XDaiSyntheticsState {
+class MainnetSyntheticsTransactionPendingState extends MainnetSyntheticsState {
   bool showingToast;
   TransactionStatus transactionStatus;
 
-  XDaiSyntheticsTransactionPendingState(XDaiSyntheticsState state,
+  MainnetSyntheticsTransactionPendingState(MainnetSyntheticsState state,
       {TransactionStatus transactionStatus, showingToast})
       : super.copy(state) {
     if (transactionStatus != null) {
@@ -134,11 +124,11 @@ class XDaiSyntheticsTransactionPendingState extends XDaiSyntheticsState {
   List<Object> get props => [showingToast, transactionStatus];
 }
 
-class XDaiSyntheticsTransactionFinishedState extends XDaiSyntheticsState {
+class MainnetSyntheticsTransactionFinishedState extends MainnetSyntheticsState {
   bool showingToast;
   TransactionStatus transactionStatus;
 
-  XDaiSyntheticsTransactionFinishedState(XDaiSyntheticsState state,
+  MainnetSyntheticsTransactionFinishedState(MainnetSyntheticsState state,
       {TransactionStatus transactionStatus, showingToast})
       : super.copy(state) {
     if (transactionStatus != null) {

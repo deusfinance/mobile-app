@@ -1,6 +1,7 @@
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TextFieldWithMax extends StatelessWidget {
   final TextEditingController controller;
@@ -26,6 +27,13 @@ class TextFieldWithMax extends StatelessWidget {
       child: TextField(
         keyboardType: keyboardType,
         cursorColor: Colors.white,
+        autofocus: false,
+        maxLines: 1,
+        inputFormatters: [
+          WhitelistingTextInputFormatter(
+              new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+        ],
+        controller: controller,
         style: MyStyles.lightWhiteMediumTextStyle,
         decoration: InputDecoration(
             hintText: hintText,

@@ -58,6 +58,8 @@ class MyBottomNavBar extends StatelessWidget {
   Decoration _getDecoration(NavigationItem item) {
     if (item.style == NavigationStyle.GreenBlue)
       return MyStyles.greenToBlueDecoration;
+    else if(item.style == NavigationStyle.BlueGreen)
+      return MyStyles.blueToGreenDecoration;
     else
       return MyStyles.blueToPurpleDecoration;
   }
@@ -65,6 +67,8 @@ class MyBottomNavBar extends StatelessWidget {
   Gradient _getGradient(NavigationItem item) {
     if (item.style == NavigationStyle.GreenBlue)
       return MyColors.greenToBlueGradient;
+    else if(item.style == NavigationStyle.BlueGreen)
+      return MyColors.blueToGreenGradient;
     else
       return MyColors.blueToPurpleGradient;
   }
