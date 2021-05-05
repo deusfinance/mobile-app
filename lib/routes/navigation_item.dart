@@ -39,27 +39,24 @@ class NavigationItem extends Equatable {
       routeUrl: XDaiSyntheticsScreen.route,
       style: NavigationStyle.BluePurple);
 
-
   static final NavigationItem stakeAndLockOverview = NavigationItem(
-      page: BlurredStakeLockScreen(),
+      page: StakingVaultOverviewScreen(),
       title: "Lock and Stake",
       routeUrl: StakingVaultOverviewScreen.url,
       style: NavigationStyle.BlueGreen);
 
-  static final NavigationItem staking = NavigationItem(
-      page: StakeScreen(), title: "Staking", routeUrl: StakeScreen.url);
+  static final NavigationItem blurredSynthethics = NavigationItem(
+      page: BlurredSyntheticsScreen(), //SynchronizerScreen(),
+      title: "Synthetics",
+      routeUrl: BlurredSyntheticsScreen.url);
 
-  static final NavigationItem vaults = NavigationItem(
-      page: LockScreen(), title: "Vaults", routeUrl: LockScreen.url);
+  static final NavigationItem blurredStakeAndLockOverview = NavigationItem(
+      page: BlurredStakeLockScreen(),
+      title: "Lock and Stake",
+      routeUrl: BlurredStakeLockScreen.url,
+      style: NavigationStyle.BlueGreen);
 
-
-  // static final NavigationItem synthethics = NavigationItem(
-  //     page: BlurredSyntheticsScreen(), //SynchronizerScreen(),
-  //     title: "Synthetics",
-  //     routeUrl: BlurredSyntheticsScreen.url);
-
-  static List<NavigationItem> get items =>
-      [swap, synthethics, stakeAndLockOverview];
+  static List<NavigationItem> get items => [swap, blurredSynthethics, blurredStakeAndLockOverview];
 
   @override
   List<Object> get props => [title];
