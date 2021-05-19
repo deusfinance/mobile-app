@@ -1,5 +1,6 @@
 import 'package:deus_mobile/core/widgets/dark_button.dart';
 import 'package:deus_mobile/core/widgets/default_screen/header_with_address.dart';
+import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/stake/stake_token_object.dart';
@@ -410,6 +411,14 @@ class _StakingVaultOverviewScreenState
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: MyColors.HalfBlack)),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+              child: Padding(padding: EdgeInsets.only(left: 12, bottom: 8), child: Text("withdraw amount:", style:  MyStyles.whiteSmallTextStyle,),)),
+          TextFieldWithMax(
+            controller: object.controller,
+            maxValue: 1.0,
           ),
           const SizedBox(height: 8),
           DarkButton(
