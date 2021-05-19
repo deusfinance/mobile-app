@@ -320,7 +320,7 @@ class _SwapScreenState extends State<SwapScreen> {
       onPressed: (bool selected) async {
         Transaction transaction = await context.read<SwapCubit>().makeApproveTransaction();
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
-        if(transaction!=null) {
+        if (transaction != null) {
           Gas gas = await showConfirmGasFeeDialog(transaction);
           await context.read<SwapCubit>().approve(gas);
         }
@@ -468,7 +468,7 @@ class _SwapScreenState extends State<SwapScreen> {
       onPressed: (bool selected) async {
         Transaction transaction = await context.read<SwapCubit>().makeTransaction();
         WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
-        if(transaction!=null) {
+        if (transaction != null) {
           Gas gas = await showConfirmGasFeeDialog(transaction);
           await context.read<SwapCubit>().swapTokens(gas);
         }
@@ -482,71 +482,11 @@ class _SwapScreenState extends State<SwapScreen> {
   Widget _buildSlippageButtons(SwapState state) {
     context.read<SwapCubit>().addListenerToSlippageController();
     return Row(children: [
+      _buildSlippageSelection(state, 0.1),
+      _buildSlippageSelection(state, 0.5),
+      _buildSlippageSelection(state, 1),
       Expanded(
         flex: 2,
-        child: GestureDetector(
-          onTap: () {
-            context.read<SwapCubit>().setSlippage(0.1);
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-            margin: EdgeInsets.all(4.0),
-            decoration:
-                state.slippage == 0.1 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                "0.1%",
-                style: state.slippage == 0.1 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 2,
-        child: GestureDetector(
-          onTap: () {
-            context.read<SwapCubit>().setSlippage(0.5);
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-            margin: EdgeInsets.all(4.0),
-            decoration:
-                state.slippage == 0.5 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                "0.5%",
-                style: state.slippage == 0.5 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 2,
-        child: GestureDetector(
-          onTap: () {
-            context.read<SwapCubit>().setSlippage(1);
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-            margin: EdgeInsets.all(4.0),
-            decoration:
-                state.slippage == 1.0 ? MyStyles.blueToGreenSwapScreenDecoration : MyStyles.lightBlackBorderDecoration,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                "1%",
-                style: state.slippage == 1.0 ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 6,
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
           margin: EdgeInsets.all(4.0),
@@ -562,7 +502,7 @@ class _SwapScreenState extends State<SwapScreen> {
                       // textDirection: TextDirection.rtl,
                       textAlign: TextAlign.right,
                       autofocus: false,
-                      inputFormatters: [WhitelistingTextInputFormatter(new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))],
+                      inputFormatters: [WhitelistingTextInputFormatter(RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))],
                       keyboardType: TextInputType.number,
                       maxLines: 1,
                       controller: state.slippageController,
@@ -594,6 +534,30 @@ class _SwapScreenState extends State<SwapScreen> {
         ),
       ),
     ]);
+  }
+
+  Widget _buildSlippageSelection(SwapState state, double percentage) {
+    return Flexible(
+      child: GestureDetector(
+        onTap: () {
+          context.read<SwapCubit>().setSlippage(percentage);
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+          margin: EdgeInsets.all(4.0),
+          decoration: state.slippage == percentage
+              ? MyStyles.blueToGreenSwapScreenDecoration
+              : MyStyles.lightBlackBorderDecoration,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              "$percentage%",
+              style: state.slippage == percentage ? MyStyles.blackSmallTextStyle : MyStyles.whiteSmallTextStyle,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildToastWidget(SwapState state) {
