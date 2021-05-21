@@ -89,7 +89,7 @@ class DisplayMnemonic extends HookWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 50),
           child: Text(
-            "Get a piece of papper, write down your seed phrase and keep it safe. This is the only way to recover your funds.",
+            "write down your seed phrase on a piece of paper and keep it safe. This is the only way to recover your funds.",
             textAlign: TextAlign.center,
           ),
         ),

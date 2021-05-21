@@ -58,7 +58,8 @@ class IntroPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 50),
           child: Text(
-            'You can either import an existing wallet or create a new wallet',
+            'To be able to make transactions, you can choose if you want to import your wallet with your seed phrase or with your private key',
+            // 'You can either import an existing wallet or create a new wallet',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15),
           ),

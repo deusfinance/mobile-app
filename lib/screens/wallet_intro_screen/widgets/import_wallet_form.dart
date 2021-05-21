@@ -4,6 +4,7 @@ import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'form/paper_form.dart';
 import 'form/paper_input.dart';
@@ -82,6 +83,30 @@ class ImportWalletForm extends HookWidget {
                       child: fieldForm(
                           label: 'Seed phrase', hintText: 'Type your seed phrase', controller: inputController),
                       visible: importType.value == WalletImportType.mnemonic),
+                  SizedBox(height: 15,),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      "Your seed is securely encrypted and stored on this device, and this device only.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.8), fontSize: 15),
+                    ),
+                  ),
+                  SizedBox(height: 15,),
+                  // GestureDetector(
+                  //   onTap: (){
+                  //     _launchInBrowser("https://wiki.deus.finance/docs/mobileapp");
+                  //   },
+                  //   child: Padding(padding: EdgeInsets.symmetric(horizontal: 16),
+                  //     child: Text(
+                  //       "read more",
+                  //       textAlign: TextAlign.center,
+                  //       style: TextStyle(
+                  //           color: Colors.white.withOpacity(0.8), fontSize: 15, decoration: TextDecoration.underline,),
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(height: 15,),
                 ],
               ),
             ],
@@ -104,6 +129,18 @@ class ImportWalletForm extends HookWidget {
     );
   }
 
+  Future<void> _launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+  
   final darkGrey = Color(0xFF1C1C1C);
 
   Widget fieldForm({

@@ -68,7 +68,18 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 50),
           child: Text(
-            'This will be your password to enter the app. It\'s the only way to log in and can\'t be recovered',
+            'Choose a strong password for your DEUS finance app on your device to ensure security.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: Text(
+            'This will be your password to enter the app. It\'s the only way to log in and can\'t be recovered.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15),
           ),
