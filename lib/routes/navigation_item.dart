@@ -56,7 +56,7 @@ class NavigationItem extends Equatable {
       routeUrl: BlurredStakeLockScreen.url,
       style: NavigationStyle.BlueGreen);
 
-  static List<NavigationItem> get items => [swap, blurredSynthethics, blurredStakeAndLockOverview];
+  static List<NavigationItem> get items => [swap, synthethics, blurredStakeAndLockOverview];
 
   @override
   List<Object> get props => [title];
