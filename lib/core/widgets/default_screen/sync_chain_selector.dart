@@ -5,14 +5,17 @@ import 'package:deus_mobile/core/widgets/svg.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
+import 'package:deus_mobile/screens/synthetics/bsc_synthetics/bsc_synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/heco_synthetics/heco_synthetics_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/matic_synthetics/matic_synthetics_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-enum SyncChains { xDAI, MAINNET, BSC }
+enum SyncChains { xDAI, MAINNET, BSC, HECO, MATIC }
 
 class SyncChainSelector extends StatefulWidget {
   SyncChains selectedChain;
@@ -35,7 +38,7 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
         showChainSelectDialog();
       },
       child: Container(
-          width: 100,
+          width: 120,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           margin: const EdgeInsets.symmetric(horizontal: 6),
           decoration: BoxDecoration(
@@ -63,7 +66,11 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
       case SyncChains.MAINNET:
         return "Mainnet";
       case SyncChains.BSC:
-        return "BSC (Coming Soon)";
+        return "BSC (SOON)";
+      case SyncChains.HECO:
+        return "Heco (SOON)";
+      case SyncChains.MATIC:
+        return "Matic (SOON)";
     }
   }
 
@@ -137,12 +144,46 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     child: GestureDetector(
                       onTap: (){
                         // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
+                        // locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
                         alignment: Alignment.center,
                         child: Text(
                           getChainName(SyncChains.BSC),
+                          style: MyStyles.whiteMediumTextStyle,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: GestureDetector(
+                      onTap: (){
+                        // locator<NavigationService>().goBack(context);
+                        // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
+                      },
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          getChainName(SyncChains.HECO),
+                          style: MyStyles.whiteMediumTextStyle,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: GestureDetector(
+                      onTap: (){
+                        // locator<NavigationService>().goBack(context);
+                        // locator<NavigationService>().navigateTo(MaticSyntheticsScreen.route, context, replace: true);
+                      },
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          getChainName(SyncChains.MATIC),
                           style: MyStyles.whiteMediumTextStyle,
                         ),
                       ),

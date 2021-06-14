@@ -25,6 +25,10 @@ class TransactionStatus {
         return "https://blockscout.com/xdai/mainnet/tx/" + hash;
       if(chainId == 1)
         return "https://mainnet.etherscan.io/tx/" + hash;
+    //  todo
+      if(chainId == 97)
+        return "";
+
     }else {
         String prefix = '';
         final int currentChainId = AppConfig.selectedConfig.params.chainId;

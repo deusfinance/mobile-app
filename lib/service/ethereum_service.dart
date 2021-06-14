@@ -22,6 +22,7 @@ class EthereumService {
     "wbtc": 8,
     "usdt": 6,
     "usdc": 6,
+    "usd": 8,
     "coinbase": 18,
     "dea": 18,
     "deus": 18,
@@ -46,9 +47,30 @@ class EthereumService {
 
   // IMPORTANT use http instead of wss infura endpoint, web3dart not supporting wss yet
   String get INFURA_URL {
-    if(this.chainId == 100){
+    //bsc
+    if(chainId == 56){
+      return 'https://bsc-dataseed.binance.org/';
+    }
+    else if(chainId == 97){
+      return 'https://data-seed-prebsc-1-s1.binance.org:8545/';
+    }
+    //heco
+    else if (chainId == 128) {
+      return 'https://http-mainnet.hecochain.com';
+    } else if(chainId == 256) {
+      return 'https://http-testnet.hecochain.com';
+    }
+    //matic
+    else if (chainId == 137)
+      return 'https://rpc-mainnet.maticvigil.com/';
+
+
+    //xdai
+    else if(this.chainId == 100){
       return 'https://rpc.xdaichain.com/';
-    }else{
+    }
+
+    else{
       return 'https://' + networkName + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
     }
   }

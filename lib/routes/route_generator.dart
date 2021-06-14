@@ -1,3 +1,5 @@
+import 'package:deus_mobile/core/widgets/token_selector/bsc_stock_selector_screen/bsc_stock_selector_screen.dart';
+import 'package:deus_mobile/core/widgets/token_selector/heco_stock_selector_screen/bsc_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
 import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
 import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
@@ -10,6 +12,10 @@ import 'package:deus_mobile/screens/staking_vault_overview/cubit/staking_vault_o
 import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overview_screen.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
+import 'package:deus_mobile/screens/synthetics/bsc_synthetics/bsc_synthetics_screen.dart';
+import 'package:deus_mobile/screens/synthetics/bsc_synthetics/cubit/bsc_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/heco_synthetics/cubit/heco_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/synthetics/heco_synthetics/heco_synthetics_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/cubit/mainnet_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
@@ -73,6 +79,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     StockSelectorScreen.url: (_) => StockSelectorScreen(),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
     XDaiStockSelectorScreen.url: (_) => XDaiStockSelectorScreen(),
+    BscStockSelectorScreen.url: (_) => BscStockSelectorScreen(),
+    HecoStockSelectorScreen.url: (_) => HecoStockSelectorScreen(),
     //main screens
     StakeScreen.url: (_) {
       return BlocProvider(
@@ -84,6 +92,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         create: (_) => SwapCubit(), child: SwapScreen()),
     XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(
         create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
+    BscSyntheticsScreen.route: (_) => BlocProvider<BscSyntheticsCubit>(
+        create: (_) => BscSyntheticsCubit(), child: BscSyntheticsScreen()),
+    HecoSyntheticsScreen.route: (_) => BlocProvider<HecoSyntheticsCubit>(
+        create: (_) => HecoSyntheticsCubit(), child: HecoSyntheticsScreen()),
     MainnetSyntheticsScreen.route: (_) => BlocProvider<MainnetSyntheticsCubit>(
         create: (_) => MainnetSyntheticsCubit(), child: MainnetSyntheticsScreen()),
     LockScreen.url: (_) {
