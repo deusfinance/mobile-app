@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
+import 'package:deus_mobile/service/xdai_stock_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
@@ -81,8 +82,10 @@ class BscStockService {
   Future<String> getTokenBalance(tokenAddress) async {
     if (!checkWallet()) return "0";
 
-    //todo get xdai token address
-
+    if (tokenAddress == XDaiStockService.xdaiTokenAddress) {
+      var res = await ethService.getEtherBalance(await credentials);
+      return EthereumService.fromWei(res.getInWei);
+    }
 
     DeployedContract tokenContract =
         await ethService.loadContractWithGivenAddress(

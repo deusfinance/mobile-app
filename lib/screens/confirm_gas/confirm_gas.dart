@@ -7,8 +7,6 @@ import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/models/swap/GWei.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/service/deus_swap_service.dart';
-import 'package:deus_mobile/service/stake_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +17,7 @@ import 'package:http/http.dart' as http;
 
 import '../../locator.dart';
 
+enum Network{ETH, XDAI, HECO, BSC, MATIC}
 enum ConfirmShowingMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
 enum ShowingMode { LOADING, NONE }
 enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
@@ -26,8 +25,9 @@ enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
 class ConfirmGasScreen extends StatefulWidget {
   static const route = '/confirm_gas';
   Transaction transaction;
+  Network network;
 
-  ConfirmGasScreen({this.transaction});
+  ConfirmGasScreen({this.transaction, this.network});
 
   @override
   _ConfirmGasScreenState createState() => _ConfirmGasScreenState();
@@ -37,7 +37,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   ConfirmShowingMode confirmSwapShowingMode;
   GWei gWei;
   bool showingError;
-  double ethPrice;
+  double gasTokenPrice;
   ShowingMode mode;
   int estimatedGasNumber;
   GasFee gasFee;
@@ -46,26 +46,59 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   TextEditingController gWeiController = new TextEditingController();
 
   Future<GWei> getGWei() async {
-    var response =
-    await http.get("https://www.gasnow.org/api/v3/gas/price?utm_source=:deusApp");
-    if (response.statusCode == 200) {
-      var map = json.decode(response.body);
-      GWei g = GWei.fromJson(map["data"]);
-      return g;
-    } else {
-      return null;
+    switch(widget.network){
+      case Network.ETH:
+        var response =
+        await http.get("https://www.gasnow.org/api/v3/gas/price?utm_source=:deusApp");
+        if (response.statusCode == 200) {
+          var map = json.decode(response.body);
+          GWei g = GWei.fromJson(map["data"]);
+          return g;
+        }
+        return null;
+      case Network.XDAI:
+        GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000); 
+        return g;
+      case Network.HECO:
+        GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
+        return g;
+      case Network.BSC:
+        GWei g = new GWei.init(10.0 * 1000000000, 10.0 * 1000000000, 10.0 * 1000000000);
+        return g;
     }
+
   }
 
-  Future<double> getEthPrice() async {
-    var response = await http.get(
-        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
-    if (response.statusCode == 200) {
-      var map = json.decode(response.body);
-      return map['ethereum']['usd'];
-    } else {
-      return 0;
+  Future<double> getGasTokenPrice() async {
+    switch(widget.network){
+      case Network.ETH:
+        var response = await http.get(
+            "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
+        if (response.statusCode == 200) {
+          var map = json.decode(response.body);
+          return map['ethereum']['usd'];
+        }
+        return 0;
+      case Network.XDAI:
+        return 1;
+      case Network.HECO:
+        var response = await http.get(
+            "https://api.coingecko.com/api/v3/simple/price?ids=huobi-token&vs_currencies=usd");
+        if (response.statusCode == 200) {
+          var map = json.decode(response.body);
+          return map['huobi-token']['usd'];
+        }
+        return 0;
+      case Network.BSC:
+        var response = await http.get(
+            "https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd");
+        if (response.statusCode == 200) {
+          var map = json.decode(response.body);
+          return map['binancecoin']['usd'];
+        }
+        return 0;
     }
+
   }
 
   @override
@@ -156,7 +189,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           ),
           Align(
               alignment: Alignment.centerRight,
-              child: Text("\$ ${(_computeGasFee() * ethPrice).toStringAsFixed(6)}",
+              child: Text("\$ ${(_computeGasFee() * gasTokenPrice).toStringAsFixed(6)}",
                   style: MyStyles.lightWhiteSmallTextStyle)),
           const Divider(
             height: 15,
@@ -591,7 +624,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "\$ ${(_computeGasFee(gFee: GasFee.SLOW) * ethPrice).toStringAsFixed(6)}",
+                      "\$ ${(_computeGasFee(gFee: GasFee.SLOW) * gasTokenPrice).toStringAsFixed(6)}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -642,7 +675,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "\$ ${(_computeGasFee(gFee: GasFee.AVERAGE) * ethPrice).toStringAsFixed(6)}",
+                      "\$ ${(_computeGasFee(gFee: GasFee.AVERAGE) * gasTokenPrice).toStringAsFixed(6)}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -693,7 +726,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "\$ ${(_computeGasFee(gFee: GasFee.FAST) * ethPrice).toStringAsFixed(6)}",
+                      "\$ ${(_computeGasFee(gFee: GasFee.FAST) * gasTokenPrice).toStringAsFixed(6)}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -711,9 +744,9 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
       mode = ShowingMode.LOADING;
     });
     gWei = await getGWei();
-    ethPrice = await getEthPrice();
+    gasTokenPrice = await getGasTokenPrice();
     estimatedGasNumber = await estimateGas();
-    if(estimatedGasNumber == 0 || ethPrice == 0 || gWei == null){
+    if(estimatedGasNumber == 0 || gasTokenPrice == 0 || gWei == null){
       setState(() {
         showingError = true;
       });
@@ -750,9 +783,8 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
     if (response.statusCode == 200) {
       var js = json.decode(response.body);
       return js['gas_fee'];
-    } else {
-      return 650000;
     }
+    return 650000;
   }
 
   _computeGasPrice({GasFee gFee}) {

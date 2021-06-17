@@ -152,10 +152,9 @@ class HecoSyntheticsCubit extends Cubit<HecoSyntheticsState> {
 
   Future<String> getTokenAddress(Token token) async {
     String tokenAddress;
-    //TODO
+
     if (token.getTokenName() == "husd") {
       tokenAddress = state.service.husd;
-        // await state.service.ethService.getTokenAddrHex("husd", "token");
     } else {
       StockAddress stockAddress = HecoStockData.getStockAddress(token);
       if (state.mode == Mode.LONG) {

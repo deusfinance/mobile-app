@@ -66,9 +66,9 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
       case SyncChains.MAINNET:
         return "Mainnet";
       case SyncChains.BSC:
-        return "BSC (SOON)";
+        return "BSC";
       case SyncChains.HECO:
-        return "Heco (SOON)";
+        return "Heco";
       case SyncChains.MATIC:
         return "Matic (SOON)";
     }
@@ -143,8 +143,8 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(
                       onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
+                        locator<NavigationService>().goBack(context);
+                        locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
                         alignment: Alignment.center,
@@ -160,8 +160,8 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(
                       onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
+                        locator<NavigationService>().goBack(context);
+                        locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
                         alignment: Alignment.center,

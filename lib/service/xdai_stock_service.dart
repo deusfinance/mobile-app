@@ -14,7 +14,7 @@ class XDaiStockService {
   final String privateKey;
   String marketMaker;
   String wxdaiProxy;
-  String xdaiTokenAddress = "0x0000000000000000000000000000000000000001";
+  static String xdaiTokenAddress = "0x0000000000000000000000000000000000000001";
 
   XDaiStockService({@required this.ethService, @required this.privateKey}) {
     _init();
@@ -42,7 +42,7 @@ class XDaiStockService {
     if (!checkWallet()) {
       return "0";
     }
-    if (tokenAddress == this.xdaiTokenAddress) {
+    if (tokenAddress == XDaiStockService.xdaiTokenAddress) {
       return "1000000000000000";
     }
     DeployedContract tokenContract =
@@ -53,7 +53,7 @@ class XDaiStockService {
     return EthereumService.fromWei(res.single, 'ether');
   }
 
-  Future<String> approve(tokenAddress) async {
+  Future<String> approve(tokenAddress, Gas gas) async {
     if (!checkWallet()) {
       return "0";
     }
@@ -61,6 +61,18 @@ class XDaiStockService {
     DeployedContract tokenContract =
     await ethService.loadContractWithGivenAddress("token",EthereumAddress.fromHex(tokenAddress));
     var res = ethService.submit(await credentials, tokenContract, "approve",
+        [EthereumAddress.fromHex(wxdaiProxy), EthereumService.getWei(amount)], gas: gas);
+    return res;
+  }
+
+  Future<Transaction> makeApproveTransaction(tokenAddress) async {
+    if (!checkWallet()) {
+      return null;
+    }
+    var amount = "10000000000000000000000000000";
+    DeployedContract tokenContract =
+    await ethService.loadContractWithGivenAddress("token",EthereumAddress.fromHex(tokenAddress));
+    var res = ethService.makeTransaction(await credentials, tokenContract, "approve",
         [EthereumAddress.fromHex(wxdaiProxy), EthereumService.getWei(amount)]);
     return res;
   }
@@ -69,7 +81,7 @@ class XDaiStockService {
     if (!checkWallet())
       return "0";
 
-    if (tokenAddress == this.xdaiTokenAddress) {
+    if (tokenAddress == XDaiStockService.xdaiTokenAddress) {
      var res = await ethService.getEtherBalance(await credentials);
      return EthereumService.fromWei(res.getInWei);
     }
@@ -80,7 +92,7 @@ class XDaiStockService {
     return EthereumService.fromWei(res.single);
   }
 
-  Future<String> buy(tokenAddress, String amount, List<ContractInputData> oracles, maxPrice) async {
+  Future<String> buy(tokenAddress, String amount, List<ContractInputData> oracles, maxPrice, Gas gas) async {
     try {
       if (!checkWallet()) return "0";
 
@@ -106,19 +118,72 @@ class XDaiStockService {
         [oracles[0].signs['buy'].getV(), oracles[1].signs['buy'].getV()],
         [oracles[0].signs['buy'].getR(), oracles[1].signs['buy'].getR()],
         [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
-      ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount));
+      ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount)
+      ,gas: gas);
     }on Exception catch(error){
       return "";
     }
   }
 
-  Future<String> sell(tokenAddress, String amount, List<ContractInputData> oracles) async {
+  Future<Transaction> makeBuyTransaction(tokenAddress, String amount, List<ContractInputData> oracles, maxPrice) async {
+    try {
+      if (!checkWallet()) return null;
+
+      DeployedContract contract =
+      await ethService.loadContractWithGivenAddress(
+          "wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
+      ContractInputData info = oracles[0];
+
+      var res = await ethService.query(contract, "calculateXdaiAmount", [
+        BigInt.parse(maxPrice),
+        BigInt.from(info.fee),
+        EthereumService.getWei(amount)
+      ]);
+
+      BigInt xdaiAmount = BigInt.parse(res.single.toString());
+      return await ethService.makeTransaction(await credentials, contract, "buy", [
+        info.getMultiplier(),
+        EthereumAddress.fromHex(tokenAddress),
+        EthereumService.getWei(amount),
+        info.getFee(),
+        [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
+        [oracles[0].getPrice(), oracles[1].getPrice()],
+        [oracles[0].signs['buy'].getV(), oracles[1].signs['buy'].getV()],
+        [oracles[0].signs['buy'].getR(), oracles[1].signs['buy'].getR()],
+        [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
+      ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount));
+    }on Exception catch(error){
+      return null;
+    }
+  }
+
+  Future<String> sell(tokenAddress, String amount, List<ContractInputData> oracles, Gas gas) async {
     if (!checkWallet()) return "0";
     DeployedContract contract =
     await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
     ContractInputData info = oracles[0];
 
     return ethService.submit(await credentials, contract, "sell", [
+      info.getMultiplier(),
+      EthereumAddress.fromHex(tokenAddress),
+      EthereumService.getWei(amount),
+      info.getFee(),
+      [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
+      [oracles[0].getPrice(), oracles[1].getPrice()],
+      [oracles[0].signs['sell'].getV(), oracles[1].signs['sell'].getV()],
+      [oracles[0].signs['sell'].getR(), oracles[1].signs['sell'].getR()],
+      [oracles[0].signs['sell'].getS(), oracles[1].signs['sell'].getS()],
+    ],
+    gas: gas);
+  }
+
+  Future<Transaction> makeSellTransaction(tokenAddress, String amount, List<ContractInputData> oracles) async {
+    if (!checkWallet()) return null;
+    DeployedContract contract =
+    await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
+    ContractInputData info = oracles[0];
+
+    return ethService.makeTransaction(await credentials, contract, "sell", [
       info.getMultiplier(),
       EthereumAddress.fromHex(tokenAddress),
       EthereumService.getWei(amount),

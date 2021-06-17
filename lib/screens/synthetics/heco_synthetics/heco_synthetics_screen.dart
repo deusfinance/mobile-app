@@ -59,8 +59,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            //TODO
-            _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 128));
           }
         },
         onClosed: () {
@@ -77,7 +76,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 128));
         },
         onClosed: () {
           context.read<HecoSyntheticsCubit>().closeToast();
@@ -93,7 +92,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 128));
         },
         onClosed: () {
           context.read<HecoSyntheticsCubit>().closeToast();
@@ -131,6 +130,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
           alignment: Alignment.center,
           child: ConfirmGasScreen(
             transaction: transaction,
+              network: Network.HECO
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
@@ -387,7 +387,6 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-            //TODO: add colors to my_colors.dart (.red and .green)
             state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
@@ -468,11 +467,10 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          //TODO
           CircleAvatar(
               radius: 12,
               backgroundImage:
-                  provider.Svg("assets/images/currencies/busd.svg")),
+                  provider.Svg("assets/images/currencies/husd.svg")),
           SizedBox(
             width: 6,
           ),

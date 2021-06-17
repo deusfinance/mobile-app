@@ -127,7 +127,8 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
           child: ConfirmGasScreen(
-            transaction: transaction,
+              transaction: transaction,
+              network: Network.ETH
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
@@ -388,7 +389,6 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-            //TODO: add colors to my_colors.dart (.red and .green)
             state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),

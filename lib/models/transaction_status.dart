@@ -25,9 +25,13 @@ class TransactionStatus {
         return "https://blockscout.com/xdai/mainnet/tx/" + hash;
       if(chainId == 1)
         return "https://mainnet.etherscan.io/tx/" + hash;
-    //  todo
+    //  heco
+      if(chainId == 128){
+        return "https://hecoinfo.com/tx/" + hash;
+      }
+      // bsc
       if(chainId == 97)
-        return "";
+        return "https://bscscan.com/tx/" + hash;
 
     }else {
         String prefix = '';

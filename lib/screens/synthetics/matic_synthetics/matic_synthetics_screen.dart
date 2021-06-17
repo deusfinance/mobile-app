@@ -60,7 +60,6 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            //TODO
             _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
           }
         },
@@ -132,6 +131,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
           alignment: Alignment.center,
           child: ConfirmGasScreen(
             transaction: transaction,
+              network: Network.MATIC
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
@@ -388,7 +388,6 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-            //TODO: add colors to my_colors.dart (.red and .green)
             state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
@@ -469,7 +468,6 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          //TODO
           CircleAvatar(
               radius: 12,
               backgroundImage:

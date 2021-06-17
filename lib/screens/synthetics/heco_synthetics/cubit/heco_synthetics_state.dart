@@ -48,7 +48,6 @@ abstract class HecoSyntheticsState extends Equatable {
         prices = new Map(),
         inputController = StreamController(),
         service = new HecoStockService(
-            //TODO
             ethService: new EthereumService(128),
             privateKey: locator<ConfigurationService>().getPrivateKey());
 

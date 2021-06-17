@@ -1,16 +1,20 @@
-import 'dart:async';
 
-import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
+import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:web3dart/web3dart.dart';
 
 import '../../../core/widgets/filled_gradient_selection_button.dart';
 import '../../../core/widgets/selection_button.dart';
@@ -22,6 +26,9 @@ import '../../../service/ethereum_service.dart';
 import '../../../statics/my_colors.dart';
 import '../../../statics/styles.dart';
 import '../market_timer.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
+
+import 'cubit/xdai_synthetics_cubit.dart';
 
 class XDaiSyntheticsScreen extends StatefulWidget {
   static const route = '/xdai_synthethics';
@@ -68,7 +75,6 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          https: //blockscout.com/xdai/mainnet/tx/
           _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
         },
         onClosed: () {
@@ -112,6 +118,31 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       }),
       chainSelector: SyncChainSelector(SyncChains.xDAI),
     );
+  }
+
+  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas res = await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black38,
+      barrierLabel: "Barrier",
+      pageBuilder: (_, __, ___) => Align(
+          alignment: Alignment.center,
+          child: ConfirmGasScreen(
+            transaction: transaction,
+              network: Network.XDAI
+          )),
+      barrierDismissible: true,
+      transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+        filter:
+            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        child: FadeTransition(
+          child: child,
+          opacity: anim1,
+        ),
+      ),
+      transitionDuration: Duration(milliseconds: 10),
+    );
+    return res;
   }
 
   Widget _buildBody(XDaiSyntheticsState state) {
@@ -262,7 +293,14 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          context.read<XDaiSyntheticsCubit>().approve();
+          Transaction transaction = await context
+              .read<XDaiSyntheticsCubit>()
+              .makeApproveTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if (transaction != null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<XDaiSyntheticsCubit>().approve(gas);
+          }
         },
         gradient: MyColors.blueToPurpleGradient,
       );
@@ -310,14 +348,25 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       );
     }
     return FilledGradientSelectionButton(
-      label: state.fromToken == CurrencyData.xdai ? 'Buy' : 'Sell',
+      label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
-        if (state.fromToken == CurrencyData.xdai) {
-          context.read<XDaiSyntheticsCubit>().buy();
+        if (state.fromToken == CurrencyData.dai) {
+          Transaction transaction =
+              await context.read<XDaiSyntheticsCubit>().makeBuyTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if (transaction != null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<XDaiSyntheticsCubit>().buy(gas);
+          }
         } else {
-          context.read<XDaiSyntheticsCubit>().sell();
+          Transaction transaction =
+              await context.read<XDaiSyntheticsCubit>().makeSellTransaction();
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          if (transaction != null) {
+            Gas gas = await showConfirmGasFeeDialog(transaction);
+            context.read<XDaiSyntheticsCubit>().sell(gas);
+          }
         }
-        ;
       },
       gradient: MyColors.blueToPurpleGradient,
     );
@@ -338,7 +387,6 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-            //TODO: add colors to my_colors.dart (.red and .green)
             state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
@@ -419,10 +467,10 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            "assets/images/currencies/dai.png",
-            height: 20,
-          ),
+          CircleAvatar(
+              radius: 12,
+              backgroundImage:
+                  provider.Svg("assets/images/currencies/xdai.svg")),
           SizedBox(
             width: 6,
           ),

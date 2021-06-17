@@ -77,6 +77,7 @@ class _SwapScreenState extends State<SwapScreen> {
           alignment: Alignment.center,
           child: ConfirmGasScreen(
             transaction: transaction,
+            network: Network.ETH,
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(

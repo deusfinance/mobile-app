@@ -19,6 +19,8 @@ class GWei{
 
   GWei();
 
+  GWei.init(this.slow, this.average, this.fast);
+
   double getSlow(){
     return slow/1000000000;
   }

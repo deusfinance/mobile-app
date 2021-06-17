@@ -75,7 +75,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
         },
         onClosed: () {
           context.read<BscSyntheticsCubit>().closeToast();
@@ -91,7 +91,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
         },
         onClosed: () {
           context.read<BscSyntheticsCubit>().closeToast();
@@ -129,6 +129,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
           alignment: Alignment.center,
           child: ConfirmGasScreen(
             transaction: transaction,
+            network: Network.BSC,
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
@@ -385,7 +386,6 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
         timerColor:
-            //TODO: add colors to my_colors.dart (.red and .green)
             state.marketTimerClosed
                 ? const Color(0xFFD40000)
                 : const Color(0xFF00D16C),
