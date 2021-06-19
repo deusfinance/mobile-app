@@ -152,8 +152,7 @@ class BscSyntheticsCubit extends Cubit<BscSyntheticsState> {
   Future<String> getTokenAddress(Token token) async {
     String tokenAddress;
     if (token.getTokenName() == "busd") {
-      tokenAddress =
-      await state.service.ethService.getTokenAddrHex("busd", "token");
+      tokenAddress = await state.service.ethService.getTokenAddrHex("busd", "token");
     } else {
       StockAddress stockAddress = BscStockData.getStockAddress(token);
       if (state.mode == Mode.LONG) {
@@ -166,7 +165,7 @@ class BscSyntheticsCubit extends Cubit<BscSyntheticsState> {
   }
 
   fromTokenChanged(Token selectedToken) async {
-    state.toToken = CurrencyData.bsc;
+    state.toToken = CurrencyData.busd;
     state.fromToken = selectedToken;
     (state.fromToken as Stock).mode = Mode.LONG;
     state.fromFieldController.text = "";
@@ -192,7 +191,7 @@ class BscSyntheticsCubit extends Cubit<BscSyntheticsState> {
   }
 
   toTokenChanged(Token selectedToken) async {
-    state.fromToken = CurrencyData.bsc;
+    state.fromToken = CurrencyData.busd;
     state.toToken = selectedToken;
     (state.toToken as Stock).mode = Mode.LONG;
     state.fromFieldController.text = "";
@@ -206,6 +205,7 @@ class BscSyntheticsCubit extends Cubit<BscSyntheticsState> {
           toToken: selectedToken, mode: Mode.LONG));
     } else {
       state.marketClosed = false;
+      emit(BscSyntheticsLoadingState(state));
       emit(BscSyntheticsAssetSelectedState(state,
           toToken: selectedToken, mode: Mode.LONG, isInProgress: true));
 

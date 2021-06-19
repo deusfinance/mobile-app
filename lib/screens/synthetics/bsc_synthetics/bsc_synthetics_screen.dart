@@ -58,7 +58,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 56));
           }
         },
         onClosed: () {
@@ -75,7 +75,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 56));
         },
         onClosed: () {
           context.read<BscSyntheticsCubit>().closeToast();
@@ -91,7 +91,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 56));
         },
         onClosed: () {
           context.read<BscSyntheticsCubit>().closeToast();
@@ -347,9 +347,9 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
       );
     }
     return FilledGradientSelectionButton(
-      label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
+      label: state.fromToken == CurrencyData.busd ? 'Buy' : 'Sell',
       onPressed: () async {
-        if (state.fromToken == CurrencyData.dai) {
+        if (state.fromToken == CurrencyData.busd) {
           Transaction transaction =
               await context.read<BscSyntheticsCubit>().makeBuyTransaction();
           WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();

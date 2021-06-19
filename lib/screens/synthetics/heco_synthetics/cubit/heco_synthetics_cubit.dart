@@ -13,6 +13,7 @@ import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/service/heco_stock_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
@@ -154,7 +155,7 @@ class HecoSyntheticsCubit extends Cubit<HecoSyntheticsState> {
     String tokenAddress;
 
     if (token.getTokenName() == "husd") {
-      tokenAddress = state.service.husd;
+      tokenAddress = HecoStockService.husd;
     } else {
       StockAddress stockAddress = HecoStockData.getStockAddress(token);
       if (state.mode == Mode.LONG) {

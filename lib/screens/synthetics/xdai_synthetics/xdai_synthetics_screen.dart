@@ -305,7 +305,6 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         gradient: MyColors.blueToPurpleGradient,
       );
     }
-
     if (state.fromFieldController.text == "" ||
         (double.tryParse(state.fromFieldController.text) != null &&
             double.tryParse(state.fromFieldController.text) == 0)) {
@@ -323,7 +322,6 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         ),
       );
     }
-
     BigInt balance = BigInt.zero;
     if (state.fromToken is CryptoCurrency) {
       balance = (state.fromToken as CryptoCurrency).getBalance();
@@ -348,9 +346,9 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       );
     }
     return FilledGradientSelectionButton(
-      label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
+      label: state.fromToken == CurrencyData.xdai ? 'Buy' : 'Sell',
       onPressed: () async {
-        if (state.fromToken == CurrencyData.dai) {
+        if (state.fromToken == CurrencyData.xdai) {
           Transaction transaction =
               await context.read<XDaiSyntheticsCubit>().makeBuyTransaction();
           WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();

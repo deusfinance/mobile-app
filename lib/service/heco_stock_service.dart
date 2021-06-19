@@ -12,16 +12,15 @@ class HecoStockService {
   final EthereumService ethService;
   final String privateKey;
   String marketMaker;
-  String husd;
+  static String husd = "0x0298c2b32eae4da002a15f36fdf7615bea3da047";
   HecoStockService({@required this.ethService, @required this.privateKey}) {
     _init();
   }
 
   _init() async {
-    this.husd = "0x0298c2b32eae4da002a15f36fdf7615bea3da047";
-
     if (ethService.chainId == 128) {
-      this.marketMaker = "0x3b62F3820e0B035cc4aD602dECe6d796BC325325";
+      // this.marketMaker = "0x3b62F3820e0B035cc4aD602dECe6d796BC325325";
+      this.marketMaker = "0xe82aa18b107aaf8D3829111C91CD0D133E0773DC";
     } else {
       this.marketMaker = "0xeF0500F9B82E72f045499932F0925C6393A5BD77";
     }
@@ -41,7 +40,7 @@ class HecoStockService {
     if (!checkWallet()) {
       return "0";
     }
-    if (tokenAddress != this.husd) {
+    if (tokenAddress != HecoStockService.husd) {
       return "1000000000000000";
     }
     DeployedContract tokenContract =
@@ -89,7 +88,7 @@ class HecoStockService {
 
     final res =
         await ethService.query(tokenContract, "balanceOf", [await address]);
-    if (tokenAddress == this.husd) {
+    if (tokenAddress == HecoStockService.husd) {
       return EthereumService.fromWei(res.single, "usd");
     }
     return EthereumService.fromWei(res.single);

@@ -30,7 +30,7 @@ class TransactionStatus {
         return "https://hecoinfo.com/tx/" + hash;
       }
       // bsc
-      if(chainId == 97)
+      if(chainId == 56)
         return "https://bscscan.com/tx/" + hash;
 
     }else {

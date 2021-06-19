@@ -43,7 +43,7 @@ abstract class CurrencyData {
   static CryptoCurrency bpt = CryptoCurrency(
       name: 'Native Balancer', symbol: 'bpt_native', logoPath: '$_basePath/deus.svg');
 
-  static CryptoCurrency bsc = CryptoCurrency(
+  static CryptoCurrency busd = CryptoCurrency(
       name: 'BUSD', symbol: 'BUSD', logoPath: '$_basePath/busd.svg');
 
   static CryptoCurrency husd = CryptoCurrency(

@@ -86,11 +86,9 @@ class BscStockService {
       var res = await ethService.getEtherBalance(await credentials);
       return EthereumService.fromWei(res.getInWei);
     }
-
     DeployedContract tokenContract =
         await ethService.loadContractWithGivenAddress(
             "token", EthereumAddress.fromHex(tokenAddress));
-
     final res =
         await ethService.query(tokenContract, "balanceOf", [await address]);
     return EthereumService.fromWei(res.single);

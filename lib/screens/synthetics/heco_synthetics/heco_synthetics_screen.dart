@@ -348,9 +348,9 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       );
     }
     return FilledGradientSelectionButton(
-      label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
+      label: state.fromToken == CurrencyData.husd ? 'Buy' : 'Sell',
       onPressed: () async {
-        if (state.fromToken == CurrencyData.dai) {
+        if (state.fromToken == CurrencyData.husd) {
           Transaction transaction =
               await context.read<HecoSyntheticsCubit>().makeBuyTransaction();
           WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();

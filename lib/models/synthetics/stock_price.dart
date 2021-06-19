@@ -7,4 +7,9 @@ class StockPrice{
   StockPriceDetail short;
 
   StockPrice(this.long, this.short);
+
+  @override
+  String toString() {
+    return long.toString() + " " + short.toString();
+  }
 }

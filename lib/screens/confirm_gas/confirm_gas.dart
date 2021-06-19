@@ -7,6 +7,7 @@ import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/models/swap/GWei.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
+import 'package:deus_mobile/service/heco_stock_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -57,7 +58,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         }
         return null;
       case Network.XDAI:
-        GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000); 
+        GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
         return g;
       case Network.HECO:
         GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
@@ -101,6 +102,21 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
 
   }
 
+
+  String getGasTokenName(){
+    switch(widget.network){
+      case Network.ETH:
+        return "ETH";
+      case Network.XDAI:
+        return "XDAI";
+      case Network.HECO:
+        return "HT";
+      case Network.BSC:
+        return "BNB";
+      case Network.MATIC:
+        return "ETH";
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -179,7 +195,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                 ),
               ),
               Text(
-                "ETH ${_computeGasFee().toStringAsFixed(6)}",
+                "${getGasTokenName()} ${_computeGasFee().toStringAsFixed(6)}",
                 style: MyStyles.whiteMediumTextStyle,
               )
             ],
@@ -420,7 +436,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "ETH ${_computeGasFee(gFee: GasFee.CUSTOM).toStringAsFixed(6)}",
+              "${getGasTokenName()} ${_computeGasFee(gFee: GasFee.CUSTOM).toStringAsFixed(6)}",
               style: MyStyles.whiteMediumTextStyle,
             ),
           ),
@@ -614,7 +630,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "ETH ${_computeGasFee(gFee: GasFee.SLOW).toStringAsFixed(6)}",
+                      "${getGasTokenName()} ${_computeGasFee(gFee: GasFee.SLOW).toStringAsFixed(6)}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -665,7 +681,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "ETH ${(_computeGasFee(gFee: GasFee.AVERAGE)).toStringAsFixed(6)}",
+                      "${getGasTokenName()} ${(_computeGasFee(gFee: GasFee.AVERAGE)).toStringAsFixed(6)}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -716,7 +732,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "ETH ${(_computeGasFee(gFee: GasFee.FAST)).toStringAsFixed(6)}",
+                      "${getGasTokenName()} ${(_computeGasFee(gFee: GasFee.FAST)).toStringAsFixed(6)}",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
@@ -746,6 +762,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
     gWei = await getGWei();
     gasTokenPrice = await getGasTokenPrice();
     estimatedGasNumber = await estimateGas();
+
     if(estimatedGasNumber == 0 || gasTokenPrice == 0 || gWei == null){
       setState(() {
         showingError = true;
@@ -768,23 +785,35 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   }
 
   Future<int> estimateGas() async {
-    Map<String, dynamic> map = new Map();
-    map['from'] = widget.transaction.from.toString();
-    map['to'] = widget.transaction.to.toString();
-    if(widget.transaction.data != null) {
-      var result = hex.encode(widget.transaction.data);
-      map['data'] = "0x$result";
+    switch(widget.network){
+      case Network.ETH:
+        Map<String, dynamic> map = new Map();
+        map['from'] = widget.transaction.from.toString();
+        map['to'] = widget.transaction.to.toString();
+        if(widget.transaction.data != null) {
+          var result = hex.encode(widget.transaction.data);
+          map['data'] = "0x$result";
+        }
+        if ( widget.transaction.value != null)
+          map['value'] = widget.transaction.value.getInWei.toInt();
+        else
+          map['value'] = 0;
+        var response = await http.post("https://app.deus.finance/app/mainnet/swap/estimate", body: json.encode(map), headers: {"Content-Type": "application/json"});
+        if (response.statusCode == 200) {
+          var js = json.decode(response.body);
+          return js['gas_fee'];
+        }
+        return 650000;
+      case Network.XDAI:
+        return 650000;
+      case Network.HECO:
+        return 650000;
+      case Network.BSC:
+        return 650000;
+      case Network.MATIC:
+        return 650000;
     }
-    if ( widget.transaction.value != null)
-      map['value'] = widget.transaction.value.getInWei.toInt();
-    else
-      map['value'] = 0;
-    var response = await http.post("https://app.deus.finance/app/mainnet/swap/estimate", body: json.encode(map), headers: {"Content-Type": "application/json"});
-    if (response.statusCode == 200) {
-      var js = json.decode(response.body);
-      return js['gas_fee'];
-    }
-    return 650000;
+
   }
 
   _computeGasPrice({GasFee gFee}) {

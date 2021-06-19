@@ -36,7 +36,7 @@ abstract class BscSyntheticsState extends Equatable {
 
   BscSyntheticsState.init()
       : isInProgress = false,
-        fromToken = CurrencyData.bsc,
+        fromToken = CurrencyData.busd,
         approved = true,
         toValue = 0,
         marketClosed = false,
@@ -47,7 +47,7 @@ abstract class BscSyntheticsState extends Equatable {
         prices = new Map(),
         inputController = StreamController(),
         service = new BscStockService(
-            ethService: new EthereumService(97),
+            ethService: new EthereumService(56),
             privateKey: locator<ConfigurationService>().getPrivateKey());
 
   BscSyntheticsState.copy(BscSyntheticsState state)
