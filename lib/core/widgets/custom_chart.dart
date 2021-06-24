@@ -15,7 +15,7 @@ class CustomChart extends StatefulWidget {
 }
 
 class _CustomChartState extends State<CustomChart> {
-  Future<List<ChartDataPoint>> _futureData;
+  late Future<List<ChartDataPoint>> _futureData;
 
   /// List which shows which ToggleButton is selected
   List<bool> _toggleButtonButtonsTime = [false, false, true, false, false];
@@ -110,12 +110,12 @@ class _CustomChartState extends State<CustomChart> {
         isSelected: _toggleButtonButtonsTime);
   }
 
-  Padding _buildButtonText({String label, bool isSelected, bool padding}) {
+  Padding _buildButtonText({String? label, bool? isSelected, bool? padding}) {
     return Padding(
-      padding: padding ? const EdgeInsets.only(right: 30): EdgeInsets.zero,
+      padding: padding! ? const EdgeInsets.only(right: 30): EdgeInsets.zero,
       child: Text(
-        label,
-        style: isSelected
+        label!,
+        style: isSelected!
             ? MyStyles.selectedToggleButtonTextStyle
             : MyStyles.unselectedToggleButtonTextStyle,
       ),

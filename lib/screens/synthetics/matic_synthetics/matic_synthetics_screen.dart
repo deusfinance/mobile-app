@@ -8,11 +8,12 @@ import 'package:deus_mobile/core/widgets/token_selector/bsc_stock_selector_scree
 import 'package:deus_mobile/core/widgets/token_selector/heco_stock_selector_screen/bsc_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/matic_stock_selector_screen/matic_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
+import 'package:deus_mobile/data_source/sync_data/matic_stock_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
+import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,7 +30,6 @@ import '../../../statics/my_colors.dart';
 import '../../../statics/styles.dart';
 import '../market_timer.dart';
 import 'cubit/matic_synthetics_cubit.dart';
-import 'cubit/matic_synthetics_state.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
 
 class MaticSyntheticsScreen extends StatefulWidget {
@@ -60,7 +60,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl(chainId: 97));
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 97)!);
           }
         },
         onClosed: () {
@@ -77,7 +77,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1)!);
         },
         onClosed: () {
           context.read<MaticSyntheticsCubit>().closeToast();
@@ -93,7 +93,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1)!);
         },
         onClosed: () {
           context.read<MaticSyntheticsCubit>().closeToast();
@@ -105,13 +105,13 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<MaticSyntheticsCubit, MaticSyntheticsState>(
+      child: BlocBuilder<MaticSyntheticsCubit, SyntheticsState>(
           builder: (context, state) {
-        if (state is MaticSyntheticsLoadingState) {
+        if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is MaticSyntheticsErrorState) {
+        } else if (state is SyntheticsErrorState) {
           return Center(
             child: Icon(Icons.refresh, color: MyColors.White),
           );
@@ -122,8 +122,8 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -147,7 +147,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     return res;
   }
 
-  Widget _buildBody(MaticSyntheticsState state) {
+  Widget _buildBody(SyntheticsState state) {
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
@@ -166,10 +166,11 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Widget _buildUserInput(MaticSyntheticsState state) {
+  Widget _buildUserInput(SyntheticsState state) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
+        syncData: state.syncData as MaticStockData,
         selectAssetRoute: MaticStockSelectorScreen.url,
         controller: state.fromFieldController,
         tokenSelected: (selectedToken) async {
@@ -182,6 +183,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       direction: Direction.to,
       initialToken: state.toToken,
       controller: state.toFieldController,
+      syncData: state.syncData as MaticStockData,
       selectAssetRoute: MaticStockSelectorScreen.url,
       tokenSelected: (selectedToken) {
         context.read<MaticSyntheticsCubit>().toTokenChanged(selectedToken);
@@ -213,8 +215,8 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
-                      ? "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
-                      : "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
+                      ? "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      : "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 GestureDetector(
@@ -245,22 +247,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Widget _buildMainButton(MaticSyntheticsState state) {
-    if (!state.service.checkWallet()) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
-        decoration: MyStyles.darkWithNoBorderDecoration,
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "CONNECT WALLET",
-            style: MyStyles.lightWhiteMediumTextStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+  Widget _buildMainButton(SyntheticsState state) {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -276,7 +263,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         ),
       );
     }
-    if (state is MaticSyntheticsSelectAssetState) {
+    if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -295,11 +282,11 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<MaticSyntheticsCubit>().makeApproveTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<MaticSyntheticsCubit>().approve(gas);
           }
         },
@@ -329,7 +316,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     if (state.fromToken is CryptoCurrency) {
       balance = (state.fromToken as CryptoCurrency).getBalance();
     } else {
-      balance = (state.fromToken as Stock).getBalance();
+      balance = (state.fromToken as Stock).getBalance()!;
     }
     if (balance <
         EthereumService.getWei(
@@ -352,19 +339,19 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.dai) {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<MaticSyntheticsCubit>().makeBuyTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<MaticSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<MaticSyntheticsCubit>().makeSellTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<MaticSyntheticsCubit>().sell(gas);
           }
         }
@@ -373,7 +360,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Container _buildModeButtons(MaticSyntheticsState state) {
+  Container _buildModeButtons(SyntheticsState state) {
     return Container(
       child: Row(children: [
         Expanded(child: _buildLongButton(state)),
@@ -383,7 +370,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Widget _buildMarketTimer(MaticSyntheticsState state) {
+  Widget _buildMarketTimer(SyntheticsState state) {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
@@ -400,7 +387,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Widget _buildShortButton(MaticSyntheticsState state) {
+  Widget _buildShortButton(SyntheticsState state) {
     return SelectionButton(
       label: 'SHORT',
       onPressed: (bool selected) {
@@ -411,7 +398,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     );
   }
 
-  Widget _buildLongButton(MaticSyntheticsState state) {
+  Widget _buildLongButton(SyntheticsState state) {
     return SelectionButton(
       label: 'LONG',
       onPressed: (bool selected) {
@@ -434,12 +421,12 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     }
   }
 
-  Widget _buildToastWidget(MaticSyntheticsState state) {
-    if (state is MaticSyntheticsTransactionPendingState && state.showingToast) {
+  Widget _buildToastWidget(SyntheticsState state) {
+    if (state is SyntheticsTransactionPendingState && state.showingToast) {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));
-    } else if (state is MaticSyntheticsTransactionFinishedState &&
+    } else if (state is SyntheticsTransactionFinishedState &&
         state.showingToast) {
       if (state.transactionStatus.status == Status.PENDING) {
         return Align(
@@ -458,7 +445,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     return Container();
   }
 
-  _buildRemainingCapacity(MaticSyntheticsState state) {
+  _buildRemainingCapacity(SyntheticsState state) {
     return Row(children: [
       Text(
         "Remaining Synchronize Capacity",
@@ -480,7 +467,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
                   return Text(
-                    EthereumService.formatDouble(snapshot.data, 2),
+                    EthereumService.formatDouble(snapshot.data.toString(), 2),
                     overflow: TextOverflow.clip,
                     style: MyStyles.lightWhiteSmallTextStyle,
                   );

@@ -1,23 +1,40 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'stock_price_detail.g.dart';
-
-@JsonSerializable(nullable: true)
 class StockPriceDetail {
-  double price;
-  double fee;
-  @JsonKey(name: 'is_close')
-  bool isClosed;
+  double? _price;
+  double? _fee;
+  bool? _isClosed;
 
-  StockPriceDetail(this.price, this.fee, this.isClosed);
+  StockPriceDetail();
 
-  factory StockPriceDetail.fromJson(Map<String, dynamic> json) =>
-      _$StockPriceDetailFromJson(json);
+  factory StockPriceDetail.fromJson(Map<String, dynamic> json){
+    return StockPriceDetail()
+      ..isClosed = json['isClosed'] as bool
+      ..fee = json['fee']!=null?(json['fee'] as num).toDouble():null
+      ..price = json['price']!=null?(json['price'] as num).toDouble():null;
+  }
 
-  Map<String, dynamic> toJson() => _$StockPriceDetailToJson(this);
 
   @override
   String toString() {
-    return price.toString() + " " + fee.toString() + " " + isClosed.toString();
+    return 'StockPriceDetail{_price: $_price, _fee: $_fee, _isClosed: $_isClosed}';
+  }
+
+  bool get isClosed => _isClosed??false;
+
+  set isClosed(bool value) {
+    _isClosed = value;
+  }
+
+  double get fee => _fee??0.0;
+
+  set fee(double? value) {
+    _fee = value;
+  }
+
+  double get price => _price??0.0;
+
+  set price(double? value) {
+    _price = value;
   }
 }

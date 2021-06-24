@@ -21,10 +21,10 @@ class NavigationItem extends Equatable {
   final NavigationStyle style;
 
   const NavigationItem({
-    @required this.page,
-    @required this.title,
+    required this.page,
+    required this.title,
     this.style = NavigationStyle.BluePurple,
-    @required this.routeUrl,
+    required this.routeUrl,
   });
 
   static final NavigationItem swap = NavigationItem(

@@ -6,11 +6,12 @@ import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
+import 'package:deus_mobile/data_source/sync_data/xdai_stock_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
+import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -58,7 +59,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 100)!);
           }
         },
         onClosed: () {
@@ -75,7 +76,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 100)!);
         },
         onClosed: () {
           context.read<XDaiSyntheticsCubit>().closeToast();
@@ -91,7 +92,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 100));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 100)!);
         },
         onClosed: () {
           context.read<XDaiSyntheticsCubit>().closeToast();
@@ -103,13 +104,13 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<XDaiSyntheticsCubit, XDaiSyntheticsState>(
+      child: BlocBuilder<XDaiSyntheticsCubit, SyntheticsState>(
           builder: (context, state) {
-        if (state is XDaiSyntheticsLoadingState) {
+        if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is XDaiSyntheticsErrorState) {
+        } else if (state is SyntheticsErrorState) {
           return Center(
             child: Icon(Icons.refresh, color: MyColors.White),
           );
@@ -120,8 +121,8 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -145,7 +146,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     return res;
   }
 
-  Widget _buildBody(XDaiSyntheticsState state) {
+  Widget _buildBody(SyntheticsState state) {
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
@@ -164,10 +165,11 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildUserInput(XDaiSyntheticsState state) {
+  Widget _buildUserInput(SyntheticsState state) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
+        syncData: state.syncData as XDaiStockData,
         selectAssetRoute: XDaiStockSelectorScreen.url,
         controller: state.fromFieldController,
         tokenSelected: (selectedToken) async {
@@ -180,6 +182,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       direction: Direction.to,
       initialToken: state.toToken,
       controller: state.toFieldController,
+      syncData: state.syncData as XDaiStockData,
       selectAssetRoute: XDaiStockSelectorScreen.url,
       tokenSelected: (selectedToken) {
         context.read<XDaiSyntheticsCubit>().toTokenChanged(selectedToken);
@@ -211,8 +214,8 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
-                      ? "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
-                      : "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
+                      ? "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      : "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 GestureDetector(
@@ -243,22 +246,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildMainButton(XDaiSyntheticsState state) {
-    if (!state.service.checkWallet()) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
-        decoration: MyStyles.darkWithNoBorderDecoration,
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "CONNECT WALLET",
-            style: MyStyles.lightWhiteMediumTextStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+  Widget _buildMainButton(SyntheticsState state) {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -274,7 +262,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
         ),
       );
     }
-    if (state is XDaiSyntheticsSelectAssetState) {
+    if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -293,12 +281,12 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction transaction = await context
+          Transaction? transaction = await context
               .read<XDaiSyntheticsCubit>()
               .makeApproveTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<XDaiSyntheticsCubit>().approve(gas);
           }
         },
@@ -326,7 +314,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     if (state.fromToken is CryptoCurrency) {
       balance = (state.fromToken as CryptoCurrency).getBalance();
     } else {
-      balance = (state.fromToken as Stock).getBalance();
+      balance = (state.fromToken as Stock).getBalance()!;
     }
     if (balance <
         EthereumService.getWei(
@@ -349,19 +337,19 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       label: state.fromToken == CurrencyData.xdai ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.xdai) {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<XDaiSyntheticsCubit>().makeBuyTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<XDaiSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<XDaiSyntheticsCubit>().makeSellTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<XDaiSyntheticsCubit>().sell(gas);
           }
         }
@@ -370,7 +358,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Container _buildModeButtons(XDaiSyntheticsState state) {
+  Container _buildModeButtons(SyntheticsState state) {
     return Container(
       child: Row(children: [
         Expanded(child: _buildLongButton(state)),
@@ -380,7 +368,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildMarketTimer(XDaiSyntheticsState state) {
+  Widget _buildMarketTimer(SyntheticsState state) {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
@@ -397,7 +385,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildShortButton(XDaiSyntheticsState state) {
+  Widget _buildShortButton(SyntheticsState state) {
     return SelectionButton(
       label: 'SHORT',
       onPressed: (bool selected) {
@@ -408,7 +396,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     );
   }
 
-  Widget _buildLongButton(XDaiSyntheticsState state) {
+  Widget _buildLongButton(SyntheticsState state) {
     return SelectionButton(
       label: 'LONG',
       onPressed: (bool selected) {
@@ -431,12 +419,12 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     }
   }
 
-  Widget _buildToastWidget(XDaiSyntheticsState state) {
-    if (state is XDaiSyntheticsTransactionPendingState && state.showingToast) {
+  Widget _buildToastWidget(SyntheticsState state) {
+    if (state is SyntheticsTransactionPendingState && state.showingToast) {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));
-    } else if (state is XDaiSyntheticsTransactionFinishedState &&
+    } else if (state is SyntheticsTransactionFinishedState &&
         state.showingToast) {
       if (state.transactionStatus.status == Status.PENDING) {
         return Align(
@@ -455,7 +443,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     return Container();
   }
 
-  _buildRemainingCapacity(XDaiSyntheticsState state) {
+  _buildRemainingCapacity(SyntheticsState state) {
     return Row(children: [
       Text(
         "Remaining Synchronize Capacity",
@@ -477,7 +465,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
                   return Text(
-                    EthereumService.formatDouble(snapshot.data, 2),
+                    EthereumService.formatDouble(snapshot.data.toString(), 2),
                     overflow: TextOverflow.clip,
                     style: MyStyles.lightWhiteSmallTextStyle,
                   );

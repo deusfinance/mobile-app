@@ -34,14 +34,14 @@ class WalletCreatePage extends HookWidget {
       ),
       body: store.state.step == WalletCreateSteps.display
           ? DisplayMnemonic(
-              mnemonic: store.state.mnemonic,
+              mnemonic: store.state.mnemonic!,
               onNext: () async {
                 store.goto(WalletCreateSteps.confirm);
               },
             )
           : ConfirmMnemonic(
-              mnemonic: store.state.mnemonic,
-              errors: store.state.errors.toList(),
+              mnemonic: store.state.mnemonic!,
+              errors: store.state.errors!.toList(),
               onConfirm: !store.state.loading
                   ? (confirmedMnemonic) async {
                       if (await store.confirmMnemonic(confirmedMnemonic)) {

@@ -15,8 +15,8 @@ import '../../../models/wallet/wallet_setup.dart';
 class ImportWalletForm extends HookWidget {
   ImportWalletForm({this.onImport, this.errors});
 
-  final Function(WalletImportType type, String value) onImport;
-  final List<String> errors;
+  Function(WalletImportType type, String value)? onImport;
+  List<String>? errors;
   static const indexMap = {0: WalletImportType.mnemonic, 1: WalletImportType.privateKey};
 
   @override
@@ -27,7 +27,7 @@ class ImportWalletForm extends HookWidget {
     final LinearGradient buttonGradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
 
     void changeSelections(int index) {
-      importType.value = indexMap[index];
+      importType.value = indexMap[index]!;
     }
 
     return Center(
@@ -40,7 +40,7 @@ class ImportWalletForm extends HookWidget {
                 gradient: buttonGradient,
                 label: 'IMPORT',
                 onPressed:
-                    this.onImport != null ? () => this.onImport(importType.value, inputController.value.text) : null,
+                    this.onImport != null ? () => this.onImport!(importType.value, inputController.value.text) : null,
               )
             ],
             children: <Widget>[
@@ -144,13 +144,13 @@ class ImportWalletForm extends HookWidget {
   final darkGrey = Color(0xFF1C1C1C);
 
   Widget fieldForm({
-    String label,
-    String hintText,
-    TextEditingController controller,
+    String? label,
+    String? hintText,
+    TextEditingController? controller,
   }) {
     return Column(
       children: <Widget>[
-        PaperValidationSummary(errors),
+        PaperValidationSummary(errors!),
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),

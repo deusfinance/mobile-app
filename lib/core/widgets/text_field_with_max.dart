@@ -12,8 +12,8 @@ class TextFieldWithMax extends StatelessWidget {
   final hintText;
 
   TextFieldWithMax(
-      {@required this.controller,
-      @required this.maxValue,
+      {required this.controller,
+      required this.maxValue,
       this.keyboardType = TextInputType.number, this.hintText = '0.00'});
 
   @override

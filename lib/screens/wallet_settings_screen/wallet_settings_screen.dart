@@ -7,12 +7,14 @@ import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/intro_page.dart';
 import 'package:deus_mobile/service/address_service.dart';
+import 'package:deus_mobile/service/config_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:deus_mobile/core/util/clipboard.dart';
+import 'package:web3dart/credentials.dart';
 
-enum copyMenu { walletAdress, seedPhrase }
+enum copyMenu { walletAdress, seedPhrase, privateKey }
 
 class WalletSettingsScreen extends StatefulWidget {
   static const url = '/wallet-settings';
@@ -162,7 +164,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                   return ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemBuilder: (ctx, ind) => _buildWalletListTile(snapshot.data.hex, _selectedWalletIndex == ind),
+                      itemBuilder: (ctx, ind) => _buildWalletListTile((snapshot.data as EthereumAddress).hex, _selectedWalletIndex == ind),
                       separatorBuilder: (_, __) => SizedBox(
                             height: 10,
                           ),
@@ -222,13 +224,16 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               icon: Icon(Icons.more_vert_rounded),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
               onSelected: (copyMenu result) async {
-                String content;
+                String? content;
                 if (result == copyMenu.walletAdress) {
                   content = walletAddress;
                 } else if (result == copyMenu.seedPhrase) {
-                  content = locator<AddressService>().getMnemonic();
+                  content = locator<AddressService>().getMnemonic()!;
                 }
-                await copyToClipBoard(content);
+                else if (result == copyMenu.privateKey) {
+                  content = locator<ConfigurationService>().getPrivateKey()!;
+                }
+                await copyToClipBoard(content!);
               },
               itemBuilder: (context) {
                 List<PopupMenuEntry<copyMenu>> list = [];
@@ -248,6 +253,17 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
                       value: copyMenu.seedPhrase,
                       child: Text(
                         'Copy seed phrase',
+                        style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 15),
+                      )),
+                );
+                list.add(PopupMenuDivider(
+                  height: 10,
+                ));
+                list.add(
+                  PopupMenuItem<copyMenu>(
+                      value: copyMenu.privateKey,
+                      child: Text(
+                        'Copy Private key',
                         style: MyStyles.whiteMediumTextStyle.copyWith(fontSize: 15),
                       )),
                 );

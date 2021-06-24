@@ -8,13 +8,13 @@ import 'package:deus_mobile/service/stake_service.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class StakingVaultOverviewState extends Equatable{
-  List<StakeTokenObject> stakeTokenObjects;
-  StakeTokenObject nativeBalancer;
-  StakeService stakeService;
+  late List<StakeTokenObject> stakeTokenObjects;
+  late StakeTokenObject nativeBalancer;
+  late StakeService stakeService;
 
   StakingVaultOverviewState.init(){
     stakeTokenObjects = [];
-    stakeService = new StakeService(ethService: new EthereumService(1), privateKey: locator<ConfigurationService>().getPrivateKey());
+    stakeService = new StakeService(ethService: new EthereumService(1), privateKey: locator<ConfigurationService>().getPrivateKey()!);
 
     stakeTokenObjects.add(new StakeTokenObject(CurrencyData.dea, CurrencyData.sand_dea));
     stakeTokenObjects.add(new StakeTokenObject(CurrencyData.deus, CurrencyData.sand_deus));

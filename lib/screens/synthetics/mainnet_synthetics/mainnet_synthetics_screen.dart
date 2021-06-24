@@ -5,11 +5,12 @@ import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
 import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
+import 'package:deus_mobile/data_source/sync_data/stock_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
+import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,7 +27,6 @@ import '../../../statics/my_colors.dart';
 import '../../../statics/styles.dart';
 import '../market_timer.dart';
 import 'cubit/mainnet_synthetics_cubit.dart';
-import 'cubit/mainnet_synthetics_state.dart';
 
 class MainnetSyntheticsScreen extends StatefulWidget {
   static const route = '/mainnet_synthethics';
@@ -57,7 +57,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 1)!);
           }
         },
         onClosed: () {
@@ -74,7 +74,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1)!);
         },
         onClosed: () {
           context.read<MainnetSyntheticsCubit>().closeToast();
@@ -90,7 +90,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 1)!);
         },
         onClosed: () {
           context.read<MainnetSyntheticsCubit>().closeToast();
@@ -102,13 +102,13 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<MainnetSyntheticsCubit, MainnetSyntheticsState>(
+      child: BlocBuilder<MainnetSyntheticsCubit, SyntheticsState>(
           builder: (context, state) {
-        if (state is MainnetSyntheticsLoadingState) {
+        if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is MainnetSyntheticsErrorState) {
+        } else if (state is SyntheticsErrorState) {
           return Center(
             child: Icon(Icons.refresh, color: MyColors.White),
           );
@@ -119,8 +119,8 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -144,7 +144,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     return res;
   }
 
-  Widget _buildBody(MainnetSyntheticsState state) {
+  Widget _buildBody(SyntheticsState state) {
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
@@ -163,11 +163,12 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Widget _buildUserInput(MainnetSyntheticsState state) {
+  Widget _buildUserInput(SyntheticsState state) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
         selectAssetRoute: StockSelectorScreen.url,
+        syncData: state.syncData as StockData,
         controller: state.fromFieldController,
         tokenSelected: (selectedToken) async {
           context
@@ -180,6 +181,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
+      syncData: state.syncData as StockData,
       controller: state.toFieldController,
       selectAssetRoute: StockSelectorScreen.url,
       tokenSelected: (selectedToken) {
@@ -212,8 +214,8 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
-                      ? "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
-                      : "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
+                      ? "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      : "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 GestureDetector(
@@ -244,22 +246,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Widget _buildMainButton(MainnetSyntheticsState state) {
-    if (!state.service.checkWallet()) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
-        decoration: MyStyles.darkWithNoBorderDecoration,
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "CONNECT WALLET",
-            style: MyStyles.lightWhiteMediumTextStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+  Widget _buildMainButton(SyntheticsState state) {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -275,7 +262,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         ),
       );
     }
-    if (state is MainnetSyntheticsSelectAssetState) {
+    if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -294,12 +281,12 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction transaction = await context
+          Transaction? transaction = await context
               .read<MainnetSyntheticsCubit>()
               .makeApproveTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<MainnetSyntheticsCubit>().approve(gas);
           }
         },
@@ -329,7 +316,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     if (state.fromToken is CryptoCurrency) {
       balance = (state.fromToken as CryptoCurrency).getBalance();
     } else {
-      balance = (state.fromToken as Stock).getBalance();
+      balance = (state.fromToken as Stock).getBalance()!;
     }
     if (balance <
         EthereumService.getWei(
@@ -352,20 +339,20 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.dai) {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<MainnetSyntheticsCubit>().makeBuyTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<MainnetSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction transaction = await context
+          Transaction? transaction = await context
               .read<MainnetSyntheticsCubit>()
               .makeSellTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<MainnetSyntheticsCubit>().sell(gas);
           }
         }
@@ -374,7 +361,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Container _buildModeButtons(MainnetSyntheticsState state) {
+  Container _buildModeButtons(SyntheticsState state) {
     return Container(
       child: Row(children: [
         Expanded(child: _buildLongButton(state)),
@@ -384,7 +371,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Widget _buildMarketTimer(MainnetSyntheticsState state) {
+  Widget _buildMarketTimer(SyntheticsState state) {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
@@ -401,7 +388,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Widget _buildShortButton(MainnetSyntheticsState state) {
+  Widget _buildShortButton(SyntheticsState state) {
     return SelectionButton(
       label: 'SHORT',
       onPressed: (bool selected) {
@@ -412,7 +399,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     );
   }
 
-  Widget _buildLongButton(MainnetSyntheticsState state) {
+  Widget _buildLongButton(SyntheticsState state) {
     return SelectionButton(
       label: 'LONG',
       onPressed: (bool selected) {
@@ -435,13 +422,13 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     }
   }
 
-  Widget _buildToastWidget(MainnetSyntheticsState state) {
-    if (state is MainnetSyntheticsTransactionPendingState &&
+  Widget _buildToastWidget(SyntheticsState state) {
+    if (state is SyntheticsTransactionPendingState &&
         state.showingToast) {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));
-    } else if (state is MainnetSyntheticsTransactionFinishedState &&
+    } else if (state is SyntheticsTransactionFinishedState &&
         state.showingToast) {
       if (state.transactionStatus.status == Status.PENDING) {
         return Align(
@@ -460,7 +447,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     return Container();
   }
 
-  _buildRemainingCapacity(MainnetSyntheticsState state) {
+  _buildRemainingCapacity(SyntheticsState state) {
     return Row(children: [
       Text(
         "Remaining Synchronize Capacity",
@@ -482,7 +469,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
                   return Text(
-                    EthereumService.formatDouble(snapshot.data, 2),
+                    EthereumService.formatDouble(snapshot.data.toString(), 2),
                     overflow: TextOverflow.clip,
                     style: MyStyles.lightWhiteSmallTextStyle,
                   );

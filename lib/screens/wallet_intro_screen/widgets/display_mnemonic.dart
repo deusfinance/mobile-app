@@ -9,8 +9,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class DisplayMnemonic extends HookWidget {
   DisplayMnemonic({this.mnemonic, this.onNext});
 
-  final String mnemonic;
-  final Function onNext;
+  String? mnemonic;
+  Function? onNext;
   final darkGrey = Color(0xFF1C1C1C);
   final borderColor = Color(0xFF282828);
 
@@ -52,7 +52,7 @@ class DisplayMnemonic extends HookWidget {
       decoration: BoxDecoration(
           border: Border.all(color: borderColor), borderRadius: BorderRadius.circular(10), color: darkGrey),
       child: Text(
-        this.mnemonic,
+        this.mnemonic!,
         style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 15),
       ),
     );
@@ -66,7 +66,7 @@ class DisplayMnemonic extends HookWidget {
           label: 'COPY',
           onPressed: () async {
             print("copy...");
-            await copyToClipBoard(this.mnemonic);
+            await copyToClipBoard(this.mnemonic!);
             print("copied :)");
           },
           gradient: button_gradient,

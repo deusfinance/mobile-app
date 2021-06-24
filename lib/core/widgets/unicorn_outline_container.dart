@@ -6,16 +6,16 @@ class UnicornOutlineContainer extends StatelessWidget {
   // final double _radius;
 
   UnicornOutlineContainer({
-    @required double strokeWidth,
-    @required Gradient gradient,
-    @required Widget child,
-    double radius,
+    required double strokeWidth,
+    required Gradient gradient,
+    required Widget child,
+    double? radius,
 
     ///Liste der Radianten (BottomLeft, Bottom Right, TopLeft, TopRight).
-    List<double> cornerRadiusBLRTLR,
+    List<double>? cornerRadiusBLRTLR,
   })  : assert(radius != null || cornerRadiusBLRTLR != null),
         this._painter = cornerRadiusBLRTLR == null
-            ? GradientPainter(strokeWidth: strokeWidth, radius: radius, gradient: gradient)
+            ? GradientPainter(strokeWidth: strokeWidth, radius: radius!, gradient: gradient)
             : CustomGradientPainter(
                 strokeWidth: strokeWidth,
                 bottomLeftRadius: cornerRadiusBLRTLR[0],
@@ -57,12 +57,12 @@ class CustomGradientPainter extends CustomPainter {
   final Gradient gradient;
 
   CustomGradientPainter(
-      {@required double strokeWidth,
-      @required this.bottomLeftRadius,
-      @required this.bottomRightRadius,
-      @required this.topLeftRadius,
-      @required this.topRightRadius,
-      @required Gradient gradient})
+      {required double strokeWidth,
+      required this.bottomLeftRadius,
+      required this.bottomRightRadius,
+      required this.topLeftRadius,
+      required this.topRightRadius,
+      required Gradient gradient})
       : this.strokeWidth = strokeWidth,
         this.gradient = gradient;
 
@@ -105,7 +105,7 @@ class GradientPainter extends CustomPainter {
   final double strokeWidth;
   final Gradient gradient;
 
-  GradientPainter({@required double strokeWidth, @required double radius, @required Gradient gradient})
+  GradientPainter({required double strokeWidth, required double radius, required Gradient gradient})
       : this.strokeWidth = strokeWidth,
         this.radius = radius,
         this.gradient = gradient;

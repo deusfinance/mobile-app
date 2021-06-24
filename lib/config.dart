@@ -18,7 +18,7 @@ class AppConfig {
 }
 
 class AppConfigParams {
-  const AppConfigParams({@required this.chainId});
+  const AppConfigParams({required this.chainId});
 
   /// 4 = Rinkeby
   /// 1 = Mainnet

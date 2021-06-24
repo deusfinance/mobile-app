@@ -14,9 +14,9 @@ import 'package:web3dart/web3dart.dart';
 /// General service in order to connect to the Ethereum blockchain.
 class EthereumService {
   int chainId;
-  String ethUrl;
-  Client httpClient;
-  Web3Client ethClient;
+  late String ethUrl;
+  late Client httpClient;
+  late Web3Client ethClient;
 
   static const TOKEN_MAX_DIGITS = {
     "wbtc": 8,
@@ -43,7 +43,7 @@ class EthereumService {
     100: "xDAI",
   };
 
-  String get networkName => NETWORK_NAMES[this.chainId];
+  String? get networkName => NETWORK_NAMES[this.chainId];
 
   // IMPORTANT use http instead of wss infura endpoint, web3dart not supporting wss yet
   String get INFURA_URL {
@@ -71,7 +71,7 @@ class EthereumService {
     }
 
     else{
-      return 'https://' + networkName + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
+      return 'https://' + networkName! + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
     }
   }
 
@@ -86,7 +86,7 @@ class EthereumService {
     final decodedAddresses = jsonDecode(allAddresses);
     final tokensAddresses = decodedAddresses["token"];
     tokensAddresses.forEach((key, value) {
-      Token t = _getTokenObjectByName(key);
+      Token? t = _getTokenObjectByName(key);
       if (t != null) {
         addressToTokenMap.addEntries(
             [MapEntry<String, Token>(value["1"].toString().toLowerCase(), t)]);
@@ -96,7 +96,7 @@ class EthereumService {
     });
   }
 
-  Token _getTokenObjectByName(String tokenName) {
+  Token? _getTokenObjectByName(String tokenName) {
     if (tokenName == "weth") {
       tokenName = "eth";
     }
@@ -109,8 +109,8 @@ class EthereumService {
   }
 
   static BigInt getWei(String amount, [String token = "eth"]) {
-    var max =
-        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
+    int max =
+        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token]??18 : 18;
     if (amount == "") {
       amount = "0.0";
     }
@@ -122,7 +122,7 @@ class EthereumService {
           .getInWei
           .toString();
     } else {
-//      TODO check largt than 18
+//      TODO check larger than 18
       int zerosNo = 18 - (amount.length - dotIndex - 1);
       amount = amount.replaceAll(".", "");
       if (zerosNo < 0) {
@@ -143,7 +143,7 @@ class EthereumService {
         TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
     String ans = value.toString();
 
-    while (ans.length < max) {
+    while (ans.length < max!) {
       ans = "0" + ans;
     }
     ans = ans.substring(0, ans.length - max) +
@@ -238,7 +238,7 @@ class EthereumService {
   /// returns a [String] containing the tx hash which can be used to acquire further information about the tx
   Future<String> submit(Credentials credentials, DeployedContract contract,
       String functionName, List<dynamic> args,
-      {EtherAmount value, Gas gas}) async {
+      {EtherAmount? value, Gas? gas}) async {
     Transaction transaction = await makeTransaction(credentials, contract, functionName, args,
         gas: gas, value: value);
     var result = await ethClient.sendTransaction(
@@ -258,7 +258,7 @@ class EthereumService {
 
   Future<Transaction> makeTransaction(Credentials credentials,
       DeployedContract contract, String functionName, List<dynamic> args,
-      {EtherAmount value, Gas gas}) async {
+      {EtherAmount? value, Gas? gas}) async {
     final ethFunction = contract.function(functionName);
     Transaction transaction;
     if (gas != null && gas.nonce > 0) {
@@ -316,14 +316,14 @@ class EthereumService {
   }
 
   /// Function to get receipt
-  Future<TransactionReceipt> getTransactionReceipt(String txHash) async {
+  Future<TransactionReceipt?> getTransactionReceipt(String txHash) async {
     return await ethClient.getTransactionReceipt(txHash);
   }
 
   Stream<TransactionReceipt> pollTransactionReceipt(String txHash,
       {int pollingTimeMs = 1500}) async* {
     StreamController<TransactionReceipt> controller = StreamController();
-    Timer timer;
+    Timer? timer;
 
     Future<void> tick() async {
       var receipt = await getTransactionReceipt(txHash);
@@ -338,7 +338,7 @@ class EthereumService {
     tick();
 
     if (!controller.isClosed) {
-      Timer.periodic(Duration(milliseconds: pollingTimeMs), (timer) async {
+      timer = Timer.periodic(Duration(milliseconds: pollingTimeMs), (timer) async {
         await tick();
       });
     }

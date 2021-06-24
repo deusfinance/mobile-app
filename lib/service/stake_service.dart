@@ -10,7 +10,7 @@ class StakeService {
   final EthereumService ethService;
   final String privateKey;
 
-  StakeService({@required this.ethService, @required this.privateKey});
+  StakeService({required this.ethService, required this.privateKey});
 
   Future<Credentials> get credentials =>
       ethService.credentialsForKey(privateKey);
@@ -69,7 +69,7 @@ class StakeService {
     return res;
   }
 
-  Future<Transaction> makeApproveTransaction(stakedToken) async {
+  Future<Transaction?> makeApproveTransaction(stakedToken) async {
     if(!checkWallet()){
       return null;
     }
@@ -90,7 +90,7 @@ class StakeService {
         gas: gas);
   }
 
-  Future<Transaction> makeStakeTransaction(stakedToken, amount) async {
+  Future<Transaction?> makeStakeTransaction(stakedToken, amount) async {
     if (!checkWallet()) {
       return null;
     }

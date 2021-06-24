@@ -5,8 +5,15 @@ import 'package:flutter/material.dart';
 import '../token.dart';
 
 class CryptoCurrency extends Token {
-  String balance = "0";
-  String allowances = "0";
+  String? _balance;
+  String? _allowances;
+
+
+  String get balance => _balance??"0";
+
+  set balance(String? value) {
+    _balance = value;
+  }
 
   BigInt getBalance() {
     return EthereumService.getWei(balance, symbol.toLowerCase());
@@ -17,8 +24,14 @@ class CryptoCurrency extends Token {
   }
 
   CryptoCurrency({
-    @required String name,
-    @required String symbol,
-    String logoPath,
+    required String name,
+    required String symbol,
+    required String logoPath,
   }) : super(name, symbol, logoPath);
+
+  String get allowances => _allowances??"0";
+
+  set allowances(String? value) {
+    _allowances = value;
+  }
 }

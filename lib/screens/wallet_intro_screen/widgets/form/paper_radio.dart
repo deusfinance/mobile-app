@@ -11,7 +11,7 @@ class PaperRadio extends StatelessWidget {
   final dynamic value;
   final String title;
   final dynamic groupValue;
-  final OnRadioChanged onChanged;
+  OnRadioChanged? onChanged;
   @override
   Widget build(BuildContext context) {
     return Row(

@@ -18,7 +18,7 @@ class StakeCubit extends Cubit<StakeState> {
 
   init() async {
     emit(StakeLoading(state));
-    state.balance = double.tryParse(await getTokenBalance());
+    state.balance = double.tryParse(await getTokenBalance())!;
     await getAllowances();
     emit(StakeHasToApprove(state));
   }
@@ -51,7 +51,7 @@ class StakeCubit extends Cubit<StakeState> {
       Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
-        if (event.status) {
+        if (event.status!) {
           emit(StakeIsApproved(state,
               transactionStatus: TransactionStatus(
                   "Approve ${state.stakeTokenObject.stakeToken.name}",
@@ -77,7 +77,7 @@ class StakeCubit extends Cubit<StakeState> {
   }
 
   makeTransaction() async {
-    Transaction transaction = await state.stakeService.makeStakeTransaction(
+    Transaction? transaction = await state.stakeService.makeStakeTransaction(
         state.stakeTokenObject.stakeToken.getTokenName(),
         state.fieldController.text);
     return transaction;
@@ -123,8 +123,8 @@ class StakeCubit extends Cubit<StakeState> {
         Stream<TransactionReceipt> result =
         state.stakeService.ethService.pollTransactionReceipt(res);
         result.listen((event) async {
-          if (event.status) {
-            state.balance = double.tryParse(await getTokenBalance());
+          if (event.status!) {
+            state.balance = double.tryParse(await getTokenBalance())!;
             emit(StakeIsApproved(state,
                 transactionStatus: TransactionStatus(
                     "Stake ${state.fieldController.text} ${state

@@ -206,8 +206,8 @@ class _StakeScreenState extends State<StakeScreen> {
     return Container();
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -215,6 +215,7 @@ class _StakeScreenState extends State<StakeScreen> {
           alignment: Alignment.center,
           child: ConfirmGasScreen(
             transaction: transaction,
+            network: Network.ETH,
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
@@ -276,18 +277,18 @@ class _StakeScreenState extends State<StakeScreen> {
         if (state is StakePendingApprove || state is StakePendingStake) return;
         if (state is StakeIsApproved) {
           Transaction transaction = await context.read<StakeCubit>().makeTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if(transaction!=null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
-            context.read<StakeCubit>().stake(gas);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
+            context.read<StakeCubit>().stake(gas!);
           }
         }
         if (state is StakeHasToApprove) {
           Transaction transaction = await context.read<StakeCubit>().makeApproveTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if(transaction!=null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
-            context.read<StakeCubit>().approve(gas);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
+            context.read<StakeCubit>().approve(gas!);
           }
         }
       },

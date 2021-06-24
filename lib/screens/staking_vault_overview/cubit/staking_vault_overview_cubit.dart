@@ -19,7 +19,7 @@ class StakingVaultOverviewCubit extends Cubit<StakingVaultOverviewState>{
 
   getAPYs() async {
     var response =
-    await http.get("https://app.deus.finance/static-api.json");
+    await http.get(Uri.parse("https://app.deus.finance/static-api.json"));
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
       state.stakeTokenObjects[0].apy = map['apy']['sand_dea'];

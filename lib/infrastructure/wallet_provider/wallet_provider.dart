@@ -13,7 +13,7 @@ import 'wallet_handler.dart';
 import 'wallet_state.dart';
 
 class WalletProvider extends ContextProviderWidget<WalletHandler> {
-  WalletProvider({Widget child, HookWidgetBuilder<WalletHandler> builder})
+  WalletProvider({Widget? child, HookWidgetBuilder<WalletHandler>? builder})
       : super(child: child, builder: builder);
 
   @override

@@ -13,10 +13,10 @@ import '../../../core/widgets/raised_gradient_button.dart';
 class ConfirmMnemonic extends HookWidget {
   ConfirmMnemonic({this.mnemonic, this.errors, this.onConfirm, this.onGenerateNew});
 
-  final String mnemonic;
-  final List<String> errors;
-  final Function onConfirm;
-  final Function onGenerateNew;
+  String? mnemonic;
+  List<String>? errors;
+  Function? onConfirm;
+  Function? onGenerateNew;
 
   final darkGrey = Color(0xFF1C1C1C);
   final LinearGradient button_gradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
@@ -57,11 +57,11 @@ class ConfirmMnemonic extends HookWidget {
         RaisedGradientButton(
           gradient: button_gradient,
           label: 'CONFIRM',
-          onPressed: this.onConfirm != null ? () => this.onConfirm(mnemonicController.value.text) : null,
+          onPressed: this.onConfirm != null ? () => this.onConfirm!(mnemonicController.value.text) : null,
         ),
       ],
       children: <Widget>[
-        PaperValidationSummary(this.errors),
+        PaperValidationSummary(this.errors!),
         _buildConfirmTextField(mnemonicController),
       ],
     );

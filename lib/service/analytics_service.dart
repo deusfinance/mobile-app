@@ -5,7 +5,7 @@ class AnalyticsService {
   final FirebaseAnalytics _analytics;
 
   FirebaseAnalytics get analytics => _analytics;
-  FirebaseAnalyticsObserver observer;
+  late FirebaseAnalyticsObserver observer;
 
   AnalyticsService() : this._analytics = FirebaseAnalytics() {
     observer = FirebaseAnalyticsObserver(analytics: _analytics);

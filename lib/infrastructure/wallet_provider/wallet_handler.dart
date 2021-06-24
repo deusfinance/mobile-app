@@ -33,7 +33,7 @@ class WalletHandler {
       return;
     }
 
-    _initialiseFromPrivateKey(privateKey);
+    _initialiseFromPrivateKey(privateKey!);
   }
 
   Future<void> _initialiseFromMnemonic(String entropyMnemonic) async {
@@ -41,7 +41,7 @@ class WalletHandler {
     final privateKey = _addressService.getPrivateKey(mnemonic);
     final address = await _addressService.getPublicAddress(privateKey);
 
-    _store.dispatch(InitialiseWallet(address.toString(), privateKey));
+    _store.dispatch(InitialiseWallet(address.toString(), privateKey!));
 
     await _initialise();
   }
@@ -76,14 +76,14 @@ class WalletHandler {
   Future<void> fetchOwnBalance() async {
     _store.dispatch(UpdatingBalance());
 
-    var ethBalance = await _ethereumService.getEtherBalance(await _ethereumService.credentialsForKey(state.privateKey));
+    var ethBalance = await _ethereumService.getEtherBalance(await _ethereumService.credentialsForKey(state.privateKey!));
 
     _store.dispatch(BalanceUpdated(ethBalance.getInWei));
   }
 
   Future<void> resetWallet() async {
-    await _configurationService.setMnemonic(null);
-    await _configurationService.setPrivateKey(null);
+    await _configurationService.setMnemonic("");
+    await _configurationService.setPrivateKey("");
     await _configurationService.setupDone(false);
   }
 }

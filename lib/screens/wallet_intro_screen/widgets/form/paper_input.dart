@@ -14,14 +14,14 @@ class PaperInput extends StatelessWidget {
     this.textStyle
   });
 
-  final ValueChanged<String> onChanged;
-  final String errorText;
-  final String labelText;
-  final String hintText;
-  final bool obscureText;
-  final int maxLines;
-  final TextEditingController controller;
-  final TextStyle textStyle;
+  ValueChanged<String>? onChanged;
+  String? errorText;
+  String? labelText;
+  String? hintText;
+  bool? obscureText;
+  int? maxLines;
+  TextEditingController? controller;
+  TextStyle? textStyle;
 
   final Color borderColor = Color(0xFF282828);
 
@@ -34,7 +34,7 @@ class PaperInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       style: this.textStyle,
-      obscureText: this.obscureText,
+      obscureText: this.obscureText!,
       controller: this.controller,
       onChanged: this.onChanged,
       maxLines: this.maxLines,

@@ -11,11 +11,11 @@ class TokenSelector extends StatelessWidget {
   final Widget selector;
   final bool showSearchBar;
   final String title;
-  final TextEditingController searchController;
+  final TextEditingController? searchController;
 
   TokenSelector(
-      {@required this.selector,
-      @required this.title,
+      {required this.selector,
+      required this.title,
       this.showSearchBar = false,
       this.searchController});
 

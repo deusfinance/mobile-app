@@ -18,7 +18,7 @@ class LockCubit extends Cubit<LockState> {
 
   init() async {
     emit(LockLoading(state));
-    state.balance = double.tryParse(await getTokenBalance());
+    state.balance = double.tryParse(await getTokenBalance())!;
     await getAllowances();
     emit(LockHasToApprove(state));
   }
@@ -51,7 +51,7 @@ class LockCubit extends Cubit<LockState> {
       Stream<TransactionReceipt> result =
           state.vaultsService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
-        if (event.status) {
+        if (event.status!) {
           emit(LockIsApproved(state,
               transactionStatus: TransactionStatus(
                   "Approve ${state.stakeTokenObject.lockToken.name}",
@@ -101,7 +101,7 @@ class LockCubit extends Cubit<LockState> {
   }
 
   makeTransaction() async {
-    Transaction transaction = await state.vaultsService.makeLockTransaction(
+    Transaction? transaction = await state.vaultsService.makeLockTransaction(
         state.stakeTokenObject.lockToken.getTokenName(),
         state.fieldController.text);
     return transaction;
@@ -123,8 +123,8 @@ class LockCubit extends Cubit<LockState> {
         Stream<TransactionReceipt> result =
             state.vaultsService.ethService.pollTransactionReceipt(res);
         result.listen((event) async {
-          if (event.status) {
-            state.balance = double.tryParse(await getTokenBalance());
+          if (event.status!) {
+            state.balance = double.tryParse(await getTokenBalance())!;
             emit(LockIsApproved(state,
                 transactionStatus: TransactionStatus(
                     "Lock ${state.fieldController.text} ${state.stakeTokenObject.lockToken.name}",

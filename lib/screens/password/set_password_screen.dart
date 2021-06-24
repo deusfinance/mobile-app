@@ -20,9 +20,9 @@ class SetPasswordScreen extends StatefulWidget {
 class _SetPasswordScreenState extends State<SetPasswordScreen> {
   var passwordController;
   var repeatPasswordController;
-  ConfigurationService configurationService;
-  bool error;
-  String errorText;
+  late ConfigurationService configurationService;
+  late bool error;
+  late String errorText;
 
   final darkGrey = Color(0xFF1C1C1C);
   final LinearGradient button_gradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);

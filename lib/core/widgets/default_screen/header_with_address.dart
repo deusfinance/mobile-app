@@ -18,8 +18,8 @@ import 'package:web3dart/credentials.dart';
 import '../../../locator.dart';
 
 class HeaderWithAddress extends StatefulWidget {
-  final String walletAddress;
-  final Widget chainSelector;
+  final String? walletAddress;
+  final Widget? chainSelector;
   HeaderWithAddress({this.walletAddress, this.chainSelector});
 
   @override
@@ -27,7 +27,7 @@ class HeaderWithAddress extends StatefulWidget {
 }
 
 class _HeaderWithAddressState extends State<HeaderWithAddress> {
-  Future<EthereumAddress> futurePublicAddress;
+  late Future<EthereumAddress> futurePublicAddress;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
     return Row(
       children: [
         _buildAddressContainer(),
-        widget.chainSelector,
+        widget.chainSelector!,
         const Spacer(),
         _buildWalletLogout(walletStore),
       ],
@@ -66,12 +66,12 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
           color: Color(MyColors.kAddressBackground).withOpacity(0.25),
           borderRadius: BorderRadius.all(Radius.circular(6))),
       child: this.widget.walletAddress != null
-          ? _buildAddress(widget.walletAddress)
+          ? _buildAddress(widget.walletAddress!)
           : FutureBuilder(
               future: futurePublicAddress,
               builder: (_, snapshot) {
                 if (snapshot.hasData)
-                  return _buildAddress(snapshot.data.hex);
+                  return _buildAddress((snapshot.data! as EthereumAddress).hex);
                 else
                   return Center(child: CircularProgressIndicator());
               }),

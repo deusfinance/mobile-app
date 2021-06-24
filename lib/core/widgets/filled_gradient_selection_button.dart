@@ -2,11 +2,11 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class FilledGradientSelectionButton extends StatelessWidget {
-  final bool selected;
-  final VoidCallback onPressed;
-  final String label;
-  final LinearGradient gradient;
-  TextStyle textStyle;
+  final bool? selected;
+  final VoidCallback? onPressed;
+  final String? label;
+  final LinearGradient? gradient;
+  TextStyle? textStyle;
 
   FilledGradientSelectionButton(
       {this.selected, this.onPressed, this.label, this.gradient, this.textStyle}){
@@ -30,7 +30,7 @@ class FilledGradientSelectionButton extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Center(
-                child: Text(this.label, style: this.textStyle),
+                child: Text(this.label!, style: this.textStyle),
               ),
             ),
           ),

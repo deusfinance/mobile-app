@@ -3,11 +3,11 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class Toast extends StatelessWidget {
-  final String label;
-  final String message;
-  final VoidCallback onPressed;
-  final VoidCallback onClosed;
-  final Color color;
+  final String? label;
+  final String? message;
+  final VoidCallback? onPressed;
+  final VoidCallback? onClosed;
+  final Color? color;
 
   Toast({this.label, this.onPressed, this.color, this.onClosed, this.message});
 
@@ -26,7 +26,7 @@ class Toast extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  label,
+                  label!,
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 Spacer(),
@@ -37,7 +37,7 @@ class Toast extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    message,
+                    message!,
                     overflow: TextOverflow.ellipsis,
                     style: MyStyles.whiteSmallUnderlinedTextStyle,
                   ),

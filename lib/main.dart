@@ -1,3 +1,4 @@
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:deus_mobile/service/analytics_service.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -15,7 +16,7 @@ import 'screens/splash/splash_screen.dart';
 import 'service/config_service.dart';
 import 'statics/styles.dart';
 
-void deusDebugPrint(String s, {int wrapWidth}) {
+void deusDebugPrint(String? s, {int? wrapWidth}) {
   if (AppConfig.selectedConfig.showDebugMessages) print(s);
 }
 
@@ -33,14 +34,14 @@ void main() async {
 }
 
 class DEUSApp extends StatefulWidget {
-  const DEUSApp({Key key}) : super(key: key);
+  const DEUSApp({Key? key}) : super(key: key);
 
   @override
   _DEUSAppState createState() => _DEUSAppState();
 }
 
 class _DEUSAppState extends State<DEUSApp> {
-  Future<bool> initializeData;
+  Future<bool>? initializeData;
   final GlobalKey _appKey = GlobalKey();
   final GlobalKey _loadingKey = GlobalKey();
 

@@ -21,7 +21,7 @@ class VaultsService {
   final EthereumService ethService;
   final String privateKey;
 
-  VaultsService({@required this.ethService, @required this.privateKey});
+  VaultsService({required this.ethService, required this.privateKey});
 
   Future<Credentials> get credentials =>
       ethService.credentialsForKey(privateKey);
@@ -72,7 +72,7 @@ class VaultsService {
     return EthereumService.fromWei(res.single, tokenName);
   }
 
-  Future<String> getLockedAmount(contractName) async {
+  Future<String?> getLockedAmount(contractName) async {
     if (!checkWallet()) {
       return "0";
     }
@@ -116,7 +116,7 @@ class VaultsService {
     return res;
   }
 
-  Future<Transaction> makeApproveTransaction(tokenName) async {
+  Future<Transaction?> makeApproveTransaction(tokenName) async {
     if (!checkWallet()) {
       return null;
     }
@@ -131,7 +131,7 @@ class VaultsService {
     return res;
   }
 
-  Future<Transaction> makeLockTransaction(contractName, amount) async {
+  Future<Transaction?> makeLockTransaction(contractName, amount) async {
     if (!checkWallet()) {
       return null;
     }

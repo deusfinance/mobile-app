@@ -15,12 +15,12 @@ class SwapService {
   final EthereumService ethService;
   final String privateKey;
 
-  DeployedContract automaticMarketMakerContract;
-  DeployedContract staticSalePrice;
-  DeployedContract uniswapRouter;
-  DeployedContract multiSwapContract;
+  late DeployedContract automaticMarketMakerContract;
+  late DeployedContract staticSalePrice;
+  late DeployedContract uniswapRouter;
+  late DeployedContract multiSwapContract;
 
-  SwapService({@required this.ethService, @required this.privateKey}) {
+  SwapService({required this.ethService, required this.privateKey}) {
     // TODO (@CodingDavid8): properly handle async stuff
     // all functions have to await initialization, maybe put await check in checkWallet.
   }
@@ -69,7 +69,7 @@ class SwapService {
     return result;
   }
 
-  Future<Transaction> makeApproveTransaction(String token) async {
+  Future<Transaction?> makeApproveTransaction(String token) async {
     if (!this.checkWallet()) return null;
 
     final tokenContract = await ethService.loadTokenContract(token);
@@ -95,7 +95,7 @@ class SwapService {
     return await ethService.sendTransaction(await credentials, transaction);
   }
 
-  Future<Transaction> makeSwapTransaction(
+  Future<Transaction?> makeSwapTransaction(
     fromToken,
     toToken,
     String _amountIn,

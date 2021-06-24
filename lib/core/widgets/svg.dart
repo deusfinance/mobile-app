@@ -7,12 +7,12 @@ class PlatformSvg {
   ///
   ///assetName is /assets/assets/$assetName on Web.
   static Widget asset(String assetName,
-      {double width,
-      double height,
+      {double? width,
+      double? height,
       BoxFit fit = BoxFit.contain,
-      Color color,
+      Color? color,
       Alignment alignment = Alignment.center,
-      String semanticsLabel}) {
+      String? semanticsLabel}) {
     if (kIsWeb) {
       return Image.network('/assets/assets/$assetName',
           width: width,

@@ -14,8 +14,8 @@ import 'package:pointycastle/api.dart';
 import 'package:hex/hex.dart';
 
 class KeyData {
-  List<int> key;
-  List<int> chainCode;
+  List<int>? key;
+  List<int>? chainCode;
   KeyData({this.key, this.chainCode});
 }
 
@@ -40,14 +40,14 @@ class _HDKey {
   KeyData _getCKDPriv(KeyData data, int index) {
     Uint8List dataBytes = Uint8List(37);
     dataBytes[0] = 0x00;
-    dataBytes.setRange(1, 33, data.key);
+    dataBytes.setRange(1, 33, data.key!);
     dataBytes.buffer.asByteData().setUint32(33, index);
-    return this._getKeys(dataBytes, data.chainCode);
+    return this._getKeys(dataBytes, Uint8List.fromList(data.chainCode!));
   }
 
   KeyData getMasterKeyFromSeed(String seed) {
     final seedBytes = HEX.decode(seed);
-    return this._getKeys(seedBytes, _HDKey._curveBytes);
+    return this._getKeys(Uint8List.fromList(seedBytes), Uint8List.fromList(_HDKey._curveBytes));
   }
 
   Uint8List getBublickKey(Uint8List privateKey, [bool withZeroByte = true]) {

@@ -41,7 +41,7 @@ import '../service/config_service.dart';
 const kInitialRoute = '/';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
-  final Map<String, dynamic> arguments = settings.arguments;
+  final Map<String, dynamic> arguments = settings.arguments as Map<String, dynamic>;
   final Map<String, WidgetBuilder> routes = {
     kInitialRoute: (BuildContext _) {
       // if (locator<ConfigurationService>().didSetupWallet()) {
@@ -76,11 +76,11 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     SetPasswordScreen.url: (_) => SetPasswordScreen(),
     PasswordScreen.url: (_) => PasswordScreen(),
     SplashScreen.route: (_) => SplashScreen(),
-    StockSelectorScreen.url: (_) => StockSelectorScreen(),
+    StockSelectorScreen.url: (_) => StockSelectorScreen(arguments["data"]),
     CurrencySelectorScreen.url: (_) => CurrencySelectorScreen(),
-    XDaiStockSelectorScreen.url: (_) => XDaiStockSelectorScreen(),
-    BscStockSelectorScreen.url: (_) => BscStockSelectorScreen(),
-    HecoStockSelectorScreen.url: (_) => HecoStockSelectorScreen(),
+    XDaiStockSelectorScreen.url: (_) => XDaiStockSelectorScreen(arguments["data"]),
+    BscStockSelectorScreen.url: (_) => BscStockSelectorScreen(arguments["data"]),
+    HecoStockSelectorScreen.url: (_) => HecoStockSelectorScreen(arguments["data"]),
     //main screens
     StakeScreen.url: (_) {
       return BlocProvider(
@@ -116,7 +116,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     WalletSettingsScreen.url: (_) => WalletSettingsScreen(),
   };
   // print("Fading to ${settings.name}");
-  final Widget screenChild = routes[settings.name](context);
+  final Widget screenChild = routes[settings.name]!(context);
   //TODO (@CodingDavid8): Replace hooks with cubit :)
   final Widget screenWithWallet =
       WalletProvider(builder: (_, __) => screenChild);
@@ -124,12 +124,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
 }
 
 PageRoute _getPageRoute(Widget child, RouteSettings settings) {
-  return _FadeRoute(child: child, routeName: settings.name);
+  return _FadeRoute(child: child, routeName: settings.name!);
 }
 
 class _FadeRoute extends PageRouteBuilder {
-  final Widget child;
-  final String routeName;
+  final Widget? child;
+  final String? routeName;
 
   _FadeRoute({this.child, this.routeName})
       : super(
@@ -139,7 +139,7 @@ class _FadeRoute extends PageRouteBuilder {
             Animation<double> animation,
             Animation<double> secondaryAnimation,
           ) =>
-              child,
+              child!,
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,

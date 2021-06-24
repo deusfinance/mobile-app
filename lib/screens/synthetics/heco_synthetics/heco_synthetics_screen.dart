@@ -7,11 +7,12 @@ import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/token_selector/bsc_stock_selector_screen/bsc_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/heco_stock_selector_screen/bsc_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
+import 'package:deus_mobile/data_source/sync_data/heco_stock_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
+import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,7 +29,6 @@ import '../../../statics/my_colors.dart';
 import '../../../statics/styles.dart';
 import '../market_timer.dart';
 import 'cubit/heco_synthetics_cubit.dart';
-import 'cubit/heco_synthetics_state.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
 
 class HecoSyntheticsScreen extends StatefulWidget {
@@ -59,7 +59,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl(chainId: 128));
+            _launchInBrowser(transactionStatus.transactionUrl(chainId: 128)!);
           }
         },
         onClosed: () {
@@ -76,7 +76,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 128));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 128)!);
         },
         onClosed: () {
           context.read<HecoSyntheticsCubit>().closeToast();
@@ -92,7 +92,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl(chainId: 128));
+          _launchInBrowser(transactionStatus.transactionUrl(chainId: 128)!);
         },
         onClosed: () {
           context.read<HecoSyntheticsCubit>().closeToast();
@@ -104,13 +104,13 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<HecoSyntheticsCubit, HecoSyntheticsState>(
+      child: BlocBuilder<HecoSyntheticsCubit, SyntheticsState>(
           builder: (context, state) {
-        if (state is HecoSyntheticsLoadingState) {
+        if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is HecoSyntheticsErrorState) {
+        } else if (state is SyntheticsErrorState) {
           return Center(
             child: Icon(Icons.refresh, color: MyColors.White),
           );
@@ -121,8 +121,8 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -146,7 +146,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     return res;
   }
 
-  Widget _buildBody(HecoSyntheticsState state) {
+  Widget _buildBody(SyntheticsState state) {
     return Container(
       padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
       decoration: BoxDecoration(color: MyColors.Main_BG_Black),
@@ -165,12 +165,13 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Widget _buildUserInput(HecoSyntheticsState state) {
+  Widget _buildUserInput(SyntheticsState state) {
     SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
         selectAssetRoute: HecoStockSelectorScreen.url,
         controller: state.fromFieldController,
+        syncData: state.syncData as HecoStockData,
         tokenSelected: (selectedToken) async {
           context.read<HecoSyntheticsCubit>().fromTokenChanged(selectedToken);
         });
@@ -182,6 +183,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       initialToken: state.toToken,
       controller: state.toFieldController,
       selectAssetRoute: HecoStockSelectorScreen.url,
+      syncData: state.syncData as HecoStockData,
       tokenSelected: (selectedToken) {
         context.read<HecoSyntheticsCubit>().toTokenChanged(selectedToken);
       },
@@ -212,8 +214,8 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
-                      ? "${context.read<HecoSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
-                      : "${context.read<HecoSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
+                      ? "${context.read<HecoSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      : "${context.read<HecoSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 GestureDetector(
@@ -244,22 +246,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Widget _buildMainButton(HecoSyntheticsState state) {
-    if (!state.service.checkWallet()) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
-        decoration: MyStyles.darkWithNoBorderDecoration,
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "CONNECT WALLET",
-            style: MyStyles.lightWhiteMediumTextStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+  Widget _buildMainButton(SyntheticsState state) {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -275,7 +262,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
         ),
       );
     }
-    if (state is HecoSyntheticsSelectAssetState) {
+    if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(16.0),
@@ -294,11 +281,11 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<HecoSyntheticsCubit>().makeApproveTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<HecoSyntheticsCubit>().approve(gas);
           }
         },
@@ -328,7 +315,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     if (state.fromToken is CryptoCurrency) {
       balance = (state.fromToken as CryptoCurrency).getBalance();
     } else {
-      balance = (state.fromToken as Stock).getBalance();
+      balance = (state.fromToken as Stock).getBalance()!;
     }
     if (balance <
         EthereumService.getWei(
@@ -351,19 +338,19 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       label: state.fromToken == CurrencyData.husd ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.husd) {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<HecoSyntheticsCubit>().makeBuyTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<HecoSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction transaction =
+          Transaction? transaction =
               await context.read<HecoSyntheticsCubit>().makeSellTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
             context.read<HecoSyntheticsCubit>().sell(gas);
           }
         }
@@ -372,7 +359,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Container _buildModeButtons(HecoSyntheticsState state) {
+  Container _buildModeButtons(SyntheticsState state) {
     return Container(
       child: Row(children: [
         Expanded(child: _buildLongButton(state)),
@@ -382,7 +369,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Widget _buildMarketTimer(HecoSyntheticsState state) {
+  Widget _buildMarketTimer(SyntheticsState state) {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
@@ -399,7 +386,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Widget _buildShortButton(HecoSyntheticsState state) {
+  Widget _buildShortButton(SyntheticsState state) {
     return SelectionButton(
       label: 'SHORT',
       onPressed: (bool selected) {
@@ -410,7 +397,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     );
   }
 
-  Widget _buildLongButton(HecoSyntheticsState state) {
+  Widget _buildLongButton(SyntheticsState state) {
     return SelectionButton(
       label: 'LONG',
       onPressed: (bool selected) {
@@ -433,12 +420,12 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     }
   }
 
-  Widget _buildToastWidget(HecoSyntheticsState state) {
-    if (state is HecoSyntheticsTransactionPendingState && state.showingToast) {
+  Widget _buildToastWidget(SyntheticsState state) {
+    if (state is SyntheticsTransactionPendingState && state.showingToast) {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));
-    } else if (state is HecoSyntheticsTransactionFinishedState &&
+    } else if (state is SyntheticsTransactionFinishedState &&
         state.showingToast) {
       if (state.transactionStatus.status == Status.PENDING) {
         return Align(
@@ -457,7 +444,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     return Container();
   }
 
-  _buildRemainingCapacity(HecoSyntheticsState state) {
+  _buildRemainingCapacity(SyntheticsState state) {
     return Row(children: [
       Text(
         "Remaining Synchronize Capacity",
@@ -479,7 +466,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
                   return Text(
-                    EthereumService.formatDouble(snapshot.data, 2),
+                    EthereumService.formatDouble(snapshot.data.toString(), 2),
                     overflow: TextOverflow.clip,
                     style: MyStyles.lightWhiteSmallTextStyle,
                   );

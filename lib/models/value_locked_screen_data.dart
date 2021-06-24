@@ -1,18 +1,18 @@
 class ValueLockedScreenData {
-  final double ethCount;
-  final double ethInUSD;
-  final double percOfPool;
+  final double? ethCount;
+  final double? ethInUSD;
+  final double? percOfPool;
 
-  final double perfDEAns;
-  final double perfsUniDeusDea;
-  final double perfsDEA;
-  final double perfsDEUS;
-  final double perfsUniDeaUsdc;
-  final double perfsUUniDeuusEth;
+  final double? perfDEAns;
+  final double? perfsUniDeusDea;
+  final double? perfsDEA;
+  final double? perfsDEUS;
+  final double? perfsUniDeaUsdc;
+  final double? perfsUUniDeuusEth;
 
-  final double nativeBalancerAPY;
-  final double timeTokenAPY;
-  final double sDeusAPY;
+  final double? nativeBalancerAPY;
+  final double? timeTokenAPY;
+  final double? sDeusAPY;
 
   ValueLockedScreenData(
       {this.ethCount,

@@ -1,14 +1,14 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class IConfigurationService {
-  Future<void> setMnemonic(String value);
+  Future<void> setMnemonic(String? value);
   Future<void> setupDone(bool value);
   Future<void> setupPasswordDone(bool value);
-  Future<void> setPrivateKey(String value);
+  Future<void> setPrivateKey(String? value);
   Future<void> setPassword(String value);
-  String getMnemonic();
-  String getPassword();
-  String getPrivateKey();
+  String? getMnemonic();
+  String? getPassword();
+  String? getPrivateKey();
   bool didSetupWallet();
   bool didSetupPassword();
 }
@@ -21,7 +21,7 @@ class ConfigurationService implements IConfigurationService {
   ConfigurationService(this._storage);
 
   /// temporary copy of the values stored in the local storage.
-  Map<String, String> _values;
+  late Map<String, String> _values;
 
   static const _kMnemonicKey = "mnemonic";
   static const _kPrivateKey = "privateKey";
@@ -42,13 +42,13 @@ class ConfigurationService implements IConfigurationService {
   }
 
   @override
-  Future<void> setMnemonic(String value) async {
-    await _write(_kMnemonicKey, value);
+  Future<void> setMnemonic(String? value) async {
+    await _write(_kMnemonicKey, value!);
   }
 
   @override
-  Future<void> setPrivateKey(String value) async {
-    await _write(_kPrivateKey, value);
+  Future<void> setPrivateKey(String? value) async {
+    await _write(_kPrivateKey, value!);
   }
 
   @override
@@ -57,12 +57,12 @@ class ConfigurationService implements IConfigurationService {
   }
 
   @override
-  String getMnemonic() {
+  String? getMnemonic() {
     return _values[_kMnemonicKey];
   }
 
   @override
-  String getPrivateKey() {
+  String? getPrivateKey() {
     return _values[_kPrivateKey];
   }
 
@@ -77,7 +77,7 @@ class ConfigurationService implements IConfigurationService {
   }
 
   @override
-  String getPassword() {
+  String? getPassword() {
     return _values[_password];
   }
 

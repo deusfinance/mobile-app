@@ -1,5 +1,5 @@
 import 'package:deus_mobile/core/widgets/token_selector/stock_selector.dart';
-import 'package:deus_mobile/data_source/stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/stock_data.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 
 import '../token_selector.dart';
@@ -7,6 +7,10 @@ import 'package:flutter/material.dart';
 
 class StockSelectorScreen extends StatefulWidget {
   static const url = '/MainnetAssetSelector';
+  StockData stockData;
+
+
+  StockSelectorScreen(this.stockData);
 
   @override
   _StockSelectorScreenState createState() =>
@@ -15,11 +19,12 @@ class StockSelectorScreen extends StatefulWidget {
 
 class _StockSelectorScreenState extends State<StockSelectorScreen> {
   TextEditingController searchController = new TextEditingController();
-  List<Stock> stocks;
+  late List<Stock> stocks;
+
 
   @override
   void initState() {
-    stocks  = StockData.conductedStocks;
+    stocks  = widget.stockData.conductedStocks;
     searchController.addListener(search);
     super.initState();
   }
@@ -40,7 +45,7 @@ class _StockSelectorScreenState extends State<StockSelectorScreen> {
   void search() async {
     String pattern = searchController.text;
     stocks = await Future.sync(() {
-      return StockData.conductedStocks
+      return widget.stockData.conductedStocks
           .where((element) =>
       element.symbol.toLowerCase().contains(pattern) ||
           element.name.toLowerCase().contains(pattern))

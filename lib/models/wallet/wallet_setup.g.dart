@@ -8,9 +8,9 @@ part of 'wallet_setup.dart';
 
 class _$WalletSetup extends WalletSetup {
   @override
-  final String mnemonic;
+  final String? mnemonic;
   @override
-  final String privateKey;
+  final String? privateKey;
   @override
   final WalletCreateSteps step;
   @override
@@ -18,28 +18,22 @@ class _$WalletSetup extends WalletSetup {
   @override
   final bool loading;
   @override
-  final BuiltList<String> errors;
+  final BuiltList<String>? errors;
 
-  factory _$WalletSetup([void Function(WalletSetupBuilder) updates]) =>
+  factory _$WalletSetup([void Function(WalletSetupBuilder)? updates]) =>
       (new WalletSetupBuilder()..update(updates)).build();
 
   _$WalletSetup._(
       {this.mnemonic,
       this.privateKey,
-      this.step,
-      this.method,
-      this.loading,
+      required this.step,
+      required this.method,
+      required this.loading,
       this.errors})
       : super._() {
-    if (step == null) {
-      throw new BuiltValueNullFieldError('WalletSetup', 'step');
-    }
-    if (method == null) {
-      throw new BuiltValueNullFieldError('WalletSetup', 'method');
-    }
-    if (loading == null) {
-      throw new BuiltValueNullFieldError('WalletSetup', 'loading');
-    }
+    BuiltValueNullFieldError.checkNotNull(step, 'WalletSetup', 'step');
+    BuiltValueNullFieldError.checkNotNull(method, 'WalletSetup', 'method');
+    BuiltValueNullFieldError.checkNotNull(loading, 'WalletSetup', 'loading');
   }
 
   @override
@@ -87,43 +81,44 @@ class _$WalletSetup extends WalletSetup {
 }
 
 class WalletSetupBuilder implements Builder<WalletSetup, WalletSetupBuilder> {
-  _$WalletSetup _$v;
+  _$WalletSetup? _$v;
 
-  String _mnemonic;
-  String get mnemonic => _$this._mnemonic;
-  set mnemonic(String mnemonic) => _$this._mnemonic = mnemonic;
+  String? _mnemonic;
+  String? get mnemonic => _$this._mnemonic;
+  set mnemonic(String? mnemonic) => _$this._mnemonic = mnemonic;
 
-  String _privateKey;
-  String get privateKey => _$this._privateKey;
-  set privateKey(String privateKey) => _$this._privateKey = privateKey;
+  String? _privateKey;
+  String? get privateKey => _$this._privateKey;
+  set privateKey(String? privateKey) => _$this._privateKey = privateKey;
 
-  WalletCreateSteps _step;
-  WalletCreateSteps get step => _$this._step;
-  set step(WalletCreateSteps step) => _$this._step = step;
+  WalletCreateSteps? _step;
+  WalletCreateSteps? get step => _$this._step;
+  set step(WalletCreateSteps? step) => _$this._step = step;
 
-  WalletSetupMethod _method;
-  WalletSetupMethod get method => _$this._method;
-  set method(WalletSetupMethod method) => _$this._method = method;
+  WalletSetupMethod? _method;
+  WalletSetupMethod? get method => _$this._method;
+  set method(WalletSetupMethod? method) => _$this._method = method;
 
-  bool _loading;
-  bool get loading => _$this._loading;
-  set loading(bool loading) => _$this._loading = loading;
+  bool? _loading;
+  bool? get loading => _$this._loading;
+  set loading(bool? loading) => _$this._loading = loading;
 
-  ListBuilder<String> _errors;
+  ListBuilder<String>? _errors;
   ListBuilder<String> get errors =>
       _$this._errors ??= new ListBuilder<String>();
-  set errors(ListBuilder<String> errors) => _$this._errors = errors;
+  set errors(ListBuilder<String>? errors) => _$this._errors = errors;
 
   WalletSetupBuilder();
 
   WalletSetupBuilder get _$this {
-    if (_$v != null) {
-      _mnemonic = _$v.mnemonic;
-      _privateKey = _$v.privateKey;
-      _step = _$v.step;
-      _method = _$v.method;
-      _loading = _$v.loading;
-      _errors = _$v.errors?.toBuilder();
+    final $v = _$v;
+    if ($v != null) {
+      _mnemonic = $v.mnemonic;
+      _privateKey = $v.privateKey;
+      _step = $v.step;
+      _method = $v.method;
+      _loading = $v.loading;
+      _errors = $v.errors?.toBuilder();
       _$v = null;
     }
     return this;
@@ -131,14 +126,12 @@ class WalletSetupBuilder implements Builder<WalletSetup, WalletSetupBuilder> {
 
   @override
   void replace(WalletSetup other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$WalletSetup;
   }
 
   @override
-  void update(void Function(WalletSetupBuilder) updates) {
+  void update(void Function(WalletSetupBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -150,12 +143,15 @@ class WalletSetupBuilder implements Builder<WalletSetup, WalletSetupBuilder> {
           new _$WalletSetup._(
               mnemonic: mnemonic,
               privateKey: privateKey,
-              step: step,
-              method: method,
-              loading: loading,
+              step: BuiltValueNullFieldError.checkNotNull(
+                  step, 'WalletSetup', 'step'),
+              method: BuiltValueNullFieldError.checkNotNull(
+                  method, 'WalletSetup', 'method'),
+              loading: BuiltValueNullFieldError.checkNotNull(
+                  loading, 'WalletSetup', 'loading'),
               errors: _errors?.build());
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'errors';
         _errors?.build();

@@ -29,8 +29,8 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreenState extends State<PasswordScreen> {
   var passwordController;
-  ConfigurationService configurationService;
-  bool error;
+  late ConfigurationService configurationService;
+  late bool error;
 
   final LocalAuthentication auth = LocalAuthentication();
   _SupportState _supportState = _SupportState.unknown;
@@ -224,7 +224,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
           future: _canCheckFingerPrint(),
           builder: (context, snapshot){
         if(snapshot.hasData && snapshot.data!=null){
-          if(snapshot.data){
+          if(snapshot.data as bool){
             return GestureDetector(
               onTap: _authenticateWithBiometrics,
               child: Column(children: [

@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:deus_mobile/data_source/stock_data.dart';
+import 'file:///D:/flutter%20projects/mobile-app/lib/data_source/sync_data/stock_data.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

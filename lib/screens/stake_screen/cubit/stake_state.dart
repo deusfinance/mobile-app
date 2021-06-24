@@ -1,17 +1,17 @@
 part of 'stake_cubit.dart';
 
 abstract class StakeState extends Equatable {
-  StakeService stakeService;
-  StakeTokenObject stakeTokenObject;
-  double balance;
+  late StakeService stakeService;
+  late StakeTokenObject stakeTokenObject;
+  late double balance;
   var fieldController;
-  bool showingToast;
-  TransactionStatus transactionStatus;
+  late bool showingToast;
+  late TransactionStatus transactionStatus;
 
   StakeState.init(StakeTokenObject object) {
     stakeService = new StakeService(
         ethService: new EthereumService(1),
-        privateKey: locator<ConfigurationService>().getPrivateKey());
+        privateKey: locator<ConfigurationService>().getPrivateKey()!);
     stakeTokenObject = object;
     balance = 0;
     showingToast = false;
@@ -40,7 +40,7 @@ class StakeInit extends StakeState {
 }
 
 class StakeHasToApprove extends StakeState {
-  StakeHasToApprove(StakeState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  StakeHasToApprove(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
@@ -54,7 +54,7 @@ class StakeHasToApprove extends StakeState {
 
 class StakePendingApprove extends StakeState {
 
-  StakePendingApprove(StakeState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  StakePendingApprove(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
@@ -67,7 +67,7 @@ class StakePendingApprove extends StakeState {
 }
 
 class StakePendingStake extends StakeState {
-  StakePendingStake(StakeState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  StakePendingStake(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
@@ -80,7 +80,7 @@ class StakePendingStake extends StakeState {
 }
 
 class StakeIsApproved extends StakeState {
-  StakeIsApproved(StakeState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  StakeIsApproved(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;

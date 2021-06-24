@@ -3,11 +3,11 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class RaisedGradientButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
+  String? label;
+  VoidCallback? onPressed;
   final gradient;
 
-  RaisedGradientButton({this.label, this.onPressed, @required this.gradient});
+  RaisedGradientButton({this.label, this.onPressed, required this.gradient});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class RaisedGradientButton extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
           color: Colors.transparent,
           child: Text(
-            label,
+            label!,
             style: TextStyle(fontSize: 20, color: Colors.black),
           ),
           onPressed: onPressed,

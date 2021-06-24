@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:deus_mobile/core/widgets/token_selector/stock_selector.dart';
-import 'package:deus_mobile/data_source/heco_stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/heco_stock_data.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +9,10 @@ import '../token_selector.dart';
 
 class HecoStockSelectorScreen extends StatefulWidget {
   static const url = '/HecoAssetSelector';
+  HecoStockData hecoStockData;
+
+
+  HecoStockSelectorScreen(this.hecoStockData);
 
   @override
   _HecoStockSelectorScreenState createState() =>
@@ -17,11 +21,11 @@ class HecoStockSelectorScreen extends StatefulWidget {
 
 class _HecoStockSelectorScreenState extends State<HecoStockSelectorScreen> {
   TextEditingController searchController = new TextEditingController();
-  List<Stock> stocks;
+  late List<Stock> stocks;
 
   @override
   void initState() {
-    stocks  = HecoStockData.conductedStocks;
+    stocks  = widget.hecoStockData.conductedStocks;
     searchController.addListener(search);
     super.initState();
   }
@@ -42,7 +46,7 @@ class _HecoStockSelectorScreenState extends State<HecoStockSelectorScreen> {
   void search() async {
     String pattern = searchController.text;
     stocks = await Future.sync(() {
-      return HecoStockData.conductedStocks
+      return widget.hecoStockData.conductedStocks
           .where((element) =>
               element.symbol.toLowerCase().contains(pattern) ||
               element.name.toLowerCase().contains(pattern))

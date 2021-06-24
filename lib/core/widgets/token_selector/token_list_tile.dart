@@ -12,7 +12,7 @@ import '../../../models/token.dart';
 class TokenListTile extends StatelessWidget {
   final CryptoCurrency currency;
 
-  TokenListTile({@required this.currency});
+  TokenListTile({required this.currency});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class TokenListTile extends StatelessWidget {
         ],
       ),
       trailing: Text(
-        EthereumService.formatDouble(currency.balance??"0.0"),
+        EthereumService.formatDouble(currency.balance),
         style: MyStyles.whiteSmallTextStyle,
       ),
     );

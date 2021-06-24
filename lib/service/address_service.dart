@@ -7,12 +7,12 @@ import 'package:web3dart/credentials.dart';
 
 ///Interface for AddressService in order to set up wallet
 abstract class IAddressService {
-  String generateMnemonic();
-  String getPrivateKey(String mnemonic);
-  Future<EthereumAddress> getPublicAddress(String privateKey);
+  String? generateMnemonic();
+  String? getPrivateKey(String mnemonic);
+  Future<EthereumAddress?> getPublicAddress(String privateKey);
   Future<bool> setupFromMnemonic(String mnemonic);
   Future<bool> setupFromPrivateKey(String privateKey);
-  String entropyToMnemonic(String entropyMnemonic);
+  String? entropyToMnemonic(String entropyMnemonic);
 }
 
 class AddressService implements IAddressService {
@@ -20,7 +20,7 @@ class AddressService implements IAddressService {
   AddressService(this._configService);
 
   @override
-  String generateMnemonic() {
+  String? generateMnemonic() {
     return bip39.generateMnemonic();
   }
 
@@ -29,25 +29,25 @@ class AddressService implements IAddressService {
   }
 
   @override
-  String getPrivateKey(String mnemonic) {
+  String? getPrivateKey(String mnemonic) {
     String seed = bip39.mnemonicToSeedHex(mnemonic);
     KeyData master = HDKey.getMasterKeyFromSeed(seed);
-    final privateKey = HEX.encode(master.key);
+    final privateKey = HEX.encode(master.key!);
     return privateKey;
   }
 
   @override
-  String getMnemonic() {
+  String? getMnemonic() {
     return bip39
-        .entropyToMnemonic(locator<ConfigurationService>().getMnemonic());
+        .entropyToMnemonic(locator<ConfigurationService>().getMnemonic()!);
   }
 
   @override
-  Future<EthereumAddress> getPublicAddress([String privateKey]) async {
+  Future<EthereumAddress> getPublicAddress([String? privateKey]) async {
     //if the privateKey wasn't passed, read it from the config (local device).
     privateKey ??= locator<ConfigurationService>().getPrivateKey();
 
-    final private = EthPrivateKey.fromHex(privateKey);
+    final private = EthPrivateKey.fromHex(privateKey!);
 
     final address = await private.extractAddress();
     return address;
@@ -66,7 +66,7 @@ class AddressService implements IAddressService {
 
   @override
   Future<bool> setupFromPrivateKey(String privateKey) async {
-    await _configService.setMnemonic(null);
+    await _configService.setMnemonic("");
     await _configService.setPrivateKey(privateKey);
     await _configService.setupDone(true);
     return true;

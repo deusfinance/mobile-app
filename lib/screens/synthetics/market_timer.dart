@@ -10,20 +10,20 @@ class MarketTimer extends StatelessWidget {
   final String label;
   final Color timerColor;
 
-  DateTime end;
+  DateTime? end;
 
   MarketTimer({
-    Key key,
-    @required this.onEnd,
-    @required this.label,
-    @required this.timerColor,
+    Key? key,
+    required this.onEnd,
+    required this.label,
+    required this.timerColor,
     this.end,
   }) : super(key: key);
 
   int get endTimeInMs {
     DateTime now = getNYC();
 
-    final int difference = end.difference(now).inMilliseconds;
+    final int difference = end!.difference(now).inMilliseconds;
     final int endTime = now.millisecondsSinceEpoch + difference + (4*60*60*1000);
     return endTime;
   }

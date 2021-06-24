@@ -68,8 +68,8 @@ class _SwapScreenState extends State<SwapScreen> {
     });
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -100,7 +100,7 @@ class _SwapScreenState extends State<SwapScreen> {
         color: MyColors.ToastGrey,
         onPressed: () {
           if (transactionStatus.hash != "") {
-            _launchInBrowser(transactionStatus.transactionUrl());
+            _launchInBrowser(transactionStatus.transactionUrl()!);
           }
         },
         onClosed: () {
@@ -117,7 +117,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl());
+          _launchInBrowser(transactionStatus.transactionUrl()!);
         },
         onClosed: () {
           context.read<SwapCubit>().closeToast();
@@ -133,7 +133,7 @@ class _SwapScreenState extends State<SwapScreen> {
         message: transactionStatus.message,
         color: MyColors.ToastRed,
         onPressed: () {
-          _launchInBrowser(transactionStatus.transactionUrl());
+          _launchInBrowser(transactionStatus.transactionUrl()!);
         },
         onClosed: () {
           context.read<SwapCubit>().closeToast();
@@ -256,7 +256,7 @@ class _SwapScreenState extends State<SwapScreen> {
             future: context.read<SwapCubit>().computePriceImpact(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                double p = snapshot.data;
+                double p = snapshot.data as double;
                 return Text(
                   "${p == 0 ? "0.0" : p < 0.005 ? "<0.005" : p}%",
                   style: TextStyle(
@@ -319,10 +319,10 @@ class _SwapScreenState extends State<SwapScreen> {
     return SelectionButton(
       label: 'Approve',
       onPressed: (bool selected) async {
-        Transaction transaction = await context.read<SwapCubit>().makeApproveTransaction();
-        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+        Transaction? transaction = await context.read<SwapCubit>().makeApproveTransaction();
+        WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
         if (transaction != null) {
-          Gas gas = await showConfirmGasFeeDialog(transaction);
+          Gas? gas = await showConfirmGasFeeDialog(transaction);
           await context.read<SwapCubit>().approve(gas);
         }
       },
@@ -344,10 +344,10 @@ class _SwapScreenState extends State<SwapScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return ListView.builder(
-                      itemCount: snapshot.data.length,
+                      itemCount: snapshot.data!.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        Token token = snapshot.data[index];
+                        Token token = snapshot.data![index];
                         return SizedBox(
                           width: 120,
                           child: Row(
@@ -356,8 +356,8 @@ class _SwapScreenState extends State<SwapScreen> {
                               token.logoPath.showCircleImage(radius: 10),
                               const SizedBox(width: 5),
                               Text(token.symbol, style: MyStyles.whiteSmallTextStyle),
-                              (index < snapshot.data.length - 1)
-                                  ? _buildRouteTransformWidget(snapshot.data, index)
+                              (index < snapshot.data!.length - 1)
+                                  ? _buildRouteTransformWidget(snapshot.data!, index)
                                   : Container(),
                             ],
                           ),
@@ -375,6 +375,7 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildRouteTransformWidget(List<Token> route, int index) {
+    print(route);
     if ((route[index].getTokenName() == "eth" && route[index + 1].getTokenName() == "deus") ||
         (route[index].getTokenName() == "deus" && route[index + 1].getTokenName() == "eth")) {
       return Row(
@@ -467,10 +468,10 @@ class _SwapScreenState extends State<SwapScreen> {
     return SelectionButton(
       label: 'SWAP',
       onPressed: (bool selected) async {
-        Transaction transaction = await context.read<SwapCubit>().makeTransaction();
-        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+        Transaction? transaction = await context.read<SwapCubit>().makeTransaction();
+        WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
         if (transaction != null) {
-          Gas gas = await showConfirmGasFeeDialog(transaction);
+          Gas? gas = await showConfirmGasFeeDialog(transaction);
           await context.read<SwapCubit>().swapTokens(gas);
         }
       },

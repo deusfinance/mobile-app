@@ -2,13 +2,13 @@ import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:flutter/cupertino.dart';
 
 class StakeTokenObject{
-  double apy;
-  String stakedAmount;
-  String pendingReward;
-  String max;
+  late double apy;
+  late String stakedAmount;
+  late String pendingReward;
+  late String max;
   CryptoCurrency lockToken;
   CryptoCurrency stakeToken;
-  TextEditingController controller;
+  late TextEditingController controller;
 
 
   StakeTokenObject(this.lockToken, this.stakeToken){
@@ -16,7 +16,7 @@ class StakeTokenObject{
   }
 
   bool isValueStaked(){
-    double res = double.tryParse(stakedAmount);
+    double res = double.tryParse(stakedAmount)!;
     if(res != null && res>0)
       return true;
     return false;

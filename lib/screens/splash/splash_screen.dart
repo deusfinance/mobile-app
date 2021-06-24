@@ -8,7 +8,7 @@ import 'cubit/splash_cubit.dart';
 class SplashScreen extends StatelessWidget {
   static const route = "/splash";
 
-  static Future<bool> init(BuildContext context) async {
+  static Future<bool?> init(BuildContext context) async {
     debugPrint("Initializing data...");
     final bool success = await context.read<SplashCubit>().initializeData();
     debugPrint("Call finished.");

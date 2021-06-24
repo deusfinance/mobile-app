@@ -2,17 +2,17 @@ part of 'lock_cubit.dart';
 
 
 abstract class LockState extends Equatable {
-  VaultsService vaultsService;
-  StakeTokenObject stakeTokenObject;
-  double balance;
+  late VaultsService vaultsService;
+  late StakeTokenObject stakeTokenObject;
+  late double balance;
   var fieldController;
-  bool showingToast;
-  TransactionStatus transactionStatus;
+  late bool showingToast;
+  late TransactionStatus transactionStatus;
 
   LockState.init(StakeTokenObject object) {
     vaultsService = new VaultsService(
         ethService: new EthereumService(1),
-        privateKey: locator<ConfigurationService>().getPrivateKey());
+        privateKey: locator<ConfigurationService>().getPrivateKey()!);
     stakeTokenObject = object;
     balance = 0;
     showingToast = false;
@@ -41,7 +41,7 @@ class LockInit extends LockState {
 }
 
 class LockHasToApprove extends LockState {
-  LockHasToApprove(LockState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  LockHasToApprove(LockState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
@@ -55,7 +55,7 @@ class LockHasToApprove extends LockState {
 
 class LockPendingApprove extends LockState {
 
-  LockPendingApprove(LockState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  LockPendingApprove(LockState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
@@ -68,7 +68,7 @@ class LockPendingApprove extends LockState {
 }
 
 class LockPendingLock extends LockState {
-  LockPendingLock(LockState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  LockPendingLock(LockState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
@@ -81,7 +81,7 @@ class LockPendingLock extends LockState {
 }
 
 class LockIsApproved extends LockState {
-  LockIsApproved(LockState state, {TransactionStatus transactionStatus, showingToast}) : super.copy(state){
+  LockIsApproved(LockState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;

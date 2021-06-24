@@ -5,9 +5,9 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class DarkButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String label;
-  final TextStyle labelStyle;
+  final VoidCallback? onPressed;
+  final String? label;
+  final TextStyle? labelStyle;
 
   const DarkButton({this.onPressed, this.label, this.labelStyle});
 
@@ -27,7 +27,7 @@ class DarkButton extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Center(
-                child: Text(label, style: labelStyle),
+                child: Text(label!, style: labelStyle),
               ),
             ),
           ),

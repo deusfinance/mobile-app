@@ -18,7 +18,7 @@ class WalletSetupHandler {
 
   void generateMnemonic() {
     var mnemonic = _addressService.generateMnemonic();
-    _store.dispatch(WalletSetupConfirmMnemonic(mnemonic));
+    _store.dispatch(WalletSetupConfirmMnemonic(mnemonic!));
   }
 
   Future<bool> confirmMnemonic(String mnemonic) async {

@@ -6,9 +6,9 @@ import 'package:deus_mobile/statics/styles.dart';
 import '../../../locator.dart';
 
 class BackButtonWithText extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   const BackButtonWithText({
-    Key key,
+    Key? key,
     this.onPressed,
   }) : super(key: key);
 

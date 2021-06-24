@@ -1,5 +1,11 @@
+import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/data_source/sync_data/sync_data.dart';
+import 'package:deus_mobile/locator.dart';
+import 'package:deus_mobile/models/swap/crypto_currency.dart';
+import 'package:deus_mobile/models/synthetics/stock.dart';
+import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_state.dart';
+import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
@@ -7,14 +13,6 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../locator.dart';
-import '../../models/swap/crypto_currency.dart';
-import '../../models/synthetics/stock.dart';
-import '../../models/token.dart';
-import 'svg.dart';
-import 'token_selector/currency_selector_screen/currency_selector_screen.dart';
-import 'token_selector/stock_selector_screen/stock_selector_screen.dart';
 
 enum Direction { from, to }
 enum TabPage { synthetics, swap }
@@ -25,19 +23,20 @@ enum TabPage { synthetics, swap }
 // ignore: must_be_immutable
 class SwapField<T extends Token> extends StatefulWidget {
   final Direction direction;
-  void Function(T selectedToken) tokenSelected;
-  final TextEditingController controller;
-  String selectAssetRoute;
-
-  final T initialToken;
+  void Function(T selectedToken)? tokenSelected;
+  final TextEditingController? controller;
+  String? selectAssetRoute;
+  SyncData? syncData;
+  final T? initialToken;
 
   SwapField(
-      {Key key,
+      {Key? key,
       this.direction = Direction.from,
       this.controller,
       this.initialToken,
       this.tokenSelected,
-      this.selectAssetRoute})
+      this.selectAssetRoute,
+      this.syncData})
       : super(key: key);
 
   @override
@@ -45,11 +44,11 @@ class SwapField<T extends Token> extends StatefulWidget {
 }
 
 class _SwapFieldState<T extends Token> extends State<SwapField> {
-  T selectedToken;
+  T? selectedToken;
 
   @override
   Widget build(BuildContext context) {
-    selectedToken = widget.initialToken;
+    selectedToken = widget.initialToken as T?;
 
     return Container(
       padding: EdgeInsets.all(12.0),
@@ -78,11 +77,11 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   Widget _buildTokenSelection() {
     return GestureDetector(
         onTap: () async {
-          final _selectedToken = await locator<NavigationService>().navigateTo(widget.selectAssetRoute, context);
+          final _selectedToken = await locator<NavigationService>().navigateTo(widget.selectAssetRoute!, context, arguments: {"data": widget.syncData});
           if (_selectedToken != null) {
             setState(() {
-              selectedToken = _selectedToken;
-              widget.tokenSelected(selectedToken);
+              selectedToken = _selectedToken as T?;
+              widget.tokenSelected!(selectedToken!);
             });
           }
         },
@@ -92,7 +91,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             selectedToken != null
-                ? selectedToken.logoPath.showCircleImage(radius: 15)
+                ? selectedToken!.logoPath.showCircleImage(radius: 15)
                 : CircleAvatar(radius: 15.0, backgroundColor: Colors.white70),
             const SizedBox(width: 5),
             _buildTokenName(),
@@ -116,7 +115,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
       child: InkWell(
         onTap: () async {
           setState(() {
-            widget.controller.text = balance;
+            widget.controller!.text = balance;
           });
         },
         child: Container(
@@ -187,7 +186,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
           style: MyStyles.lightWhiteSmallTextStyle,
         ),
         Text(
-          'Balance: ${EthereumService.formatDouble(balance ?? "0.0")}',
+          'Balance: ${EthereumService.formatDouble(balance)}',
           style: MyStyles.lightWhiteSmallTextStyle,
         ),
       ],
@@ -197,7 +196,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   Widget _buildTokenName() {
     if (selectedToken != null) {
       if (selectedToken is CryptoCurrency) {
-        return Text(selectedToken.symbol, style: MyStyles.whiteMediumTextStyle);
+        return Text(selectedToken!.symbol, style: MyStyles.whiteMediumTextStyle);
       } else if (selectedToken is Stock) {
         Stock stock = selectedToken as Stock;
         if (stock.mode == Mode.SHORT) {
@@ -208,7 +207,6 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
       } else {
         return Text("---", style: MyStyles.whiteMediumTextStyle);
       }
-      Text(selectedToken != null ? selectedToken.symbol : "select asset", style: MyStyles.whiteMediumTextStyle);
     } else {
       return Text("select asset", style: MyStyles.whiteMediumTextStyle);
     }

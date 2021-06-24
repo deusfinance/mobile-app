@@ -13,7 +13,7 @@ import '../../../locator.dart';
 class StockListTile extends StatelessWidget {
   final Stock stock;
 
-  StockListTile({@required this.stock});
+  StockListTile({required this.stock});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class StockListTile extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(EthereumService.formatDouble(stock.shortBalance??"0.0"), maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
+              Text(EthereumService.formatDouble(stock.shortBalance), maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
               SizedBox(width: 8,),
               Text("S",overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
               SizedBox(width: 6,),
@@ -53,7 +53,7 @@ class StockListTile extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(EthereumService.formatDouble(stock.longBalance??"0.0"), maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
+              Text(EthereumService.formatDouble(stock.longBalance), maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
               SizedBox(width: 8,),
               Text("L",overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
               SizedBox(width: 6,),

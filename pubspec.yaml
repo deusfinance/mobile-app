@@ -6,19 +6,19 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.1.5+10
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  
   # BACKEND
-  http: ^0.12.2
-  json_annotation: ^3.1.0
+  http: ^0.13.3
+  json_annotation: ^4.0.1
+#  json_annotation: ^3.1.1
   equatable: ^2.0.0
-  web3dart: ^2.0.0-dev.9
-  bip39: ^1.0.3
-  hex: ^0.1.2
+  web3dart: ^2.1.4
+  bip39: ^1.0.6
+  hex: ^0.2.0
   tweetnacl: ^0.3.2
   get_it: ^5.0.6
   flutter_bloc: ^7.0.0
@@ -33,7 +33,7 @@ dependencies:
   # FRONTEND
   fluttertoast: ^7.1.6
   flutter_hooks: ^0.9.0
-  flutter_svg: ^0.19.3
+  flutter_svg: ^0.22.0
   shimmer_animation: ^0.0.9+1
   shared_preferences: ^2.0.4
   flutter_icons: ^1.1.0
@@ -45,21 +45,27 @@ dependencies:
   outline_gradient_button: ^1.0.0+2
   flutter_countdown_timer: ^3.0.0
   flutter_svg_provider: ^0.1.8
-  stream_transform: ^0.0.19
+  stream_transform: ^2.0.0
   fl_chart: ^0.36.0
   vibration: ^1.7.2
   flappy_search_bar: 1.4.1
-
+  floor: ^1.1.0
 dependency_overrides:
-  analyzer: ^0.41.2
+#  analyzer: ^1.5.0
+  convert: ^3.0.0
+  fixnum: ^1.0.0
+  package_config: ^2.0.0
 
 dev_dependencies:
-  # flutter_test:
-  #   sdk: flutter
-  build_runner: ^1.10.0
-  built_value_generator: ^7.1.0
-  json_serializable: ^3.5.1
-  flutter_launcher_icons: ^0.8.0
+    # flutter_test:
+    #   sdk: flutter
+  floor_generator: ^1.1.0
+  build_runner: ^2.0.4
+  built_value_generator: ^8.1.0
+  json_serializable: ^4.1.0
+#  json_serializable: ^3.5.1
+  flutter_launcher_icons: ^0.9.0
+
 
 flutter:
   uses-material-design: true

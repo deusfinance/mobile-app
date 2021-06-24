@@ -9,11 +9,11 @@ import 'custom_app_bar.dart';
 import 'header_with_address.dart';
 
 class DefaultScreen extends StatelessWidget {
-  final Widget child;
-  Widget chainSelector;
-  final bool showHeading;
+  final Widget? child;
+  Widget? chainSelector;
+  final bool? showHeading;
 
-  DefaultScreen({Key key, @required this.child, this.showHeading = true, this.chainSelector}) : super(key: key){
+  DefaultScreen({Key? key, required this.child, this.showHeading = true, this.chainSelector}) : super(key: key){
     if(chainSelector == null)
       this.chainSelector = Container();
   }
@@ -30,13 +30,13 @@ class DefaultScreen extends StatelessWidget {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: MyColors.Main_BG_Black,
-          appBar: showHeading ? CustomAppBar() : null,
+          appBar: showHeading! ? CustomAppBar() : null,
           body: Column(
             children: [
               // const SizedBox(height: 50),
               //TODO: Move into AppBar?
-              if (showHeading) Container(margin: EdgeInsets.only(right: 8, left: 8), child: HeaderWithAddress(chainSelector: chainSelector,)),
-              Expanded(child: child),
+              if (showHeading!) Container(margin: EdgeInsets.only(right: 8, left: 8), child: HeaderWithAddress(chainSelector: chainSelector,)),
+              Expanded(child: child!),
             ],
           ),
           bottomNavigationBar: MyBottomNavBar(),

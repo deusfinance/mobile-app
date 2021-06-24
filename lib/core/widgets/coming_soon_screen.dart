@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ComingSoonScreen extends StatelessWidget {
   final String imgPath;
 
-  const ComingSoonScreen({Key key, @required this.imgPath}) : super(key: key);
+  const ComingSoonScreen({Key? key, required this.imgPath}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

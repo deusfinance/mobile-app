@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'filled_gradient_selection_button.dart';
 
 class SelectionButton extends StatefulWidget {
-  final String label;
-  final void Function(bool selected) onPressed;
+  final String? label;
+  final void Function(bool selected)? onPressed;
   final bool selected;
-  final LinearGradient gradient;
-  TextStyle textStyle;
+  final LinearGradient? gradient;
+  TextStyle? textStyle;
 
   /// You can choose between using a label or another widget if you use a widget the label is useless
-  final Widget child;
+  final Widget? child;
 
   SelectionButton(
       {this.label,
@@ -35,7 +35,7 @@ class _SelectionButtonState extends State<SelectionButton> {
     return !widget.selected
         ? GestureDetector(
             onTap: () {
-              widget.onPressed(widget.selected);
+              widget.onPressed!(widget.selected);
             },
             child: Container(
               decoration: MyStyles.darkWithBorderDecoration,
@@ -43,18 +43,18 @@ class _SelectionButtonState extends State<SelectionButton> {
               child: Align(
                 alignment: Alignment.center,
                 child: widget.child ?? Text(
-                  widget.label,
+                  widget.label!,
                   style: MyStyles.lightWhiteMediumTextStyle,
                 ),
               ),
             ),
           )
         : FilledGradientSelectionButton(
-            onPressed: () => widget.onPressed(widget.selected),
+            onPressed: () => widget.onPressed!(widget.selected),
             selected: widget.selected,
-            label: widget.label,
-            gradient: widget.gradient,
-            textStyle: widget.textStyle,
+            label: widget.label!,
+            gradient: widget.gradient!,
+            textStyle: widget.textStyle!,
           );
   }
 

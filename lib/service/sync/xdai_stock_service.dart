@@ -2,46 +2,21 @@ import 'dart:math';
 
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
-import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:deus_mobile/service/sync/sync_service.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 
-import 'ethereum_service.dart';
+import '../ethereum_service.dart';
 
-class XDaiStockService {
-  final EthereumService ethService;
-  final String privateKey;
-  String marketMaker;
-  String wxdaiProxy;
+class XDaiStockService extends SyncService {
+  String marketMaker = "0xc2fB644cd18325C58889Cf8BB0573e4a8774BCD2";
+  String wxdaiProxy = "0x89951F2546f36789072c72C94272a68970Eba65e";
   static String xdaiTokenAddress = "0x0000000000000000000000000000000000000001";
 
-  XDaiStockService({@required this.ethService, @required this.privateKey}) {
-    _init();
-  }
+  XDaiStockService({required ethService, required privateKey}): super(ethService, privateKey);
 
-  _init() async {
-    if (ethService.chainId == 100) {
-      this.marketMaker = "0xc2fB644cd18325C58889Cf8BB0573e4a8774BCD2";
-      this.wxdaiProxy = "0x89951F2546f36789072c72C94272a68970Eba65e";
-    } else {
-      this.marketMaker = "0xBa13DaE5D0dB9B6683b4ad6b6dbee5251D18eAcb";
-    }
-  }
-
-  Future<Credentials> get credentials =>
-      ethService.credentialsForKey(privateKey);
-
-  Future<EthereumAddress> get address async =>
-      (await credentials).extractAddress();
-
-  bool checkWallet() {
-    return ethService != null && this.privateKey != null;
-  }
+  @override
   Future<String> getAllowances(tokenAddress) async {
-    if (!checkWallet()) {
-      return "0";
-    }
     if (tokenAddress == XDaiStockService.xdaiTokenAddress) {
       return "1000000000000000";
     }
@@ -53,10 +28,8 @@ class XDaiStockService {
     return EthereumService.fromWei(res.single, 'ether');
   }
 
-  Future<String> approve(tokenAddress, Gas gas) async {
-    if (!checkWallet()) {
-      return "0";
-    }
+  @override
+  Future<String> approve(String tokenAddress, Gas gas) async {
     var amount = "10000000000000000000000000000";
     DeployedContract tokenContract =
     await ethService.loadContractWithGivenAddress("token",EthereumAddress.fromHex(tokenAddress));
@@ -64,11 +37,8 @@ class XDaiStockService {
         [EthereumAddress.fromHex(wxdaiProxy), EthereumService.getWei(amount)], gas: gas);
     return res;
   }
-
+  @override
   Future<Transaction> makeApproveTransaction(tokenAddress) async {
-    if (!checkWallet()) {
-      return null;
-    }
     var amount = "10000000000000000000000000000";
     DeployedContract tokenContract =
     await ethService.loadContractWithGivenAddress("token",EthereumAddress.fromHex(tokenAddress));
@@ -77,10 +47,8 @@ class XDaiStockService {
     return res;
   }
 
+  @override
   Future<String> getTokenBalance(String tokenAddress) async {
-    if (!checkWallet())
-      return "0";
-
     if (tokenAddress == XDaiStockService.xdaiTokenAddress) {
      var res = await ethService.getEtherBalance(await credentials);
      return EthereumService.fromWei(res.getInWei);
@@ -92,17 +60,15 @@ class XDaiStockService {
     return EthereumService.fromWei(res.single);
   }
 
-  Future<String> buy(tokenAddress, String amount, List<ContractInputData> oracles, maxPrice, Gas gas) async {
-    try {
-      if (!checkWallet()) return "0";
-
+  @override
+  Future<String> buy(tokenAddress, String amount, List<ContractInputData> oracles, Gas gas , {String? maxPrice}) async {
       DeployedContract contract =
       await ethService.loadContractWithGivenAddress(
           "wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
       ContractInputData info = oracles[0];
 
       var res = await ethService.query(contract, "calculateXdaiAmount", [
-        BigInt.parse(maxPrice),
+        BigInt.parse(maxPrice!),
         BigInt.from(info.fee),
         EthereumService.getWei(amount)
       ]);
@@ -115,27 +81,22 @@ class XDaiStockService {
         info.getFee(),
         [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
         [oracles[0].getPrice(), oracles[1].getPrice()],
-        [oracles[0].signs['buy'].getV(), oracles[1].signs['buy'].getV()],
-        [oracles[0].signs['buy'].getR(), oracles[1].signs['buy'].getR()],
-        [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
+        [oracles[0].signs['buy']!.getV(), oracles[1].signs['buy']!.getV()],
+        [oracles[0].signs['buy']!.getR(), oracles[1].signs['buy']!.getR()],
+        [oracles[0].signs['buy']!.getS(), oracles[1].signs['buy']!.getS()],
       ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount)
       ,gas: gas);
-    }on Exception catch(error){
-      return "";
-    }
   }
 
-  Future<Transaction> makeBuyTransaction(tokenAddress, String amount, List<ContractInputData> oracles, maxPrice) async {
-    try {
-      if (!checkWallet()) return null;
-
+  @override
+  Future<Transaction> makeBuyTransaction(tokenAddress, String amount, List<ContractInputData> oracles,  {String? maxPrice}) async {
       DeployedContract contract =
       await ethService.loadContractWithGivenAddress(
           "wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
       ContractInputData info = oracles[0];
 
       var res = await ethService.query(contract, "calculateXdaiAmount", [
-        BigInt.parse(maxPrice),
+        BigInt.parse(maxPrice!),
         BigInt.from(info.fee),
         EthereumService.getWei(amount)
       ]);
@@ -148,17 +109,14 @@ class XDaiStockService {
         info.getFee(),
         [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
         [oracles[0].getPrice(), oracles[1].getPrice()],
-        [oracles[0].signs['buy'].getV(), oracles[1].signs['buy'].getV()],
-        [oracles[0].signs['buy'].getR(), oracles[1].signs['buy'].getR()],
-        [oracles[0].signs['buy'].getS(), oracles[1].signs['buy'].getS()],
+        [oracles[0].signs['buy']!.getV(), oracles[1].signs['buy']!.getV()],
+        [oracles[0].signs['buy']!.getR(), oracles[1].signs['buy']!.getR()],
+        [oracles[0].signs['buy']!.getS(), oracles[1].signs['buy']!.getS()],
       ], value: EtherAmount.fromUnitAndValue(EtherUnit.wei, xdaiAmount));
-    }on Exception catch(error){
-      return null;
-    }
   }
 
+  @override
   Future<String> sell(tokenAddress, String amount, List<ContractInputData> oracles, Gas gas) async {
-    if (!checkWallet()) return "0";
     DeployedContract contract =
     await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
     ContractInputData info = oracles[0];
@@ -170,15 +128,15 @@ class XDaiStockService {
       info.getFee(),
       [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
       [oracles[0].getPrice(), oracles[1].getPrice()],
-      [oracles[0].signs['sell'].getV(), oracles[1].signs['sell'].getV()],
-      [oracles[0].signs['sell'].getR(), oracles[1].signs['sell'].getR()],
-      [oracles[0].signs['sell'].getS(), oracles[1].signs['sell'].getS()],
+      [oracles[0].signs['sell']!.getV(), oracles[1].signs['sell']!.getV()],
+      [oracles[0].signs['sell']!.getR(), oracles[1].signs['sell']!.getR()],
+      [oracles[0].signs['sell']!.getS(), oracles[1].signs['sell']!.getS()],
     ],
     gas: gas);
   }
 
+  @override
   Future<Transaction> makeSellTransaction(tokenAddress, String amount, List<ContractInputData> oracles) async {
-    if (!checkWallet()) return null;
     DeployedContract contract =
     await ethService.loadContractWithGivenAddress("wxdai_proxy", EthereumAddress.fromHex(this.wxdaiProxy));
     ContractInputData info = oracles[0];
@@ -190,13 +148,14 @@ class XDaiStockService {
       info.getFee(),
       [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
       [oracles[0].getPrice(), oracles[1].getPrice()],
-      [oracles[0].signs['sell'].getV(), oracles[1].signs['sell'].getV()],
-      [oracles[0].signs['sell'].getR(), oracles[1].signs['sell'].getR()],
-      [oracles[0].signs['sell'].getS(), oracles[1].signs['sell'].getS()],
+      [oracles[0].signs['sell']!.getV(), oracles[1].signs['sell']!.getV()],
+      [oracles[0].signs['sell']!.getR(), oracles[1].signs['sell']!.getR()],
+      [oracles[0].signs['sell']!.getS(), oracles[1].signs['sell']!.getS()],
     ]);
   }
 
-  Future getUsedCap() async {
+  @override
+  Future<String> getUsedCap() async {
     DeployedContract contract =
         await ethService.loadContractWithGivenAddress("synchronizer", EthereumAddress.fromHex(this.marketMaker));
     final res = await ethService.query(contract, "remainingDollarCap", []);

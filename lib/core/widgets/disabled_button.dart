@@ -2,8 +2,8 @@ import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class DisabledButton extends StatelessWidget {
-  final Widget child;
-  final String label;
+  final Widget? child;
+  final String? label;
 
   DisabledButton({this.child, this.label});
 
@@ -16,7 +16,7 @@ class DisabledButton extends StatelessWidget {
         alignment: Alignment.center,
         child: child ??
             Text(
-              label,
+              label!,
               style: MyStyles.lightWhiteMediumTextStyle,
             ),
       ),

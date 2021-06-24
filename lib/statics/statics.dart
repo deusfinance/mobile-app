@@ -1,5 +1,6 @@
 
 import 'package:deus_mobile/core/util/responsive.dart';
+import 'package:deus_mobile/data_source/sync_data/xdai_stock_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,6 +9,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/transaction_status.dart';
 import 'my_colors.dart';
 import 'styles.dart';
+
+class Statics{
+  static XDaiStockData? xDaiStockData;
+}
 
 showToast(BuildContext context, final TransactionStatus status) {
   Color c;
@@ -77,3 +82,4 @@ showToast(BuildContext context, final TransactionStatus status) {
     toastDuration: Duration(seconds: 8),
   );
 }
+

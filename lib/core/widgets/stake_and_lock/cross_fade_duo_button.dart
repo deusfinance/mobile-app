@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import '../filled_gradient_selection_button.dart';
 
 class CrossFadeDuoButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
-  final String mergedButtonLabel;
-  final String offButtonLabel;
-  final String gradientButtonLabel;
+  final String? mergedButtonLabel;
+  final String? offButtonLabel;
+  final String? gradientButtonLabel;
 
-  final bool showLoading;
-  final bool showBothButtons;
+  final bool? showLoading;
+  final bool? showBothButtons;
 
   CrossFadeDuoButton(
       {this.onPressed,
@@ -29,11 +29,11 @@ class CrossFadeDuoButton extends StatelessWidget {
     return AnimatedCrossFade(
         firstChild: Row(
           children: [
-            if (showLoading)
+            if (showLoading!)
               Expanded(
                 child: DisabledButton(
                   label: gradientButtonLabel,
-                  child: showLoading
+                  child: showLoading!
                       ? SizedBox(
                     height: 21,
                     width: 20,
@@ -55,14 +55,14 @@ class CrossFadeDuoButton extends StatelessWidget {
                   gradient: MyColors.blueToGreenGradient,
                 ),
               ),
-            if (showBothButtons)
+            if (showBothButtons!)
               SizedBox(
                 width: 10,
               ),
             Expanded(
               child: DisabledButton(
                 label: offButtonLabel,
-                child: showLoading
+                child: showLoading!
                     ? SizedBox(
                         height: 21,
                         width: 20,
@@ -85,7 +85,7 @@ class CrossFadeDuoButton extends StatelessWidget {
               label: mergedButtonLabel,
               textStyle: MyStyles.blackMediumTextStyle),
         ),
-        crossFadeState: !showBothButtons
+        crossFadeState: !showBothButtons!
             ? CrossFadeState.showSecond
             : CrossFadeState.showFirst,
         duration: Duration(milliseconds: 150));

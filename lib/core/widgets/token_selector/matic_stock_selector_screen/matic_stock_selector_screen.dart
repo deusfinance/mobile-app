@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:deus_mobile/core/widgets/token_selector/stock_selector.dart';
-import 'package:deus_mobile/data_source/heco_stock_data.dart';
-import 'package:deus_mobile/data_source/matic_stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/matic_stock_data.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:flutter/material.dart';
 
@@ -18,11 +17,17 @@ class MaticStockSelectorScreen extends StatefulWidget {
 
 class _MaticStockSelectorScreenState extends State<MaticStockSelectorScreen> {
   TextEditingController searchController = new TextEditingController();
-  List<Stock> stocks;
+  late List<Stock> stocks;
+  late MaticStockData maticStockData;
+
+
+  _MaticStockSelectorScreenState(){
+    maticStockData = new MaticStockData();
+  }
 
   @override
   void initState() {
-    stocks  = MaticStockData.conductedStocks;
+    stocks  = maticStockData.conductedStocks;
     searchController.addListener(search);
     super.initState();
   }
@@ -43,7 +48,7 @@ class _MaticStockSelectorScreenState extends State<MaticStockSelectorScreen> {
   void search() async {
     String pattern = searchController.text;
     stocks = await Future.sync(() {
-      return MaticStockData.conductedStocks
+      return maticStockData.conductedStocks
           .where((element) =>
               element.symbol.toLowerCase().contains(pattern) ||
               element.name.toLowerCase().contains(pattern))

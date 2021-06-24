@@ -21,7 +21,7 @@ class MuskService {
   final EthereumService ethService;
   final String privateKey;
 
-  MuskService({@required this.ethService, @required this.privateKey});
+  MuskService({required this.ethService, required this.privateKey});
 
   Future<Credentials> get credentials =>
       ethService.credentialsForKey(privateKey);
@@ -41,7 +41,7 @@ class MuskService {
     var ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount)
         .getInWei
         .toString();
-    ans = ans.substring(0, ans.length - (18 - max));
+    ans = ans.substring(0, ans.length - (18 - max!));
     return BigInt.parse(ans.toString());
   }
 
@@ -50,7 +50,7 @@ class MuskService {
     TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
     String ans = value.toString();
 
-    while (ans.length < max) {
+    while (ans.length < max!) {
       ans = "0" + ans;
     }
     ans = ans.substring(0, ans.length - max) +
@@ -123,7 +123,7 @@ class MuskService {
     return "0";
   }
 
-  Future<String> getAmountsOut(fromToken, toToken, amountIn) async{
+  Future<String?> getAmountsOut(fromToken, toToken, amountIn) async{
     DeployedContract spcxContract = await ethService.loadContractWithGivenAddress("sps", await ethService.getAddrHex("spcx_swap_contract"));
     if(fromToken == "spcx" && toToken == "dea"){
       var res = await ethService.query(spcxContract, "calculateSaleReturn", [getWei(amountIn, fromToken)]);

@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 class NavigationService {
   NavigationItem selectedNavItem;
-  NavigationService({@required this.selectedNavItem});
+  NavigationService({required this.selectedNavItem});
 
   bool canGoBack(BuildContext context) => Navigator.canPop(context);
 
   bool isSelected(NavigationItem item) => selectedNavItem == item;
 
-  Future navigateTo(String routeName, BuildContext context, {bool replace = false, bool replaceAll = false , arguments}) {
+  Future<Object?>? navigateTo(String routeName, BuildContext context, {bool replace = false, bool replaceAll = false , arguments}) {
     if (replace)
       Navigator.pushReplacementNamed(context, routeName, arguments: arguments);
     else if (replaceAll)

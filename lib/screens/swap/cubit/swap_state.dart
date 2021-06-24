@@ -13,22 +13,22 @@ import 'package:flutter/cupertino.dart';
 import '../../../locator.dart';
 
 abstract class SwapState extends Equatable {
-  SwapService swapService;
+  late SwapService swapService;
 
-  CryptoCurrency fromToken;
-  CryptoCurrency toToken;
-  double slippage;
+  late CryptoCurrency fromToken;
+  late CryptoCurrency toToken;
+  late double slippage;
 
   var fromFieldController;
   var toFieldController;
-  double toValue;
+  late double toValue;
   var slippageController;
-  StreamController<String> streamController;
+  late StreamController<String> streamController;
 
-  bool isPriceRatioForward;
-  bool isInProgress;
+  late bool isPriceRatioForward;
+  late bool isInProgress;
 
-  bool approved;
+  late bool approved;
 
   SwapState();
 
@@ -40,7 +40,7 @@ abstract class SwapState extends Equatable {
     toValue = 0;
     swapService = new SwapService(
         ethService: new EthereumService(1),
-        privateKey: locator<ConfigurationService>().getPrivateKey());
+        privateKey: locator<ConfigurationService>().getPrivateKey()!);
     swapService.init();
     fromFieldController = new TextEditingController();
     toFieldController = new TextEditingController();
@@ -75,9 +75,9 @@ class SwapLoaded extends SwapState {
         toToken,
         slippage,
         approved,
-      SwapService swapService,
-      StreamController streamController,
-      bool isPriceRatioForward,
+      SwapService? swapService,
+      StreamController<String>? streamController,
+      bool? isPriceRatioForward,
       fromFieldController,
       slippageController,
       toFieldController,
@@ -102,10 +102,10 @@ class SwapLoaded extends SwapState {
 }
 
 class TransactionFinishedState extends SwapState {
-  bool showingToast;
-  TransactionStatus transactionStatus;
+  bool? _showingToast;
+  TransactionStatus? _transactionStatus;
 
-  TransactionFinishedState(SwapState state, {TransactionStatus transactionStatus, showingToast})
+  TransactionFinishedState(SwapState state, {TransactionStatus? transactionStatus, showingToast})
       : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
@@ -118,13 +118,25 @@ class TransactionFinishedState extends SwapState {
   }
   @override
   List<Object> get props => [showingToast, transactionStatus];
+
+  TransactionStatus get transactionStatus => _transactionStatus??new TransactionStatus("message", Status.PENDING, "label");
+
+  set transactionStatus(TransactionStatus value) {
+    _transactionStatus = value;
+  }
+
+  bool get showingToast => _showingToast??false;
+
+  set showingToast(bool value) {
+    _showingToast = value;
+  }
 }
 
 class TransactionPendingState extends SwapState {
-  bool showingToast;
-  TransactionStatus transactionStatus;
+  bool? _showingToast;
+  TransactionStatus? _transactionStatus;
 
-  TransactionPendingState(SwapState state, {TransactionStatus transactionStatus, showingToast})
+  TransactionPendingState(SwapState state, {TransactionStatus? transactionStatus, showingToast})
       : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
@@ -137,6 +149,18 @@ class TransactionPendingState extends SwapState {
   }
   @override
   List<Object> get props => [showingToast, transactionStatus];
+
+  TransactionStatus get transactionStatus => _transactionStatus??new TransactionStatus("message", Status.PENDING, "label");
+
+  set transactionStatus(TransactionStatus value) {
+    _transactionStatus = value;
+  }
+
+  bool get showingToast => _showingToast??false;
+
+  set showingToast(bool value) {
+    _showingToast = value;
+  }
 }
 
 class SwapInitial extends SwapState {

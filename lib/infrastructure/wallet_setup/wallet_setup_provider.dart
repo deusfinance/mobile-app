@@ -12,7 +12,7 @@ import 'wallet_setup_state.dart';
 
 class WalletSetupProvider extends ContextProviderWidget<WalletSetupHandler> {
   WalletSetupProvider(
-      {Widget child, HookWidgetBuilder<WalletSetupHandler> builder})
+      {Widget? child, HookWidgetBuilder<WalletSetupHandler>? builder})
       : super(child: child, builder: builder);
 
   @override

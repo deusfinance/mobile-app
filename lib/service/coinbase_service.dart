@@ -14,7 +14,7 @@ class CoinBaseService {
   final EthereumService ethService;
   final String privateKey;
 
-  CoinBaseService({@required this.ethService, @required this.privateKey});
+  CoinBaseService({required this.ethService, required this.privateKey});
 
   Future<Credentials> get credentials =>
       ethService.credentialsForKey(privateKey);
@@ -34,7 +34,7 @@ class CoinBaseService {
     var ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount)
         .getInWei
         .toString();
-    ans = ans.substring(0, ans.length - (18 - max));
+    ans = ans.substring(0, ans.length - (18 - max!));
     return BigInt.parse(ans.toString());
   }
 
@@ -43,7 +43,7 @@ class CoinBaseService {
         TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
     String ans = value.toString();
 
-    while (ans.length < max) {
+    while (ans.length < max!) {
       ans = "0" + ans;
     }
     ans = ans.substring(0, ans.length - max) +
@@ -116,7 +116,7 @@ class CoinBaseService {
     return "0";
   }
 
-  Future<String> getAmountsOut(fromToken, toToken, amountIn) async{
+  Future<String?> getAmountsOut(fromToken, toToken, amountIn) async{
     DeployedContract bakktContract = await ethService.loadContractWithGivenAddress("sps", await ethService.getAddrHex("coinbase_swap_contract"));
     if(fromToken == "coinbase" && toToken == "deus"){
       var res = await ethService.query(bakktContract, "calculateSaleReturn", [getWei(amountIn, fromToken)]);

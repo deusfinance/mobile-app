@@ -229,7 +229,7 @@ class _LockScreenState extends State<LockScreen> {
               style: MyStyles.gradientMediumTextStyle);
         } else {
           return Text(
-            'Current locking period still lasts ${time?.days ?? 0} Days, ${time?.hours ?? 0} Hours, ${time?.min ?? 0} Minutes and ${time?.sec ?? 0} Seconds.',
+            'Current locking period still lasts ${time.days ?? 0} Days, ${time.hours ?? 0} Hours, ${time.min ?? 0} Minutes and ${time.sec ?? 0} Seconds.',
             style: MyStyles.gradientMediumTextStyle,
           );
         }
@@ -237,8 +237,8 @@ class _LockScreenState extends State<LockScreen> {
     );
   }
 
-  Future<Gas> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas res = await showGeneralDialog(
+  Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -246,6 +246,7 @@ class _LockScreenState extends State<LockScreen> {
           alignment: Alignment.center,
           child: ConfirmGasScreen(
             transaction: transaction,
+            network: Network.ETH,
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
@@ -271,18 +272,18 @@ class _LockScreenState extends State<LockScreen> {
         if (state is LockPendingApprove || state is LockPendingLock) return;
         if (state is LockIsApproved) {
           Transaction transaction = await context.read<LockCubit>().makeTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if(transaction!=null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
-            context.read<LockCubit>().lock(gas);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
+            context.read<LockCubit>().lock(gas!);
           }
         }
         if (state is LockHasToApprove){
           Transaction transaction = await context.read<LockCubit>().makeApproveTransaction();
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if(transaction!=null) {
-            Gas gas = await showConfirmGasFeeDialog(transaction);
-            context.read<LockCubit>().approve(gas);
+            Gas? gas = await showConfirmGasFeeDialog(transaction);
+            context.read<LockCubit>().approve(gas!);
           }
         }
       },

@@ -22,7 +22,7 @@ class BakktService {
   final EthereumService ethService;
   final String privateKey;
 
-  BakktService({@required this.ethService, @required this.privateKey});
+  BakktService({required this.ethService, required this.privateKey});
 
   Future<Credentials> get credentials => ethService.credentialsForKey(privateKey);
 
@@ -36,7 +36,7 @@ class BakktService {
     var max = TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
     // let value = typeof number === "string" ? parseFloat(number).toFixed(18) : number.toFixed(18)
     var ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount).getInWei.toString();
-    ans = ans.substring(0, ans.length - (18 - max));
+    ans = ans.substring(0, ans.length - (18 - max!));
     return BigInt.parse(ans.toString());
   }
 
@@ -44,7 +44,7 @@ class BakktService {
     var max = TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
     String ans = value.toString();
 
-    while (ans.length < max) {
+    while (ans.length < max!) {
       ans = "0" + ans;
     }
     ans = ans.substring(0, ans.length - max) + "." + ans.substring(ans.length - max);
@@ -115,7 +115,7 @@ class BakktService {
     return "0";
   }
 
-  Future<String> getAmountsOut(fromToken, toToken, amountIn) async {
+  Future<String?> getAmountsOut(fromToken, toToken, amountIn) async {
     DeployedContract contract =
         await ethService.loadContractWithGivenAddress("sps", await ethService.getAddrHex("bakkt_swap_contract"));
     if (fromToken == "bakkt" && toToken == "deus") {
@@ -174,9 +174,9 @@ class BakktService {
       stockAddress,
       getWei(amount),
       info.blockNo.toString(),
-      info.signs[0].v.toString(),
-      info.signs[0].r,
-      info.signs[0].s,
+      info.signs[0]!.v.toString(),
+      info.signs[0]!.r,
+      info.signs[0]!.s,
       info.price.toString(),
       info.fee.toString()
     ]);
@@ -192,9 +192,9 @@ class BakktService {
       tokenAddress,
       getWei(amount),
       info.blockNo.toString(),
-      info.signs[0].v.toString(),
-      info.signs[0].r,
-      info.signs[0].s,
+      info.signs[0]!.v.toString(),
+      info.signs[0]!.r,
+      info.signs[0]!.s,
       info.price.toString(),
       info.fee.toString()
     ]);

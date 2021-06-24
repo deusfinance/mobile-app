@@ -64,11 +64,11 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
       case SyncChains.xDAI:
         return "xDai";
       case SyncChains.MAINNET:
-        return "Mainnet";
+        return "ETH";
       case SyncChains.BSC:
         return "BSC";
       case SyncChains.HECO:
-        return "Heco";
+        return "Heco (SOON)";
       case SyncChains.MATIC:
         return "Matic (SOON)";
     }
@@ -160,8 +160,8 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(
                       onTap: (){
-                        locator<NavigationService>().goBack(context);
-                        locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
+                        // locator<NavigationService>().goBack(context);
+                        // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
                       },
                       child: Align(
                         alignment: Alignment.center,

@@ -11,7 +11,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 
 class ChartContainer extends StatefulWidget {
-  final Future<List<ChartDataPoint>> chartPoints;
+  final Future<List<ChartDataPoint>>? chartPoints;
 
   ChartContainer({this.chartPoints});
 
@@ -20,9 +20,9 @@ class ChartContainer extends StatefulWidget {
 }
 
 class _ChartContainerState extends State<ChartContainer> {
-  Future<ValueLockedChartData> futureData;
+  late Future<ValueLockedChartData> futureData;
   String timeSpanOfChart = 'Past Week';
-  Duration _displayedChartDuration;
+  late Duration _displayedChartDuration;
 
   static const SizedBox _bigHeightDivider = SizedBox(
     height: 20,
@@ -54,7 +54,7 @@ class _ChartContainerState extends State<ChartContainer> {
 
   getTvl() async {
     double tvl = 0;
-    var response = await http.get("https://app.deus.finance/tvl.json");
+    var response = await http.get(Uri.parse("https://app.deus.finance/tvl.json"));
     if (response.statusCode == 200) {
       final Map<String, dynamic> map = json.decode(response.body);
       map.forEach((key, value) {
@@ -67,7 +67,7 @@ class _ChartContainerState extends State<ChartContainer> {
   void _onTimeSelected(Duration dur) {
     setState(() {
       _displayedChartDuration = dur;
-      timeSpanOfChart = durationTimeSpan[dur];
+      timeSpanOfChart = durationTimeSpan[dur]!;
       futureData = _getFutureChartData(dur);
     });
   }
@@ -106,13 +106,13 @@ class _ChartContainerState extends State<ChartContainer> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildHeader(
-                    valueLockedData.lockedInCash,
-                    valueLockedData.lockedInCrypto,
-                    valueLockedData.absoluteChange,
-                    valueLockedData.relativeChange,
+                    valueLockedData!.lockedInCash!,
+                    valueLockedData.lockedInCrypto!,
+                    valueLockedData.absoluteChange!,
+                    valueLockedData.relativeChange!,
                     snap.connectionState == ConnectionState.done),
                 _bigHeightDivider,
-                CustomChart(valueLockedData.chartDataPoints, _onTimeSelected)
+                CustomChart(valueLockedData.chartDataPoints!, _onTimeSelected)
               ],
             )
           : Container(
