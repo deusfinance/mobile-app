@@ -56,7 +56,7 @@ class EthereumService {
     }
     //heco
     else if (chainId == 128) {
-      return 'https://http-mainnet.hecochain.com';
+      return 'https://http-mainnet.hecochain.com/';
     } else if(chainId == 256) {
       return 'https://http-testnet.hecochain.com';
     }

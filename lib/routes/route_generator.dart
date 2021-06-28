@@ -18,6 +18,10 @@ import 'package:deus_mobile/screens/synthetics/heco_synthetics/cubit/heco_synthe
 import 'package:deus_mobile/screens/synthetics/heco_synthetics/heco_synthetics_screen.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/cubit/mainnet_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
+import 'package:deus_mobile/screens/wallet/add_wallet_asset/add_wallet_asset_screen.dart';
+import 'package:deus_mobile/screens/wallet/add_wallet_asset/cubit/add_wallet_asset_cubit.dart';
+import 'package:deus_mobile/screens/wallet/cubit/wallet_cubit.dart';
+import 'package:deus_mobile/screens/wallet/wallet_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
@@ -81,6 +85,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     XDaiStockSelectorScreen.url: (_) => XDaiStockSelectorScreen(arguments["data"]),
     BscStockSelectorScreen.url: (_) => BscStockSelectorScreen(arguments["data"]),
     HecoStockSelectorScreen.url: (_) => HecoStockSelectorScreen(arguments["data"]),
+
+    AddWalletAssetScreen.route: (_) {
+      return BlocProvider(
+        create: (context) => AddWalletAssetCubit(arguments["chain"]),
+        child: AddWalletAssetScreen(),
+      );
+    },
+
     //main screens
     StakeScreen.url: (_) {
       return BlocProvider(
@@ -90,6 +102,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
     },
     SwapScreen.route: (_) => BlocProvider<SwapCubit>(
         create: (_) => SwapCubit(), child: SwapScreen()),
+    WalletScreen.route: (_) => BlocProvider<WalletCubit>(
+        create: (_) => WalletCubit(), child: WalletScreen()),
     XDaiSyntheticsScreen.route: (_) => BlocProvider<XDaiSyntheticsCubit>(
         create: (_) => XDaiSyntheticsCubit(), child: XDaiSyntheticsScreen()),
     BscSyntheticsScreen.route: (_) => BlocProvider<BscSyntheticsCubit>(

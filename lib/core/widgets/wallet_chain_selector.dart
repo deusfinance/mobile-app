@@ -1,26 +1,31 @@
 import 'dart:ui';
 
+import 'package:deus_mobile/core/database/chain.dart';
+import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/util/responsive.dart';
+import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/core/widgets/svg.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/screens/synthetics/bsc_synthetics/bsc_synthetics_screen.dart';
-import 'package:deus_mobile/screens/synthetics/heco_synthetics/heco_synthetics_screen.dart';
-import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthetics_screen.dart';
-import 'package:deus_mobile/screens/synthetics/matic_synthetics/matic_synthetics_screen.dart';
-import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
-import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
 
-enum WalletChains { xDAI, MAINNET, BSC, HECO, MATIC }
-
 class WalletChainSelector extends StatefulWidget {
-  WalletChains selectedChain;
+  Chain? selectedChain;
+  Stream<List<Chain>> chains;
+  void Function(Chain chain) onChainSelected;
+  void Function() addChain;
+  void Function(Chain chain) deleteChain;
+  void Function(Chain chain) updateChain;
 
-  WalletChainSelector(this.selectedChain);
+  WalletChainSelector(
+      {this.selectedChain,
+      required this.chains,
+      required this.onChainSelected,
+      required this.addChain,
+      required this.deleteChain,
+      required this.updateChain});
 
   @override
   _WalletChainSelectorState createState() => _WalletChainSelectorState();
@@ -49,7 +54,7 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
           child: Row(
             children: [
               Text(
-                getChainName(widget.selectedChain),
+                widget.selectedChain?.name ?? "--",
                 style: MyStyles.whiteSmallTextStyle,
               ),
               Spacer(),
@@ -57,21 +62,6 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
             ],
           )),
     );
-  }
-
-  String getChainName(WalletChains chain) {
-    switch (chain) {
-      case WalletChains.xDAI:
-        return "xDai";
-      case WalletChains.MAINNET:
-        return "Mainnet";
-      case WalletChains.BSC:
-        return "BSC";
-      case WalletChains.HECO:
-        return "Heco";
-      case WalletChains.MATIC:
-        return "Matic";
-    }
   }
 
   void showChainSelectDialog() {
@@ -83,12 +73,14 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
         alignment: Alignment.center,
         child: Material(
           child: Container(
-            width: getScreenWidth(context) - 50,
+              height: 450,
+              width: getScreenWidth(context) - 50,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               margin: const EdgeInsets.symmetric(horizontal: 6),
               decoration: BoxDecoration(
                   border: Border.all(
-                      color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
+                      color:
+                          Color(MyColors.kAddressBackground).withOpacity(0.5)),
                   color: Color(MyColors.kAddressBackground).withOpacity(0.25),
                   borderRadius: BorderRadius.all(Radius.circular(6))),
               child: Column(
@@ -96,97 +88,122 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(8),
-                    child:Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Select your Network',
-                          style: MyStyles.whiteSmallTextStyle,
-                        ),
-                      ),
-                  ),
-                  SizedBox(height: 20,),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(WalletChains.xDAI),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        'Select your Network',
+                        style: MyStyles.whiteSmallTextStyle,
                       ),
                     ),
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(MainnetSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(WalletChains.MAINNET),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
-                      ),
-                    ),
+                  SizedBox(
+                    height: 20,
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(WalletChains.BSC),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
-                      ),
-                    ),
+                  Expanded(child: StreamBuilder<List<Chain>>(
+                    stream: widget.chains,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Expanded(
+                          child: MediaQuery.removePadding(
+                            removeTop: true,
+                            context: context,
+                            child: ListView.builder(
+                              itemCount: snapshot.data?.length ?? 0,
+                              itemBuilder: (context, index) {
+                                Chain chain = snapshot.data![index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    widget.selectedChain = chain;
+                                    setState(() {});
+                                    widget.onChainSelected(chain);
+                                    locator<NavigationService>()
+                                        .goBack(context);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        gradient: chain.id == (widget.selectedChain?.id??0)?MyColors.greenToBlueGradient:null,
+                                        border:
+                                        Border.all(color: Colors.white)),
+                                    child: Stack(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.center,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              chain.name,
+                                              style: chain.id == (widget.selectedChain?.id??0)?MyStyles.blackMediumTextStyle:MyStyles.whiteMediumTextStyle
+                                              ,
+                                            ),
+                                          ),
+                                        ),
+                                        Visibility(
+                                          visible: chain.id != 1,
+                                          child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      widget.updateChain(chain);
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                      const EdgeInsets.all(1.0),
+                                                      child: Icon(
+                                                        Icons.edit,
+                                                        color: Colors.white,
+                                                        size: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      widget.deleteChain(chain);
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                      const EdgeInsets.all(8.0),
+                                                      child: Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red,
+                                                        size: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),),
+                  SizedBox(
+                    height: 20,
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
                   Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
+                    margin: EdgeInsets.all(8.0),
+                    child: SelectionButton(
+                      label: 'Add New Network',
+                      onPressed: (bool selected) async {
+                        locator<NavigationService>().goBack(context);
+                        widget.addChain();
                       },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(WalletChains.HECO),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(MaticSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(WalletChains.MATIC),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
-                      ),
+                      selected: true,
+                      gradient: MyColors.greenToBlueGradient,
+                      textStyle: MyStyles.blackMediumTextStyle,
                     ),
                   ),
                 ],

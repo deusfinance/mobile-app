@@ -11,7 +11,7 @@ import 'my_colors.dart';
 import 'styles.dart';
 
 class Statics{
-  static XDaiStockData? xDaiStockData;
+  static String DB_NAME = 'app_database4.db';
 }
 
 showToast(BuildContext context, final TransactionStatus status) {

@@ -3,8 +3,7 @@ import 'dart:math';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:deus_mobile/service/sync/sync_service.dart';
-import 'file:///D:/flutter%20projects/mobile-app/lib/service/sync/xdai_stock_service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 

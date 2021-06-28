@@ -96,7 +96,6 @@ abstract class SyntheticsState extends Equatable {
             ethService: new EthereumService(100),
             privateKey: locator<ConfigurationService>().getPrivateKey()!);
         syncData = new XDaiStockData();
-        Statics.xDaiStockData = syncData as XDaiStockData;
         break;
       case SyntheticsChain.MATIC:
         fromToken = CurrencyData.usdc;

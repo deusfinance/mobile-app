@@ -11,18 +11,35 @@ import 'package:floor/floor.dart';
   ],
 )
 class WalletAsset {
-  @primaryKey
-  final int id;
+  @PrimaryKey(autoGenerate: true)
+  int? id;
 
   @ColumnInfo(name: 'chain_id')
-  final int chainId;
+  int chainId;
 
-  final String tokenName;
-  final String tokenSymbol;
-  final String tokenLogoPath;
+  String tokenAddress;
+  String? tokenSymbol;
+  int? tokenDecimal;
 
-  final double value;
+  double? valueWhenInserted;
 
-  WalletAsset(this.id, this.chainId, this.tokenName, this.tokenSymbol,
-      this.tokenLogoPath, this.value);
+
+  @ignore
+  String? balance;
+
+  String? logoPath;
+
+  @ignore
+  String? tokenName;
+
+  @ignore
+  double? value;
+
+
+  WalletAsset({required this.chainId, required this.tokenAddress, this.tokenSymbol,
+      this.tokenDecimal, this.valueWhenInserted, this.logoPath});
+
+  double getValuePercentage() {
+    return 12;
+  }
 }

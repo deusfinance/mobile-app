@@ -83,9 +83,9 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `WalletAsset` (`id` INTEGER NOT NULL, `chain_id` INTEGER NOT NULL, `tokenName` TEXT NOT NULL, `tokenSymbol` TEXT NOT NULL, `tokenLogoPath` TEXT NOT NULL, `value` REAL NOT NULL, FOREIGN KEY (`chain_id`) REFERENCES `Chain` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `WalletAsset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `chain_id` INTEGER NOT NULL, `tokenAddress` TEXT NOT NULL, `tokenSymbol` TEXT, `tokenDecimal` INTEGER, `valueWhenInserted` REAL, `logoPath` TEXT, FOREIGN KEY (`chain_id`) REFERENCES `Chain` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Chain` (`id` INTEGER NOT NULL, `chainId` INTEGER NOT NULL, `name` TEXT NOT NULL, `RPC_url` TEXT NOT NULL, `blockExplorerUrl` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Chain` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `RPC_url` TEXT NOT NULL, `blockExplorerUrl` TEXT, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -114,10 +114,37 @@ class _$WalletAssetDao extends WalletAssetDao {
             (WalletAsset item) => <String, Object?>{
                   'id': item.id,
                   'chain_id': item.chainId,
-                  'tokenName': item.tokenName,
+                  'tokenAddress': item.tokenAddress,
                   'tokenSymbol': item.tokenSymbol,
-                  'tokenLogoPath': item.tokenLogoPath,
-                  'value': item.value
+                  'tokenDecimal': item.tokenDecimal,
+                  'valueWhenInserted': item.valueWhenInserted,
+                  'logoPath': item.logoPath
+                }),
+        _walletAssetUpdateAdapter = UpdateAdapter(
+            database,
+            'WalletAsset',
+            ['id'],
+            (WalletAsset item) => <String, Object?>{
+                  'id': item.id,
+                  'chain_id': item.chainId,
+                  'tokenAddress': item.tokenAddress,
+                  'tokenSymbol': item.tokenSymbol,
+                  'tokenDecimal': item.tokenDecimal,
+                  'valueWhenInserted': item.valueWhenInserted,
+                  'logoPath': item.logoPath
+                }),
+        _walletAssetDeletionAdapter = DeletionAdapter(
+            database,
+            'WalletAsset',
+            ['id'],
+            (WalletAsset item) => <String, Object?>{
+                  'id': item.id,
+                  'chain_id': item.chainId,
+                  'tokenAddress': item.tokenAddress,
+                  'tokenSymbol': item.tokenSymbol,
+                  'tokenDecimal': item.tokenDecimal,
+                  'valueWhenInserted': item.valueWhenInserted,
+                  'logoPath': item.logoPath
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -128,28 +155,78 @@ class _$WalletAssetDao extends WalletAssetDao {
 
   final InsertionAdapter<WalletAsset> _walletAssetInsertionAdapter;
 
+  final UpdateAdapter<WalletAsset> _walletAssetUpdateAdapter;
+
+  final DeletionAdapter<WalletAsset> _walletAssetDeletionAdapter;
+
   @override
-  Future<List<WalletAsset>> getAllWalletAssets() async {
-    return _queryAdapter.queryList('SELECT * FROM WalletAsset',
+  Future<List<WalletAsset>> getAllWalletAssets(int chainId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM WalletAsset Where chain_id = ?1',
         mapper: (Map<String, Object?> row) => WalletAsset(
-            row['id'] as int,
-            row['chain_id'] as int,
-            row['tokenName'] as String,
-            row['tokenSymbol'] as String,
-            row['tokenLogoPath'] as String,
-            row['value'] as double));
+            chainId: row['chain_id'] as int,
+            tokenAddress: row['tokenAddress'] as String,
+            tokenSymbol: row['tokenSymbol'] as String?,
+            tokenDecimal: row['tokenDecimal'] as int?,
+            valueWhenInserted: row['valueWhenInserted'] as double?,
+            logoPath: row['logoPath'] as String?),
+        arguments: [chainId]);
   }
 
   @override
-  Future<void> insertWalletAsset(WalletAsset walletAsset) async {
-    await _walletAssetInsertionAdapter.insert(
-        walletAsset, OnConflictStrategy.abort);
+  Future<List<int>> insertWalletAsset(List<WalletAsset> walletAssets) {
+    return _walletAssetInsertionAdapter.insertListAndReturnIds(
+        walletAssets, OnConflictStrategy.ignore);
+  }
+
+  @override
+  Future<int> updateCtWalletAsset(List<WalletAsset> walletAssets) {
+    return _walletAssetUpdateAdapter.updateListAndReturnChangedRows(
+        walletAssets, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> deleteWalletAsset(List<WalletAsset> walletAssets) {
+    return _walletAssetDeletionAdapter
+        .deleteListAndReturnChangedRows(walletAssets);
   }
 }
 
 class _$ChainDao extends ChainDao {
   _$ChainDao(this.database, this.changeListener)
-      : _queryAdapter = QueryAdapter(database);
+      : _queryAdapter = QueryAdapter(database, changeListener),
+        _chainInsertionAdapter = InsertionAdapter(
+            database,
+            'Chain',
+            (Chain item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'RPC_url': item.RPC_url,
+                  'blockExplorerUrl': item.blockExplorerUrl
+                },
+            changeListener),
+        _chainUpdateAdapter = UpdateAdapter(
+            database,
+            'Chain',
+            ['id'],
+            (Chain item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'RPC_url': item.RPC_url,
+                  'blockExplorerUrl': item.blockExplorerUrl
+                },
+            changeListener),
+        _chainDeletionAdapter = DeletionAdapter(
+            database,
+            'Chain',
+            ['id'],
+            (Chain item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'RPC_url': item.RPC_url,
+                  'blockExplorerUrl': item.blockExplorerUrl
+                },
+            changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -157,14 +234,38 @@ class _$ChainDao extends ChainDao {
 
   final QueryAdapter _queryAdapter;
 
+  final InsertionAdapter<Chain> _chainInsertionAdapter;
+
+  final UpdateAdapter<Chain> _chainUpdateAdapter;
+
+  final DeletionAdapter<Chain> _chainDeletionAdapter;
+
   @override
-  Future<List<Chain>> getAllChains() async {
-    return _queryAdapter.queryList('SELECT * FROM Chain',
+  Stream<List<Chain>> getAllChains() {
+    return _queryAdapter.queryListStream('SELECT * FROM Chain',
         mapper: (Map<String, Object?> row) => Chain(
-            row['id'] as int,
-            row['chainId'] as int,
-            row['name'] as String,
-            row['RPC_url'] as String,
-            row['blockExplorerUrl'] as String));
+            id: row['id'] as int,
+            name: row['name'] as String,
+            RPC_url: row['RPC_url'] as String,
+            blockExplorerUrl: row['blockExplorerUrl'] as String?),
+        queryableName: 'Chain',
+        isView: false);
+  }
+
+  @override
+  Future<List<int>> insertChain(List<Chain> chains) {
+    return _chainInsertionAdapter.insertListAndReturnIds(
+        chains, OnConflictStrategy.ignore);
+  }
+
+  @override
+  Future<int> updateChains(List<Chain> chains) {
+    return _chainUpdateAdapter.updateListAndReturnChangedRows(
+        chains, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> deleteChains(List<Chain> chains) {
+    return _chainDeletionAdapter.deleteListAndReturnChangedRows(chains);
   }
 }

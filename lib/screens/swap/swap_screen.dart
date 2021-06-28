@@ -375,7 +375,6 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildRouteTransformWidget(List<Token> route, int index) {
-    print(route);
     if ((route[index].getTokenName() == "eth" && route[index + 1].getTokenName() == "deus") ||
         (route[index].getTokenName() == "deus" && route[index + 1].getTokenName() == "eth")) {
       return Row(

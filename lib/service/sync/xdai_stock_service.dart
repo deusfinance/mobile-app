@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';

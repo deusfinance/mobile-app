@@ -6,7 +6,6 @@ import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
 
 import '../core/widgets/svg.dart';
 
-@entity
 class Token extends Equatable {
   final String name;
   final String symbol;

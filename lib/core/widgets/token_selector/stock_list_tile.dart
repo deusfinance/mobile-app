@@ -47,7 +47,11 @@ class StockListTile extends StatelessWidget {
               SizedBox(width: 8,),
               Text("S",overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteMediumTextStyle),
               SizedBox(width: 6,),
-              Icon(Icons.copy, color: MyColors.HalfWhite,size: 12,)
+              GestureDetector(
+                  onTap: (){
+
+                  },
+                  child: Icon(Icons.copy, color: MyColors.HalfWhite,size: 12,))
             ],
           ),
           Row(

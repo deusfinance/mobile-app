@@ -19,7 +19,6 @@ enum SyncChains { xDAI, MAINNET, BSC, HECO, MATIC }
 
 class SyncChainSelector extends StatefulWidget {
   SyncChains selectedChain;
-
   SyncChainSelector(this.selectedChain);
 
   @override
@@ -105,88 +104,129 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                       ),
                   ),
                   SizedBox(height: 20,),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        locator<NavigationService>().goBack(context);
-                        locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
-                      },
+                  GestureDetector(
+                    onTap: (){
+                      locator<NavigationService>().goBack(context);
+                      locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: widget.selectedChain == SyncChains.xDAI?MyColors.greenToBlueGradient:null,
+                          border: Border.all(color: Colors.white)
+                      ),
+                      padding: EdgeInsets.all(8),
                       child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(SyncChains.xDAI),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            getChainName(SyncChains.xDAI),
+                            style: widget.selectedChain == SyncChains.xDAI?MyStyles.blackMediumTextStyle:MyStyles.whiteMediumTextStyle,
+                          ),
                       ),
                     ),
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        locator<NavigationService>().goBack(context);
-                        locator<NavigationService>().navigateTo(MainnetSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(SyncChains.MAINNET),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
+                  GestureDetector(
+                    onTap: (){
+                      locator<NavigationService>().goBack(context);
+                      locator<NavigationService>().navigateTo(MainnetSyntheticsScreen.route, context, replace: true);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: widget.selectedChain == SyncChains.MAINNET?MyColors.greenToBlueGradient:null,
+                          border: Border.all(color: Colors.white)
+                      ),
+                      padding: EdgeInsets.all(8),
+
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            getChainName(SyncChains.MAINNET),
+                            style: widget.selectedChain == SyncChains.MAINNET?MyStyles.blackMediumTextStyle:MyStyles.whiteMediumTextStyle,
+                          ),
                       ),
                     ),
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        locator<NavigationService>().goBack(context);
-                        locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(SyncChains.BSC),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
+                  GestureDetector(
+                    onTap: (){
+                      locator<NavigationService>().goBack(context);
+                      locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: widget.selectedChain == SyncChains.BSC?MyColors.greenToBlueGradient:null,
+                          border: Border.all(color: Colors.white)
                       ),
+                      padding: EdgeInsets.all(8),
+
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            getChainName(SyncChains.BSC),
+                            style: widget.selectedChain == SyncChains.BSC?MyStyles.blackMediumTextStyle:MyStyles.whiteMediumTextStyle,
+                          ),
+                        ),
                     ),
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(SyncChains.HECO),
-                          style: MyStyles.whiteMediumTextStyle,
-                        ),
-                      ),
-                    ),
+                  SizedBox(
+                    height: 12,
                   ),
-                  Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: (){
-                        // locator<NavigationService>().goBack(context);
-                        // locator<NavigationService>().navigateTo(MaticSyntheticsScreen.route, context, replace: true);
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          getChainName(SyncChains.MATIC),
-                          style: MyStyles.whiteMediumTextStyle,
+                  // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
+                  GestureDetector(
+                    onTap: (){
+                      // locator<NavigationService>().goBack(context);
+                      // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: widget.selectedChain == SyncChains.HECO?MyColors.greenToBlueGradient:null,
+                          border: Border.all(color: Colors.white)
+                      ),
+                      padding: EdgeInsets.all(8),
+
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            getChainName(SyncChains.HECO),
+                            style: widget.selectedChain == SyncChains.HECO?MyStyles.blackMediumTextStyle:MyStyles.whiteMediumTextStyle,
+                          ),
                         ),
                       ),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
+                  GestureDetector(
+                    onTap: (){
+                      // locator<NavigationService>().goBack(context);
+                      // locator<NavigationService>().navigateTo(MaticSyntheticsScreen.route, context, replace: true);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: widget.selectedChain == SyncChains.MATIC?MyColors.greenToBlueGradient:null,
+                          border: Border.all(color: Colors.white)
+                      ),
+                      padding: EdgeInsets.all(8),
+
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            getChainName(SyncChains.MATIC),
+                            style: widget.selectedChain == SyncChains.MATIC?MyStyles.blackMediumTextStyle:MyStyles.whiteMediumTextStyle,
+                          ),
+                        ),
                     ),
                   ),
                 ],

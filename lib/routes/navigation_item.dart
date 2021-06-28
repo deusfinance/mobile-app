@@ -5,6 +5,8 @@ import 'package:deus_mobile/screens/staking_vault_overview/staking_vault_overvie
 import 'package:deus_mobile/screens/swap/cubit/swap_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/xdai_synthetics_screen.dart';
+import 'package:deus_mobile/screens/wallet/cubit/wallet_cubit.dart';
+import 'package:deus_mobile/screens/wallet/wallet_screen.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:equatable/equatable.dart';
@@ -56,7 +58,13 @@ class NavigationItem extends Equatable {
       routeUrl: BlurredStakeLockScreen.url,
       style: NavigationStyle.BlueGreen);
 
-  static List<NavigationItem> get items => [swap, synthethics, blurredStakeAndLockOverview];
+  static final NavigationItem wallet = NavigationItem(
+      page: BlocProvider<WalletCubit>(create: (_) => WalletCubit(), child: WalletScreen()),
+      title: "Wallet",
+      routeUrl: WalletScreen.route,
+      style: NavigationStyle.BluePurple);
+
+  static List<NavigationItem> get items => [swap, synthethics, wallet];
 
   @override
   List<Object> get props => [title];

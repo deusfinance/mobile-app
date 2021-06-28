@@ -12,7 +12,7 @@ import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/service/sync/heco_stock_service.dart';
 import 'package:deus_mobile/service/sync/matic_stock_service.dart';
-import 'file:///D:/flutter%20projects/mobile-app/lib/service/sync/xdai_stock_service.dart';
+import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
@@ -530,7 +530,6 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
               }
             });
           } on Exception catch (error) {
-            print(error.toString());
             emit(SyntheticsTransactionFinishedState(state,
                 transactionStatus: TransactionStatus(
                     error.toString(),
