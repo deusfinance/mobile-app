@@ -179,7 +179,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
               .fromTokenChanged(selectedToken);
         });
 
-    context.read<MainnetSyntheticsCubit>().addListenerToFromField();
+    // context.read<MainnetSyntheticsCubit>().addListenerToFromField();
 
     SwapField toField = new SwapField(
       direction: Direction.to,

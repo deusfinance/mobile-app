@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
@@ -9,6 +11,7 @@ import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/statics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
@@ -17,30 +20,14 @@ class SwapCubit extends Cubit<SwapState> {
   SwapCubit() : super(SwapInitial());
 
   init({SwapState? swapState}) async {
-
     if (swapState != null) {
+      addListenerToFromField(swapState);
       emit(swapState);
     }else{
       emit(SwapLoading(state));
-      fetchBalances();
-      state.streamController.stream
-          .debounce(Duration(milliseconds: 500))
-          .listen((s) async {
-        emit(SwapLoaded(state, isInProgress: true));
-        if (double.tryParse(s)! > 0) {
-          state.swapService
-              .getAmountsOut(
-              state.fromToken.getTokenName(), state.toToken.getTokenName(), s)
-              .then((value) {
-            state.toValue = double.tryParse(value)!;
-            state.toFieldController.text = EthereumService.formatDouble(value);
-          });
-        } else {
-          state.toValue = 0;
-          state.toFieldController.text = "0.0";
-        }
-        emit(SwapLoaded(state, isInProgress: false));
-      });
+      await fetchBalances();
+      addListenerToFromField(state);
+      emit(SwapLoaded(state));
     }
 
   }
@@ -246,12 +233,30 @@ class SwapCubit extends Cubit<SwapState> {
     return "0.0";
   }
 
-  addListenerToFromField() {
-    if (!state.fromFieldController.hasListeners) {
-      state.fromFieldController.addListener(() {
-        listenInput();
-      });
-    }
+  addListenerToFromField(SwapState s) {
+    s.fromFieldController = new TextEditingController();
+    s.toFieldController = new TextEditingController();
+    s.toValue = 0;
+    s.streamController = new StreamController();
+    s.fromFieldController.addListener(listenInput);
+    s.streamController.stream
+        .debounce(Duration(milliseconds: 500))
+        .listen((s) async {
+      emit(SwapLoaded(state, isInProgress: true));
+      if (double.tryParse(s)! > 0) {
+        state.swapService
+            .getAmountsOut(
+            state.fromToken.getTokenName(), state.toToken.getTokenName(), s)
+            .then((value) {
+          state.toValue = double.tryParse(value)!;
+          state.toFieldController.text = EthereumService.formatDouble(value);
+        });
+      } else {
+        state.toValue = 0;
+        state.toFieldController.text = "0.0";
+      }
+      emit(SwapLoaded(state, isInProgress: false));
+    });
   }
 
   addListenerToSlippageController() {

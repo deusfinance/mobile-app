@@ -156,8 +156,6 @@ class _SwapScreenState extends State<SwapScreen> {
       },
     );
 
-    context.read<SwapCubit>().addListenerToFromField();
-
     SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,

@@ -57,7 +57,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   }
 
   _buildBody(AssetDetailState state) {
-    print(state.walletAsset.logoPath);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +262,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   showReceiveBarcode(AssetDetailState state) async {
     String publicAddress =
         (await locator<AddressService>().getPublicAddress()).hex;
-    print(publicAddress);
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,

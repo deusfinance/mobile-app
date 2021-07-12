@@ -6,9 +6,11 @@ import 'package:deus_mobile/core/database/transaction.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/svg.dart';
+import 'package:deus_mobile/core/widgets/toast.dart';
 import 'package:deus_mobile/core/widgets/wallet_chain_selector.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/asset_detail/asset_detail_screen.dart';
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/add_wallet_asset_screen.dart';
@@ -81,10 +83,15 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   Widget _buildBody(WalletState state) {
-    return Column(
+    return Stack(
       children: [
-        _navbar(state),
-        state is WalletPortfilioState ? _assets(state) : listTransactions(state)
+        Column(
+          children: [
+            _navbar(state),
+            state is WalletPortfilioState ? _assets(state) : listTransactions(state)
+          ],
+        ),
+        _buildToastWidget(state),
       ],
     );
   }
@@ -94,11 +101,6 @@ class _WalletScreenState extends State<WalletScreen> {
       margin: EdgeInsets.fromLTRB(8, 16, 8, 8),
       child: Column(
         children: [
-          GestureDetector(
-              onTap: (){
-                context.read<WalletCubit>().test();
-              },
-              child: Text("ahoildvecfj")),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -540,7 +542,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 .makeTransactionWithInfo(transaction);
 
                             Gas? gas = await showConfirmGasFeeDialog(state, t);
-                            context.read<WalletCubit>().sendTransaction(gas, t);
+                            context.read<WalletCubit>().sendTransaction(gas, t, transaction.title, TransactionType.SPEEDUP);
                           },
                           child: Container(
                               decoration: BoxDecoration(
@@ -562,7 +564,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 .makeCancelTransaction(transaction);
 
                             Gas? gas = await showConfirmGasFeeDialog(state, t);
-                            context.read<WalletCubit>().sendTransaction(gas, t);
+                            context.read<WalletCubit>().sendTransaction(gas, t, transaction.title, TransactionType.CANCEL);
                           },
                           child: Container(
                               decoration: BoxDecoration(
@@ -747,5 +749,79 @@ class _WalletScreenState extends State<WalletScreen> {
       return PlatformSvg.asset('icons/upload.svg', height: 30);
     } else
       return Container();
+  }
+
+  Widget _buildTransactionPending(TransactionStatus transactionStatus) {
+    return Container(
+      child: Toast(
+        label: transactionStatus.label,
+        message: transactionStatus.message,
+        color: MyColors.ToastGrey,
+        onPressed: () {
+          if (transactionStatus.hash != "") {
+            // _launchInBrowser();
+          }
+        },
+        onClosed: () {
+          context.read<WalletCubit>().closeToast();
+        },
+      ),
+    );
+  }
+
+  Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
+    return Container(
+      child: Toast(
+        label: transactionStatus.label,
+        message: transactionStatus.message,
+        color: MyColors.ToastGreen,
+        onPressed: () {
+          // _launchInBrowser(transactionStatus.transactionUrl(chainId: 100)!);
+        },
+        onClosed: () {
+          context.read<WalletCubit>().closeToast();
+        },
+      ),
+    );
+  }
+
+  Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
+    return Container(
+      child: Toast(
+        label: transactionStatus.label,
+        message: transactionStatus.message,
+        color: MyColors.ToastRed,
+        onPressed: () {
+          // _launchInBrowser(transactionStatus.transactionUrl(chainId: 100)!);
+        },
+        onClosed: () {
+          context.read<WalletCubit>().closeToast();
+        },
+      ),
+    );
+  }
+
+  Widget _buildToastWidget(WalletState state) {
+    if (state is WalletTransactionPendingState && state.showingToast) {
+      return Align(
+          alignment: Alignment.bottomCenter,
+          child: _buildTransactionPending(state.transactionStatus));
+    } else if (state is WalletTransactionFinishedState &&
+        state.showingToast) {
+      if (state.transactionStatus.status == Status.PENDING) {
+        return Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildTransactionPending(state.transactionStatus));
+      } else if (state.transactionStatus.status == Status.SUCCESSFUL) {
+        return Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildTransactionSuccessFul(state.transactionStatus));
+      } else if (state.transactionStatus.status == Status.FAILED) {
+        return Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildTransactionFailed(state.transactionStatus));
+      }
+    }
+    return Container();
   }
 }

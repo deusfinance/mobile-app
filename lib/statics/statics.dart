@@ -15,7 +15,7 @@ import 'my_colors.dart';
 import 'styles.dart';
 
 class Statics{
-  static String DB_NAME = 'app_database18.db';
+  static String DB_NAME = 'app_database19.db';
   static SyntheticsState? xdaiSyncState;
   static SyntheticsState? bscSyncState;
   static SyntheticsState? hecoSyncState;

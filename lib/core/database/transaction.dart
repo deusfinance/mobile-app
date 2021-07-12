@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:floor/floor.dart';
 import 'package:web3dart/web3dart.dart';
 
-enum TransactionType{APPROVE, SWAP, BUY, SELL, SEND}
+enum TransactionType{APPROVE, SWAP, BUY, SELL, SEND, CANCEL, SPEEDUP}
 
 @entity
 class DbTransaction {
@@ -47,7 +47,10 @@ class DbTransaction {
         return "SELL: ${title}";
       case 4:
         return "SEND: ${title}";
-
+      case 5:
+        return "CANCEL: ${title}";
+      case 6:
+        return "SPEED UP: ${title}";
     }
     return "";
   }

@@ -17,6 +17,7 @@ import 'package:deus_mobile/service/sync/heco_stock_service.dart';
 import 'package:deus_mobile/service/sync/matic_stock_service.dart';
 import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
 import 'package:deus_mobile/statics/statics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
@@ -27,20 +28,8 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
 
   init({SyntheticsState? syntheticsState}) async {
     if (syntheticsState != null) {
-      if(syntheticsState is SyntheticsSelectAssetState)
-        emit(SyntheticsSelectAssetState(syntheticsState));
-      else if(syntheticsState is SyntheticsAssetSelectedState)
-        emit(SyntheticsAssetSelectedState(syntheticsState));
-      else if(syntheticsState is SyntheticsTransactionFinishedState)
-        emit(SyntheticsTransactionFinishedState(syntheticsState));
-      else if(syntheticsState is SyntheticsTransactionPendingState)
-        emit(SyntheticsTransactionPendingState(syntheticsState));
-      else if(syntheticsState is SyntheticsErrorState)
-        emit(SyntheticsErrorState(syntheticsState));
-      else if(syntheticsState is SyntheticsLoadingState)
-        emit(SyntheticsLoadingState(syntheticsState));
-      else
-        emit(SyntheticsErrorState(syntheticsState));
+      addListenerToFromField(syntheticsState);
+      emit(syntheticsState);
     } else {
       emit(SyntheticsLoadingState(state));
       bool res1 = await state.syncData.getData();
@@ -49,27 +38,11 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
         state.marketTimerClosed = checkMarketStatus();
         (state.fromToken as CryptoCurrency).balance =
             await getTokenBalance(state.fromToken);
-        state.inputController.stream
-            .debounce(Duration(milliseconds: 500))
-            .listen((s) {
-          if (!(state is SyntheticsSelectAssetState)) {
-            emit(SyntheticsAssetSelectedState(state, isInProgress: true));
-            if (double.tryParse(s)! > 0) {
-              double value = computeToPrice(s);
-              state.toValue = value;
-              state.toFieldController.text =
-                  EthereumService.formatDouble(value.toStringAsFixed(18));
-            } else {
-              state.toValue = 0;
-              state.toFieldController.text = "0.0";
-            }
-            emit(SyntheticsAssetSelectedState(state, isInProgress: false));
-          }
-        });
-        state.timer =
-            new Timer.periodic(Duration(seconds: 14), (Timer t) => getPrices());
         state.database = await AppDatabase.getInstance();
 
+        state.timer =
+        new Timer.periodic(Duration(seconds: 14), (Timer t) => getPrices());
+        addListenerToFromField(state);
         emit(SyntheticsSelectAssetState(state));
       } else {
         emit(SyntheticsErrorState(state));
@@ -232,7 +205,7 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
 
     if (checkMarketClosed(selectedToken, Mode.LONG)) {
       state.marketClosed = true;
-      // emit(SyntheticsLoadingState(state));
+      emit(SyntheticsLoadingState(state));
       emit(SyntheticsAssetSelectedState(state,
           toToken: selectedToken, mode: Mode.LONG));
     } else {
@@ -249,12 +222,29 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
     }
   }
 
-  addListenerToFromField() {
-    if (!state.fromFieldController.hasListeners) {
-      state.fromFieldController.addListener(() {
-        listenInput();
-      });
-    }
+  addListenerToFromField(SyntheticsState s) {
+    s.fromFieldController = new TextEditingController();
+    s.toFieldController = new TextEditingController();
+    s.toValue = 0;
+    s.inputController = new StreamController();
+    s.fromFieldController.addListener(listenInput);
+    s.inputController.stream
+        .debounce(Duration(milliseconds: 500))
+        .listen((s) {
+      if (!(state is SyntheticsSelectAssetState)) {
+        emit(SyntheticsAssetSelectedState(state, isInProgress: true));
+        if (double.tryParse(s)! > 0) {
+          double value = computeToPrice(s);
+          state.toValue = value;
+          state.toFieldController.text =
+              EthereumService.formatDouble(value.toStringAsFixed(18));
+        } else {
+          state.toValue = 0;
+          state.toFieldController.text = "0.0";
+        }
+        emit(SyntheticsAssetSelectedState(state, isInProgress: false));
+      }
+    });
   }
 
   int getDecimalNumbers(String token) {
@@ -265,11 +255,12 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
   }
 
   listenInput() async {
-    if(!(state is SyntheticsSelectAssetState)) {
+    if (!(state is SyntheticsSelectAssetState)) {
       String input = state.fromFieldController.text;
       if (input.isEmpty) {
         input = "0.0";
       }
+
       if (isBuy()) {
         if ((state.fromToken as CryptoCurrency).getAllowances() >=
             EthereumService.getWei(input)) {

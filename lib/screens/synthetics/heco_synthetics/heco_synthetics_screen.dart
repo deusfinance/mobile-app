@@ -179,7 +179,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
           context.read<HecoSyntheticsCubit>().fromTokenChanged(selectedToken);
         });
 
-    context.read<HecoSyntheticsCubit>().addListenerToFromField();
+    // context.read<HecoSyntheticsCubit>().addListenerToFromField();
 
     SwapField toField = new SwapField(
       direction: Direction.to,

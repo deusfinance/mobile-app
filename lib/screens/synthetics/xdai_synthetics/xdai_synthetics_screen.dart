@@ -40,16 +40,14 @@ class XDaiSyntheticsScreen extends StatefulWidget {
 }
 
 class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
-  SyntheticsState? syntheticsState;
   @override
   void initState() {
-    context.read<XDaiSyntheticsCubit>().init();
+    context.read<XDaiSyntheticsCubit>().init(syntheticsState: Statics.xdaiSyncState);
     super.initState();
   }
 
   @override
   void deactivate() {
-    Statics.xdaiSyncState = syntheticsState;
     context.read<XDaiSyntheticsCubit>().dispose();
     super.deactivate();
   }
@@ -109,7 +107,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     return DefaultScreen(
       child: BlocConsumer<XDaiSyntheticsCubit, SyntheticsState>(
           listener: (context, state) {
-        syntheticsState = state;
+        Statics.xdaiSyncState = state;
       }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
           return Center(
@@ -179,7 +177,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
           context.read<XDaiSyntheticsCubit>().fromTokenChanged(selectedToken);
         });
 
-    context.read<XDaiSyntheticsCubit>().addListenerToFromField();
+    // context.read<XDaiSyntheticsCubit>().addListenerToFromField();
 
     SwapField toField = new SwapField(
       direction: Direction.to,

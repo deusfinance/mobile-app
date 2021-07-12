@@ -14,7 +14,7 @@ class Token extends Equatable {
   Token(this.name, this.symbol, this.logoPath);
 
   @override
-  List<Object> get props => [symbol];
+  List<Object> get props => [symbol, name, logoPath];
 
   String getTokenName() {
     return symbol.toLowerCase();

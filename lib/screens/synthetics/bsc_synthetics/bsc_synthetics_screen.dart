@@ -42,7 +42,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
   void initState() {
     context
         .read<BscSyntheticsCubit>()
-        .init();
+        .init(syntheticsState: Statics.bscSyncState);
     super.initState();
   }
 
@@ -179,7 +179,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
           context.read<BscSyntheticsCubit>().fromTokenChanged(selectedToken);
         });
 
-    context.read<BscSyntheticsCubit>().addListenerToFromField();
+    // context.read<BscSyntheticsCubit>().addListenerToFromField();
 
     SwapField toField = new SwapField(
       direction: Direction.to,

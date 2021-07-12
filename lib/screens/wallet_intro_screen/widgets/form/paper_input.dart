@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PaperInput extends StatelessWidget {
   PaperInput({
@@ -11,7 +12,9 @@ class PaperInput extends StatelessWidget {
     this.controller,
     this.maxLines,
     this.obscureText = false,
-    this.textStyle
+    this.textStyle,
+    this.inputFormatters,
+    this.keyboardType
   });
 
   ValueChanged<String>? onChanged;
@@ -20,6 +23,9 @@ class PaperInput extends StatelessWidget {
   String? hintText;
   bool? obscureText;
   int? maxLines;
+  List<TextInputFormatter>? inputFormatters;
+  TextInputType? keyboardType;
+
   TextEditingController? controller;
   TextStyle? textStyle;
 
@@ -38,6 +44,8 @@ class PaperInput extends StatelessWidget {
       controller: this.controller,
       onChanged: this.onChanged,
       maxLines: this.maxLines,
+      keyboardType: this.keyboardType,
+      inputFormatters: this.inputFormatters,
       decoration: InputDecoration(
         border: border,
         focusedBorder: border,

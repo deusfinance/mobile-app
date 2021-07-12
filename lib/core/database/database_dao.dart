@@ -1,4 +1,5 @@
 import 'package:deus_mobile/core/database/transaction.dart';
+import 'package:deus_mobile/core/database/user_address.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/statics/statics.dart';
@@ -47,6 +48,22 @@ abstract class ChainDao {
   @delete
   Future<int> deleteChains(List<Chain> chains);
 }
+
+@dao
+abstract class UserAddressDao {
+  @Query('SELECT * FROM UserAddress')
+  Stream<List<UserAddress>> getAllUserAddresses();
+
+  @Insert(onConflict: OnConflictStrategy.ignore)
+  Future<List<int>> insertUserAddress(List<UserAddress> userAddresses);
+
+  @update
+  Future<int> updateUserAddress(List<UserAddress> userAddresses);
+
+  @delete
+  Future<int> deleteUserAddress(List<UserAddress> userAddresses);
+}
+
 
 @dao
 abstract class DbTransactionDao {

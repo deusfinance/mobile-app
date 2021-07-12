@@ -66,6 +66,8 @@ class _$AppDatabase extends AppDatabase {
 
   DbTransactionDao? _transactionDaoInstance;
 
+  UserAddressDao? _userAddressDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -90,6 +92,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Chain` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `RPC_url` TEXT NOT NULL, `blockExplorerUrl` TEXT, `currencySymbol` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `DbTransaction` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash` TEXT NOT NULL, `chainId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `title` TEXT NOT NULL, `isSuccess` INTEGER)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `UserAddress` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `address` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -112,6 +116,12 @@ class _$AppDatabase extends AppDatabase {
   DbTransactionDao get transactionDao {
     return _transactionDaoInstance ??=
         _$DbTransactionDao(database, changeListener);
+  }
+
+  @override
+  UserAddressDao get userAddressDao {
+    return _userAddressDaoInstance ??=
+        _$UserAddressDao(database, changeListener);
   }
 }
 
@@ -411,5 +421,80 @@ class _$DbTransactionDao extends DbTransactionDao {
   Future<int> deleteDbTransactions(List<DbTransaction> transactions) {
     return _dbTransactionDeletionAdapter
         .deleteListAndReturnChangedRows(transactions);
+  }
+}
+
+class _$UserAddressDao extends UserAddressDao {
+  _$UserAddressDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database, changeListener),
+        _userAddressInsertionAdapter = InsertionAdapter(
+            database,
+            'UserAddress',
+            (UserAddress item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'address': item.address
+                },
+            changeListener),
+        _userAddressUpdateAdapter = UpdateAdapter(
+            database,
+            'UserAddress',
+            ['id'],
+            (UserAddress item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'address': item.address
+                },
+            changeListener),
+        _userAddressDeletionAdapter = DeletionAdapter(
+            database,
+            'UserAddress',
+            ['id'],
+            (UserAddress item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'address': item.address
+                },
+            changeListener);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<UserAddress> _userAddressInsertionAdapter;
+
+  final UpdateAdapter<UserAddress> _userAddressUpdateAdapter;
+
+  final DeletionAdapter<UserAddress> _userAddressDeletionAdapter;
+
+  @override
+  Stream<List<UserAddress>> getAllUserAddresses() {
+    return _queryAdapter.queryListStream('SELECT * FROM UserAddress',
+        mapper: (Map<String, Object?> row) => UserAddress(
+            id: row['id'] as int?,
+            name: row['name'] as String,
+            address: row['address'] as String),
+        queryableName: 'UserAddress',
+        isView: false);
+  }
+
+  @override
+  Future<List<int>> insertUserAddress(List<UserAddress> userAddresses) {
+    return _userAddressInsertionAdapter.insertListAndReturnIds(
+        userAddresses, OnConflictStrategy.ignore);
+  }
+
+  @override
+  Future<int> updateUserAddress(List<UserAddress> userAddresses) {
+    return _userAddressUpdateAdapter.updateListAndReturnChangedRows(
+        userAddresses, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> deleteUserAddress(List<UserAddress> userAddresses) {
+    return _userAddressDeletionAdapter
+        .deleteListAndReturnChangedRows(userAddresses);
   }
 }

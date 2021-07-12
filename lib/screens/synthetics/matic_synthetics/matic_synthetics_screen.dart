@@ -177,7 +177,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
           context.read<MaticSyntheticsCubit>().fromTokenChanged(selectedToken);
         });
 
-    context.read<MaticSyntheticsCubit>().addListenerToFromField();
+    // context.read<MaticSyntheticsCubit>().addListenerToFromField();
 
     SwapField toField = new SwapField(
       direction: Direction.to,

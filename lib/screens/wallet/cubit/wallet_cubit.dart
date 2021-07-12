@@ -7,6 +7,7 @@ import 'package:deus_mobile/core/database/transaction.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/screens/wallet/cubit/wallet_state.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:deus_mobile/service/wallet_service.dart';
@@ -29,6 +30,7 @@ class WalletCubit extends Cubit<WalletState> {
       emit(WalletPortfilioState(state));
     }
   }
+
   Stream<List<WalletAsset>> getWalletAssetsStream() {
     Stream<List<WalletAsset>> stream = getWalletAssetsStreamFromDB(state
         .database!.walletAssetDao
@@ -46,10 +48,11 @@ class WalletCubit extends Cubit<WalletState> {
     if (walletAssets.isNotEmpty) yield walletAssets;
   }
 
-  Future<List<WalletAsset>> getWalletAssetsInfo(List<WalletAsset> walletAssets) async {
+  Future<List<WalletAsset>> getWalletAssetsInfo(
+      List<WalletAsset> walletAssets) async {
     for (int i = 0; i < walletAssets.length; i += 1) {
       walletAssets[i].balance =
-      await (state.walletService!.getTokenBalance(walletAssets[i]));
+          await (state.walletService!.getTokenBalance(walletAssets[i]));
     }
     if (state.selectedChain != null) {
       WalletAsset? walletAsset;
@@ -84,34 +87,13 @@ class WalletCubit extends Cubit<WalletState> {
     return walletAssets;
   }
 
-  Future<void> test()async{
-    DbTransaction transaction;
-    Future.delayed(Duration(seconds: 2),() async {
-      transaction = new DbTransaction(
-          chainId: state.selectedChain?.id??0,
-          hash: "",
-          type: TransactionType.BUY.index,
-          title: "test");
-      List<int> ids = await state.database!.transactionDao
-          .insertDbTransaction([transaction]);
-      transaction.id = ids[0];
-      print("hello");
-      Future.delayed(Duration(seconds: 2),() async {
-        transaction.title = "asdca";
-        await state.database!.transactionDao
-            .updateDbTransactions([transaction]);
-        print("helloasdasda");
-      });
-    });
-
-  }
-
   Stream<List<DbTransaction>> getTransactionsStream() {
     Stream<List<DbTransaction>> stream = getTransactionsStreamFromDB(state
         .database!.transactionDao
         .getAllDbTransactions(state.selectedChain?.id ?? 0));
     return stream;
   }
+
   // Stream<List<DbTransaction>> getTransactionsStreamFromDB(List<DbTransaction> source) async* {
   //   List<DbTransaction> transactions = [];
   //   transactions = await getTransactionsInfo(source);
@@ -131,17 +113,19 @@ class WalletCubit extends Cubit<WalletState> {
   Future<List<DbTransaction>> getTransactionsInfo(
       List<DbTransaction> transactions) async {
     for (int i = 0; i < transactions.length; i += 1) {
-      if(transactions[i].hash.isNotEmpty) {
-        TransactionInformation info =
-        await state.walletService!.getTransactionInfo(transactions[i].hash);
-        transactions[i].nonce = info.nonce;
-        transactions[i].blockNum = info.blockNumber;
-        transactions[i].data = info.input;
-        transactions[i].value = info.value;
-        transactions[i].from = info.from;
-        transactions[i].to = info.to;
-        transactions[i].gasPrice = info.gasPrice;
-        transactions[i].maxGas = info.gas;
+      if (transactions[i].hash.isNotEmpty) {
+        try {
+          TransactionInformation info = await state.walletService!
+              .getTransactionInfo(transactions[i].hash);
+          transactions[i].nonce = info.nonce;
+          transactions[i].blockNum = info.blockNumber;
+          transactions[i].data = info.input;
+          transactions[i].value = info.value;
+          transactions[i].from = info.from;
+          transactions[i].to = info.to;
+          transactions[i].gasPrice = info.gasPrice;
+          transactions[i].maxGas = info.gas;
+        } catch (_) {}
       }
     }
     return transactions;
@@ -217,11 +201,20 @@ class WalletCubit extends Cubit<WalletState> {
     return t;
   }
 
+  void closeToast() {
+    if (state is WalletTransactionPendingState)
+      emit(WalletTransactionPendingState(state, showingToast: false));
+    else if (state is WalletTransactionFinishedState)
+      emit(WalletTransactionFinishedState(state, showingToast: false));
+  }
+
   Future<Transaction> makeCancelTransaction(DbTransaction transaction) async {
     Gas gas = new Gas();
     gas.nonce = transaction.nonce;
     gas.gasLimit = transaction.maxGas;
-    gas.gasPrice = ((transaction.gasPrice?.getInWei??BigInt.zero) / BigInt.from(pow(10,18))).toDouble();
+    gas.gasPrice = ((transaction.gasPrice?.getInWei ?? BigInt.zero) /
+            BigInt.from(pow(10, 18)))
+        .toDouble();
 
     Transaction t = await state.walletService!.makeEtherTransaction(
         await state.walletService!.credentials,
@@ -231,21 +224,87 @@ class WalletCubit extends Cubit<WalletState> {
     return t;
   }
 
-  Future<String> sendTransaction(Gas? gas, Transaction transaction) async {
-    if (gas != null) {
-      Transaction t = new Transaction(
-          from: transaction.from,
-          to: transaction.from,
-          value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 0),
-          data: transaction.data,
-          gasPrice:
-              EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
-          maxGas: gas.gasLimit > 0 ? gas.gasLimit : 650000,
-          nonce: transaction.nonce);
-      var res = await state.walletService!.submit(transaction: t);
-      return res;
+  Future<void> sendTransaction(Gas? gas, Transaction transaction,
+      String tokenName, TransactionType type) async {
+    if (!state.isInProgress) {
+      if (gas != null) {
+        DbTransaction? dbTransaction;
+        try {
+          Transaction t = new Transaction(
+              from: transaction.from,
+              to: transaction.from,
+              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 0),
+              data: transaction.data,
+              gasPrice: EtherAmount.fromUnitAndValue(
+                  EtherUnit.gwei, gas.getGasPrice()),
+              maxGas: gas.gasLimit > 0 ? gas.gasLimit : 650000,
+              nonce: transaction.nonce);
+          var res = await state.walletService!.submit(transaction: t);
+
+          dbTransaction = new DbTransaction(
+              chainId: state.selectedChain?.id ?? 0,
+              hash: res,
+              type: type.index,
+              title: tokenName);
+          List<int> ids = await state.database!.transactionDao
+              .insertDbTransaction([dbTransaction]);
+          dbTransaction.id = ids[0];
+
+          emit(WalletTransactionPendingState(state,
+              transactionStatus: TransactionStatus(
+                  "${type.toString()} $tokenName",
+                  Status.PENDING,
+                  "Transaction Pending",
+                  res)));
+          Stream<TransactionReceipt> result =
+              state.walletService!.pollTransactionReceipt(res);
+          result.listen((event) async {
+            if (event.status!) {
+              emit(WalletTransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "${type.toString()} $tokenName",
+                      Status.SUCCESSFUL,
+                      "Transaction Successful",
+                      res)));
+            } else {
+              emit(WalletTransactionFinishedState(state,
+                  transactionStatus: TransactionStatus(
+                      "${type.toString()} $tokenName",
+                      Status.FAILED,
+                      "Transaction Failed",
+                      res)));
+            }
+            dbTransaction!.isSuccess = event.status;
+            await state.database!.transactionDao
+                .updateDbTransactions([dbTransaction]);
+          });
+        } on Exception catch (value) {
+          if (dbTransaction != null) {
+            dbTransaction.isSuccess = false;
+            state.database!.transactionDao
+                .updateDbTransactions([dbTransaction]);
+          } else {
+            dbTransaction = new DbTransaction(
+                chainId: state.selectedChain?.id ?? 0,
+                hash: "",
+                type: type.index,
+                title: tokenName);
+            List<int> ids = await state.database!.transactionDao
+                .insertDbTransaction([dbTransaction]);
+            dbTransaction.id = ids[0];
+          }
+
+          emit(WalletTransactionFinishedState(state,
+              transactionStatus: TransactionStatus(
+                  "${type.toString()} $tokenName",
+                  Status.FAILED,
+                  "Transaction Failed")));
+        }
+      }
     } else {
-      return "";
+      emit(WalletTransactionFinishedState(state,
+          transactionStatus: TransactionStatus("${type.toString()} $tokenName",
+              Status.FAILED, "Transaction Failed")));
     }
   }
 }

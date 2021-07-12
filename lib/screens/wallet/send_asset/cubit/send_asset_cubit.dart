@@ -1,6 +1,7 @@
 
 import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/database/transaction.dart';
+import 'package:deus_mobile/core/database/user_address.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
@@ -36,6 +37,10 @@ class SendAssetCubit extends Cubit<SendAssetState> {
     state.amountController.text = state.walletAsset.balance??"0";
     emit(SendAssetLoadingState(state));
     emit(SendAssetLoadedState(state));
+  }
+
+  Stream<List<UserAddress>> getUserAddresses() {
+    return state.database!.userAddressDao.getAllUserAddresses();
   }
 
   Future<Transaction?> makeTransferTransaction() async {
@@ -123,5 +128,10 @@ class SendAssetCubit extends Cubit<SendAssetState> {
       emit(TransactionPendingState(state, showingToast: false));
     else if (state is TransactionFinishedState)
       emit(TransactionFinishedState(state, showingToast: false));
+  }
+
+  void setAddress(UserAddress address) {
+    state.recAddressController.text = address.address;
+    emit(SendAssetLoadedState(state));
   }
 }
