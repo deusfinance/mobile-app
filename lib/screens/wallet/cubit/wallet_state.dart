@@ -2,6 +2,7 @@
 
 import 'package:deus_mobile/core/database/chain.dart';
 import 'package:deus_mobile/core/database/database.dart';
+import 'package:deus_mobile/core/database/transaction.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/service/wallet_service.dart';
 import 'package:equatable/equatable.dart';

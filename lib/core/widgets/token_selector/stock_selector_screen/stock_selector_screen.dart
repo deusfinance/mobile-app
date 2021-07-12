@@ -38,7 +38,7 @@ class _StockSelectorScreenState extends State<StockSelectorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TokenSelector(selector: StockSelector(stocks), title: 'Asset', showSearchBar: true, searchController: searchController,),
+      body: TokenSelector(selector: StockSelector(stocks, widget.stockData), title: 'Asset', showSearchBar: true, searchController: searchController,),
     );
   }
 

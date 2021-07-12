@@ -60,10 +60,18 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
         return g;
       case Network.HECO:
-        GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
+        double gNumber = 2.0;
+        var response =
+        await http.get(Uri.parse("https://tc.hecochain.com/price/prediction"));
+        if (response.statusCode == 200) {
+          var map = json.decode(response.body);
+          try{gNumber = map['prices']['median'];}
+          catch(e){}
+        }
+        GWei g = new GWei.init(gNumber * 1000000000, gNumber * 1000000000, gNumber * 1000000000);
         return g;
       case Network.BSC:
-        GWei g = new GWei.init(10.0 * 1000000000, 10.0 * 1000000000, 10.0 * 1000000000);
+        GWei g = new GWei.init(5.0 * 1000000000, 5.0 * 1000000000, 5.0 * 1000000000);
         return g;
       case Network.MATIC:
         // TODO: Handle this case.
@@ -171,7 +179,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           ),
           Align(
               alignment: Alignment.centerRight,
-              child: GestureDetector(
+              child: InkWell(
                 onTap: () {
                   setState(() {
                     confirmSwapShowingMode = ConfirmShowingMode.BASIC_CUSTOMIZE;
@@ -219,7 +227,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           ),
           Visibility(
             visible: showingError == true,
-            child: GestureDetector(
+            child: InkWell(
               onTap: (){
                 getData();
               },
@@ -238,7 +246,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           Row(
             children: [
               Expanded(
-                  child: GestureDetector(
+                  child: InkWell(
                     onTap: () {
                       locator<NavigationService>().goBack(context);
                     },
@@ -306,7 +314,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  GestureDetector(
+                  InkWell(
                       onTap: () {
                         setState(() {
                           confirmSwapShowingMode = ConfirmShowingMode.BASIC_CUSTOMIZE;
@@ -345,7 +353,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   SizedBox(
                     width: 12,
                   ),
-                  GestureDetector(
+                  InkWell(
                       onTap: () {
                         setState(() {
                           confirmSwapShowingMode = ConfirmShowingMode.ADVANCED_CUSTOMIZE;
@@ -605,7 +613,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           SizedBox(
             height: 24.0,
           ),
-          GestureDetector(
+          InkWell(
             onTap: () {
               setState(() {
                 gasFee = GasFee.SLOW;
@@ -656,7 +664,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           SizedBox(
             height: 8.0,
           ),
-          GestureDetector(
+          InkWell(
             onTap: () {
               setState(() {
                 gasFee = GasFee.AVERAGE;
@@ -707,7 +715,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           SizedBox(
             height: 8.0,
           ),
-          GestureDetector(
+          InkWell(
             onTap: () {
               setState(() {
                 gasFee = GasFee.FAST;

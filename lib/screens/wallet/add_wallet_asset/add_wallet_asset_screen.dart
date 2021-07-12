@@ -6,11 +6,13 @@ import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
 import 'package:deus_mobile/core/widgets/selection_button.dart';
 import 'package:deus_mobile/locator.dart';
+import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/models/wallet/wallet_asset_api.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/cubit/add_wallet_asset_state.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/widgets/form/paper_input.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -98,6 +100,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
       padding: EdgeInsets.all(12),
       child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 15, bottom: 5),
@@ -113,9 +116,24 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
               ),
               child: PaperInput(
                 textStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
-                hintText: '',
+                hintText: '0x..',
                 maxLines: 1,
                 controller: state.tokenAddressController,
+              ),
+            ),
+            Visibility(
+              visible: state.tokenAddressController.text.toString().length > 0 || state.visibleErrors,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
+                child: Text(
+                  state.addressConfirmed
+                      ? 'token address confirmed'
+                      : 'token address is not valid',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color:
+                          state.addressConfirmed ? Colors.green : Colors.red),
+                ),
               ),
             ),
             SizedBox(
@@ -140,6 +158,20 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                 controller: state.tokenSymbolController,
               ),
             ),
+            Visibility(
+              visible: state.tokenSymbolController.text.toString().length > 0 || state.visibleErrors,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
+                child: Text(
+                  state.symbolConfirmed
+                      ? 'confirmed'
+                      : 'symbol must be 11 characters or fewer',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: state.symbolConfirmed ? Colors.green : Colors.red),
+                ),
+              ),
+            ),
             SizedBox(
               height: 16,
             ),
@@ -157,9 +189,24 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
               ),
               child: PaperInput(
                 textStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
-                hintText: '16',
+                hintText: '18',
                 maxLines: 1,
                 controller: state.tokenDecimalController,
+              ),
+            ),
+            Visibility(
+              visible: state.tokenDecimalController.text.toString().length > 0 || state.visibleErrors,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
+                child: Text(
+                  state.decimalConfirmed
+                      ? 'confirmed'
+                      : 'token decimal required',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color:
+                          state.decimalConfirmed ? Colors.green : Colors.red),
+                ),
               ),
             ),
             SizedBox(
@@ -171,16 +218,23 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                 label: 'Add Token',
                 onPressed: (bool selected) async {
                   try {
-                    WalletAsset walletAsset = new WalletAsset(
-                        chainId: state.chain.id,
-                        tokenAddress:
-                            state.tokenAddressController.text.toString(),
-                        tokenDecimal: int.tryParse(
-                                state.tokenDecimalController.text.toString()) ??
-                            0,
-                        tokenSymbol:
-                            state.tokenSymbolController.text.toString());
-                    locator<NavigationService>().goBack(context, walletAsset);
+                    if (state.decimalConfirmed &&
+                        state.symbolConfirmed &&
+                        state.addressConfirmed) {
+                      WalletAsset walletAsset = new WalletAsset(
+                          chainId: state.chain.id,
+                          tokenAddress:
+                              state.tokenAddressController.text.toString(),
+                          tokenDecimal: int.tryParse(state
+                                  .tokenDecimalController.text
+                                  .toString()) ??
+                              18,
+                          tokenSymbol:
+                              state.tokenSymbolController.text.toString());
+                      locator<NavigationService>().goBack(context, walletAsset);
+                    }else{
+                      context.read<AddWalletAssetCubit>().visibleErrors(true);
+                    }
                   } on Exception catch (e) {}
                 },
                 selected: true,
@@ -202,75 +256,109 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              margin: EdgeInsets.all(8),
+              child: Column(
                 children: [
-                  GestureDetector(
-                      onTap: () {
-                        context.read<AddWalletAssetCubit>().changeTab(0);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              context.read<AddWalletAssetCubit>().changeTab(0);
+                            });
+                          },
+                          child: Center(
+                              child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
                               "Search",
+                              overflow: TextOverflow.ellipsis,
                               style: state is AddWalletAssetSearchState
                                   ? TextStyle(
                                       fontFamily: MyStyles.kFontFamily,
                                       fontWeight: FontWeight.w300,
-                                      fontSize: MyStyles.S5,
+                                      fontSize: 14,
                                       foreground: Paint()
                                         ..shader = MyColors.greenToBlueGradient
                                             .createShader(
                                                 Rect.fromLTRB(0, 0, 50, 30)))
-                                  : MyStyles.lightWhiteMediumTextStyle,
+                                  : TextStyle(
+                                      fontFamily: MyStyles.kFontFamily,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 14,
+                                      color: MyColors.HalfWhite,
+                                    ),
                             ),
-                            Visibility(
-                              visible: state is AddWalletAssetSearchState,
-                              child: Container(
-                                  margin: EdgeInsets.only(top: 3),
-                                  height: 2.0,
-                                  width: 40,
-                                  decoration: MyStyles.greenToBlueDecoration),
-                            )
-                          ],
+                          )),
                         ),
-                      )),
-                  GestureDetector(
-                      onTap: () {
-                        context.read<AddWalletAssetCubit>().changeTab(1);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              context.read<AddWalletAssetCubit>().changeTab(1);
+                            });
+                          },
+                          child: Center(
+                              child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
                               "Custom Token",
+                              overflow: TextOverflow.ellipsis,
                               style: state is AddWalletAssetCustomState
                                   ? TextStyle(
                                       fontFamily: MyStyles.kFontFamily,
                                       fontWeight: FontWeight.w300,
-                                      fontSize: MyStyles.S5,
+                                      fontSize: 14,
                                       foreground: Paint()
                                         ..shader = MyColors.greenToBlueGradient
                                             .createShader(
                                                 Rect.fromLTRB(0, 0, 50, 30)))
-                                  : MyStyles.lightWhiteMediumTextStyle,
+                                  : TextStyle(
+                                      fontFamily: MyStyles.kFontFamily,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 14,
+                                      color: MyColors.HalfWhite,
+                                    ),
                             ),
-                            Visibility(
-                              visible: state is AddWalletAssetCustomState,
-                              child: Container(
-                                  margin: EdgeInsets.only(top: 3),
-                                  height: 2.0,
-                                  width: 60,
-                                  decoration: MyStyles.greenToBlueDecoration),
-                            )
-                          ],
+                          )),
                         ),
-                      )),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 6,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Visibility(
+                          visible: state is AddWalletAssetSearchState,
+                          child: Container(
+                              margin: EdgeInsets.only(top: 3),
+                              height: 2.0,
+                              width: 40,
+                              decoration: MyStyles.greenToBlueDecoration),
+                        ),
+                      ),
+                      Expanded(
+                        child: Visibility(
+                          visible: state is AddWalletAssetCustomState,
+                          child: Container(
+                              margin: EdgeInsets.only(top: 3),
+                              height: 2.0,
+                              width: 60,
+                              decoration: MyStyles.greenToBlueDecoration),
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -318,7 +406,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
               ],
             ),
           ),
-          GestureDetector(
+          InkWell(
             onTap: () {
               WalletAsset walletAsset = new WalletAsset(
                   chainId: state.chain.id,

@@ -20,6 +20,7 @@ class EthereumService {
 
   static const TOKEN_MAX_DIGITS = {
     "wbtc": 8,
+    "husd": 8,
     "usdt": 6,
     "usdc": 6,
     "usd": 8,
@@ -168,6 +169,8 @@ class EthereumService {
         value = value.substring(0, dotIndex + doubleNo + 1);
       }
     }
+    if(value == "0.")
+      value = "0.0";
     return value;
   }
 

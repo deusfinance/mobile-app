@@ -39,7 +39,7 @@ class _HecoStockSelectorScreenState extends State<HecoStockSelectorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TokenSelector(selector: StockSelector(stocks), title: 'Asset', showSearchBar: true, searchController: searchController,),
+      body: TokenSelector(selector: StockSelector(stocks, widget.hecoStockData), title: 'Asset', showSearchBar: true, searchController: searchController,),
     );
   }
 

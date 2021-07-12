@@ -23,6 +23,18 @@ abstract class SyncData {
     return null;
   }
 
+  StockAddress? getStockAddressFromAddress(String address) {
+    for (var i = 0; i < addresses.length; i++) {
+      if (addresses[i].short == address) {
+        return addresses[i];
+      }
+      if(addresses[i].long == address) {
+        return addresses[i];
+      }
+    }
+    return null;
+  }
+
   Stock? getStockFromAddress(StockAddress stockAddress){
     for (var i = 0; i < values.length; i++) {
       if (stockAddress.id.toLowerCase() == values[i].getTokenName()) {
@@ -32,6 +44,7 @@ abstract class SyncData {
     return null;
   }
 
+
   Future<bool> getData() async {
     bool res1 = await getStockAddresses();
     bool res2 = await getValues();
@@ -40,7 +53,6 @@ abstract class SyncData {
       return true;
     }
     return false;
-
   }
 
   Future<Map<String, StockPrice>> getPrices();

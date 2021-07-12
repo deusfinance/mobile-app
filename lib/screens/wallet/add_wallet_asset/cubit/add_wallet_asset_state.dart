@@ -3,6 +3,13 @@ import 'dart:async';
 import 'package:deus_mobile/core/database/chain.dart';
 import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
+import 'package:deus_mobile/data_source/sync_data/bsc_stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/heco_stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/matic_stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/stock_data.dart';
+import 'package:deus_mobile/data_source/sync_data/sync_data.dart';
+import 'package:deus_mobile/data_source/sync_data/xdai_stock_data.dart';
+import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/wallet/wallet_asset_api.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +20,11 @@ abstract class AddWalletAssetState extends Equatable {
   List<WalletAssetApi>? walletAssetApis;
   List<WalletAssetApi>? searchedWalletAssetApis;
   StreamController streamController;
+  bool addressConfirmed;
+  bool decimalConfirmed;
+  bool symbolConfirmed;
+  bool visibleErrors;
+
 
   var tokenSearchController;
   var tokenDecimalController;
@@ -20,6 +32,10 @@ abstract class AddWalletAssetState extends Equatable {
   var tokenAddressController;
 
   AddWalletAssetState.init(this.chain):
+      addressConfirmed = false,
+      visibleErrors = false,
+      decimalConfirmed = false,
+      symbolConfirmed = false,
         streamController = new StreamController()
   {
     walletAssetApis = new List.empty();
@@ -32,6 +48,10 @@ abstract class AddWalletAssetState extends Equatable {
 
   AddWalletAssetState.copy(AddWalletAssetState state)
       : database = state.database,
+        addressConfirmed = state.addressConfirmed,
+        visibleErrors = state.visibleErrors,
+        symbolConfirmed = state.symbolConfirmed,
+        decimalConfirmed = state.decimalConfirmed,
         streamController = state.streamController,
         chain = state.chain,
         walletAssetApis = state.walletAssetApis,

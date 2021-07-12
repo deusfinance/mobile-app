@@ -32,7 +32,7 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
   }
 
   Widget _buildChainContainer() {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         showChainSelectDialog();
       },
@@ -67,9 +67,9 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
       case SyncChains.BSC:
         return "BSC";
       case SyncChains.HECO:
-        return "Heco (SOON)";
+        return "Heco";
       case SyncChains.MATIC:
-        return "Matic (SOON)";
+        return "Matic(Polygon) (SOON)";
     }
   }
 
@@ -104,10 +104,9 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                       ),
                   ),
                   SizedBox(height: 20,),
-                  GestureDetector(
+                  InkWell(
                     onTap: (){
-                      locator<NavigationService>().goBack(context);
-                      locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replace: true);
+                      locator<NavigationService>().navigateTo(XDaiSyntheticsScreen.route, context, replaceAll: true);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -129,10 +128,9 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     height: 12,
                   ),
                   // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  GestureDetector(
+                  InkWell(
                     onTap: (){
-                      locator<NavigationService>().goBack(context);
-                      locator<NavigationService>().navigateTo(MainnetSyntheticsScreen.route, context, replace: true);
+                      locator<NavigationService>().navigateTo(MainnetSyntheticsScreen.route, context, replaceAll: true);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -155,10 +153,9 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     height: 12,
                   ),
                   // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  GestureDetector(
+                  InkWell(
                     onTap: (){
-                      locator<NavigationService>().goBack(context);
-                      locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replace: true);
+                      locator<NavigationService>().navigateTo(BscSyntheticsScreen.route, context, replaceAll: true);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -181,10 +178,9 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     height: 12,
                   ),
                   // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  GestureDetector(
+                  InkWell(
                     onTap: (){
-                      // locator<NavigationService>().goBack(context);
-                      // locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replace: true);
+                      locator<NavigationService>().navigateTo(HecoSyntheticsScreen.route, context, replaceAll: true);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -207,7 +203,7 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
                     height: 12,
                   ),
                   // Divider(height: 10, thickness: 2, color: Color(MyColors.kAddressBackground).withOpacity(0.5),),
-                  GestureDetector(
+                  InkWell(
                     onTap: (){
                       // locator<NavigationService>().goBack(context);
                       // locator<NavigationService>().navigateTo(MaticSyntheticsScreen.route, context, replace: true);

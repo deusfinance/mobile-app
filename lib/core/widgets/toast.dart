@@ -13,7 +13,7 @@ class Toast extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onPressed,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
@@ -30,7 +30,7 @@ class Toast extends StatelessWidget {
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 Spacer(),
-                GestureDetector(onTap: onClosed, child: Icon(Icons.close))
+                InkWell(onTap: onClosed, child: Icon(Icons.close))
               ],
             ),
             Row(

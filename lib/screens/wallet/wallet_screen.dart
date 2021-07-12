@@ -1,16 +1,27 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:deus_mobile/core/database/chain.dart';
+import 'package:deus_mobile/core/database/transaction.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
+import 'package:deus_mobile/core/widgets/svg.dart';
 import 'package:deus_mobile/core/widgets/wallet_chain_selector.dart';
 import 'package:deus_mobile/locator.dart';
+import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
+import 'package:deus_mobile/screens/asset_detail/asset_detail_screen.dart';
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/add_wallet_asset_screen.dart';
+import 'package:deus_mobile/screens/wallet/manage_gas.dart';
+import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:deus_mobile/statics/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:web3dart/web3dart.dart';
 
 import 'add_chain_screen.dart';
 import 'cubit/wallet_cubit.dart';
@@ -26,19 +37,28 @@ class WalletScreen extends StatefulWidget {
 class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
-    context.read<WalletCubit>().init();
+    context.read<WalletCubit>().init(walletState: Statics.walletState);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WalletCubit, WalletState>(builder: (context, state) {
+    return BlocConsumer<WalletCubit, WalletState>(listener: (context, state) {
+      Statics.walletState = state;
+    }, builder: (context, state) {
       if (state is WalletLoadingState) {
         return DefaultScreen(
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+            chainSelector: WalletChainSelector(
+              selectedChain: state.selectedChain,
+              chains: state.chains,
+              onChainSelected: onChainSelected,
+              addChain: addChain,
+              deleteChain: deleteChain,
+              updateChain: updateChain,
+            ));
       } else if (state is WalletErrorState) {
         return DefaultScreen(
           child: Center(
@@ -49,7 +69,7 @@ class _WalletScreenState extends State<WalletScreen> {
         return DefaultScreen(
             child: _buildBody(state),
             chainSelector: WalletChainSelector(
-              selectedChain: state.selectedChain,
+              selectedChain: state.selectedChain!,
               chains: state.chains,
               onChainSelected: onChainSelected,
               addChain: addChain,
@@ -62,56 +82,119 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _buildBody(WalletState state) {
     return Column(
-      children: [_assets(state)],
+      children: [
+        _navbar(state),
+        state is WalletPortfilioState ? _assets(state) : listTransactions(state)
+      ],
     );
   }
 
   Widget _navbar(WalletState state) {
-    TextStyle colorTextStyle = TextStyle(
-        fontFamily: MyStyles.kFontFamily,
-        fontWeight: FontWeight.w300,
-        fontSize: MyStyles.S6,
-        decoration: TextDecoration.underline,
-        decorationColor: Color(0xff0779E4),
-        foreground: Paint()
-          ..shader = LinearGradient(
-            colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
-          ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
-    TextStyle whiteTextStyle = TextStyle(
-      fontFamily: MyStyles.kFontFamily,
-      fontWeight: FontWeight.w300,
-      fontSize: MyStyles.S6,
-      color: MyColors.White,
-    );
     return Container(
-      padding: EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      margin: EdgeInsets.fromLTRB(8, 16, 8, 8),
+      child: Column(
         children: [
           GestureDetector(
-            onTap: () {
-              context.read<WalletCubit>().changeTab(0);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("Portfilio",
-                  style: state is WalletPortfilioState
-                      ? colorTextStyle
-                      : whiteTextStyle),
-            ),
+              onTap: (){
+                context.read<WalletCubit>().test();
+              },
+              child: Text("ahoildvecfj")),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      context.read<WalletCubit>().changeTab(0);
+                    });
+                  },
+                  child: Center(
+                      child: Container(
+                    child: Text(
+                      "Assets",
+                      overflow: TextOverflow.ellipsis,
+                      style: state is WalletPortfilioState
+                          ? TextStyle(
+                              fontFamily: MyStyles.kFontFamily,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14,
+                              foreground: Paint()
+                                ..shader = MyColors.greenToBlueGradient
+                                    .createShader(Rect.fromLTRB(0, 0, 50, 30)))
+                          : TextStyle(
+                              fontFamily: MyStyles.kFontFamily,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14,
+                              color: MyColors.HalfWhite,
+                            ),
+                    ),
+                  )),
+                ),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      context.read<WalletCubit>().changeTab(1);
+                    });
+                  },
+                  child: Center(
+                      child: Container(
+                    child: Text(
+                      "Activity",
+                      overflow: TextOverflow.ellipsis,
+                      style: state is WalletManageTransState
+                          ? TextStyle(
+                              fontFamily: MyStyles.kFontFamily,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14,
+                              foreground: Paint()
+                                ..shader = MyColors.greenToBlueGradient
+                                    .createShader(Rect.fromLTRB(0, 0, 50, 30)))
+                          : TextStyle(
+                              fontFamily: MyStyles.kFontFamily,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14,
+                              color: MyColors.HalfWhite,
+                            ),
+                    ),
+                  )),
+                ),
+              ),
+            ],
           ),
-          GestureDetector(
-            onTap: () {
-              context.read<WalletCubit>().changeTab(1);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("Manage Transactions",
-                  style: state is WalletManageTransState
-                      ? colorTextStyle
-                      : whiteTextStyle),
-            ),
-          )
+          SizedBox(
+            height: 6,
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Visibility(
+                  visible: state is WalletPortfilioState,
+                  child: Container(
+                      margin: EdgeInsets.only(top: 3),
+                      height: 2.0,
+                      width: 40,
+                      decoration: MyStyles.greenToBlueDecoration),
+                ),
+              ),
+              Expanded(
+                child: Visibility(
+                  visible: state is WalletManageTransState,
+                  child: Container(
+                      margin: EdgeInsets.only(top: 3),
+                      height: 2.0,
+                      width: 60,
+                      decoration: MyStyles.greenToBlueDecoration),
+                ),
+              )
+            ],
+          ),
         ],
       ),
     );
@@ -126,13 +209,30 @@ class _WalletScreenState extends State<WalletScreen> {
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Assets"),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: StreamBuilder<List<WalletAsset>>(
+                      stream:
+                          context.read<WalletCubit>().getWalletAssetsStream(),
+                      builder: (context, snapshot) {
+                        return Text(
+                          "Assets(${snapshot.connectionState == ConnectionState.waiting ? "--" : snapshot.data?.length ?? 0})",
+                          style: TextStyle(
+                            fontFamily: MyStyles.kFontFamily,
+                            fontWeight: FontWeight.w300,
+                            fontSize: MyStyles.S6,
+                            color: MyColors.White,
+                          ),
+                        );
+                      }),
+                ),
               ),
-              GestureDetector(
+              InkWell(
                 onTap: () async {
                   final walletAsset = await locator<NavigationService>()
                       .navigateTo(AddWalletAssetScreen.route, context,
@@ -143,42 +243,50 @@ class _WalletScreenState extends State<WalletScreen> {
                         .addWalletAsset(walletAsset as WalletAsset);
                   }
                 },
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                child: Container(
+                    margin: EdgeInsets.fromLTRB(0, 12, 12, 4),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Color(MyColors.kAddressBorder)
+                                .withOpacity(0.5)),
+                        borderRadius: BorderRadius.all(Radius.circular(6))),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 4, horizontal: 8.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Add New Asset"),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Icon(Icons.add),
-                        )
+                        Container(
+                          // padding: const EdgeInsets.all(4.0),
+                          margin: EdgeInsets.only(right: 4),
+                          child: Icon(
+                            Icons.add,
+                            color: Color(0xff1DD3BD),
+                          ),
+                        ),
+                        Text("Add Asset",
+                            style: TextStyle(
+                                fontFamily: MyStyles.kFontFamily,
+                                fontWeight: FontWeight.w300,
+                                fontSize: MyStyles.S6,
+                                foreground: Paint()
+                                  ..shader = LinearGradient(
+                                    colors: <Color>[
+                                      Color(0xff0779E4),
+                                      Color(0xff1DD3BD)
+                                    ],
+                                  ).createShader(
+                                      Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)))),
                       ],
                     )),
               ),
             ],
           ),
-          Divider(
-            height: 10,
-            thickness: 2,
-            color: Colors.white.withOpacity(0.2),
+          const Divider(
+            height: 12,
+            thickness: 1,
+            color: Colors.black,
           ),
-          Expanded(
-            child: ListView.separated(
-              itemCount: state.walletAssets.length,
-              itemBuilder: (context, index) {
-                WalletAsset walletAsset = state.walletAssets[index];
-                return walletAssetCard(walletAsset);
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return Divider(
-                  height: 10,
-                  thickness: 2,
-                  color: Colors.white.withOpacity(0.1),
-                );
-              },
-            ),
-          )
+          listWalletAsset(state),
         ],
       ),
     );
@@ -190,7 +298,10 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Future<void> addChain() async {
     Chain? chain = await showAddChainDialog(null);
-    if (chain != null) context.read<WalletCubit>().addChain(chain);
+    if (chain != null) {
+      context.read<WalletCubit>().addChain(chain);
+      // locator<NavigationService>().goBack(context);
+    }
   }
 
   Future<Chain?> showAddChainDialog(Chain? chain) async {
@@ -241,19 +352,57 @@ class _WalletScreenState extends State<WalletScreen> {
     showDialog(context: context, builder: (context) => dialog);
   }
 
-  Widget walletAssetCard(WalletAsset walletAsset) {
-    return GestureDetector(
-      onTap: () {},
+  Widget walletAssetCard(WalletAsset walletAsset, WalletState state) {
+    return InkWell(
+      onLongPress: () {
+        final Widget dialog = AlertDialog(
+          title: Text('Are you sure?'),
+          content:
+              Text('Do you want to delete Asset ${walletAsset.tokenSymbol}?'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                locator<NavigationService>().goBack(context, false);
+              },
+              child: Text('No'),
+            ),
+            FlatButton(
+              onPressed: () {
+                context.read<WalletCubit>().deleteWalletAsset(walletAsset);
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+        showDialog(context: context, builder: (context) => dialog);
+      },
+      onTap: () {
+        locator<NavigationService>().navigateTo(
+            AssetDetailScreen.route, context, arguments: {
+          'wallet_asset': walletAsset,
+          "chain": state.selectedChain
+        });
+      },
       child: Container(
         margin: EdgeInsets.all(8),
         padding: EdgeInsets.all(4),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: CircleAvatar(
-                  radius: 25,
-                  backgroundImage: NetworkImage(walletAsset.logoPath ?? "")),
+              child: walletAsset.logoPath != null && walletAsset.logoPath != ""
+                  ? walletAsset.logoPath!.showCircleImage(radius: 20)
+                  // CircleAvatar(
+                  //         radius: 25,
+                  //         backgroundImage: NetworkImage(
+                  //           walletAsset.logoPath ?? "",
+                  //         ))
+                  : Image.asset(
+                      "assets/icons/circles.png",
+                      width: 40,
+                      height: 40,
+                    ),
             ),
             Expanded(
               child: Column(
@@ -261,8 +410,8 @@ class _WalletScreenState extends State<WalletScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: Text("${walletAsset.tokenSymbol ?? "--"} ${walletAsset.balance??"--"}",
-                        overflow: TextOverflow.ellipsis),
+                    child: Text("${walletAsset.tokenSymbol ?? "--"}",
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -275,30 +424,38 @@ class _WalletScreenState extends State<WalletScreen> {
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "\$${walletAsset.valueWhenInserted?.toString() ?? "123"}",
-                    overflow: TextOverflow.ellipsis,
-                    style: MyStyles.whiteSmallTextStyle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "${walletAsset.getValuePercentage()}% (\$${walletAsset.value?.toString() ?? "16551"})",
-                    style: TextStyle(
-                      fontSize: MyStyles.S6,
-                        color: walletAsset.getValuePercentage() >= 0
-                            ? Colors.green
-                            : Colors.red),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            // Column(
+            //   crossAxisAlignment: CrossAxisAlignment.end,
+            //   children: [
+            //     Padding(
+            //       padding: const EdgeInsets.all(8.0),
+            //       child: Text(
+            //         "\$${walletAsset.valueWhenInserted?.toString() ?? "123"}",
+            //         overflow: TextOverflow.ellipsis,
+            //         style: MyStyles.whiteSmallTextStyle,
+            //       ),
+            //     ),
+            //     Padding(
+            //       padding: const EdgeInsets.all(8.0),
+            //       child: Text(
+            //         "${walletAsset.getValuePercentage()}% (\$${walletAsset.value?.toString() ?? "16551"})",
+            //         style: TextStyle(
+            //             fontSize: MyStyles.S6,
+            //             color: walletAsset.getValuePercentage() >= 0
+            //                 ? Colors.green
+            //                 : Colors.red),
+            //         overflow: TextOverflow.ellipsis,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "balance: ${EthereumService.formatDouble(walletAsset.balance ?? "0")}",
+                overflow: TextOverflow.ellipsis,
+                style: MyStyles.whiteSmallTextStyle,
+              ),
             ),
           ],
         ),
@@ -306,8 +463,289 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
+  Future<Gas?> showConfirmGasFeeDialog(
+      WalletState state, Transaction transaction) async {
+    Gas? res = await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black38,
+      barrierLabel: "Barrier",
+      pageBuilder: (_, __, ___) => Align(
+          alignment: Alignment.center,
+          child: ManageGasScreen(
+              transaction: transaction, chain: state.selectedChain!)),
+      barrierDismissible: true,
+      transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+        filter:
+            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        child: FadeTransition(
+          child: child,
+          opacity: anim1,
+        ),
+      ),
+      transitionDuration: Duration(milliseconds: 10),
+    );
+    return res;
+  }
+
+  Widget transactionCard(WalletState state, DbTransaction transaction) {
+    return InkWell(
+      onTap: () async {
+        if (transaction.blockNum!.isPending) {
+          String url =
+              (state.selectedChain?.blockExplorerUrl ?? "") + transaction.hash;
+          await _launchInBrowser(url);
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.all(8),
+        padding: EdgeInsets.all(4),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: transactionCardIcon(transaction),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      transaction.getTitle(),
+                      style: MyStyles.whiteMediumTextStyle,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      "block No. ${transaction.blockNum?.toString() ?? "---"}",
+                      style: MyStyles.lightWhiteSmallTextStyle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            transaction.blockNum != null &&
+                    (transaction.blockNum?.isPending ?? true)
+                ? Container(
+                    width: 120,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            Transaction? t = context
+                                .read<WalletCubit>()
+                                .makeTransactionWithInfo(transaction);
+
+                            Gas? gas = await showConfirmGasFeeDialog(state, t);
+                            context.read<WalletCubit>().sendTransaction(gas, t);
+                          },
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.green),
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              margin: EdgeInsets.all(4),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 20),
+                              child: Center(
+                                  child: Text(
+                                "Speed Up",
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            Transaction? t = await context
+                                .read<WalletCubit>()
+                                .makeCancelTransaction(transaction);
+
+                            Gas? gas = await showConfirmGasFeeDialog(state, t);
+                            context.read<WalletCubit>().sendTransaction(gas, t);
+                          },
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.red),
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              margin: EdgeInsets.all(4),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 20),
+                              child: Center(
+                                  child: Text(
+                                "Cancel",
+                                overflow: TextOverflow.ellipsis,
+                              ))),
+                        ),
+                      ],
+                    ),
+                  )
+                : InkWell(
+                    onTap: () async {
+                      String url =
+                          (state.selectedChain?.blockExplorerUrl ?? "") +
+                              transaction.hash;
+                      await _launchInBrowser(url);
+                    },
+                    child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(8.0)),
+                        margin: EdgeInsets.all(4),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+                        child: Center(
+                            child: Text(
+                          "Show Tnx",
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   Future<void> updateChain(Chain ch) async {
     Chain? chain = await showAddChainDialog(ch);
     if (chain != null) context.read<WalletCubit>().updateChain(chain);
+  }
+
+  Widget listWalletAsset(WalletState state) {
+    return Expanded(
+      child: StreamBuilder<List<WalletAsset>>(
+          stream: context.read<WalletCubit>().getWalletAssetsStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasData && snapshot.data != null) {
+              if (snapshot.data?.length == 0) {
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: 150,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PlatformSvg.asset('icons/empty.svg', height: 50),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("There is no Asset on this Network"),
+                    ),
+                  ],
+                );
+              }
+              return ListView.separated(
+                itemCount: snapshot.data?.length ?? 0,
+                itemBuilder: (context, index) {
+                  WalletAsset walletAsset = snapshot.data![index];
+                  return walletAssetCard(walletAsset, state);
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider(
+                    height: 10,
+                    thickness: 2,
+                    color: Colors.white.withOpacity(0.1),
+                  );
+                },
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          }),
+    );
+  }
+
+  Widget listTransactions(WalletState state) {
+    return Expanded(
+      child: StreamBuilder<List<DbTransaction>>(
+          stream: context.read<WalletCubit>().getTransactionsStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasData && snapshot.data != null) {
+              List<DbTransaction> transactions = snapshot.data!;
+              if (transactions.length == 0) {
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: 150,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PlatformSvg.asset('icons/empty.svg', height: 50),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("There is no Transaction on this Network"),
+                    ),
+                  ],
+                );
+              }
+
+              return ListView.separated(
+                itemCount: transactions.length,
+                itemBuilder: (context, index) {
+                  DbTransaction transaction = transactions[index];
+                  return transactionCard(state, transaction);
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider(
+                    height: 10,
+                    thickness: 2,
+                    color: Colors.white.withOpacity(0.1),
+                  );
+                },
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          }),
+    );
+  }
+
+  transactionCardIcon(DbTransaction transaction) {
+    if (transaction.blockNum == null) {
+      return PlatformSvg.asset('icons/error.svg', height: 30);
+    }
+    if (transaction.blockNum?.isPending ?? true) {
+      return CircularProgressIndicator(
+        backgroundColor: Colors.white,
+        valueColor: new AlwaysStoppedAnimation<Color>(MyColors.Main_BG_Black),
+        strokeWidth: 2,
+      );
+    } else if (transaction.isSuccess == false) {
+      return PlatformSvg.asset('icons/error.svg', height: 30);
+    } else if (transaction.type == TransactionType.APPROVE.index) {
+      return PlatformSvg.asset('icons/tick.svg', height: 30);
+    } else if (transaction.type == TransactionType.SWAP.index) {
+      return Container(
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(color: Colors.white, width: 2)),
+          child: PlatformSvg.asset('icons/exchange.svg', height: 20));
+    } else if (transaction.type == TransactionType.BUY.index) {
+      return PlatformSvg.asset('icons/download.svg', height: 30);
+    } else if (transaction.type == TransactionType.SELL.index) {
+      return PlatformSvg.asset('icons/upload.svg', height: 30);
+    } else if (transaction.type == TransactionType.SEND.index) {
+      return PlatformSvg.asset('icons/upload.svg', height: 30);
+    } else
+      return Container();
   }
 }

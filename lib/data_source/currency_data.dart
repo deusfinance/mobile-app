@@ -48,4 +48,10 @@ abstract class CurrencyData {
 
   static CryptoCurrency husd = CryptoCurrency(
       name: 'HUSD', symbol: 'HUSD', logoPath: '$_basePath/husd.svg');
+
+  static CryptoCurrency bnb = CryptoCurrency(
+      name: 'Binance Coin', symbol: 'BNB', logoPath: '$_basePath/bnb.png');
+
+  static CryptoCurrency ht = CryptoCurrency(
+      name: 'Houbi Token', symbol: 'HT', logoPath: '$_basePath/ht.png');
 }

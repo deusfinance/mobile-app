@@ -14,7 +14,7 @@ class BackButtonWithText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: this.onPressed ?? () => locator<NavigationService>().goBack(context),
       child: Row(
         children: [

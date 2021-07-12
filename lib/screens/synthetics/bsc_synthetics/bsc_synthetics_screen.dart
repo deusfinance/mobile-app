@@ -11,6 +11,7 @@ import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -39,7 +40,9 @@ class BscSyntheticsScreen extends StatefulWidget {
 class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
   @override
   void initState() {
-    context.read<BscSyntheticsCubit>().init();
+    context
+        .read<BscSyntheticsCubit>()
+        .init();
     super.initState();
   }
 
@@ -102,8 +105,10 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<BscSyntheticsCubit, SyntheticsState>(
-          builder: (context, state) {
+      child: BlocConsumer<BscSyntheticsCubit, SyntheticsState>(
+          listener: (context, state) {
+        Statics.bscSyncState = state;
+      }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
@@ -190,7 +195,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
       children: [
         fromField,
         const SizedBox(height: 12),
-        GestureDetector(
+        InkWell(
             onTap: () {
               context.read<BscSyntheticsCubit>().reverseSync();
             },
@@ -216,7 +221,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
                       : "${context.read<BscSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                GestureDetector(
+                InkWell(
                   onTap: () {
                     context.read<BscSyntheticsCubit>().reversePriceRatio();
                   },
@@ -371,10 +376,9 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
-        timerColor:
-            state.marketTimerClosed
-                ? const Color(0xFFD40000)
-                : const Color(0xFF00D16C),
+        timerColor: state.marketTimerClosed
+            ? const Color(0xFFD40000)
+            : const Color(0xFF00D16C),
         onEnd: context.read<BscSyntheticsCubit>().marketTimerFinished(),
         label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'

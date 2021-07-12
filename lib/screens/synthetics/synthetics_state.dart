@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/data_source/sync_data/bsc_stock_data.dart';
 import 'package:deus_mobile/data_source/sync_data/heco_stock_data.dart';
@@ -26,6 +27,7 @@ import 'package:flutter/cupertino.dart';
 enum Mode { LONG, SHORT, NONE }
 enum SyntheticsChain { ETH, XDAI, MATIC, HECO, BSC }
 
+// ignore: must_be_immutable
 abstract class SyntheticsState extends Equatable {
   late Token fromToken;
   late Token mainToken;
@@ -34,8 +36,8 @@ abstract class SyntheticsState extends Equatable {
   bool approved;
   bool isInProgress;
   bool isPriceRatioForward;
-  var fromFieldController;
-  var toFieldController;
+  TextEditingController fromFieldController;
+  TextEditingController toFieldController;
   late SyncService service;
   Mode mode;
   bool marketClosed;
@@ -43,7 +45,7 @@ abstract class SyntheticsState extends Equatable {
   StreamController<String> inputController;
   Map<String, StockPrice> prices;
   late SyncData syncData;
-
+  AppDatabase? database;
   SyntheticsChain syntheticsChain;
   Timer? timer;
 
@@ -53,6 +55,7 @@ abstract class SyntheticsState extends Equatable {
         this.toToken = state.toToken,
         this.approved = state.approved,
         this.syntheticsChain = state.syntheticsChain,
+        this.database = state.database,
         this.service = state.service,
         this.prices = state.prices,
         this.marketClosed = state.marketClosed,
@@ -144,7 +147,14 @@ abstract class SyntheticsState extends Equatable {
         timer,
         toValue,
         marketClosed,
-        marketTimerClosed
+        marketTimerClosed,
+        inputController,
+        database,
+        syntheticsChain,
+        mainToken,
+        syncData,
+        fromFieldController,
+        toFieldController,
       ];
 }
 

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" x="0" y="0"
+    viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path xmlns="http://www.w3.org/2000/svg" d="m12 24c-6.617 0-12-5.383-12-12s5.383-12 12-12 12 5.383 12 12-5.383 12-12 12zm0-23c-6.065 0-11 4.935-11 11s4.935 11 11 11 11-4.935 11-11-4.935-11-11-11z" fill="#ffffff" style="" class=""/><path
+    xmlns="http://www.w3.org/2000/svg"
+    d="m17.5 18h-11c-.276 0-.5-.224-.5-.5s.224-.5.5-.5h11c.276 0 .5.224.5.5s-.224.5-.5.5z"
+    fill="#ffffff" style="" class="" /><path
+    xmlns="http://www.w3.org/2000/svg"
+    d="m12 15.75c-.276 0-.5-.224-.5-.5v-9.75c0-.276.224-.5.5-.5s.5.224.5.5v9.75c0 .277-.224.5-.5.5z"
+    fill="#ffffff" style="" class="" /><path
+    xmlns="http://www.w3.org/2000/svg"
+    d="m12 16c-.128 0-.256-.049-.354-.146l-3.5-3.5c-.195-.195-.195-.512 0-.707s.512-.195.707 0l3.147 3.146 3.146-3.146c.195-.195.512-.195.707 0s.195.512 0 .707l-3.5 3.5c-.097.097-.225.146-.353.146z"
+    fill="#ffffff" style="" class="" /></g></svg>

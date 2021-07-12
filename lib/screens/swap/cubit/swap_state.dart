@@ -14,20 +14,16 @@ import '../../../locator.dart';
 
 abstract class SwapState extends Equatable {
   late SwapService swapService;
-
   late CryptoCurrency fromToken;
   late CryptoCurrency toToken;
   late double slippage;
-
   var fromFieldController;
   var toFieldController;
   late double toValue;
   var slippageController;
   late StreamController<String> streamController;
-
   late bool isPriceRatioForward;
   late bool isInProgress;
-
   late bool approved;
 
   SwapState();
@@ -46,7 +42,6 @@ abstract class SwapState extends Equatable {
     toFieldController = new TextEditingController();
     slippageController = new TextEditingController();
     streamController = StreamController();
-
     this.isPriceRatioForward = true;
     this.isInProgress = false;
   }
@@ -66,15 +61,27 @@ abstract class SwapState extends Equatable {
         this.isInProgress = swapState.isInProgress;
 
   @override
-  List<Object> get props => [fromToken, toToken, slippage, isInProgress, isPriceRatioForward, approved];
+  List<Object> get props => [
+        fromToken,
+        toToken,
+        slippage,
+        isInProgress,
+        isPriceRatioForward,
+        approved,
+        swapService,
+        toValue,
+        fromFieldController,
+        toFieldController,
+        slippageController,streamController
+      ];
 }
 
 class SwapLoaded extends SwapState {
   SwapLoaded(SwapState state,
       {fromToken,
-        toToken,
-        slippage,
-        approved,
+      toToken,
+      slippage,
+      approved,
       SwapService? swapService,
       StreamController<String>? streamController,
       bool? isPriceRatioForward,
@@ -105,7 +112,8 @@ class TransactionFinishedState extends SwapState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
 
-  TransactionFinishedState(SwapState state, {TransactionStatus? transactionStatus, showingToast})
+  TransactionFinishedState(SwapState state,
+      {TransactionStatus? transactionStatus, showingToast})
       : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
@@ -113,19 +121,22 @@ class TransactionFinishedState extends SwapState {
     } else {
       this.showingToast = false;
     }
-    if(showingToast!=null) this.showingToast = showingToast;
+    if (showingToast != null) this.showingToast = showingToast;
     this.isInProgress = false;
   }
+
   @override
   List<Object> get props => [showingToast, transactionStatus];
 
-  TransactionStatus get transactionStatus => _transactionStatus??new TransactionStatus("message", Status.PENDING, "label");
+  TransactionStatus get transactionStatus =>
+      _transactionStatus ??
+      new TransactionStatus("message", Status.PENDING, "label");
 
   set transactionStatus(TransactionStatus value) {
     _transactionStatus = value;
   }
 
-  bool get showingToast => _showingToast??false;
+  bool get showingToast => _showingToast ?? false;
 
   set showingToast(bool value) {
     _showingToast = value;
@@ -136,7 +147,8 @@ class TransactionPendingState extends SwapState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
 
-  TransactionPendingState(SwapState state, {TransactionStatus? transactionStatus, showingToast})
+  TransactionPendingState(SwapState state,
+      {TransactionStatus? transactionStatus, showingToast})
       : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
@@ -144,19 +156,22 @@ class TransactionPendingState extends SwapState {
     } else {
       this.showingToast = false;
     }
-    if(showingToast!=null) this.showingToast = showingToast;
+    if (showingToast != null) this.showingToast = showingToast;
     this.isInProgress = true;
   }
+
   @override
   List<Object> get props => [showingToast, transactionStatus];
 
-  TransactionStatus get transactionStatus => _transactionStatus??new TransactionStatus("message", Status.PENDING, "label");
+  TransactionStatus get transactionStatus =>
+      _transactionStatus ??
+      new TransactionStatus("message", Status.PENDING, "label");
 
   set transactionStatus(TransactionStatus value) {
     _transactionStatus = value;
   }
 
-  bool get showingToast => _showingToast??false;
+  bool get showingToast => _showingToast ?? false;
 
   set showingToast(bool value) {
     _showingToast = value;

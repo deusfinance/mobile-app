@@ -49,8 +49,8 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
     );
   }
 
-  GestureDetector _buildWalletLogout(WalletHandler walletStore) {
-    return GestureDetector(
+  InkWell _buildWalletLogout(WalletHandler walletStore) {
+    return InkWell(
         onTap: () {
           locator<NavigationService>().navigateTo(WalletSettingsScreen.url, context);
         },
@@ -79,7 +79,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
   }
 
   Widget _buildAddress(String address) {
-    return GestureDetector(
+    return InkWell(
         onTap: () {
           locator<NavigationService>().navigateTo(WalletSettingsScreen.url, context);
         },

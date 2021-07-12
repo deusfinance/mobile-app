@@ -42,7 +42,7 @@ class TextFieldWithMax extends StatelessWidget {
             border: InputBorder.none,
             disabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
-            suffixIcon: GestureDetector(
+            suffixIcon: InkWell(
               onTap: () {
                 controller.text = maxValue.toString();
               },

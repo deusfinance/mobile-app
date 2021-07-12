@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:async';
+import 'package:deus_mobile/models/token.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:deus_mobile/core/database/chain.dart';
 import 'package:deus_mobile/core/database/database.dart';
@@ -15,14 +16,11 @@ class AddWalletAssetCubit extends Cubit<AddWalletAssetState> {
 
   init() async {
     emit(AddWalletAssetLoadingState(state));
-    state.database =
-        await $FloorAppDatabase.databaseBuilder(Statics.DB_NAME).build();
+    state.database = await AppDatabase.getInstance();
     state.walletAssetApis = await getWalletAssets();
-
     state.streamController.stream
         .debounce(Duration(milliseconds: 300))
         .listen((s) async {
-      // emit(AddWalletAssetLoadingState(state));
       search(s).then((value) {
         state.searchedWalletAssetApis = value;
         emit(AddWalletAssetLoadingState(state));
@@ -38,7 +36,55 @@ class AddWalletAssetCubit extends Cubit<AddWalletAssetState> {
       });
     }
 
+    if(!state.tokenAddressController.hasListeners)
+      state.tokenAddressController.addListener(() {
+        String text = state.tokenAddressController.text.toString();
+        if(text.startsWith("0x") && text.length == 42){
+          state.addressConfirmed = true;
+          emit(AddWalletAssetLoadingState(state));
+          emit(AddWalletAssetCustomState(state));
+        }else{
+          state.addressConfirmed = false;
+          emit(AddWalletAssetLoadingState(state));
+          emit(AddWalletAssetCustomState(state));
+        }
+      });
+
+    if(!state.tokenSymbolController.hasListeners)
+      state.tokenSymbolController.addListener(() {
+        String text = state.tokenSymbolController.text.toString();
+        if(text.length <= 11){
+          state.symbolConfirmed = true;
+          emit(AddWalletAssetLoadingState(state));
+          emit(AddWalletAssetCustomState(state));
+        }else{
+          state.symbolConfirmed = false;
+          emit(AddWalletAssetLoadingState(state));
+          emit(AddWalletAssetCustomState(state));
+        }
+      });
+
+    if(!state.tokenDecimalController.hasListeners)
+      state.tokenDecimalController.addListener(() {
+        String text = state.tokenDecimalController.text.toString();
+        if(int.tryParse(text) != null){
+          state.decimalConfirmed = true;
+          emit(AddWalletAssetLoadingState(state));
+          emit(AddWalletAssetCustomState(state));
+        }else{
+          state.decimalConfirmed = false;
+          emit(AddWalletAssetLoadingState(state));
+          emit(AddWalletAssetCustomState(state));
+        }
+      });
+
     emit(AddWalletAssetSearchState(state));
+  }
+
+  visibleErrors(bool b){
+    state.visibleErrors = b;
+    emit(AddWalletAssetLoadingState(state));
+    emit(AddWalletAssetCustomState(state));
   }
 
   Future<List<WalletAssetApi>> search(String pattern) async {

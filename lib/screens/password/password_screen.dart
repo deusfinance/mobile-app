@@ -225,7 +225,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
           builder: (context, snapshot){
         if(snapshot.hasData && snapshot.data!=null){
           if(snapshot.data as bool){
-            return GestureDetector(
+            return InkWell(
               onTap: _authenticateWithBiometrics,
               child: Column(children: [
                 Icon(Icons.fingerprint,size: 60,),

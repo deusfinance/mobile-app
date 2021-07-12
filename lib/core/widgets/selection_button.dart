@@ -33,7 +33,7 @@ class _SelectionButtonState extends State<SelectionButton> {
   @override
   Widget build(BuildContext context) {
     return !widget.selected
-        ? GestureDetector(
+        ? InkWell(
             onTap: () {
               widget.onPressed!(widget.selected);
             },

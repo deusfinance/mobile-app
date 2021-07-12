@@ -9,18 +9,19 @@ import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/styles.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WalletChainSelector extends StatefulWidget {
   Chain? selectedChain;
-  Stream<List<Chain>> chains;
-  void Function(Chain chain) onChainSelected;
-  void Function() addChain;
-  void Function(Chain chain) deleteChain;
-  void Function(Chain chain) updateChain;
+  Stream<List<Chain>>? chains;
+  void Function(Chain chain)? onChainSelected;
+  void Function()? addChain;
+  void Function(Chain chain)? deleteChain;
+  void Function(Chain chain)? updateChain;
 
   WalletChainSelector(
-      {this.selectedChain,
+      {required this.selectedChain,
       required this.chains,
       required this.onChainSelected,
       required this.addChain,
@@ -32,13 +33,14 @@ class WalletChainSelector extends StatefulWidget {
 }
 
 class _WalletChainSelectorState extends State<WalletChainSelector> {
+
   @override
   Widget build(BuildContext context) {
     return _buildChainContainer();
   }
 
   Widget _buildChainContainer() {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         showChainSelectDialog();
       },
@@ -54,7 +56,7 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
           child: Row(
             children: [
               Text(
-                widget.selectedChain?.name ?? "--",
+                widget.selectedChain?.name??"--",
                 style: MyStyles.whiteSmallTextStyle,
               ),
               Spacer(),
@@ -86,18 +88,46 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Text(
-                        'Select your Network',
-                        style: MyStyles.whiteSmallTextStyle,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            'Select Network',
+                            style: MyStyles.whiteSmallTextStyle,
+                          ),
+                        ),
                       ),
-                    ),
+                      InkWell(
+                        onTap: (){
+                          if(widget.addChain != null) {
+                            locator<NavigationService>().goBack(context);
+                            widget.addChain!();
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.add, size:20),
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Text(
+                                  'Add Network',
+                                  style: MyStyles.whiteSmallTextStyle,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 40,
                   ),
                   Expanded(child: StreamBuilder<List<Chain>>(
                     stream: widget.chains,
@@ -111,16 +141,18 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
                               itemCount: snapshot.data?.length ?? 0,
                               itemBuilder: (context, index) {
                                 Chain chain = snapshot.data![index];
-                                return GestureDetector(
+                                return InkWell(
                                   onTap: () {
-                                    widget.selectedChain = chain;
-                                    setState(() {});
-                                    widget.onChainSelected(chain);
-                                    locator<NavigationService>()
-                                        .goBack(context);
+                                    if(widget.onChainSelected != null){
+                                      widget.selectedChain = chain;
+                                      setState(() {});
+                                      widget.onChainSelected!(chain);
+                                      locator<NavigationService>()
+                                          .goBack(context);
+                                    }
                                   },
                                   child: Container(
-                                    margin: EdgeInsets.all(4),
+                                    margin: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
                                         gradient: chain.id == (widget.selectedChain?.id??0)?MyColors.greenToBlueGradient:null,
@@ -129,7 +161,7 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
                                     child: Stack(
                                       children: [
                                         Align(
-                                          alignment: Alignment.center,
+                                          alignment: Alignment.centerLeft,
                                           child: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Text(
@@ -146,32 +178,24 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  GestureDetector(
+                                                  InkWell(
                                                     onTap: () {
-                                                      widget.updateChain(chain);
-                                                    },
-                                                    child: Padding(
-                                                      padding:
-                                                      const EdgeInsets.all(1.0),
-                                                      child: Icon(
-                                                        Icons.edit,
-                                                        color: Colors.white,
-                                                        size: 18,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      widget.deleteChain(chain);
+                                                      widget.updateChain!(chain);
                                                     },
                                                     child: Padding(
                                                       padding:
                                                       const EdgeInsets.all(8.0),
-                                                      child: Icon(
-                                                        Icons.delete,
-                                                        color: Colors.red,
-                                                        size: 18,
-                                                      ),
+                                                      child: Image.asset('assets/icons/pencil.png', width:18, height:18),
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      widget.deleteChain!(chain);
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                      const EdgeInsets.all(8.0),
+                                                      child: Image.asset('assets/icons/delete.png', width:18, height:18),
                                                     ),
                                                   ),
                                                 ],
@@ -190,22 +214,6 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
                       }
                     },
                   ),),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: SelectionButton(
-                      label: 'Add New Network',
-                      onPressed: (bool selected) async {
-                        locator<NavigationService>().goBack(context);
-                        widget.addChain();
-                      },
-                      selected: true,
-                      gradient: MyColors.greenToBlueGradient,
-                      textStyle: MyStyles.blackMediumTextStyle,
-                    ),
-                  ),
                 ],
               )),
         ),

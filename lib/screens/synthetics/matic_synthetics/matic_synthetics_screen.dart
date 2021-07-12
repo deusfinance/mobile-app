@@ -193,7 +193,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       children: [
         fromField,
         const SizedBox(height: 12),
-        GestureDetector(
+        InkWell(
             onTap: () {
               context.read<MaticSyntheticsCubit>().reverseSync();
             },
@@ -219,7 +219,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
                       : "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                GestureDetector(
+                InkWell(
                   onTap: () {
                     context.read<MaticSyntheticsCubit>().reversePriceRatio();
                   },

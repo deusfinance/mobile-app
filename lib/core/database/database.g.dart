@@ -64,6 +64,8 @@ class _$AppDatabase extends AppDatabase {
 
   ChainDao? _chainDaoInstance;
 
+  DbTransactionDao? _transactionDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -83,9 +85,11 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `WalletAsset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `chain_id` INTEGER NOT NULL, `tokenAddress` TEXT NOT NULL, `tokenSymbol` TEXT, `tokenDecimal` INTEGER, `valueWhenInserted` REAL, `logoPath` TEXT, FOREIGN KEY (`chain_id`) REFERENCES `Chain` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `WalletAsset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `chain_id` INTEGER NOT NULL, `tokenAddress` TEXT NOT NULL, `tokenSymbol` TEXT, `tokenDecimal` INTEGER, `valueWhenInserted` REAL, `logoPath` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Chain` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `RPC_url` TEXT NOT NULL, `blockExplorerUrl` TEXT, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Chain` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `RPC_url` TEXT NOT NULL, `blockExplorerUrl` TEXT, `currencySymbol` TEXT, PRIMARY KEY (`id`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `DbTransaction` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash` TEXT NOT NULL, `chainId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `title` TEXT NOT NULL, `isSuccess` INTEGER)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -103,11 +107,17 @@ class _$AppDatabase extends AppDatabase {
   ChainDao get chainDao {
     return _chainDaoInstance ??= _$ChainDao(database, changeListener);
   }
+
+  @override
+  DbTransactionDao get transactionDao {
+    return _transactionDaoInstance ??=
+        _$DbTransactionDao(database, changeListener);
+  }
 }
 
 class _$WalletAssetDao extends WalletAssetDao {
   _$WalletAssetDao(this.database, this.changeListener)
-      : _queryAdapter = QueryAdapter(database),
+      : _queryAdapter = QueryAdapter(database, changeListener),
         _walletAssetInsertionAdapter = InsertionAdapter(
             database,
             'WalletAsset',
@@ -119,7 +129,8 @@ class _$WalletAssetDao extends WalletAssetDao {
                   'tokenDecimal': item.tokenDecimal,
                   'valueWhenInserted': item.valueWhenInserted,
                   'logoPath': item.logoPath
-                }),
+                },
+            changeListener),
         _walletAssetUpdateAdapter = UpdateAdapter(
             database,
             'WalletAsset',
@@ -132,7 +143,8 @@ class _$WalletAssetDao extends WalletAssetDao {
                   'tokenDecimal': item.tokenDecimal,
                   'valueWhenInserted': item.valueWhenInserted,
                   'logoPath': item.logoPath
-                }),
+                },
+            changeListener),
         _walletAssetDeletionAdapter = DeletionAdapter(
             database,
             'WalletAsset',
@@ -145,7 +157,8 @@ class _$WalletAssetDao extends WalletAssetDao {
                   'tokenDecimal': item.tokenDecimal,
                   'valueWhenInserted': item.valueWhenInserted,
                   'logoPath': item.logoPath
-                });
+                },
+            changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -162,8 +175,9 @@ class _$WalletAssetDao extends WalletAssetDao {
   @override
   Future<List<WalletAsset>> getAllWalletAssets(int chainId) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM WalletAsset Where chain_id = ?1',
+        'SELECT * FROM WalletAsset Where chain_id = ?1 ORDER BY id DESC',
         mapper: (Map<String, Object?> row) => WalletAsset(
+            id: row['id'] as int?,
             chainId: row['chain_id'] as int,
             tokenAddress: row['tokenAddress'] as String,
             tokenSymbol: row['tokenSymbol'] as String?,
@@ -171,6 +185,38 @@ class _$WalletAssetDao extends WalletAssetDao {
             valueWhenInserted: row['valueWhenInserted'] as double?,
             logoPath: row['logoPath'] as String?),
         arguments: [chainId]);
+  }
+
+  @override
+  Stream<List<WalletAsset>> getAllWalletAssetsStream(int chainId) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM WalletAsset Where chain_id = ?1 ORDER BY id DESC',
+        mapper: (Map<String, Object?> row) => WalletAsset(
+            id: row['id'] as int?,
+            chainId: row['chain_id'] as int,
+            tokenAddress: row['tokenAddress'] as String,
+            tokenSymbol: row['tokenSymbol'] as String?,
+            tokenDecimal: row['tokenDecimal'] as int?,
+            valueWhenInserted: row['valueWhenInserted'] as double?,
+            logoPath: row['logoPath'] as String?),
+        arguments: [chainId],
+        queryableName: 'WalletAsset',
+        isView: false);
+  }
+
+  @override
+  Future<WalletAsset?> getWalletAsset(int chainId, String tokenAddress) async {
+    return _queryAdapter.query(
+        'SELECT * FROM WalletAsset Where chain_id = ?1 AND tokenAddress = ?2',
+        mapper: (Map<String, Object?> row) => WalletAsset(
+            id: row['id'] as int?,
+            chainId: row['chain_id'] as int,
+            tokenAddress: row['tokenAddress'] as String,
+            tokenSymbol: row['tokenSymbol'] as String?,
+            tokenDecimal: row['tokenDecimal'] as int?,
+            valueWhenInserted: row['valueWhenInserted'] as double?,
+            logoPath: row['logoPath'] as String?),
+        arguments: [chainId, tokenAddress]);
   }
 
   @override
@@ -202,7 +248,8 @@ class _$ChainDao extends ChainDao {
                   'id': item.id,
                   'name': item.name,
                   'RPC_url': item.RPC_url,
-                  'blockExplorerUrl': item.blockExplorerUrl
+                  'blockExplorerUrl': item.blockExplorerUrl,
+                  'currencySymbol': item.currencySymbol
                 },
             changeListener),
         _chainUpdateAdapter = UpdateAdapter(
@@ -213,7 +260,8 @@ class _$ChainDao extends ChainDao {
                   'id': item.id,
                   'name': item.name,
                   'RPC_url': item.RPC_url,
-                  'blockExplorerUrl': item.blockExplorerUrl
+                  'blockExplorerUrl': item.blockExplorerUrl,
+                  'currencySymbol': item.currencySymbol
                 },
             changeListener),
         _chainDeletionAdapter = DeletionAdapter(
@@ -224,7 +272,8 @@ class _$ChainDao extends ChainDao {
                   'id': item.id,
                   'name': item.name,
                   'RPC_url': item.RPC_url,
-                  'blockExplorerUrl': item.blockExplorerUrl
+                  'blockExplorerUrl': item.blockExplorerUrl,
+                  'currencySymbol': item.currencySymbol
                 },
             changeListener);
 
@@ -247,7 +296,8 @@ class _$ChainDao extends ChainDao {
             id: row['id'] as int,
             name: row['name'] as String,
             RPC_url: row['RPC_url'] as String,
-            blockExplorerUrl: row['blockExplorerUrl'] as String?),
+            blockExplorerUrl: row['blockExplorerUrl'] as String?,
+            currencySymbol: row['currencySymbol'] as String?),
         queryableName: 'Chain',
         isView: false);
   }
@@ -267,5 +317,99 @@ class _$ChainDao extends ChainDao {
   @override
   Future<int> deleteChains(List<Chain> chains) {
     return _chainDeletionAdapter.deleteListAndReturnChangedRows(chains);
+  }
+}
+
+class _$DbTransactionDao extends DbTransactionDao {
+  _$DbTransactionDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database, changeListener),
+        _dbTransactionInsertionAdapter = InsertionAdapter(
+            database,
+            'DbTransaction',
+            (DbTransaction item) => <String, Object?>{
+                  'id': item.id,
+                  'hash': item.hash,
+                  'chainId': item.chainId,
+                  'type': item.type,
+                  'title': item.title,
+                  'isSuccess':
+                      item.isSuccess == null ? null : (item.isSuccess! ? 1 : 0)
+                },
+            changeListener),
+        _dbTransactionUpdateAdapter = UpdateAdapter(
+            database,
+            'DbTransaction',
+            ['id'],
+            (DbTransaction item) => <String, Object?>{
+                  'id': item.id,
+                  'hash': item.hash,
+                  'chainId': item.chainId,
+                  'type': item.type,
+                  'title': item.title,
+                  'isSuccess':
+                      item.isSuccess == null ? null : (item.isSuccess! ? 1 : 0)
+                },
+            changeListener),
+        _dbTransactionDeletionAdapter = DeletionAdapter(
+            database,
+            'DbTransaction',
+            ['id'],
+            (DbTransaction item) => <String, Object?>{
+                  'id': item.id,
+                  'hash': item.hash,
+                  'chainId': item.chainId,
+                  'type': item.type,
+                  'title': item.title,
+                  'isSuccess':
+                      item.isSuccess == null ? null : (item.isSuccess! ? 1 : 0)
+                },
+            changeListener);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<DbTransaction> _dbTransactionInsertionAdapter;
+
+  final UpdateAdapter<DbTransaction> _dbTransactionUpdateAdapter;
+
+  final DeletionAdapter<DbTransaction> _dbTransactionDeletionAdapter;
+
+  @override
+  Stream<List<DbTransaction>> getAllDbTransactions(int chainId) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM DbTransaction Where chainId = ?1 ORDER BY id DESC',
+        mapper: (Map<String, Object?> row) => DbTransaction(
+            id: row['id'] as int?,
+            chainId: row['chainId'] as int,
+            hash: row['hash'] as String,
+            type: row['type'] as int,
+            title: row['title'] as String,
+            isSuccess: row['isSuccess'] == null
+                ? null
+                : (row['isSuccess'] as int) != 0),
+        arguments: [chainId],
+        queryableName: 'DbTransaction',
+        isView: false);
+  }
+
+  @override
+  Future<List<int>> insertDbTransaction(List<DbTransaction> transactions) {
+    return _dbTransactionInsertionAdapter.insertListAndReturnIds(
+        transactions, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> updateDbTransactions(List<DbTransaction> transactions) {
+    return _dbTransactionUpdateAdapter.updateListAndReturnChangedRows(
+        transactions, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> deleteDbTransactions(List<DbTransaction> transactions) {
+    return _dbTransactionDeletionAdapter
+        .deleteListAndReturnChangedRows(transactions);
   }
 }

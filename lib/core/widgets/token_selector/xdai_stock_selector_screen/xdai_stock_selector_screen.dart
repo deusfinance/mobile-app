@@ -39,7 +39,7 @@ class _XDaiStockSelectorScreenState extends State<XDaiStockSelectorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TokenSelector(selector: StockSelector(stocks), title: 'Asset', showSearchBar: true, searchController: searchController,),
+      body: TokenSelector(selector: StockSelector(stocks,widget.xDaiStockData), title: 'Asset', showSearchBar: true, searchController: searchController,),
     );
   }
 

@@ -67,7 +67,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
-                  child: GestureDetector(
+                  child: InkWell(
                 onTap: () {
                   setState(() {
                     _showLogOutDialogue = false;
@@ -89,7 +89,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
               )),
               SizedBox(width: 20),
               Expanded(
-                child: GestureDetector(
+                child: InkWell(
                   onTap: () async {
                     await walletStore.resetWallet();
                     _showLogOutDialogue = false;
@@ -133,7 +133,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             ),
           ),
           SizedBox(height: 20),
-          GestureDetector(
+          InkWell(
             onTap: () => locator<NavigationService>().navigateTo(IntroPage.url, context),
             child: Container(
               height: 50,
@@ -200,7 +200,7 @@ class _WalletSettingsScreenState extends State<WalletSettingsScreen> {
             style: MyStyles.whiteSmallTextStyle,
           ),
           Spacer(),
-          GestureDetector(
+          InkWell(
             onTap: () {
               setState(() {
                 _showLogOutDialogue = true;

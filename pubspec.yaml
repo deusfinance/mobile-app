@@ -22,10 +22,12 @@ dependencies:
   tweetnacl: ^0.3.2
   get_it: ^5.0.6
   flutter_bloc: ^7.0.0
+  bloc: ^7.0.0
   string_validator: ^0.1.4
   flutter_secure_storage: ^4.1.0
   intl: ^0.17.0
   local_auth: ^1.1.0
+  floor: ^1.1.0
   # analytics
   firebase_analytics: ^7.0.1
   firebase_core: ^1.0.1
@@ -41,7 +43,7 @@ dependencies:
   page_transition: ^1.1.5
   provider: ^5.0.0
   flutter_device_type: ^0.2.0
-  url_launcher:
+  url_launcher: ^6.0.9
   outline_gradient_button: ^1.0.0+2
   flutter_countdown_timer: ^3.0.0
   flutter_svg_provider: ^0.1.8
@@ -49,7 +51,7 @@ dependencies:
   fl_chart: ^0.36.0
   vibration: ^1.7.2
   flappy_search_bar: 1.4.1
-  floor: ^1.1.0
+  qr_flutter: ^4.0.0
 dependency_overrides:
 #  analyzer: ^1.5.0
   convert: ^3.0.0
@@ -76,6 +78,7 @@ flutter:
     - assets/images/stocks/
     - assets/images/icons/
     - assets/launcher_icon/
+    - assets/icons/
     - assets/blur_screens/
     # BACKEND
     - assets/deus_data/ # data of tokens, contract ABI/functions etc.

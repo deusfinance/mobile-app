@@ -1,4 +1,5 @@
 import 'package:deus_mobile/config.dart';
+import 'package:deus_mobile/core/database/chain.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 
 enum Status { PENDING, SUCCESSFUL, FAILED }
@@ -40,5 +41,9 @@ class TransactionStatus {
             EthereumService.NETWORK_NAMES[currentChainId]!.toLowerCase() + '.';
         return "https://${prefix}etherscan.io/tx/" + hash;
       }
+  }
+
+  String transactionUrlWithChain(Chain chain) {
+    return chain.blockExplorerUrl??"" + hash;
   }
 }

@@ -1,6 +1,8 @@
 import 'package:deus_mobile/core/widgets/token_selector/bsc_stock_selector_screen/bsc_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/heco_stock_selector_screen/bsc_stock_selector_screen.dart';
 import 'package:deus_mobile/core/widgets/token_selector/xdai_stock_selector_screen/xdai_stock_selector_screen.dart';
+import 'package:deus_mobile/screens/asset_detail/asset_detail_screen.dart';
+import 'package:deus_mobile/screens/asset_detail/cubit/asset_detail_cubit.dart';
 import 'package:deus_mobile/screens/blurred_stake_lock_screen/blurred_stake_lock_screen.dart';
 import 'package:deus_mobile/screens/blurred_synthetics_screen/blurred_synthetics_screen.dart';
 import 'package:deus_mobile/screens/lock/cubit/lock_cubit.dart';
@@ -21,6 +23,8 @@ import 'package:deus_mobile/screens/synthetics/mainnet_synthetics/mainnet_synthe
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/add_wallet_asset_screen.dart';
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/cubit/add_wallet_asset_cubit.dart';
 import 'package:deus_mobile/screens/wallet/cubit/wallet_cubit.dart';
+import 'package:deus_mobile/screens/wallet/send_asset/cubit/send_asset_cubit.dart';
+import 'package:deus_mobile/screens/wallet/send_asset/send_asset_screen.dart';
 import 'package:deus_mobile/screens/wallet/wallet_screen.dart';
 import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
 import 'package:deus_mobile/screens/synthetics/xdai_synthetics/cubit/xdai_synthetics_cubit.dart';
@@ -92,6 +96,21 @@ Route<dynamic> onGenerateRoute(RouteSettings settings, BuildContext context) {
         child: AddWalletAssetScreen(),
       );
     },
+
+    AssetDetailScreen.route: (_) {
+      return BlocProvider(
+        create: (context) => AssetDetailCubit(arguments["wallet_asset"], arguments["chain"]),
+        child: AssetDetailScreen(),
+      );
+    },
+
+    SendAssetScreen.route: (_) {
+      return BlocProvider(
+        create: (context) => SendAssetCubit(walletAsset: arguments["wallet_asset"], walletService: arguments["wallet_service"]),
+        child: SendAssetScreen(),
+      );
+    },
+
 
     //main screens
     StakeScreen.url: (_) {

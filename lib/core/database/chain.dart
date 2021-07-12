@@ -1,3 +1,4 @@
+import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:floor/floor.dart';
 
 @entity
@@ -11,5 +12,10 @@ class Chain {
 
   String? blockExplorerUrl;
 
-  Chain({required this.id, required this.name, required this.RPC_url, this.blockExplorerUrl = "as"});
+  String? currencySymbol;
+
+  @ignore
+  WalletAsset? mainAsset;
+
+  Chain({required this.id, required this.name, required this.RPC_url, this.blockExplorerUrl, this.currencySymbol,  this.mainAsset});
 }

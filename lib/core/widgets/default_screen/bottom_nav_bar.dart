@@ -23,11 +23,11 @@ class MyBottomNavBar extends StatelessWidget {
     );
   }
 
-  GestureDetector _buildNavItem(NavigationItem item, BuildContext context) {
-    return GestureDetector(
+  InkWell _buildNavItem(NavigationItem item, BuildContext context) {
+    return InkWell(
         onTap: () {
           locator<NavigationService>().selectedNavItem = item;
-          locator<NavigationService>().navigateTo(item.routeUrl, context, replace: true);
+          locator<NavigationService>().navigateTo(item.routeUrl, context, replaceAll: true);
         },
         child: Container(
           child: Column(

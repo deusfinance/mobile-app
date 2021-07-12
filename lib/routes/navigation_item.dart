@@ -62,7 +62,7 @@ class NavigationItem extends Equatable {
       page: BlocProvider<WalletCubit>(create: (_) => WalletCubit(), child: WalletScreen()),
       title: "Wallet",
       routeUrl: WalletScreen.route,
-      style: NavigationStyle.BluePurple);
+      style: NavigationStyle.BlueGreen);
 
   static List<NavigationItem> get items => [swap, synthethics, wallet];
 

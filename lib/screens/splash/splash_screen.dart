@@ -26,7 +26,7 @@ class SplashScreen extends StatelessWidget {
               child: BlocBuilder<SplashCubit, SplashState>(builder: (context, state) {
                 if (state is SplashError)
                   return Center(
-                      child: GestureDetector(onTap: () async => await init(context) , child: Icon(Icons.refresh, color: MyColors.White)));
+                      child: InkWell(onTap: () async => await init(context) , child: Icon(Icons.refresh, color: MyColors.White)));
                 else
                   return Center(child: SvgPicture.asset("assets/images/deus.svg"));
               })),

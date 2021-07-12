@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:ui';
 
@@ -11,7 +10,9 @@ import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
+import 'package:deus_mobile/screens/synthetics/synthetics_cubit.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -39,6 +40,7 @@ class XDaiSyntheticsScreen extends StatefulWidget {
 }
 
 class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
+  SyntheticsState? syntheticsState;
   @override
   void initState() {
     context.read<XDaiSyntheticsCubit>().init();
@@ -47,6 +49,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
 
   @override
   void deactivate() {
+    Statics.xdaiSyncState = syntheticsState;
     context.read<XDaiSyntheticsCubit>().dispose();
     super.deactivate();
   }
@@ -104,8 +107,10 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<XDaiSyntheticsCubit, SyntheticsState>(
-          builder: (context, state) {
+      child: BlocConsumer<XDaiSyntheticsCubit, SyntheticsState>(
+          listener: (context, state) {
+        syntheticsState = state;
+      }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
@@ -129,9 +134,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
           child: ConfirmGasScreen(
-            transaction: transaction,
-              network: Network.XDAI
-          )),
+              transaction: transaction, network: Network.XDAI)),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
         filter:
@@ -192,7 +195,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
       children: [
         fromField,
         const SizedBox(height: 12),
-        GestureDetector(
+        InkWell(
             onTap: () {
               context.read<XDaiSyntheticsCubit>().reverseSync();
             },
@@ -218,7 +221,7 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
                       : "${context.read<XDaiSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                GestureDetector(
+                InkWell(
                   onTap: () {
                     context.read<XDaiSyntheticsCubit>().reversePriceRatio();
                   },
@@ -372,10 +375,9 @@ class _XDaiSyntheticsScreenState extends State<XDaiSyntheticsScreen> {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
-        timerColor:
-            state.marketTimerClosed
-                ? const Color(0xFFD40000)
-                : const Color(0xFF00D16C),
+        timerColor: state.marketTimerClosed
+            ? const Color(0xFFD40000)
+            : const Color(0xFF00D16C),
         onEnd: context.read<XDaiSyntheticsCubit>().marketTimerFinished(),
         label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'

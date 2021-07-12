@@ -41,7 +41,7 @@ class _MaticStockSelectorScreenState extends State<MaticStockSelectorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TokenSelector(selector: StockSelector(stocks), title: 'Asset', showSearchBar: true, searchController: searchController,),
+      body: TokenSelector(selector: StockSelector(stocks, maticStockData), title: 'Asset', showSearchBar: true, searchController: searchController,),
     );
   }
 

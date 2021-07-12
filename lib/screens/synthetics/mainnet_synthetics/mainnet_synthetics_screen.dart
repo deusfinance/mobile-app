@@ -11,6 +11,7 @@ import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -39,7 +40,9 @@ class MainnetSyntheticsScreen extends StatefulWidget {
 class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   @override
   void initState() {
-    context.read<MainnetSyntheticsCubit>().init();
+    context
+        .read<MainnetSyntheticsCubit>()
+        .init(syntheticsState: Statics.ethSyncState);
     super.initState();
   }
 
@@ -102,8 +105,10 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<MainnetSyntheticsCubit, SyntheticsState>(
-          builder: (context, state) {
+      child: BlocConsumer<MainnetSyntheticsCubit, SyntheticsState>(
+          listener: (context, state) {
+        Statics.ethSyncState = state;
+      }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
@@ -126,10 +131,8 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       barrierLabel: "Barrier",
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
-          child: ConfirmGasScreen(
-              transaction: transaction,
-              network: Network.ETH
-          )),
+          child:
+              ConfirmGasScreen(transaction: transaction, network: Network.ETH)),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
         filter:
@@ -192,7 +195,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       children: [
         fromField,
         const SizedBox(height: 12),
-        GestureDetector(
+        InkWell(
             onTap: () {
               context.read<MainnetSyntheticsCubit>().reverseSync();
             },
@@ -218,7 +221,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
                       : "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                GestureDetector(
+                InkWell(
                   onTap: () {
                     context.read<MainnetSyntheticsCubit>().reversePriceRatio();
                   },
@@ -375,10 +378,9 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
-        timerColor:
-            state.marketTimerClosed
-                ? const Color(0xFFD40000)
-                : const Color(0xFF00D16C),
+        timerColor: state.marketTimerClosed
+            ? const Color(0xFFD40000)
+            : const Color(0xFF00D16C),
         onEnd: context.read<MainnetSyntheticsCubit>().marketTimerFinished(),
         label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'
@@ -423,8 +425,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   }
 
   Widget _buildToastWidget(SyntheticsState state) {
-    if (state is SyntheticsTransactionPendingState &&
-        state.showingToast) {
+    if (state is SyntheticsTransactionPendingState && state.showingToast) {
       return Align(
           alignment: Alignment.bottomCenter,
           child: _buildTransactionPending(state.transactionStatus));

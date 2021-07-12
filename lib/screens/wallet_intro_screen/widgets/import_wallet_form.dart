@@ -93,7 +93,7 @@ class ImportWalletForm extends HookWidget {
                     ),
                   ),
                   SizedBox(height: 15,),
-                  // GestureDetector(
+                  // InkWell(
                   //   onTap: (){
                   //     _launchInBrowser("https://wiki.deus.finance/docs/mobileapp");
                   //   },

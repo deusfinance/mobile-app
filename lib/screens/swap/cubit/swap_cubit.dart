@@ -1,3 +1,5 @@
+import 'package:deus_mobile/core/database/database.dart';
+import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
@@ -6,6 +8,7 @@ import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
 import 'package:deus_mobile/screens/swap/swap_screen.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
@@ -13,30 +16,33 @@ import 'package:web3dart/web3dart.dart';
 class SwapCubit extends Cubit<SwapState> {
   SwapCubit() : super(SwapInitial());
 
-  init() async {
-    if (state is SwapLoaded) {
-      return;
+  init({SwapState? swapState}) async {
+
+    if (swapState != null) {
+      emit(swapState);
+    }else{
+      emit(SwapLoading(state));
+      fetchBalances();
+      state.streamController.stream
+          .debounce(Duration(milliseconds: 500))
+          .listen((s) async {
+        emit(SwapLoaded(state, isInProgress: true));
+        if (double.tryParse(s)! > 0) {
+          state.swapService
+              .getAmountsOut(
+              state.fromToken.getTokenName(), state.toToken.getTokenName(), s)
+              .then((value) {
+            state.toValue = double.tryParse(value)!;
+            state.toFieldController.text = EthereumService.formatDouble(value);
+          });
+        } else {
+          state.toValue = 0;
+          state.toFieldController.text = "0.0";
+        }
+        emit(SwapLoaded(state, isInProgress: false));
+      });
     }
-    emit(SwapLoading(state));
-    fetchBalances();
-    state.streamController.stream
-        .debounce(Duration(milliseconds: 500))
-        .listen((s) async {
-      emit(SwapLoaded(state, isInProgress: true));
-      if (double.tryParse(s)! > 0) {
-        state.swapService
-            .getAmountsOut(
-                state.fromToken.getTokenName(), state.toToken.getTokenName(), s)
-            .then((value) {
-              state.toValue = double.tryParse(value)!;
-          state.toFieldController.text = EthereumService.formatDouble(value);
-        });
-      } else {
-        state.toValue = 0;
-        state.toFieldController.text = "0.0";
-      }
-      emit(SwapLoaded(state, isInProgress: false));
-    });
+
   }
 
   fromTokenChanged(Token selectedToken) async {
@@ -156,6 +162,26 @@ class SwapCubit extends Cubit<SwapState> {
               String toBalance = await getTokenBalance(state.toToken);
               state.fromToken.balance = fromBalance;
               state.toToken.balance = toBalance;
+
+
+              //TODO
+              AppDatabase? database = await AppDatabase.getInstance();
+              String tokenAddress = await state.swapService.ethService.getTokenAddrHex(state.toToken.getTokenName(), "token");
+              WalletAsset? ws = await database!.walletAssetDao.getWalletAsset(1, tokenAddress);
+
+              if(ws == null){
+                CryptoCurrency? cryptoCurrency;
+                CurrencyData.all.forEach((element) {
+                  if(element.getTokenName() == state.toToken.getTokenName()){
+                    cryptoCurrency = element;
+                  }
+                });
+                if(cryptoCurrency != null){
+                  WalletAsset walletAsset = new WalletAsset(chainId: 1, tokenAddress: tokenAddress, tokenSymbol: cryptoCurrency!.symbol, logoPath: cryptoCurrency!.logoPath, valueWhenInserted: 0);
+                  await database.walletAssetDao.insertWalletAsset([walletAsset]);
+                }
+              }
+
               emit(TransactionFinishedState(state,
                   transactionStatus: TransactionStatus(
                       "Swapped your ${state.fromFieldController.text} ${state.fromToken.getTokenName()} for ${state.toFieldController.text} ${state.toToken.getTokenName()}",

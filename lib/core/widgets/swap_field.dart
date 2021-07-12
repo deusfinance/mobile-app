@@ -75,7 +75,7 @@ class _SwapFieldState<T extends Token> extends State<SwapField> {
   }
 
   Widget _buildTokenSelection() {
-    return GestureDetector(
+    return InkWell(
         onTap: () async {
           final _selectedToken = await locator<NavigationService>().navigateTo(widget.selectAssetRoute!, context, arguments: {"data": widget.syncData});
           if (_selectedToken != null) {

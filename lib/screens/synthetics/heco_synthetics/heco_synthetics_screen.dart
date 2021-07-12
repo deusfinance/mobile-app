@@ -13,6 +13,7 @@ import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
 import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
+import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,7 +42,9 @@ class HecoSyntheticsScreen extends StatefulWidget {
 class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
   @override
   void initState() {
-    context.read<HecoSyntheticsCubit>().init();
+    context
+        .read<HecoSyntheticsCubit>()
+        .init(syntheticsState: Statics.hecoSyncState);
     super.initState();
   }
 
@@ -104,8 +107,10 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultScreen(
-      child: BlocBuilder<HecoSyntheticsCubit, SyntheticsState>(
-          builder: (context, state) {
+      child: BlocConsumer<HecoSyntheticsCubit, SyntheticsState>(
+          listener: (context, state) {
+        Statics.hecoSyncState = state;
+      }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
           return Center(
             child: CircularProgressIndicator(),
@@ -129,9 +134,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
           child: ConfirmGasScreen(
-            transaction: transaction,
-              network: Network.HECO
-          )),
+              transaction: transaction, network: Network.HECO)),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
         filter:
@@ -192,7 +195,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       children: [
         fromField,
         const SizedBox(height: 12),
-        GestureDetector(
+        InkWell(
             onTap: () {
               context.read<HecoSyntheticsCubit>().reverseSync();
             },
@@ -218,7 +221,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
                       : "${context.read<HecoSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                GestureDetector(
+                InkWell(
                   onTap: () {
                     context.read<HecoSyntheticsCubit>().reversePriceRatio();
                   },
@@ -281,8 +284,9 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction? transaction =
-              await context.read<HecoSyntheticsCubit>().makeApproveTransaction();
+          Transaction? transaction = await context
+              .read<HecoSyntheticsCubit>()
+              .makeApproveTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
             Gas? gas = await showConfirmGasFeeDialog(transaction);
@@ -343,7 +347,7 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
             Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<HecoSyntheticsCubit>().buy(gas);
+            await context.read<HecoSyntheticsCubit>().buy(gas);
           }
         } else {
           Transaction? transaction =
@@ -373,10 +377,9 @@ class _HecoSyntheticsScreenState extends State<HecoSyntheticsScreen> {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
-        timerColor:
-            state.marketTimerClosed
-                ? const Color(0xFFD40000)
-                : const Color(0xFF00D16C),
+        timerColor: state.marketTimerClosed
+            ? const Color(0xFFD40000)
+            : const Color(0xFF00D16C),
         onEnd: context.read<HecoSyntheticsCubit>().marketTimerFinished(),
         label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'
