@@ -23,6 +23,7 @@ import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
 import 'package:deus_mobile/statics/statics.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 enum Mode { LONG, SHORT, NONE }
 enum SyntheticsChain { ETH, XDAI, MATIC, HECO, BSC }
@@ -48,9 +49,11 @@ abstract class SyntheticsState extends Equatable {
   AppDatabase? database;
   SyntheticsChain syntheticsChain;
   Timer? timer;
+  RefreshController refreshController;
 
   SyntheticsState.copy(SyntheticsState state)
       : this.fromToken = state.fromToken,
+        this.refreshController = state.refreshController,
         this.isInProgress = state.isInProgress,
         this.toToken = state.toToken,
         this.approved = state.approved,
@@ -76,6 +79,7 @@ abstract class SyntheticsState extends Equatable {
         toValue = 0,
         marketClosed = false,
         marketTimerClosed = false,
+        refreshController = new RefreshController(initialRefresh: false),
         fromFieldController = new TextEditingController(),
         toFieldController = new TextEditingController(),
         isPriceRatioForward = true,

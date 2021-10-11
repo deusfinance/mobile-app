@@ -27,7 +27,6 @@ class OmniServices {
         locator.registerLazySingleton<EthereumService>(() => EthereumService(params.chainId));
     } catch (e) {
       print("Error creating providers. ${e.runtimeType}");
-      print(e);
     }
   }
 }

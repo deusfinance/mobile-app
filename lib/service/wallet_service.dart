@@ -238,8 +238,10 @@ class WalletService {
     return transaction;
   }
 
-  Future<TransactionInformation> getTransactionInfo(String hash) async {
-    return await ethClient.getTransactionByHash(hash);
+  Future<TransactionInformation?> getTransactionInfo(String hash) async {
+    TransactionInformation? info;
+    info = await ethClient.getTransactionByHash(hash);
+    return info;
   }
 
   Future<Transaction> makeEtherTransaction(Credentials credentials,
@@ -249,6 +251,7 @@ class WalletService {
     Transaction transaction;
     if (gas != null && gas.nonce > 0) {
       transaction = Transaction(
+        from: await credentials.extractAddress(),
         to: EthereumAddress.fromHex(recAddress),
         gasPrice:
             EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
@@ -258,6 +261,7 @@ class WalletService {
       );
     } else {
       transaction = Transaction(
+        from: await credentials.extractAddress(),
         to: EthereumAddress.fromHex(recAddress),
         gasPrice: gas != null
             ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())

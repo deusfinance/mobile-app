@@ -293,8 +293,21 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                                   .transfer(gas);
                             }
                             break;
-                          // case 1:
-                          //   return "ETH";
+                          case 1:
+                          // return "ETH";
+                            Transaction? transaction = await context
+                                .read<SendAssetCubit>()
+                                .makeTransferTransaction();
+                            // WidgetsBinding.instance!.focusManager.primaryFocus
+                            //     ?.unfocus();
+                            if (transaction != null) {
+                              Gas? gas = await showConfirmGasFeeDialog(
+                                  transaction, Network.ETH);
+                              await context
+                                  .read<SendAssetCubit>()
+                                  .transfer(gas);
+                            }
+                            break;
                           case 56:
                             // return "BSC";
                             Transaction? transaction = await context
@@ -310,8 +323,21 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                                   .transfer(gas);
                             }
                             break;
-                          // case 128:
-                          //   return "Heco (SOON)";
+                          case 128:
+                            // return "Heco (SOON)";
+                            Transaction? transaction = await context
+                                .read<SendAssetCubit>()
+                                .makeTransferTransaction();
+                            WidgetsBinding.instance!.focusManager.primaryFocus
+                                ?.unfocus();
+                            if (transaction != null) {
+                              Gas? gas = await showConfirmGasFeeDialog(
+                                  transaction, Network.HECO);
+                              await context
+                                  .read<SendAssetCubit>()
+                                  .transfer(gas);
+                            }
+                            break;
                           // case 137:
                           //   return "Matic (SOON)";
                         }

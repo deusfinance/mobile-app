@@ -11,11 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../models/transaction_status.dart';
-import 'my_colors.dart';
 import 'styles.dart';
 
 class Statics{
-  static String DB_NAME = 'app_database19.db';
+  static String DB_NAME = 'deus_app_database_v1.db';
   static SyntheticsState? xdaiSyncState;
   static SyntheticsState? bscSyncState;
   static SyntheticsState? hecoSyncState;
@@ -28,10 +27,11 @@ class Statics{
       id: 1,
       name: "ETH",
       RPC_url:
-      "https://Mainnet.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093",
-      blockExplorerUrl: "https://mainnet.etherscan.io/tx/",
+      "https://Mainnet.infura.io/v3/8344fd70eef24c50b3fa252322585913",
+      blockExplorerUrl: "https://etherscan.io/tx/",
       currencySymbol: CurrencyData.eth.symbol,
       mainAsset: new WalletAsset(
+          walletAddress: "",
           chainId: 1,
           tokenAddress: zeroAddress,
           tokenSymbol: CurrencyData.eth.symbol,
@@ -44,6 +44,7 @@ class Statics{
       blockExplorerUrl: "https://blockscout.com/xdai/mainnet/tx/",
       currencySymbol: CurrencyData.xdai.symbol,
       mainAsset: new WalletAsset(
+          walletAddress: "",
           chainId: 100,
           tokenAddress: zeroAddress,
           tokenSymbol: CurrencyData.xdai.symbol,
@@ -56,6 +57,7 @@ class Statics{
       blockExplorerUrl: "https://bscscan.com/tx/",
       currencySymbol: CurrencyData.bnb.symbol,
       mainAsset: new WalletAsset(
+          walletAddress: "",
           chainId: 56,
           tokenAddress: zeroAddress,
           tokenSymbol: CurrencyData.bnb.symbol,
@@ -68,6 +70,7 @@ class Statics{
       blockExplorerUrl: "https://hecoinfo.com/tx/",
       currencySymbol: CurrencyData.ht.symbol,
       mainAsset: new WalletAsset(
+          walletAddress: "",
           chainId: 128,
           tokenAddress: zeroAddress,
           tokenSymbol: CurrencyData.ht.symbol,
@@ -80,6 +83,7 @@ class Statics{
       blockExplorerUrl: "",
       currencySymbol: CurrencyData.eth.symbol,
       mainAsset: new WalletAsset(
+          walletAddress: "",
           chainId: 137,
           tokenAddress: zeroAddress,
           tokenSymbol: CurrencyData.eth.symbol,

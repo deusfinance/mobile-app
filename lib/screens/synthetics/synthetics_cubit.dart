@@ -4,6 +4,7 @@ import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/database/transaction.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
+import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/stock.dart';
@@ -11,7 +12,9 @@ import 'package:deus_mobile/models/synthetics/stock_address.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:deus_mobile/models/token.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
+import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
 import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/service/sync/heco_stock_service.dart';
 import 'package:deus_mobile/service/sync/matic_stock_service.dart';
@@ -19,6 +22,7 @@ import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
 import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:intl/intl.dart';
@@ -28,6 +32,7 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
 
   init({SyntheticsState? syntheticsState}) async {
     if (syntheticsState != null) {
+      syntheticsState.refreshController = new RefreshController(initialRefresh: false);
       addListenerToFromField(syntheticsState);
       emit(syntheticsState);
     } else {
@@ -48,6 +53,12 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
         emit(SyntheticsErrorState(state));
       }
     }
+  }
+
+  void refresh() async{
+    state.refreshController.refreshCompleted();
+    emit(SyntheticsInitialState(state.syntheticsChain));
+    await init();
   }
 
   Future<String> getTokenAddress(Token token) async {
@@ -223,9 +234,8 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
   }
 
   addListenerToFromField(SyntheticsState s) {
-    s.fromFieldController = new TextEditingController();
-    s.toFieldController = new TextEditingController();
-    s.toValue = 0;
+    s.fromFieldController = new TextEditingController(text : s.fromFieldController.text);
+    s.toFieldController = new TextEditingController(text: s.toFieldController.text);
     s.inputController = new StreamController();
     s.fromFieldController.addListener(listenInput);
     s.inputController.stream
@@ -326,6 +336,7 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
   }
 
   void closeToast() {
+    state.isInProgress = false;
     if (state is SyntheticsTransactionPendingState)
       emit(SyntheticsTransactionPendingState(state, showingToast: false));
     else if (state is SyntheticsTransactionFinishedState)
@@ -354,8 +365,8 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
         try {
           var res = await state.service
               .approve(await getTokenAddress(state.fromToken), gas);
-
           transaction = new DbTransaction(
+              walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
               chainId: getChainId(),
               hash: res,
               type: TransactionType.APPROVE.index,
@@ -367,7 +378,6 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
           List<int> ids = await state.database!.transactionDao
               .insertDbTransaction([transaction]);
           transaction.id = ids[0];
-
           emit(SyntheticsTransactionPendingState(state,
               transactionStatus: TransactionStatus(
                   "Approve ${state.fromToken.name}",
@@ -379,7 +389,6 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
           result.listen((event) async {
             state.approved = event.status!;
             if (event.status!) {
-              state.approved = true;
               emit(SyntheticsTransactionFinishedState(state,
                   transactionStatus: TransactionStatus(
                       "Approve ${state.fromToken.name}",
@@ -406,6 +415,7 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
             state.database!.transactionDao.updateDbTransactions([transaction]);
           } else {
             transaction = new DbTransaction(
+                walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                 chainId: getChainId(),
                 hash: "",
                 type: TransactionType.APPROVE.index,
@@ -470,6 +480,7 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                 state.fromFieldController.text, inputOracles, gas);
 
             transaction = new DbTransaction(
+                walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                 chainId: getChainId(),
                 hash: res,
                 type: TransactionType.SELL.index,
@@ -528,8 +539,10 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                   .updateDbTransactions([transaction]);
             } else {
               transaction = new DbTransaction(
+                  walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                   chainId: getChainId(),
                   hash: "",
+                  isSuccess: false,
                   type: TransactionType.SELL.index,
                   title: state.fromToken is CryptoCurrency
                       ? state.fromToken.symbol
@@ -596,6 +609,7 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                 maxPrice: maxPrice);
 
             transaction = new DbTransaction(
+                walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                 chainId: getChainId(),
                 hash: res,
                 type: TransactionType.BUY.index,
@@ -631,16 +645,18 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                 (state.fromToken as CryptoCurrency).balance = fromBalance;
 
                 //TODO add to wallet
+                String walletAddress = (await locator<AddressService>().getPublicAddress()).hex;
                 switch (state.syntheticsChain) {
                   case SyntheticsChain.ETH:
                     WalletAsset? ws = await state.database!.walletAssetDao
-                        .getWalletAsset(1, tokenAddress);
+                        .getWalletAsset(1, tokenAddress, walletAddress);
                     if (ws == null) {
                       StockAddress? stockAddress = state.syncData
                           .getStockAddressFromAddress(tokenAddress);
                       Stock? stock =
                           state.syncData.getStockFromAddress(stockAddress!);
                       WalletAsset walletAsset = new WalletAsset(
+                          walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                           chainId: 1,
                           tokenAddress: tokenAddress,
                           tokenSymbol: stock!.symbol,
@@ -653,13 +669,14 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                     break;
                   case SyntheticsChain.XDAI:
                     WalletAsset? ws = await state.database!.walletAssetDao
-                        .getWalletAsset(100, tokenAddress);
+                        .getWalletAsset(100, tokenAddress, walletAddress);
                     if (ws == null) {
                       StockAddress? stockAddress = state.syncData
                           .getStockAddressFromAddress(tokenAddress);
                       Stock? stock =
                           state.syncData.getStockFromAddress(stockAddress!);
                       WalletAsset walletAsset = new WalletAsset(
+                          walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                           chainId: 100,
                           tokenAddress: tokenAddress,
                           tokenSymbol: stock!.symbol,
@@ -674,13 +691,14 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                     break;
                   case SyntheticsChain.HECO:
                     WalletAsset? ws = await state.database!.walletAssetDao
-                        .getWalletAsset(128, tokenAddress);
+                        .getWalletAsset(128, tokenAddress , walletAddress);
                     if (ws == null) {
                       StockAddress? stockAddress = state.syncData
                           .getStockAddressFromAddress(tokenAddress);
                       Stock? stock =
                           state.syncData.getStockFromAddress(stockAddress!);
                       WalletAsset walletAsset = new WalletAsset(
+                          walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                           chainId: 128,
                           tokenAddress: tokenAddress,
                           tokenSymbol: stock!.symbol,
@@ -692,13 +710,14 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                     break;
                   case SyntheticsChain.BSC:
                     WalletAsset? ws = await state.database!.walletAssetDao
-                        .getWalletAsset(56, tokenAddress);
+                        .getWalletAsset(56, tokenAddress, walletAddress);
                     if (ws == null) {
                       StockAddress? stockAddress = state.syncData
                           .getStockAddressFromAddress(tokenAddress);
                       Stock? stock =
                           state.syncData.getStockFromAddress(stockAddress!);
                       WalletAsset walletAsset = new WalletAsset(
+                          walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                           chainId: 56,
                           tokenAddress: tokenAddress,
                           tokenSymbol: stock!.symbol,
@@ -732,8 +751,10 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
                   .updateDbTransactions([transaction]);
             } else {
               transaction = new DbTransaction(
+                  walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                   chainId: getChainId(),
                   hash: "",
+                  isSuccess: false,
                   type: TransactionType.BUY.index,
                   title: state.toToken is CryptoCurrency
                       ? state.toToken!.symbol
@@ -840,79 +861,114 @@ abstract class SyntheticsCubit extends Cubit<SyntheticsState> {
 
   Future<Transaction?> makeBuyTransaction() async {
     assert(!state.isInProgress);
-    emit(SyntheticsTransactionPendingState(state));
-    String tokenAddress = await getTokenAddress(state.toToken!);
-    List<ContractInputData> oracles = await state.syncData.getContractInputData(
-        tokenAddress,
-        await state.service.ethService.ethClient.getBlockNumber());
-    if (oracles.length >= 2) {
-      //sort oracles on price and then on oracle number
-      List arr = [];
-      oracles.asMap().forEach((index, element) {
-        arr.add([index, element.getPrice()]);
-      });
-      arr.sort((a, b) => b[1].compareTo(a[1]));
+    try {
+      emit(SyntheticsTransactionPendingState(state));
+      String tokenAddress = await getTokenAddress(state.toToken!);
+      List<ContractInputData> oracles = await state.syncData
+          .getContractInputData(
+          tokenAddress,
+          await state.service.ethService.ethClient.getBlockNumber());
+      if (oracles.length >= 2) {
+        //sort oracles on price and then on oracle number
+        List arr = [];
+        oracles.asMap().forEach((index, element) {
+          arr.add([index, element.getPrice()]);
+        });
+        arr.sort((a, b) => b[1].compareTo(a[1]));
 
-      List<ContractInputData> inputOracles;
-      if (arr[0][0] < arr[1][0]) {
-        inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
-      } else {
-        inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+        List<ContractInputData> inputOracles;
+        if (arr[0][0] < arr[1][0]) {
+          inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
+        } else {
+          inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+        }
+        String maxPrice = arr[0][1].toString();
+        Transaction? transaction = await state.service.makeBuyTransaction(
+            tokenAddress, state.toValue.toStringAsFixed(18), inputOracles,
+            maxPrice: maxPrice);
+        emit(SyntheticsTransactionFinishedState(state));
+        if (transaction != null) return transaction;
       }
-      String maxPrice = arr[0][1].toString();
-      Transaction? transaction = await state.service.makeBuyTransaction(
-          tokenAddress, state.toValue.toStringAsFixed(18), inputOracles,
-          maxPrice: maxPrice);
-      emit(SyntheticsTransactionFinishedState(state));
-      if (transaction != null) return transaction;
+      emit(SyntheticsTransactionFinishedState(state,
+          transactionStatus: TransactionStatus(
+              "Buy ${state.toFieldController.text} ${state.toToken!
+                  .getTokenName()}",
+              Status.FAILED,
+              "Transaction Failed")));
+      return null;
+    }catch(e){
+      emit(SyntheticsTransactionFinishedState(state,
+          transactionStatus: TransactionStatus(
+              "Buy ${state.toFieldController.text} ${state.toToken!
+                  .getTokenName()}",
+              Status.FAILED,
+              e.toString())));
+      return null;
     }
-    emit(SyntheticsTransactionFinishedState(state,
-        transactionStatus: TransactionStatus(
-            "Buy ${state.toFieldController.text} ${state.toToken!.getTokenName()}",
-            Status.FAILED,
-            "Transaction Failed")));
-    return null;
   }
 
   Future<Transaction?> makeSellTransaction() async {
     assert(!state.isInProgress);
-    emit(SyntheticsTransactionPendingState(state));
-    String tokenAddress = await getTokenAddress(state.fromToken);
-    List<ContractInputData> oracles = await state.syncData.getContractInputData(
-        tokenAddress,
-        await state.service.ethService.ethClient.getBlockNumber());
-    if (oracles.length >= 2) {
-      //sort oracles on price and then on oracle number
-      List arr = [];
-      oracles.asMap().forEach((index, element) {
-        arr.add([index, element.getPrice()]);
-      });
-      arr.sort((a, b) => a[1].compareTo(b[1]));
+    try {
+      emit(SyntheticsTransactionPendingState(state));
+      String tokenAddress = await getTokenAddress(state.fromToken);
+      List<ContractInputData> oracles = await state.syncData
+          .getContractInputData(
+          tokenAddress,
+          await state.service.ethService.ethClient.getBlockNumber());
+      if (oracles.length >= 2) {
+        //sort oracles on price and then on oracle number
+        List arr = [];
+        oracles.asMap().forEach((index, element) {
+          arr.add([index, element.getPrice()]);
+        });
+        arr.sort((a, b) => a[1].compareTo(b[1]));
 
-      List<ContractInputData> inputOracles;
-      if (arr[0][0] < arr[1][0]) {
-        inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
-      } else {
-        inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+        List<ContractInputData> inputOracles;
+        if (arr[0][0] < arr[1][0]) {
+          inputOracles = [oracles[arr[0][0]], oracles[arr[1][0]]];
+        } else {
+          inputOracles = [oracles[arr[1][0]], oracles[arr[0][0]]];
+        }
+
+        Transaction? transaction = await state.service.makeSellTransaction(
+            tokenAddress, state.fromFieldController.text, inputOracles);
+        emit(SyntheticsTransactionFinishedState(state));
+        if (transaction != null) return transaction;
       }
-
-      Transaction? transaction = await state.service.makeSellTransaction(
-          tokenAddress, state.fromFieldController.text, inputOracles);
-      emit(SyntheticsTransactionFinishedState(state));
-      if (transaction != null) return transaction;
+      emit(SyntheticsTransactionFinishedState(state,
+          transactionStatus: TransactionStatus(
+              "Sell ${state.fromFieldController.text} ${state.fromToken
+                  .getTokenName()}",
+              Status.FAILED,
+              "Transaction Failed")));
+      return null;
+    }catch(e){
+      emit(SyntheticsTransactionFinishedState(state,
+          transactionStatus: TransactionStatus(
+              "Sell ${state.fromFieldController.text} ${state.fromToken
+                  .getTokenName()}",
+              Status.FAILED,
+              e.toString())));
+      return null;
     }
-    emit(SyntheticsTransactionFinishedState(state,
-        transactionStatus: TransactionStatus(
-            "Sell ${state.fromFieldController.text} ${state.fromToken.getTokenName()}",
-            Status.FAILED,
-            "Transaction Failed")));
-    return null;
   }
 
   Future<Transaction?> makeApproveTransaction() async {
     assert(!state.isInProgress);
-    emit(SyntheticsTransactionPendingState(state));
-    return await state.service
-        .makeApproveTransaction(await getTokenAddress(state.fromToken));
+    try {
+      emit(SyntheticsTransactionPendingState(state));
+      Transaction? tr = await state.service
+          .makeApproveTransaction(await getTokenAddress(state.fromToken));
+      emit(SyntheticsTransactionFinishedState(state));
+      return tr;
+    }catch(e){
+      emit(SyntheticsTransactionFinishedState(state,
+          transactionStatus: TransactionStatus(
+              "Approve ${state.fromToken.getTokenName()}",
+              Status.FAILED,
+              e.toString())));
+      return null;
+    }
   }
 }

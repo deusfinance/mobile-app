@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -166,85 +167,102 @@ class _SwapScreenState extends State<SwapScreen> {
       },
     );
 
-    return Container(
-      padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
-      decoration: BoxDecoration(color: MyColors.Main_BG_Black),
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                fromField,
-                const SizedBox(height: 12),
-                InkWell(
-                    onTap: () {
-                      context.read<SwapCubit>().reverseSwap();
-                    },
-                    child: Center(
-                        child:
-                            PlatformSvg.asset('images/icons/arrow_down.svg'))),
-                const SizedBox(height: 12),
-                toField,
-                const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Price",
+    return SmartRefresher(
+      enablePullDown: true,
+      controller: state.refreshController,
+      onRefresh: context.read<SwapCubit>().refresh,
+      header: BezierHeader(child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+        child: Center(child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text("Release to Refresh", style: MyStyles.lightWhiteSmallTextStyle,),
+              Icon(Icons.refresh_sharp),
+            ],
+          ),
+        )),
+      ),),
+
+      child: Container(
+        padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+        decoration: BoxDecoration(color: MyColors.Main_BG_Black),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  fromField,
+                  const SizedBox(height: 12),
+                  InkWell(
+                      onTap: () {
+                        context.read<SwapCubit>().reverseSwap();
+                      },
+                      child: Center(
+                          child:
+                              PlatformSvg.asset('images/icons/arrow_down.svg'))),
+                  const SizedBox(height: 12),
+                  toField,
+                  const SizedBox(height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Price",
+                        style: MyStyles.whiteSmallTextStyle,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            state.isPriceRatioForward
+                                ? "${context.read<SwapCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
+                                : "${context.read<SwapCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
+                            style: MyStyles.whiteSmallTextStyle,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              context.read<SwapCubit>().reversePriceRatio();
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(left: 4.0),
+                              child: PlatformSvg.asset(
+                                  "images/icons/exchange.svg",
+                                  width: 15),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPriceImpact(state),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Slippage Tolerance",
                       style: MyStyles.whiteSmallTextStyle,
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          state.isPriceRatioForward
-                              ? "${context.read<SwapCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
-                              : "${context.read<SwapCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
-                          style: MyStyles.whiteSmallTextStyle,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            context.read<SwapCubit>().reversePriceRatio();
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(left: 4.0),
-                            child: PlatformSvg.asset(
-                                "images/icons/exchange.svg",
-                                width: 15),
-                          ),
-                        ),
-                      ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSlippageButtons(state),
+                  const SizedBox(height: 12),
+                  _buildModeButtons(state),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Route",
+                      style: MyStyles.whiteSmallTextStyle,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _buildPriceImpact(state),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Slippage Tolerance",
-                    style: MyStyles.whiteSmallTextStyle,
                   ),
-                ),
-                const SizedBox(height: 8),
-                _buildSlippageButtons(state),
-                const SizedBox(height: 12),
-                _buildModeButtons(state),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Route",
-                    style: MyStyles.whiteSmallTextStyle,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _buildRouteWidget(state),
-              ],
+                  const SizedBox(height: 8),
+                  _buildRouteWidget(state),
+                ],
+              ),
             ),
-          ),
-          _buildToastWidget(state),
-        ],
+            _buildToastWidget(state),
+          ],
+        ),
       ),
     );
   }

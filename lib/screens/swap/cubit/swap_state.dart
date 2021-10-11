@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/data_source/currency_data.dart';
 import 'package:deus_mobile/models/swap/crypto_currency.dart';
 import 'package:deus_mobile/models/token.dart';
@@ -9,6 +10,7 @@ import 'package:deus_mobile/service/deus_swap_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../locator.dart';
 
@@ -25,32 +27,35 @@ abstract class SwapState extends Equatable {
   late bool isPriceRatioForward;
   late bool isInProgress;
   late bool approved;
+  AppDatabase? database;
+  RefreshController refreshController;
 
-  SwapState();
-
-  SwapState.init() {
-    fromToken = CurrencyData.eth;
-    toToken = CurrencyData.deus;
-    approved = true;
-    slippage = 0.5;
-    toValue = 0;
-    swapService = new SwapService(
-        ethService: new EthereumService(1),
-        privateKey: locator<ConfigurationService>().getPrivateKey()!);
+  SwapState.init()
+      : fromToken = CurrencyData.eth,
+        toToken = CurrencyData.deus,
+        approved = true,
+        slippage = 0.5,
+        toValue = 0,
+        refreshController = RefreshController(initialRefresh: false),
+        swapService = new SwapService(
+            ethService: new EthereumService(1),
+            privateKey: locator<ConfigurationService>().getPrivateKey()!),
+        fromFieldController = new TextEditingController(),
+        toFieldController = new TextEditingController(),
+        slippageController = new TextEditingController(),
+        streamController = StreamController(),
+        this.isPriceRatioForward = true,
+        this.isInProgress = false {
     swapService.init();
-    fromFieldController = new TextEditingController();
-    toFieldController = new TextEditingController();
-    slippageController = new TextEditingController();
-    streamController = StreamController();
-    this.isPriceRatioForward = true;
-    this.isInProgress = false;
   }
 
   SwapState.copy(SwapState swapState)
       : this.swapService = swapState.swapService,
         this.slippage = swapState.slippage,
+        this.refreshController = swapState.refreshController,
         this.fromToken = swapState.fromToken,
         this.toToken = swapState.toToken,
+        this.database = swapState.database,
         this.toValue = swapState.toValue,
         this.fromFieldController = swapState.fromFieldController,
         this.toFieldController = swapState.toFieldController,
@@ -72,7 +77,8 @@ abstract class SwapState extends Equatable {
         toValue,
         fromFieldController,
         toFieldController,
-        slippageController,streamController
+        slippageController,
+        streamController
       ];
 }
 

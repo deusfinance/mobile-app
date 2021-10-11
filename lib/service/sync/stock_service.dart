@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
 import 'package:deus_mobile/service/sync/sync_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -12,7 +11,8 @@ import '../ethereum_service.dart';
 class StockService extends SyncService {
   String marketMaker = "0x7a27a7BF25d64FAa090404F94606c580ce8E1D37";
 
-  StockService({required ethService, required privateKey}) : super(ethService, privateKey);
+  StockService({required ethService, required privateKey})
+      : super(ethService, privateKey);
 
   @override
   Future<String> getAllowances(tokenAddress) async {
@@ -54,6 +54,7 @@ class StockService extends SyncService {
         [EthereumAddress.fromHex(marketMaker), EthereumService.getWei(amount)]);
     return res;
   }
+
   @override
   Future<String> getTokenBalance(tokenAddress) async {
     DeployedContract tokenContract =
@@ -66,33 +67,30 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<String> buy(tokenAddress, String amount,
-      List<ContractInputData> oracles, Gas gas,  {String? maxPrice}) async {
-    try {
-      DeployedContract contract = await ethService.loadContractWithGivenAddress(
-          "synchronizer", EthereumAddress.fromHex(this.marketMaker));
-      ContractInputData info = oracles[0];
+  Future<String> buy(
+      tokenAddress, String amount, List<ContractInputData> oracles, Gas gas,
+      {String? maxPrice}) async {
+    DeployedContract contract = await ethService.loadContractWithGivenAddress(
+        "synchronizer", EthereumAddress.fromHex(this.marketMaker));
+    ContractInputData info = oracles[0];
 
-      return await ethService.submit(
-          await credentials,
-          contract,
-          "buyFor",
-          [
-            await address,
-            info.getMultiplier(),
-            EthereumAddress.fromHex(tokenAddress),
-            EthereumService.getWei(amount),
-            info.getFee(),
-            [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
-            [oracles[0].getPrice(), oracles[1].getPrice()],
-            [oracles[0].signs['buy']!.getV(), oracles[1].signs['buy']!.getV()],
-            [oracles[0].signs['buy']!.getR(), oracles[1].signs['buy']!.getR()],
-            [oracles[0].signs['buy']!.getS(), oracles[1].signs['buy']!.getS()],
-          ],
-          gas: gas);
-    } on Exception catch (error) {
-      return "";
-    }
+    return await ethService.submit(
+        await credentials,
+        contract,
+        "buyFor",
+        [
+          await address,
+          info.getMultiplier(),
+          EthereumAddress.fromHex(tokenAddress),
+          EthereumService.getWei(amount),
+          info.getFee(),
+          [oracles[0].getBlockNo(), oracles[1].getBlockNo()],
+          [oracles[0].getPrice(), oracles[1].getPrice()],
+          [oracles[0].signs['buy']!.getV(), oracles[1].signs['buy']!.getV()],
+          [oracles[0].signs['buy']!.getR(), oracles[1].signs['buy']!.getR()],
+          [oracles[0].signs['buy']!.getS(), oracles[1].signs['buy']!.getS()],
+        ],
+        gas: gas);
   }
 
   @override
@@ -130,8 +128,9 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<Transaction> makeBuyTransaction(String tokenAddress, String amount,
-      List<ContractInputData> oracles,  {String? maxPrice}) async {
+  Future<Transaction> makeBuyTransaction(
+      String tokenAddress, String amount, List<ContractInputData> oracles,
+      {String? maxPrice}) async {
     DeployedContract contract = await ethService.loadContractWithGivenAddress(
         "synchronizer", EthereumAddress.fromHex(this.marketMaker));
     ContractInputData info = oracles[0];

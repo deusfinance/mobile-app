@@ -11,6 +11,7 @@ import 'package:deus_mobile/models/wallet/wallet_asset_api.dart';
 import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/cubit/add_wallet_asset_state.dart';
 import 'package:deus_mobile/screens/wallet_intro_screen/widgets/form/paper_input.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/statics.dart';
 import 'package:deus_mobile/statics/styles.dart';
@@ -222,6 +223,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                         state.symbolConfirmed &&
                         state.addressConfirmed) {
                       WalletAsset walletAsset = new WalletAsset(
+                          walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                           chainId: state.chain.id,
                           tokenAddress:
                               state.tokenAddressController.text.toString(),
@@ -407,8 +409,9 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
             ),
           ),
           InkWell(
-            onTap: () {
+            onTap: () async{
               WalletAsset walletAsset = new WalletAsset(
+                  walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                   chainId: state.chain.id,
                   tokenAddress: wa.address,
                   tokenSymbol: wa.symbol,

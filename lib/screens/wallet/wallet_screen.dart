@@ -15,6 +15,7 @@ import 'package:deus_mobile/routes/navigation_service.dart';
 import 'package:deus_mobile/screens/asset_detail/asset_detail_screen.dart';
 import 'package:deus_mobile/screens/wallet/add_wallet_asset/add_wallet_asset_screen.dart';
 import 'package:deus_mobile/screens/wallet/manage_gas.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/ethereum_service.dart';
 import 'package:deus_mobile/statics/my_colors.dart';
 import 'package:deus_mobile/statics/statics.dart';
@@ -37,6 +38,7 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+
   @override
   void initState() {
     context.read<WalletCubit>().init(walletState: Statics.walletState);
@@ -88,7 +90,7 @@ class _WalletScreenState extends State<WalletScreen> {
         Column(
           children: [
             _navbar(state),
-            state is WalletPortfilioState ? _assets(state) : listTransactions(state)
+            state.walletTab == WalletTab.ASSETS ? _assets(state) : listTransactions(state)
           ],
         ),
         _buildToastWidget(state),
@@ -116,7 +118,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     child: Text(
                       "Assets",
                       overflow: TextOverflow.ellipsis,
-                      style: state is WalletPortfilioState
+                      style: state.walletTab == WalletTab.ASSETS
                           ? TextStyle(
                               fontFamily: MyStyles.kFontFamily,
                               fontWeight: FontWeight.w300,
@@ -149,7 +151,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     child: Text(
                       "Activity",
                       overflow: TextOverflow.ellipsis,
-                      style: state is WalletManageTransState
+                      style: state.walletTab == WalletTab.ACTIVITY
                           ? TextStyle(
                               fontFamily: MyStyles.kFontFamily,
                               fontWeight: FontWeight.w300,
@@ -177,7 +179,7 @@ class _WalletScreenState extends State<WalletScreen> {
             children: [
               Expanded(
                 child: Visibility(
-                  visible: state is WalletPortfilioState,
+                  visible: state.walletTab == WalletTab.ASSETS,
                   child: Container(
                       margin: EdgeInsets.only(top: 3),
                       height: 2.0,
@@ -187,7 +189,7 @@ class _WalletScreenState extends State<WalletScreen> {
               ),
               Expanded(
                 child: Visibility(
-                  visible: state is WalletManageTransState,
+                  visible: state.walletTab == WalletTab.ACTIVITY,
                   child: Container(
                       margin: EdgeInsets.only(top: 3),
                       height: 2.0,
@@ -218,10 +220,14 @@ class _WalletScreenState extends State<WalletScreen> {
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: StreamBuilder<List<WalletAsset>>(
-                      stream:
-                          context.read<WalletCubit>().getWalletAssetsStream(),
-                      builder: (context, snapshot) {
+                  child: FutureBuilder<Stream<List<WalletAsset>>>(
+                    future: context.read<WalletCubit>().getWalletAssetsStream(),
+                    builder:(context, streamData){
+                      if(streamData.connectionState == ConnectionState.waiting || streamData.data == null)
+                        return Container();
+                      return StreamBuilder<List<WalletAsset>>(
+                          stream: streamData.data,
+                          builder: (context, snapshot) {
                         return Text(
                           "Assets(${snapshot.connectionState == ConnectionState.waiting ? "--" : snapshot.data?.length ?? 0})",
                           style: TextStyle(
@@ -231,7 +237,9 @@ class _WalletScreenState extends State<WalletScreen> {
                             color: MyColors.White,
                           ),
                         );
-                      }),
+                      });
+                    }
+                  ),
                 ),
               ),
               InkWell(
@@ -491,6 +499,29 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget transactionCard(WalletState state, DbTransaction transaction) {
     return InkWell(
+      onLongPress: () {
+        final Widget dialog = AlertDialog(
+          title: Text('Are you sure?'),
+          content:
+          Text('Do you want to delete Transaction ${transaction.title}?'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                locator<NavigationService>().goBack(context, false);
+              },
+              child: Text('No'),
+            ),
+            FlatButton(
+              onPressed: () {
+                context.read<WalletCubit>().deleteTransaction(transaction);
+                locator<NavigationService>().goBack(context, false);
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+        showDialog(context: context, builder: (context) => dialog);
+      },
       onTap: () async {
         if (transaction.blockNum!.isPending) {
           String url =
@@ -540,7 +571,6 @@ class _WalletScreenState extends State<WalletScreen> {
                             Transaction? t = context
                                 .read<WalletCubit>()
                                 .makeTransactionWithInfo(transaction);
-
                             Gas? gas = await showConfirmGasFeeDialog(state, t);
                             context.read<WalletCubit>().sendTransaction(gas, t, transaction.title, TransactionType.SPEEDUP);
                           },
@@ -627,96 +657,109 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget listWalletAsset(WalletState state) {
     return Expanded(
-      child: StreamBuilder<List<WalletAsset>>(
-          stream: context.read<WalletCubit>().getWalletAssetsStream(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasData && snapshot.data != null) {
-              if (snapshot.data?.length == 0) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 150,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PlatformSvg.asset('icons/empty.svg', height: 50),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("There is no Asset on this Network"),
-                    ),
-                  ],
-                );
-              }
-              return ListView.separated(
-                itemCount: snapshot.data?.length ?? 0,
-                itemBuilder: (context, index) {
-                  WalletAsset walletAsset = snapshot.data![index];
-                  return walletAssetCard(walletAsset, state);
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Divider(
-                    height: 10,
-                    thickness: 2,
-                    color: Colors.white.withOpacity(0.1),
+      child: FutureBuilder<Stream<List<WalletAsset>>>(
+        future: context.read<WalletCubit>().getWalletAssetsStream(),
+        builder:(context, streamData) {
+          if (streamData.connectionState == ConnectionState.waiting || streamData.data == null)
+            return Center(child: CircularProgressIndicator());
+          return StreamBuilder<List<WalletAsset>>(
+              stream: streamData.data,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasData && snapshot.data != null) {
+                  if (snapshot.data?.length == 0) {
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 150,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: PlatformSvg.asset(
+                              'icons/empty.svg', height: 50),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("There is no Asset on this Network"),
+                        ),
+                      ],
+                    );
+                  }
+                  return ListView.separated(
+                    itemCount: snapshot.data?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      WalletAsset walletAsset = snapshot.data![index];
+                      return walletAssetCard(walletAsset, state);
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider(
+                        height: 10,
+                        thickness: 2,
+                        color: Colors.white.withOpacity(0.1),
+                      );
+                    },
                   );
-                },
-              );
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }),
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              });}
+      ),
     );
   }
 
   Widget listTransactions(WalletState state) {
     return Expanded(
-      child: StreamBuilder<List<DbTransaction>>(
-          stream: context.read<WalletCubit>().getTransactionsStream(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasData && snapshot.data != null) {
-              List<DbTransaction> transactions = snapshot.data!;
-              if (transactions.length == 0) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 150,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PlatformSvg.asset('icons/empty.svg', height: 50),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("There is no Transaction on this Network"),
-                    ),
-                  ],
-                );
-              }
+      child: FutureBuilder<Stream<List<DbTransaction>>>(
+        future: context.read<WalletCubit>().getTransactionsStream(),
+        builder: (context, streamData){
+          if (streamData.connectionState == ConnectionState.waiting || streamData.data == null)
+            return Center(child: CircularProgressIndicator());
+          return StreamBuilder<List<DbTransaction>>(
+              stream: streamData.data,
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  List<DbTransaction> transactions = snapshot.data!;
+                  if (transactions.length == 0) {
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 150,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: PlatformSvg.asset('icons/empty.svg', height: 50),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("There is no Transaction on this Network"),
+                        ),
+                      ],
+                    );
+                  }
 
-              return ListView.separated(
-                itemCount: transactions.length,
-                itemBuilder: (context, index) {
-                  DbTransaction transaction = transactions[index];
-                  return transactionCard(state, transaction);
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Divider(
-                    height: 10,
-                    thickness: 2,
-                    color: Colors.white.withOpacity(0.1),
+                  return ListView.separated(
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      DbTransaction transaction = transactions[index];
+                      return transactionCard(state, transaction);
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider(
+                        height: 10,
+                        thickness: 2,
+                        color: Colors.white.withOpacity(0.1),
+                      );
+                    },
                   );
-                },
-              );
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }),
+                }
+                else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              });
+        }
+      ),
     );
   }
 
@@ -747,7 +790,19 @@ class _WalletScreenState extends State<WalletScreen> {
       return PlatformSvg.asset('icons/upload.svg', height: 30);
     } else if (transaction.type == TransactionType.SEND.index) {
       return PlatformSvg.asset('icons/upload.svg', height: 30);
-    } else
+    }else if (transaction.type == TransactionType.CANCEL.index) {
+      return PlatformSvg.asset('icons/white_error.svg', height: 30);
+    }else if (transaction.type == TransactionType.SPEEDUP.index) {
+      return Container(
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(color: Colors.white, width: 2)),
+          child: RotatedBox(
+              quarterTurns: 3,
+              child: PlatformSvg.asset('icons/speed_up.svg', height: 17)));
+    }
+    else
       return Container();
   }
 

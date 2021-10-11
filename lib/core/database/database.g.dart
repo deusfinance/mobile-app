@@ -87,11 +87,11 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `WalletAsset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `chain_id` INTEGER NOT NULL, `tokenAddress` TEXT NOT NULL, `tokenSymbol` TEXT, `tokenDecimal` INTEGER, `valueWhenInserted` REAL, `logoPath` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `WalletAsset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `chain_id` INTEGER NOT NULL, `walletAddress` TEXT NOT NULL, `tokenAddress` TEXT NOT NULL, `tokenSymbol` TEXT, `tokenDecimal` INTEGER, `valueWhenInserted` REAL, `logoPath` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Chain` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `RPC_url` TEXT NOT NULL, `blockExplorerUrl` TEXT, `currencySymbol` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `DbTransaction` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash` TEXT NOT NULL, `chainId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `title` TEXT NOT NULL, `isSuccess` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `DbTransaction` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash` TEXT NOT NULL, `walletAddress` TEXT NOT NULL, `chainId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `title` TEXT NOT NULL, `isSuccess` INTEGER)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `UserAddress` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `address` TEXT NOT NULL)');
 
@@ -134,6 +134,7 @@ class _$WalletAssetDao extends WalletAssetDao {
             (WalletAsset item) => <String, Object?>{
                   'id': item.id,
                   'chain_id': item.chainId,
+                  'walletAddress': item.walletAddress,
                   'tokenAddress': item.tokenAddress,
                   'tokenSymbol': item.tokenSymbol,
                   'tokenDecimal': item.tokenDecimal,
@@ -148,6 +149,7 @@ class _$WalletAssetDao extends WalletAssetDao {
             (WalletAsset item) => <String, Object?>{
                   'id': item.id,
                   'chain_id': item.chainId,
+                  'walletAddress': item.walletAddress,
                   'tokenAddress': item.tokenAddress,
                   'tokenSymbol': item.tokenSymbol,
                   'tokenDecimal': item.tokenDecimal,
@@ -162,6 +164,7 @@ class _$WalletAssetDao extends WalletAssetDao {
             (WalletAsset item) => <String, Object?>{
                   'id': item.id,
                   'chain_id': item.chainId,
+                  'walletAddress': item.walletAddress,
                   'tokenAddress': item.tokenAddress,
                   'tokenSymbol': item.tokenSymbol,
                   'tokenDecimal': item.tokenDecimal,
@@ -183,50 +186,40 @@ class _$WalletAssetDao extends WalletAssetDao {
   final DeletionAdapter<WalletAsset> _walletAssetDeletionAdapter;
 
   @override
-  Future<List<WalletAsset>> getAllWalletAssets(int chainId) async {
+  Future<List<WalletAsset>> getAllWalletAssets(
+      int chainId, String walletAddress) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM WalletAsset Where chain_id = ?1 ORDER BY id DESC',
-        mapper: (Map<String, Object?> row) => WalletAsset(
-            id: row['id'] as int?,
-            chainId: row['chain_id'] as int,
-            tokenAddress: row['tokenAddress'] as String,
-            tokenSymbol: row['tokenSymbol'] as String?,
-            tokenDecimal: row['tokenDecimal'] as int?,
-            valueWhenInserted: row['valueWhenInserted'] as double?,
-            logoPath: row['logoPath'] as String?),
-        arguments: [chainId]);
+        'SELECT * FROM WalletAsset Where chain_id = ?1 AND walletAddress = ?2 ORDER BY id DESC',
+        mapper: (Map<String, Object?> row) => WalletAsset(id: row['id'] as int?, walletAddress: row['walletAddress'] as String, chainId: row['chain_id'] as int, tokenAddress: row['tokenAddress'] as String, tokenSymbol: row['tokenSymbol'] as String?, tokenDecimal: row['tokenDecimal'] as int?, valueWhenInserted: row['valueWhenInserted'] as double?, logoPath: row['logoPath'] as String?),
+        arguments: [chainId, walletAddress]);
   }
 
   @override
-  Stream<List<WalletAsset>> getAllWalletAssetsStream(int chainId) {
+  Stream<List<WalletAsset>> getAllWalletAssetsStream(
+      int chainId, String walletAddress) {
     return _queryAdapter.queryListStream(
-        'SELECT * FROM WalletAsset Where chain_id = ?1 ORDER BY id DESC',
+        'SELECT * FROM WalletAsset Where chain_id = ?1 AND walletAddress = ?2 ORDER BY id DESC',
         mapper: (Map<String, Object?> row) => WalletAsset(
             id: row['id'] as int?,
+            walletAddress: row['walletAddress'] as String,
             chainId: row['chain_id'] as int,
             tokenAddress: row['tokenAddress'] as String,
             tokenSymbol: row['tokenSymbol'] as String?,
             tokenDecimal: row['tokenDecimal'] as int?,
             valueWhenInserted: row['valueWhenInserted'] as double?,
             logoPath: row['logoPath'] as String?),
-        arguments: [chainId],
+        arguments: [chainId, walletAddress],
         queryableName: 'WalletAsset',
         isView: false);
   }
 
   @override
-  Future<WalletAsset?> getWalletAsset(int chainId, String tokenAddress) async {
+  Future<WalletAsset?> getWalletAsset(
+      int chainId, String tokenAddress, String walletAddress) async {
     return _queryAdapter.query(
-        'SELECT * FROM WalletAsset Where chain_id = ?1 AND tokenAddress = ?2',
-        mapper: (Map<String, Object?> row) => WalletAsset(
-            id: row['id'] as int?,
-            chainId: row['chain_id'] as int,
-            tokenAddress: row['tokenAddress'] as String,
-            tokenSymbol: row['tokenSymbol'] as String?,
-            tokenDecimal: row['tokenDecimal'] as int?,
-            valueWhenInserted: row['valueWhenInserted'] as double?,
-            logoPath: row['logoPath'] as String?),
-        arguments: [chainId, tokenAddress]);
+        'SELECT * FROM WalletAsset Where chain_id = ?1 AND tokenAddress = ?2 AND walletAddress = ?3',
+        mapper: (Map<String, Object?> row) => WalletAsset(id: row['id'] as int?, walletAddress: row['walletAddress'] as String, chainId: row['chain_id'] as int, tokenAddress: row['tokenAddress'] as String, tokenSymbol: row['tokenSymbol'] as String?, tokenDecimal: row['tokenDecimal'] as int?, valueWhenInserted: row['valueWhenInserted'] as double?, logoPath: row['logoPath'] as String?),
+        arguments: [chainId, tokenAddress, walletAddress]);
   }
 
   @override
@@ -315,7 +308,7 @@ class _$ChainDao extends ChainDao {
   @override
   Future<List<int>> insertChain(List<Chain> chains) {
     return _chainInsertionAdapter.insertListAndReturnIds(
-        chains, OnConflictStrategy.ignore);
+        chains, OnConflictStrategy.replace);
   }
 
   @override
@@ -339,6 +332,7 @@ class _$DbTransactionDao extends DbTransactionDao {
             (DbTransaction item) => <String, Object?>{
                   'id': item.id,
                   'hash': item.hash,
+                  'walletAddress': item.walletAddress,
                   'chainId': item.chainId,
                   'type': item.type,
                   'title': item.title,
@@ -353,6 +347,7 @@ class _$DbTransactionDao extends DbTransactionDao {
             (DbTransaction item) => <String, Object?>{
                   'id': item.id,
                   'hash': item.hash,
+                  'walletAddress': item.walletAddress,
                   'chainId': item.chainId,
                   'type': item.type,
                   'title': item.title,
@@ -367,6 +362,7 @@ class _$DbTransactionDao extends DbTransactionDao {
             (DbTransaction item) => <String, Object?>{
                   'id': item.id,
                   'hash': item.hash,
+                  'walletAddress': item.walletAddress,
                   'chainId': item.chainId,
                   'type': item.type,
                   'title': item.title,
@@ -388,11 +384,13 @@ class _$DbTransactionDao extends DbTransactionDao {
   final DeletionAdapter<DbTransaction> _dbTransactionDeletionAdapter;
 
   @override
-  Stream<List<DbTransaction>> getAllDbTransactions(int chainId) {
+  Stream<List<DbTransaction>> getAllDbTransactions(
+      int chainId, String walletAddress) {
     return _queryAdapter.queryListStream(
-        'SELECT * FROM DbTransaction Where chainId = ?1 ORDER BY id DESC',
+        'SELECT * FROM DbTransaction Where chainId = ?1 AND walletAddress = ?2 ORDER BY id DESC',
         mapper: (Map<String, Object?> row) => DbTransaction(
             id: row['id'] as int?,
+            walletAddress: row['walletAddress'] as String,
             chainId: row['chainId'] as int,
             hash: row['hash'] as String,
             type: row['type'] as int,
@@ -400,7 +398,7 @@ class _$DbTransactionDao extends DbTransactionDao {
             isSuccess: row['isSuccess'] == null
                 ? null
                 : (row['isSuccess'] as int) != 0),
-        arguments: [chainId],
+        arguments: [chainId, walletAddress],
         queryableName: 'DbTransaction',
         isView: false);
   }

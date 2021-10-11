@@ -25,7 +25,7 @@ class TransactionStatus {
       if (chainId == 100)
         return "https://blockscout.com/xdai/mainnet/tx/" + hash;
       if(chainId == 1)
-        return "https://mainnet.etherscan.io/tx/" + hash;
+        return "https://etherscan.io/tx/" + hash;
     //  heco
       if(chainId == 128){
         return "https://hecoinfo.com/tx/" + hash;

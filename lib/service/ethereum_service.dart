@@ -72,7 +72,7 @@ class EthereumService {
     }
 
     else{
-      return 'https://' + networkName! + '.infura.io/v3/cf6ea736e00b4ee4bc43dfdb68f51093';
+      return 'https://' + networkName! + '.infura.io/v3/8344fd70eef24c50b3fa252322585913';
     }
   }
 

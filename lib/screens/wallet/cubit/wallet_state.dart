@@ -1,5 +1,3 @@
-
-
 import 'package:deus_mobile/core/database/chain.dart';
 import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/database/transaction.dart';
@@ -9,48 +7,48 @@ import 'package:deus_mobile/models/wallet/wallet.dart';
 import 'package:deus_mobile/service/wallet_service.dart';
 import 'package:equatable/equatable.dart';
 
+enum WalletTab { ACTIVITY, ASSETS }
+
 abstract class WalletState extends Equatable {
   AppDatabase? database;
   Stream<List<Chain>> chains;
   Chain? selectedChain;
   WalletService? walletService;
   bool isInProgress;
+  WalletTab walletTab;
 
-  WalletState.init():
-      isInProgress = false,
-      chains = new Stream.empty();
+  WalletState.init()
+      : isInProgress = false,
+        walletTab = WalletTab.ASSETS,
+        chains = new Stream.empty();
 
-  WalletState.copy(WalletState state):
-      isInProgress = state.isInProgress,
-      database = state.database,
-      walletService = state.walletService,
-      selectedChain = state.selectedChain,
-      chains = state.chains;
+  WalletState.copy(WalletState state)
+      : isInProgress = state.isInProgress,
+        database = state.database,
+        walletTab = state.walletTab,
+        walletService = state.walletService,
+        selectedChain = state.selectedChain,
+        chains = state.chains;
 
   @override
-  List<Object?> get props => [chains, selectedChain, walletService, database, isInProgress];
-
+  List<Object?> get props =>
+      [chains, selectedChain, walletService, database, isInProgress];
 }
 
-class WalletInitialState extends WalletState{
-  WalletInitialState(): super.init();
-
+class WalletInitialState extends WalletState {
+  WalletInitialState() : super.init();
 }
 
-class WalletLoadingState extends WalletState{
-  WalletLoadingState(WalletState state): super.copy(state);
+class WalletLoadingState extends WalletState {
+  WalletLoadingState(WalletState state) : super.copy(state);
 }
 
-class WalletErrorState extends WalletState{
-  WalletErrorState(WalletState state): super.copy(state);
+class WalletErrorState extends WalletState {
+  WalletErrorState(WalletState state) : super.copy(state);
 }
 
-class WalletPortfilioState extends WalletState{
-  WalletPortfilioState(WalletState state): super.copy(state);
-}
-
-class WalletManageTransState extends WalletState{
-  WalletManageTransState(WalletState state): super.copy(state);
+class WalletLoadedState extends WalletState {
+  WalletLoadedState(WalletState state) : super.copy(state);
 }
 
 class WalletTransactionPendingState extends WalletState {
@@ -72,7 +70,7 @@ class WalletTransactionPendingState extends WalletState {
 
   TransactionStatus get transactionStatus =>
       _transactionStatus ??
-          new TransactionStatus("message", Status.PENDING, "label");
+      new TransactionStatus("message", Status.PENDING, "label");
 
   set transactionStatus(TransactionStatus value) {
     _transactionStatus = value;
@@ -107,7 +105,7 @@ class WalletTransactionFinishedState extends WalletState {
 
   TransactionStatus get transactionStatus =>
       _transactionStatus ??
-          new TransactionStatus("message", Status.PENDING, "label");
+      new TransactionStatus("message", Status.PENDING, "label");
 
   set transactionStatus(TransactionStatus value) {
     _transactionStatus = value;

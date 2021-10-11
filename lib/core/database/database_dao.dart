@@ -9,11 +9,11 @@ import 'chain.dart';
 
 @dao
 abstract class WalletAssetDao {
-  @Query('SELECT * FROM WalletAsset Where chain_id = :chainId ORDER BY id DESC')
-  Future<List<WalletAsset>> getAllWalletAssets(int chainId);
+  @Query('SELECT * FROM WalletAsset Where chain_id = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
+  Future<List<WalletAsset>> getAllWalletAssets(int chainId, String walletAddress);
 
-  @Query('SELECT * FROM WalletAsset Where chain_id = :chainId ORDER BY id DESC')
-  Stream<List<WalletAsset>> getAllWalletAssetsStream(int chainId);
+  @Query('SELECT * FROM WalletAsset Where chain_id = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
+  Stream<List<WalletAsset>> getAllWalletAssetsStream(int chainId, String walletAddress);
 
   @Insert(onConflict: OnConflictStrategy.ignore)
   Future<List<int>> insertWalletAsset(List<WalletAsset> walletAssets);
@@ -25,8 +25,8 @@ abstract class WalletAssetDao {
   Future<int> deleteWalletAsset(List<WalletAsset> walletAssets);
 
   @Query(
-      'SELECT * FROM WalletAsset Where chain_id = :chainId AND tokenAddress = :tokenAddress')
-  Future<WalletAsset?> getWalletAsset(int chainId, String tokenAddress);
+      'SELECT * FROM WalletAsset Where chain_id = :chainId AND tokenAddress = :tokenAddress AND walletAddress = :walletAddress')
+  Future<WalletAsset?> getWalletAsset(int chainId, String tokenAddress, String walletAddress);
 }
 
 @dao
@@ -39,7 +39,7 @@ abstract class ChainDao {
     insertChain([Statics.eth, Statics.xdai, Statics.bsc, Statics.heco, Statics.matic]);
   }
 
-  @Insert(onConflict: OnConflictStrategy.ignore)
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<List<int>> insertChain(List<Chain> chains);
 
   @update
@@ -67,8 +67,8 @@ abstract class UserAddressDao {
 
 @dao
 abstract class DbTransactionDao {
-  @Query('SELECT * FROM DbTransaction Where chainId = :chainId ORDER BY id DESC')
-  Stream<List<DbTransaction>> getAllDbTransactions(int chainId);
+  @Query('SELECT * FROM DbTransaction Where chainId = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
+  Stream<List<DbTransaction>> getAllDbTransactions(int chainId, String walletAddress);
 
   @insert
   Future<List<int>> insertDbTransaction(List<DbTransaction> transactions);

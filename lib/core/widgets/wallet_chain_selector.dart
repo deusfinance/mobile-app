@@ -55,9 +55,12 @@ class _WalletChainSelectorState extends State<WalletChainSelector> {
               borderRadius: BorderRadius.all(Radius.circular(6))),
           child: Row(
             children: [
-              Text(
-                widget.selectedChain?.name??"--",
-                style: MyStyles.whiteSmallTextStyle,
+              Expanded(
+                child: Text(
+                  widget.selectedChain?.name??"--",
+                  style: MyStyles.whiteSmallTextStyle,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               Spacer(),
               PlatformSvg.asset('images/icons/chevron_down.svg'),

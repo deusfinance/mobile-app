@@ -10,6 +10,7 @@ class DbTransaction {
   @PrimaryKey(autoGenerate: true)
   int? id;
   String hash;
+  String walletAddress;
   int chainId;
   int type;
   String title;
@@ -33,7 +34,7 @@ class DbTransaction {
   BlockNum? blockNum;
 
 
-  DbTransaction({this.id, required this.chainId, required this.hash, required this.type, required this.title, this.isSuccess});
+  DbTransaction({this.id, required this.walletAddress, required this.chainId, required this.hash, required this.type, required this.title, this.isSuccess});
 
   String getTitle(){
     switch(type){

@@ -46,15 +46,18 @@ class _SyncChainSelectorState extends State<SyncChainSelector> {
               color: Color(MyColors.kAddressBackground).withOpacity(0.25),
               borderRadius: BorderRadius.all(Radius.circular(6))),
           child: Row(
-            children: [
-              Text(
-                getChainName(widget.selectedChain),
-                style: MyStyles.whiteSmallTextStyle,
-              ),
-              Spacer(),
-              PlatformSvg.asset('images/icons/chevron_down.svg'),
-            ],
-          )),
+              children: [
+                Expanded(
+                  child: Text(
+                    getChainName(widget.selectedChain),
+                    style: MyStyles.whiteSmallTextStyle,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Spacer(),
+                PlatformSvg.asset('images/icons/chevron_down.svg'),
+              ],
+            ),),
     );
   }
 

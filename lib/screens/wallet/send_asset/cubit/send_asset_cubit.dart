@@ -3,9 +3,11 @@ import 'package:deus_mobile/core/database/database.dart';
 import 'package:deus_mobile/core/database/transaction.dart';
 import 'package:deus_mobile/core/database/user_address.dart';
 import 'package:deus_mobile/core/database/wallet_asset.dart';
+import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/screens/wallet/send_asset/cubit/send_asset_state.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/wallet_service.dart';
 import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,10 +58,16 @@ class SendAssetCubit extends Cubit<SendAssetState> {
       if (gas != null) {
         DbTransaction? transaction;
         try {
+          emit(TransactionPendingState(state,
+              transactionStatus: TransactionStatus(
+                  "Transfer ${state.walletAsset.tokenName}",
+                  Status.PENDING,
+                  "Transaction Pending")));
           var res =
           await state.walletService.transfer(state.walletAsset.tokenAddress, state.recAddressController.text.toString(), state.amountController.text.toString(), gas);
 
           transaction = new DbTransaction(
+              walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
               chainId: state.walletAsset.chainId,
               hash: res,
               type: TransactionType.SEND.index,
@@ -68,6 +76,7 @@ class SendAssetCubit extends Cubit<SendAssetState> {
               .insertDbTransaction([transaction]);
           transaction.id = ids[0];
 
+          emit(SendAssetLoadingState(state));
           emit(TransactionPendingState(state,
               transactionStatus: TransactionStatus(
                   "Transfer ${state.walletAsset.tokenName}",
@@ -106,6 +115,17 @@ class SendAssetCubit extends Cubit<SendAssetState> {
             int ids = await state.database!.transactionDao
                 .updateDbTransactions([transaction]);
           }
+          else{
+            transaction = new DbTransaction(
+                walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
+                chainId: state.walletAsset.chainId,
+                hash: "",
+                type: TransactionType.SEND.index,
+                title: state.walletAsset.tokenSymbol??state.walletAsset.tokenAddress);
+            List<int> ids = await state.database!.transactionDao
+                .insertDbTransaction([transaction]);
+            transaction.id = ids[0];
+          }
 
           emit(TransactionFinishedState(state,
               transactionStatus: TransactionStatus(
@@ -113,6 +133,13 @@ class SendAssetCubit extends Cubit<SendAssetState> {
                   Status.FAILED,
                   "Transaction Failed")));
         }
+      }
+      else{
+        emit(TransactionFinishedState(state,
+            transactionStatus: TransactionStatus(
+                "Transfer ${state.walletAsset.tokenName}",
+                Status.FAILED,
+                "Transaction Rejected")));
       }
     }else{
       emit(TransactionFinishedState(state,

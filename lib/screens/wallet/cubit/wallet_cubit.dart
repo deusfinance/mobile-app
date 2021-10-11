@@ -9,6 +9,7 @@ import 'package:deus_mobile/locator.dart';
 import 'package:deus_mobile/models/swap/gas.dart';
 import 'package:deus_mobile/models/transaction_status.dart';
 import 'package:deus_mobile/screens/wallet/cubit/wallet_state.dart';
+import 'package:deus_mobile/service/address_service.dart';
 import 'package:deus_mobile/service/config_service.dart';
 import 'package:deus_mobile/service/wallet_service.dart';
 import 'package:deus_mobile/statics/statics.dart';
@@ -27,14 +28,15 @@ class WalletCubit extends Cubit<WalletState> {
       state.database!.chainDao.insertDefaultChains();
       state.chains = getChainsList();
       await setSelectedChain(Statics.eth);
-      emit(WalletPortfilioState(state));
+      emit(WalletLoadedState(state));
     }
   }
 
-  Stream<List<WalletAsset>> getWalletAssetsStream() {
+  Future<Stream<List<WalletAsset>>> getWalletAssetsStream() async{
+    String walletAddress = (await locator<AddressService>().getPublicAddress()).hex;
     Stream<List<WalletAsset>> stream = getWalletAssetsStreamFromDB(state
         .database!.walletAssetDao
-        .getAllWalletAssetsStream(state.selectedChain?.id ?? 0));
+        .getAllWalletAssetsStream(state.selectedChain?.id ?? 0, walletAddress));
     return stream;
   }
 
@@ -74,6 +76,7 @@ class WalletCubit extends Cubit<WalletState> {
           break;
         default:
           walletAsset = new WalletAsset(
+              walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
               chainId: state.selectedChain!.id,
               tokenAddress: Statics.zeroAddress,
               tokenSymbol: state.selectedChain!.currencySymbol ?? "ETH",
@@ -87,10 +90,11 @@ class WalletCubit extends Cubit<WalletState> {
     return walletAssets;
   }
 
-  Stream<List<DbTransaction>> getTransactionsStream() {
+  Future<Stream<List<DbTransaction>>> getTransactionsStream() async{
+    String walletAddress = (await locator<AddressService>().getPublicAddress()).hex;
     Stream<List<DbTransaction>> stream = getTransactionsStreamFromDB(state
         .database!.transactionDao
-        .getAllDbTransactions(state.selectedChain?.id ?? 0));
+        .getAllDbTransactions(state.selectedChain?.id ?? 0, walletAddress));
     return stream;
   }
 
@@ -115,9 +119,9 @@ class WalletCubit extends Cubit<WalletState> {
     for (int i = 0; i < transactions.length; i += 1) {
       if (transactions[i].hash.isNotEmpty) {
         try {
-          TransactionInformation info = await state.walletService!
+          TransactionInformation? info = await state.walletService!
               .getTransactionInfo(transactions[i].hash);
-          transactions[i].nonce = info.nonce;
+          transactions[i].nonce = info!.nonce;
           transactions[i].blockNum = info.blockNumber;
           transactions[i].data = info.input;
           transactions[i].value = info.value;
@@ -125,7 +129,8 @@ class WalletCubit extends Cubit<WalletState> {
           transactions[i].to = info.to;
           transactions[i].gasPrice = info.gasPrice;
           transactions[i].maxGas = info.gas;
-        } catch (_) {}
+        } catch (e) {
+        }
       }
     }
     return transactions;
@@ -136,10 +141,14 @@ class WalletCubit extends Cubit<WalletState> {
   }
 
   void changeTab(int i) {
-    if (i == 0)
-      emit(WalletPortfilioState(state));
-    else
-      emit(WalletManageTransState(state));
+    if (i == 0) {
+      state.walletTab = WalletTab.ASSETS;
+      emit(WalletLoadedState(state));
+    }
+    else {
+      state.walletTab = WalletTab.ACTIVITY;
+      emit(WalletLoadedState(state));
+    }
   }
 
   Future<void> addChain(Chain chain) async {
@@ -149,7 +158,7 @@ class WalletCubit extends Cubit<WalletState> {
       state.selectedChain = chain;
       await setSelectedChain(chain);
     }
-    emit(WalletPortfilioState(state));
+    emit(WalletLoadedState(state));
   }
 
   Future<void> deleteChain(Chain chain) async {
@@ -158,7 +167,7 @@ class WalletCubit extends Cubit<WalletState> {
       state.database!.chainDao.deleteChains([chain]);
       await setSelectedChain(Statics.eth);
     }
-    emit(WalletPortfilioState(state));
+    emit(WalletLoadedState(state));
   }
 
   Future<void> setSelectedChain(Chain chain) async {
@@ -166,27 +175,25 @@ class WalletCubit extends Cubit<WalletState> {
     state.selectedChain = chain;
     state.walletService = new WalletService(state.selectedChain ?? Statics.eth,
         locator<ConfigurationService>().getPrivateKey()!);
-    emit(WalletPortfilioState(state));
+    emit(WalletLoadedState(state));
   }
 
   Future<void> addWalletAsset(WalletAsset walletAsset) async {
     emit(WalletLoadingState(state));
     List<int> ids =
         await state.database!.walletAssetDao.insertWalletAsset([walletAsset]);
-    emit(WalletPortfilioState(state));
+    emit(WalletLoadedState(state));
   }
 
   Future<void> updateChain(Chain chain) async {
     emit(WalletLoadingState(state));
     int id = await state.database!.chainDao.updateChains([chain]);
     await setSelectedChain(chain);
-    emit(WalletPortfilioState(state));
+    emit(WalletLoadedState(state));
   }
 
   Future<void> deleteWalletAsset(WalletAsset walletAsset) async {
-    emit(WalletLoadingState(state));
-    state.database!.walletAssetDao.deleteWalletAsset([walletAsset]);
-    emit(WalletPortfilioState(state));
+    await state.database!.walletAssetDao.deleteWalletAsset([walletAsset]);
   }
 
   Transaction makeTransactionWithInfo(DbTransaction transaction) {
@@ -232,7 +239,7 @@ class WalletCubit extends Cubit<WalletState> {
         try {
           Transaction t = new Transaction(
               from: transaction.from,
-              to: transaction.from,
+              to: transaction.to,
               value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 0),
               data: transaction.data,
               gasPrice: EtherAmount.fromUnitAndValue(
@@ -242,6 +249,7 @@ class WalletCubit extends Cubit<WalletState> {
           var res = await state.walletService!.submit(transaction: t);
 
           dbTransaction = new DbTransaction(
+              walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
               chainId: state.selectedChain?.id ?? 0,
               hash: res,
               type: type.index,
@@ -285,6 +293,7 @@ class WalletCubit extends Cubit<WalletState> {
                 .updateDbTransactions([dbTransaction]);
           } else {
             dbTransaction = new DbTransaction(
+                walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
                 chainId: state.selectedChain?.id ?? 0,
                 hash: "",
                 type: type.index,
@@ -306,5 +315,9 @@ class WalletCubit extends Cubit<WalletState> {
           transactionStatus: TransactionStatus("${type.toString()} $tokenName",
               Status.FAILED, "Transaction Failed")));
     }
+  }
+
+  void deleteTransaction(DbTransaction transaction) async {
+    await state.database!.transactionDao.deleteDbTransactions([transaction]);
   }
 }

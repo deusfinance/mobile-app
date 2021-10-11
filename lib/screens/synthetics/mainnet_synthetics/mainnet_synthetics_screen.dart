@@ -14,6 +14,7 @@ import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
 import 'package:deus_mobile/statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -148,20 +149,37 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   }
 
   Widget _buildBody(SyntheticsState state) {
-    return Container(
-      padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
-      decoration: BoxDecoration(color: MyColors.Main_BG_Black),
-      child: Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SmartRefresher(
+      enablePullDown: true,
+      controller: state.refreshController,
+      onRefresh: context.read<MainnetSyntheticsCubit>().refresh,
+      header: BezierHeader(child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+        child: Center(child: SingleChildScrollView(
+          child: Column(
             children: [
-              SingleChildScrollView(child: _buildUserInput(state)),
-              _buildMarketTimer(state)
+              Text("Release to Refresh", style: MyStyles.lightWhiteSmallTextStyle,),
+              Icon(Icons.refresh_sharp),
             ],
           ),
-          _buildToastWidget(state),
-        ],
+        )),
+      ),),
+
+      child: Container(
+        padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+        decoration: BoxDecoration(color: MyColors.Main_BG_Black),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SingleChildScrollView(child: _buildUserInput(state)),
+                _buildMarketTimer(state)
+              ],
+            ),
+            _buildToastWidget(state),
+          ],
+        ),
       ),
     );
   }

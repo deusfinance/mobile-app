@@ -65,8 +65,9 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         await http.get(Uri.parse("https://tc.hecochain.com/price/prediction"));
         if (response.statusCode == 200) {
           var map = json.decode(response.body);
-          try{gNumber = map['prices']['median'];}
-          catch(e){}
+          try{gNumber = map['prices']['median'] * 1.0;}
+          catch(e){
+          }
         }
         GWei g = new GWei.init(gNumber * 1000000000, gNumber * 1000000000, gNumber * 1000000000);
         return g;

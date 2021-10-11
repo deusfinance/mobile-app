@@ -19,7 +19,7 @@ class WalletAsset {
 
   @ColumnInfo(name: 'chain_id')
   int chainId;
-
+  String walletAddress;
   String tokenAddress;
   String? tokenSymbol;
   int? tokenDecimal;
@@ -39,7 +39,7 @@ class WalletAsset {
   double? value;
 
 
-  WalletAsset({this.id, required this.chainId, required this.tokenAddress, this.tokenSymbol,
+  WalletAsset({this.id, required this.walletAddress, required this.chainId, required this.tokenAddress, this.tokenSymbol,
       this.tokenDecimal, this.valueWhenInserted, this.logoPath, this.tokenName});
 
   double getValuePercentage() {
