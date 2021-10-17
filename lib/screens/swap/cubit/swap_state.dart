@@ -1,28 +1,29 @@
 import 'dart:async';
 
-import 'package:deus_mobile/core/database/database.dart';
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/models/token.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:deus_mobile/service/deus_swap_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
+import 'package:flutter/material.dart';
+
+import '../../../core/database/database.dart';
+import '../../../data_source/currency_data.dart';
+import '../../../models/swap/crypto_currency.dart';
+import '../../../models/transaction_status.dart';
+import '../../../service/config_service.dart';
+import '../../../service/deus_swap_service.dart';
+import '../../../service/ethereum_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../locator.dart';
 
+// ignore: must_be_immutable
 abstract class SwapState extends Equatable {
   late SwapService swapService;
   late CryptoCurrency fromToken;
   late CryptoCurrency toToken;
   late double slippage;
-  var fromFieldController;
-  var toFieldController;
+  TextEditingController fromFieldController;
+  TextEditingController toFieldController;
   late double toValue;
-  var slippageController;
+  TextEditingController slippageController;
   late StreamController<String> streamController;
   late bool isPriceRatioForward;
   late bool isInProgress;
@@ -82,6 +83,7 @@ abstract class SwapState extends Equatable {
       ];
 }
 
+// ignore: must_be_immutable
 class SwapLoaded extends SwapState {
   SwapLoaded(SwapState state,
       {fromToken,
@@ -114,6 +116,7 @@ class SwapLoaded extends SwapState {
   }
 }
 
+// ignore: must_be_immutable
 class TransactionFinishedState extends SwapState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
@@ -149,6 +152,7 @@ class TransactionFinishedState extends SwapState {
   }
 }
 
+// ignore: must_be_immutable
 class TransactionPendingState extends SwapState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
@@ -184,14 +188,17 @@ class TransactionPendingState extends SwapState {
   }
 }
 
+// ignore: must_be_immutable
 class SwapInitial extends SwapState {
   SwapInitial() : super.init();
 }
 
+// ignore: must_be_immutable
 class SwapLoading extends SwapState {
   SwapLoading(SwapState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class SwapError extends SwapState {
   SwapError(SwapState state) : super.copy(state);
 }

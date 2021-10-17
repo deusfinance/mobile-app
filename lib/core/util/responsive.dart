@@ -5,6 +5,7 @@ double getScreenHeight(BuildContext context) {
   return MediaQuery.of(context).size.height;
 }
 
-double getScreenWidth(BuildContext context) => MediaQuery.of(context).size.width;
+double getScreenWidth(BuildContext context) =>
+    MediaQuery.of(context).size.width;
 
 bool isPhone() => Device.get().isPhone;

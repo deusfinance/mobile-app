@@ -1,5 +1,5 @@
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,12 +9,13 @@ class TextFieldWithMax extends StatelessWidget {
   /// the maximum value that can be chosen
   final double maxValue;
   final TextInputType keyboardType;
-  final hintText;
+  final String hintText;
 
   TextFieldWithMax(
       {required this.controller,
       required this.maxValue,
-      this.keyboardType = TextInputType.number, this.hintText = '0.00'});
+      this.keyboardType = TextInputType.number,
+      this.hintText = '0.00'});
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +24,14 @@ class TextFieldWithMax extends StatelessWidget {
           borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
           color: MyColors.Button_BG_Black,
           border: Border.all(color: Colors.white.withOpacity(0.1))),
-      padding: EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: TextField(
         keyboardType: keyboardType,
         cursorColor: Colors.white,
         autofocus: false,
         maxLines: 1,
         inputFormatters: [
-          WhitelistingTextInputFormatter(
+          FilteringTextInputFormatter.allow(
               new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
         ],
         controller: controller,
@@ -47,14 +48,14 @@ class TextFieldWithMax extends StatelessWidget {
                 controller.text = maxValue.toString();
               },
               child: Container(
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                 child: Text(
                   'MAX',
                   style: MyStyles.whiteSmallTextStyle,
                 ),
                 decoration: BoxDecoration(
-                    color: Color(0xFF5BCCBD).withOpacity(0.25),
+                    color: const Color(0xFF5BCCBD).withOpacity(0.25),
                     border: Border.all(color: Colors.white, width: 1.5),
                     borderRadius: BorderRadius.circular(7)),
               ),

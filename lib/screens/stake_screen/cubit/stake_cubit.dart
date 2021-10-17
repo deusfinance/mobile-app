@@ -1,14 +1,13 @@
 import 'package:bloc/bloc.dart';
-import 'package:deus_mobile/locator.dart';
-import 'package:deus_mobile/models/stake/stake_token_object.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/service/stake_service.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import 'package:flutter/material.dart';
+import '../../../locator.dart';
+import '../../../models/stake/stake_token_object.dart';
+import '../../../models/swap/gas.dart';
+import '../../../models/transaction_status.dart';
+import '../../../service/config_service.dart';
+import '../../../service/ethereum_service.dart';
+import '../../../service/stake_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:web3dart/web3dart.dart';
 
 part 'stake_state.dart';
@@ -16,14 +15,14 @@ part 'stake_state.dart';
 class StakeCubit extends Cubit<StakeState> {
   StakeCubit(StakeTokenObject object) : super(StakeInit(object));
 
-  init() async {
+  void init() async {
     emit(StakeLoading(state));
     state.balance = double.tryParse(await getTokenBalance())!;
     await getAllowances();
     emit(StakeHasToApprove(state));
   }
 
-  getTokenBalance() async {
+  Future<String> getTokenBalance() async {
     return await state.stakeService
         .getTokenBalance(state.stakeTokenObject.stakeToken.getTokenName());
   }
@@ -46,9 +45,9 @@ class StakeCubit extends Cubit<StakeState> {
             "Transaction Pending")));
 
     try {
-      var res = await state.stakeService
+      final res = await state.stakeService
           .approve(state.stakeTokenObject.stakeToken.getTokenName(), gas);
-      Stream<TransactionReceipt> result =
+      final Stream<TransactionReceipt> result =
           state.stakeService.ethService.pollTransactionReceipt(res);
       result.listen((event) {
         if (event.status!) {
@@ -67,7 +66,7 @@ class StakeCubit extends Cubit<StakeState> {
                   res)));
         }
       });
-    } on Exception catch (value) {
+    } on Exception {
       emit(StakeHasToApprove(state,
           transactionStatus: TransactionStatus(
               "Approve ${state.stakeTokenObject.stakeToken.name}",
@@ -76,14 +75,15 @@ class StakeCubit extends Cubit<StakeState> {
     }
   }
 
-  makeTransaction() async {
-    Transaction? transaction = await state.stakeService.makeStakeTransaction(
-        state.stakeTokenObject.stakeToken.getTokenName(),
-        state.fieldController.text);
+  Future<Transaction?> makeTransaction() async {
+    final Transaction? transaction = await state.stakeService
+        .makeStakeTransaction(state.stakeTokenObject.stakeToken.getTokenName(),
+            state.fieldController.text);
     return transaction;
   }
 
-  addListenerToFromField() {
+  void addListenerToFromField() {
+    // ignore: invalid_use_of_protected_member
     if (!state.fieldController.hasListeners) {
       state.fieldController.addListener(() {
         listenInput();
@@ -91,9 +91,9 @@ class StakeCubit extends Cubit<StakeState> {
     }
   }
 
-  listenInput() async {
-    String input = state.fieldController.text;
-    if (input == null || input.isEmpty) {
+  void listenInput() async {
+    String? input = state.fieldController.text;
+    if (input.isEmpty) {
       input = "0.0";
     }
     if (state.stakeTokenObject.stakeToken.getAllowances() >=
@@ -107,28 +107,29 @@ class StakeCubit extends Cubit<StakeState> {
     }
   }
 
-  Future<void> stake(Gas gas) async {
+  Future<void> stake(Gas? gas) async {
     assert(state is StakeIsApproved);
-    if(gas!=null) {
+    if (gas != null) {
       try {
-        var res = await state.stakeService.stake(
+        final res = await state.stakeService.stake(
             state.stakeTokenObject.stakeToken.getTokenName(),
-            state.fieldController.text, gas);
+            state.fieldController.text,
+            gas);
         emit(StakePendingStake(state,
             transactionStatus: TransactionStatus(
                 "Stake ${state.stakeTokenObject.stakeToken.name}",
                 Status.PENDING,
-                "Transaction Pending", res)));
+                "Transaction Pending",
+                res)));
 
-        Stream<TransactionReceipt> result =
-        state.stakeService.ethService.pollTransactionReceipt(res);
+        final Stream<TransactionReceipt> result =
+            state.stakeService.ethService.pollTransactionReceipt(res);
         result.listen((event) async {
           if (event.status!) {
             state.balance = double.tryParse(await getTokenBalance())!;
             emit(StakeIsApproved(state,
                 transactionStatus: TransactionStatus(
-                    "Stake ${state.fieldController.text} ${state
-                        .stakeTokenObject.stakeToken.name}",
+                    "Stake ${state.fieldController.text} ${state.stakeTokenObject.stakeToken.name}",
                     Status.SUCCESSFUL,
                     "Transaction Successful",
                     res)));
@@ -141,14 +142,14 @@ class StakeCubit extends Cubit<StakeState> {
                     res)));
           }
         });
-      } on Exception catch (value) {
+      } on Exception {
         emit(StakeIsApproved(state,
             transactionStatus: TransactionStatus(
                 "Stake ${state.stakeTokenObject.stakeToken.name}",
                 Status.FAILED,
                 "Transaction Failed")));
       }
-    }else{
+    } else {
       emit(StakeIsApproved(state,
           transactionStatus: TransactionStatus(
               "Stake ${state.stakeTokenObject.stakeToken.name}",
@@ -169,7 +170,8 @@ class StakeCubit extends Cubit<StakeState> {
       emit(StakePendingStake(state, showingToast: false));
   }
 
-  makeApproveTransaction() async{
-    return await state.stakeService.makeApproveTransaction(state.stakeTokenObject.stakeToken.getTokenName());
+  Future<Transaction?> makeApproveTransaction() async {
+    return await state.stakeService.makeApproveTransaction(
+        state.stakeTokenObject.stakeToken.getTokenName());
   }
 }

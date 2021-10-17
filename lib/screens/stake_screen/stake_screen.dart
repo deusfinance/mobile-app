@@ -1,20 +1,16 @@
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/default_screen/back_button.dart';
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/stake_and_lock/cross_fade_duo_button.dart';
-import 'package:deus_mobile/core/widgets/dark_button.dart';
-// import 'package:deus_mobile/core/widgets/header_with_address.dart';
-import 'package:deus_mobile/core/widgets/stake_and_lock/steps.dart';
-import 'package:deus_mobile/core/widgets/text_field_with_max.dart';
-import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/core/widgets/default_screen/bottom_nav_bar.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../core/widgets/default_screen/default_screen.dart';
+import '../../core/widgets/stake_and_lock/cross_fade_duo_button.dart';
+import '../../core/widgets/dark_button.dart';
+import '../../core/widgets/stake_and_lock/steps.dart';
+import '../../core/widgets/text_field_with_max.dart';
+import '../../core/widgets/toast.dart';
+import '../../models/swap/gas.dart';
+import '../../models/transaction_status.dart';
+import '../confirm_gas/confirm_gas.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,11 +44,10 @@ class _StakeScreenState extends State<StakeScreen> {
       child: SafeArea(
         child: BlocBuilder<StakeCubit, StakeState>(builder: (_, state) {
           if (state is StakeLoading) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
-          }
-          else {
+          } else {
             context.read<StakeCubit>().addListenerToFromField();
             return Stack(
               children: [
@@ -67,12 +62,12 @@ class _StakeScreenState extends State<StakeScreen> {
                         kSpacer,
                         Text(
                           'Stake your ${state.stakeTokenObject.stakeToken.name}',
-                          style: TextStyle(fontSize: 25),
+                          style: const TextStyle(fontSize: 25),
                         ),
                         kSmallSpacer,
                         Text(
                           '${state.stakeTokenObject.apy}% APY',
-                          style: TextStyle(fontSize: 20),
+                          style: const TextStyle(fontSize: 20),
                         ),
                         kSpacer,
                         Padding(
@@ -96,8 +91,10 @@ class _StakeScreenState extends State<StakeScreen> {
                         kSmallSpacer,
                         _buildStakeApproveButton(state),
                         kMediumSpacer,
-                        if (state is StakeHasToApprove || state is StakePendingApprove) Steps(),
-                        Spacer(),
+                        if (state is StakeHasToApprove ||
+                            state is StakePendingApprove)
+                          Steps(),
+                        const Spacer(),
                       ],
                     ),
                   ),
@@ -113,14 +110,12 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Widget _buildTransactionPending(TransactionStatus transactionStatus) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Toast(
         label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGrey,
-        onPressed: () {
-
-        },
+        onPressed: () {},
         onClosed: () {
           context.read<StakeCubit>().closeToast();
         },
@@ -130,13 +125,12 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Widget _buildTransactionSuccessFul(TransactionStatus transactionStatus) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Toast(
         label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastGreen,
-        onPressed: () {
-        },
+        onPressed: () {},
         onClosed: () {
           context.read<StakeCubit>().closeToast();
         },
@@ -146,13 +140,12 @@ class _StakeScreenState extends State<StakeScreen> {
 
   Widget _buildTransactionFailed(TransactionStatus transactionStatus) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Toast(
         label: transactionStatus.label,
         message: transactionStatus.message,
         color: MyColors.ToastRed,
-        onPressed: () {
-        },
+        onPressed: () {},
         onClosed: () {
           context.read<StakeCubit>().closeToast();
         },
@@ -161,18 +154,18 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Widget _buildToastWidget(StakeState state) {
-    if(state.showingToast){
-      if (state is StakePendingApprove){
+    if (state.showingToast) {
+      if (state is StakePendingApprove) {
         return Align(
             alignment: Alignment.bottomCenter,
             child: _buildTransactionPending(state.transactionStatus));
       }
-      if (state is StakePendingStake){
+      if (state is StakePendingStake) {
         return Align(
             alignment: Alignment.bottomCenter,
             child: _buildTransactionPending(state.transactionStatus));
       }
-      if (state is StakeHasToApprove){
+      if (state is StakeHasToApprove) {
         if (state.transactionStatus.status == Status.PENDING) {
           return Align(
               alignment: Alignment.bottomCenter,
@@ -187,7 +180,7 @@ class _StakeScreenState extends State<StakeScreen> {
               child: _buildTransactionFailed(state.transactionStatus));
         }
       }
-      if (state is StakeIsApproved){
+      if (state is StakeIsApproved) {
         if (state.transactionStatus.status == Status.PENDING) {
           return Align(
               alignment: Alignment.bottomCenter,
@@ -207,7 +200,7 @@ class _StakeScreenState extends State<StakeScreen> {
   }
 
   Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas? res = await showGeneralDialog(
+    final Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -219,17 +212,17 @@ class _StakeScreenState extends State<StakeScreen> {
           )),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+        filter:
+            ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
         child: FadeTransition(
           child: child,
           opacity: anim1,
         ),
       ),
-      transitionDuration: Duration(milliseconds: 10),
+      transitionDuration: const Duration(milliseconds: 10),
     );
     return res;
   }
-
 
   Widget _buildStakeApproveButton(StakeState state) {
     // if (state.fieldController.text == "" ||
@@ -271,25 +264,24 @@ class _StakeScreenState extends State<StakeScreen> {
       gradientButtonLabel: 'APPROVE',
       mergedButtonLabel: 'Stake',
       offButtonLabel: 'Stake',
-      showBothButtons: state is StakeHasToApprove || state is StakePendingApprove,
+      showBothButtons:
+          state is StakeHasToApprove || state is StakePendingApprove,
       showLoading: state is StakePendingApprove || state is StakePendingStake,
       onPressed: () async {
         if (state is StakePendingApprove || state is StakePendingStake) return;
         if (state is StakeIsApproved) {
-          Transaction transaction = await context.read<StakeCubit>().makeTransaction();
+          final Transaction? transaction =
+              await context.read<StakeCubit>().makeTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
-          if(transaction!=null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<StakeCubit>().stake(gas!);
-          }
+          final Gas? gas = await showConfirmGasFeeDialog(transaction!);
+          await context.read<StakeCubit>().stake(gas!);
         }
         if (state is StakeHasToApprove) {
-          Transaction transaction = await context.read<StakeCubit>().makeApproveTransaction();
+          final Transaction? transaction =
+              await context.read<StakeCubit>().makeApproveTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
-          if(transaction!=null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<StakeCubit>().approve(gas!);
-          }
+          final Gas? gas = await showConfirmGasFeeDialog(transaction!);
+          await context.read<StakeCubit>().approve(gas!);
         }
       },
     );

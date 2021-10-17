@@ -1,8 +1,9 @@
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import 'filled_gradient_selection_button.dart';
 
+// ignore: must_be_immutable
 class SelectionButton extends StatefulWidget {
   final String? label;
   final void Function(bool selected)? onPressed;
@@ -19,8 +20,8 @@ class SelectionButton extends StatefulWidget {
       this.onPressed,
       this.gradient,
       this.child,
-      this.textStyle}){
-    if(this.textStyle == null){
+      this.textStyle}) {
+    if (this.textStyle == null) {
       this.textStyle = MyStyles.whiteMediumTextStyle;
     }
   }
@@ -39,13 +40,14 @@ class _SelectionButtonState extends State<SelectionButton> {
             },
             child: Container(
               decoration: MyStyles.darkWithBorderDecoration,
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.center,
-                child: widget.child ?? Text(
-                  widget.label!,
-                  style: MyStyles.lightWhiteMediumTextStyle,
-                ),
+                child: widget.child ??
+                    Text(
+                      widget.label!,
+                      style: MyStyles.lightWhiteMediumTextStyle,
+                    ),
               ),
             ),
           )
@@ -57,21 +59,4 @@ class _SelectionButtonState extends State<SelectionButton> {
             textStyle: widget.textStyle!,
           );
   }
-
-//  OutlineGradientButton(
-//            strokeWidth: 1,
-//            inkWell: true,
-//            radius: const Radius.circular(MyStyles.cardRadiusSize),
-////            TODO (@kazem) make it not gradient
-//            gradient: SynchronizerScreen.kGradient,
-//            child: Padding(
-//              padding: const EdgeInsets.symmetric(
-//                  vertical: MyStyles.mainPadding),
-//              child: Text(
-//                widget.label,
-//                textAlign: TextAlign.center,
-//                style: MyStyles.lightWhiteMediumTextStyle,
-//              ),
-//            ),
-//            onTap:() => widget.onPressed(widget.selected))
 }

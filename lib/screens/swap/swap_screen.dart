@@ -1,13 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/service/address_service.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:flutter/cupertino.dart';
+import '../../core/widgets/default_screen/default_screen.dart';
+import '../../core/widgets/token_selector/currency_selector_screen/currency_selector_screen.dart';
+import '../confirm_gas/confirm_gas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +17,6 @@ import '../../core/widgets/selection_button.dart';
 import '../../core/widgets/svg.dart';
 import '../../core/widgets/swap_field.dart';
 import '../../core/widgets/toast.dart';
-import '../../locator.dart';
 import '../../models/swap/gas.dart';
 import '../../models/token.dart';
 import '../../models/transaction_status.dart';
@@ -55,7 +50,7 @@ class _SwapScreenState extends State<SwapScreen> {
     }, builder: (context, state) {
       if (state is SwapLoading) {
         return DefaultScreen(
-          child: Center(
+          child: const Center(
             child: CircularProgressIndicator(),
           ),
         );
@@ -72,7 +67,7 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas? res = await showGeneralDialog(
+    final Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -91,7 +86,7 @@ class _SwapScreenState extends State<SwapScreen> {
           opacity: anim1,
         ),
       ),
-      transitionDuration: Duration(milliseconds: 10),
+      transitionDuration: const Duration(milliseconds: 10),
     );
     return res;
   }
@@ -147,7 +142,7 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildBody(SwapState state) {
-    SwapField fromField = new SwapField(
+    final SwapField fromField = new SwapField(
       direction: Direction.from,
       initialToken: state.fromToken,
       selectAssetRoute: CurrencySelectorScreen.url,
@@ -157,7 +152,7 @@ class _SwapScreenState extends State<SwapScreen> {
       },
     );
 
-    SwapField toField = new SwapField(
+    final SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
       selectAssetRoute: CurrencySelectorScreen.url,
@@ -171,20 +166,25 @@ class _SwapScreenState extends State<SwapScreen> {
       enablePullDown: true,
       controller: state.refreshController,
       onRefresh: context.read<SwapCubit>().refresh,
-      header: BezierHeader(child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-        child: Center(child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text("Release to Refresh", style: MyStyles.lightWhiteSmallTextStyle,),
-              Icon(Icons.refresh_sharp),
-            ],
-          ),
-        )),
-      ),),
-
+      header: BezierHeader(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  "Release to Refresh",
+                  style: MyStyles.lightWhiteSmallTextStyle,
+                ),
+                const Icon(Icons.refresh_sharp),
+              ],
+            ),
+          )),
+        ),
+      ),
       child: Container(
-        padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+        padding: const EdgeInsets.all(MyStyles.mainPadding * 1.5),
         decoration: BoxDecoration(color: MyColors.Main_BG_Black),
         child: Stack(
           children: [
@@ -198,8 +198,8 @@ class _SwapScreenState extends State<SwapScreen> {
                         context.read<SwapCubit>().reverseSwap();
                       },
                       child: Center(
-                          child:
-                              PlatformSvg.asset('images/icons/arrow_down.svg'))),
+                          child: PlatformSvg.asset(
+                              'images/icons/arrow_down.svg'))),
                   const SizedBox(height: 12),
                   toField,
                   const SizedBox(height: 18),
@@ -214,7 +214,9 @@ class _SwapScreenState extends State<SwapScreen> {
                         children: [
                           Text(
                             state.isPriceRatioForward
+                                // ignore: unnecessary_null_comparison
                                 ? "${context.read<SwapCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken.symbol : "asset name"}"
+                                // ignore: unnecessary_null_comparison
                                 : "${context.read<SwapCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                             style: MyStyles.whiteSmallTextStyle,
                           ),
@@ -223,7 +225,7 @@ class _SwapScreenState extends State<SwapScreen> {
                               context.read<SwapCubit>().reversePriceRatio();
                             },
                             child: Container(
-                              margin: EdgeInsets.only(left: 4.0),
+                              margin: const EdgeInsets.only(left: 4.0),
                               child: PlatformSvg.asset(
                                   "images/icons/exchange.svg",
                                   width: 15),
@@ -279,7 +281,7 @@ class _SwapScreenState extends State<SwapScreen> {
             future: context.read<SwapCubit>().computePriceImpact(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                double p = snapshot.data as double;
+                final double p = snapshot.data as double;
                 return Text(
                   "${p == 0 ? "0.0" : p < 0.005 ? "<0.005" : p}%",
                   style: TextStyle(
@@ -287,10 +289,12 @@ class _SwapScreenState extends State<SwapScreen> {
                     fontWeight: FontWeight.w300,
                     fontSize: MyStyles.S6,
                     color: p <= 1
-                        ? Color(0xFF00D16C)
+                        ? const Color(0xFF00D16C)
                         : (p <= 3
-                            ? Color(0xFFFFFFFF)
-                            : (p < 5 ? Color(0xFFf58516) : Color(0xFFD40000))),
+                            ? const Color(0xFFFFFFFF)
+                            : (p < 5
+                                ? const Color(0xFFf58516)
+                                : const Color(0xFFD40000))),
                   ),
                 );
               } else {
@@ -302,21 +306,22 @@ class _SwapScreenState extends State<SwapScreen> {
   }
 
   Widget _buildModeButtons(SwapState state) {
-    if (!state.swapService.checkWallet()) {
-      return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
-        decoration: MyStyles.darkWithNoBorderDecoration,
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            "CONNECT WALLET",
-            style: MyStyles.lightWhiteMediumTextStyle,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    } else if (!state.approved) {
+    // if (!state.swapService.checkWallet()) {
+    //   return Container(
+    //     width: MediaQuery.of(context).size.width,
+    //     padding: EdgeInsets.all(16.0),
+    //     decoration: MyStyles.darkWithNoBorderDecoration,
+    //     child: Align(
+    //       alignment: Alignment.center,
+    //       child: Text(
+    //         "CONNECT WALLET",
+    //         style: MyStyles.lightWhiteMediumTextStyle,
+    //         textAlign: TextAlign.center,
+    //       ),
+    //     ),
+    //   );
+    // }
+    if (!state.approved) {
       return Opacity(
         opacity: state.isInProgress ? 0.5 : 1,
         child: Container(
@@ -324,7 +329,7 @@ class _SwapScreenState extends State<SwapScreen> {
             Expanded(
               child: _buildApproveButton(state),
             ),
-            SizedBox(
+            const SizedBox(
               width: 8.0,
             ),
             Expanded(
@@ -346,11 +351,11 @@ class _SwapScreenState extends State<SwapScreen> {
     return SelectionButton(
       label: 'Approve',
       onPressed: (bool selected) async {
-        Transaction? transaction =
+        final Transaction? transaction =
             await context.read<SwapCubit>().makeApproveTransaction();
         WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
         if (transaction != null) {
-          Gas? gas = await showConfirmGasFeeDialog(transaction);
+          final Gas? gas = await showConfirmGasFeeDialog(transaction);
           await context.read<SwapCubit>().approve(gas);
         }
       },
@@ -362,7 +367,7 @@ class _SwapScreenState extends State<SwapScreen> {
 
   Widget _buildRouteWidget(SwapState state) {
     return Container(
-        margin: EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(8.0),
         child: Align(
           alignment: Alignment.center,
           child: SizedBox(
@@ -375,7 +380,7 @@ class _SwapScreenState extends State<SwapScreen> {
                       itemCount: snapshot.data!.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        Token token = snapshot.data![index];
+                        final Token token = snapshot.data![index];
                         return SizedBox(
                           width: 120,
                           child: Row(
@@ -394,7 +399,7 @@ class _SwapScreenState extends State<SwapScreen> {
                         );
                       });
                 } else {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -412,13 +417,13 @@ class _SwapScreenState extends State<SwapScreen> {
       return Row(
         children: [
           const SizedBox(width: 15),
-          Image(
+          const Image(
             width: 15,
             height: 15,
             image: Svg('assets/images/icons/d-swap.svg'),
           ),
           const SizedBox(width: 5),
-          Image(
+          const Image(
             width: 15,
             height: 15,
             image: Svg('assets/images/icons/right-arrow.svg'),
@@ -436,7 +441,7 @@ class _SwapScreenState extends State<SwapScreen> {
           ),
 //        CircleAvatar(radius: 10, backgroundImage: provider.Svg('assets/images/icons/uni.svg')),
           const SizedBox(width: 5),
-          Image(
+          const Image(
             width: 15,
             height: 15,
             image: Svg('assets/images/icons/right-arrow.svg'),
@@ -450,7 +455,7 @@ class _SwapScreenState extends State<SwapScreen> {
     if (!state.approved) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -467,7 +472,7 @@ class _SwapScreenState extends State<SwapScreen> {
             double.tryParse(state.fromFieldController.text) == 0)) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -485,7 +490,7 @@ class _SwapScreenState extends State<SwapScreen> {
                 state.fromToken.getTokenName())) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -500,11 +505,11 @@ class _SwapScreenState extends State<SwapScreen> {
     return SelectionButton(
       label: 'SWAP',
       onPressed: (bool selected) async {
-        Transaction? transaction =
+        final Transaction? transaction =
             await context.read<SwapCubit>().makeTransaction();
         WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
         if (transaction != null) {
-          Gas? gas = await showConfirmGasFeeDialog(transaction);
+          final Gas? gas = await showConfirmGasFeeDialog(transaction);
           await context.read<SwapCubit>().swapTokens(gas);
         }
       },
@@ -523,8 +528,8 @@ class _SwapScreenState extends State<SwapScreen> {
       Expanded(
         flex: 2,
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-          margin: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+          margin: const EdgeInsets.all(4.0),
           decoration: state.slippageController.text != ""
               ? MyStyles.greenToBlueDecoration
               : MyStyles.lightBlackBorderDecoration,
@@ -538,7 +543,7 @@ class _SwapScreenState extends State<SwapScreen> {
                       textAlign: TextAlign.right,
                       autofocus: false,
                       inputFormatters: [
-                        WhitelistingTextInputFormatter(
+                        FilteringTextInputFormatter.allow(
                             RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
                       ],
                       keyboardType: TextInputType.number,
@@ -557,8 +562,8 @@ class _SwapScreenState extends State<SwapScreen> {
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
                         isDense: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 0),
                       ),
                     ),
                   ),
@@ -582,8 +587,8 @@ class _SwapScreenState extends State<SwapScreen> {
           context.read<SwapCubit>().setSlippage(percentage);
         },
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-          margin: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+          margin: const EdgeInsets.all(4.0),
           decoration: state.slippage == percentage
               ? MyStyles.blueToGreenSwapScreenDecoration
               : MyStyles.lightBlackBorderDecoration,

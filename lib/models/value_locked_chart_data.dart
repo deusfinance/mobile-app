@@ -1,4 +1,4 @@
-import 'package:deus_mobile/models/chart_data_point.dart';
+import 'chart_data_point.dart';
 
 class ValueLockedChartData {
   final double? relativeChange;

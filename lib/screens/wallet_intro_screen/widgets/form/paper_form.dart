@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class PaperForm extends StatelessWidget {
   PaperForm({this.children, this.padding = 8, this.actionButtons});
 
-  List<Widget>? children;
-  List<Widget>? actionButtons;
+  final List<Widget>? children;
+  final List<Widget>? actionButtons;
   final double padding;
 
   @override

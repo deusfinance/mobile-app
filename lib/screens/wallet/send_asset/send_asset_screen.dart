@@ -1,20 +1,17 @@
 import 'dart:ui';
-
-import 'package:deus_mobile/core/database/user_address.dart';
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/wallet/send_asset/cubit/send_asset_cubit.dart';
-import 'package:deus_mobile/screens/wallet/send_asset/cubit/send_asset_state.dart';
-import 'package:deus_mobile/screens/wallet_intro_screen/widgets/form/paper_input.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/statics/styles.dart';
-import 'package:flutter/cupertino.dart';
+import '../../../core/widgets/default_screen/default_screen.dart';
+import '../../../core/widgets/selection_button.dart';
+import '../../../core/widgets/toast.dart';
+import '../../../models/swap/gas.dart';
+import '../../../models/transaction_status.dart';
+import '../../confirm_gas/confirm_gas.dart';
+import 'cubit/send_asset_cubit.dart';
+import 'cubit/send_asset_state.dart';
+import '../../wallet_intro_screen/widgets/form/paper_input.dart';
+import '../../../service/ethereum_service.dart';
+import '../../../statics/my_colors.dart';
+import '../../../core/database/wallet_asset.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,7 +37,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
     return DefaultScreen(child:
         BlocBuilder<SendAssetCubit, SendAssetState>(builder: (context, state) {
       if (state is SendAssetLoadingState) {
-        return Center(
+        return const Center(
           child: CircularProgressIndicator(),
         );
       } else if (state is SendAssetErrorState) {
@@ -55,7 +52,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
 
   Future<Gas?> showConfirmGasFeeDialog(
       Transaction transaction, Network network) async {
-    Gas? res = await showGeneralDialog(
+    final Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -74,7 +71,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
           opacity: anim1,
         ),
       ),
-      transitionDuration: Duration(milliseconds: 10),
+      transitionDuration: const Duration(milliseconds: 10),
     );
     return res;
   }
@@ -101,12 +98,12 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                 thickness: 2,
                 color: Colors.grey.withOpacity(0.2),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 16,
               ),
               //  Asset
               Padding(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   children: [
                     Padding(
@@ -149,14 +146,14 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 16,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 24, bottom: 5),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 24, bottom: 5),
                     child: Text(
                       'Recipient Address',
                       style: TextStyle(fontSize: 12),
@@ -167,7 +164,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
               ),
 
               Container(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: MyColors.darkGrey,
@@ -180,7 +177,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                 ),
               ),
               Visibility(
-                visible: state.recAddressController.text.toString().length > 0,
+                visible: state.recAddressController.text.toString().isNotEmpty,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
                   child: Text(
@@ -194,7 +191,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 16,
               ),
               Row(
@@ -218,7 +215,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                     child: Container(
                       width: 40,
                       height: 25,
-                      margin: EdgeInsets.only(right: 24),
+                      margin: const EdgeInsets.only(right: 24),
                       decoration: BoxDecoration(
                           gradient: LinearGradient(colors: [
                             const Color(0xFF5BCCBD).withOpacity(0.149),
@@ -238,18 +235,18 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                   )
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 16,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 24, bottom: 5),
+              const Padding(
+                padding: EdgeInsets.only(left: 24, bottom: 5),
                 child: Text(
                   'Amount',
                   style: TextStyle(fontSize: 12),
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: MyColors.darkGrey,
@@ -259,20 +256,20 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                   hintText: '',
                   maxLines: 1,
                   inputFormatters: [
-                    WhitelistingTextInputFormatter(
+                    FilteringTextInputFormatter.allow(
                         new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
                   ],
                   keyboardType: TextInputType.number,
                   controller: state.amountController,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 40,
               ),
               Opacity(
                 opacity: state.isInProgress ? 0.5 : 1,
                 child: Container(
-                  margin: EdgeInsets.all(16.0),
+                  margin: const EdgeInsets.all(16.0),
                   child: SelectionButton(
                     label: 'Send Asset',
                     onPressed: (bool selected) async {
@@ -280,13 +277,13 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                         switch (state.walletService.chain.id) {
                           case 100:
                             // return "xDai";
-                            Transaction? transaction = await context
+                            final Transaction? transaction = await context
                                 .read<SendAssetCubit>()
                                 .makeTransferTransaction();
                             WidgetsBinding.instance!.focusManager.primaryFocus
                                 ?.unfocus();
                             if (transaction != null) {
-                              Gas? gas = await showConfirmGasFeeDialog(
+                              final Gas? gas = await showConfirmGasFeeDialog(
                                   transaction, Network.XDAI);
                               await context
                                   .read<SendAssetCubit>()
@@ -294,14 +291,14 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                             }
                             break;
                           case 1:
-                          // return "ETH";
-                            Transaction? transaction = await context
+                            // return "ETH";
+                            final Transaction? transaction = await context
                                 .read<SendAssetCubit>()
                                 .makeTransferTransaction();
                             // WidgetsBinding.instance!.focusManager.primaryFocus
                             //     ?.unfocus();
                             if (transaction != null) {
-                              Gas? gas = await showConfirmGasFeeDialog(
+                              final Gas? gas = await showConfirmGasFeeDialog(
                                   transaction, Network.ETH);
                               await context
                                   .read<SendAssetCubit>()
@@ -310,13 +307,13 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                             break;
                           case 56:
                             // return "BSC";
-                            Transaction? transaction = await context
+                            final Transaction? transaction = await context
                                 .read<SendAssetCubit>()
                                 .makeTransferTransaction();
                             WidgetsBinding.instance!.focusManager.primaryFocus
                                 ?.unfocus();
                             if (transaction != null) {
-                              Gas? gas = await showConfirmGasFeeDialog(
+                              final Gas? gas = await showConfirmGasFeeDialog(
                                   transaction, Network.BSC);
                               await context
                                   .read<SendAssetCubit>()
@@ -325,13 +322,13 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
                             break;
                           case 128:
                             // return "Heco (SOON)";
-                            Transaction? transaction = await context
+                            final Transaction? transaction = await context
                                 .read<SendAssetCubit>()
                                 .makeTransferTransaction();
                             WidgetsBinding.instance!.focusManager.primaryFocus
                                 ?.unfocus();
                             if (transaction != null) {
-                              Gas? gas = await showConfirmGasFeeDialog(
+                              final Gas? gas = await showConfirmGasFeeDialog(
                                   transaction, Network.HECO);
                               await context
                                   .read<SendAssetCubit>()
@@ -395,7 +392,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
   Widget _buildTransactionPending(
       SendAssetState state, TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Toast(
         label: transactionStatus.label,
         message: transactionStatus.message,
@@ -416,7 +413,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
   Widget _buildTransactionSuccessFul(
       SendAssetState state, TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Toast(
         label: transactionStatus.label,
         message: transactionStatus.message,
@@ -435,7 +432,7 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
   Widget _buildTransactionFailed(
       SendAssetState state, TransactionStatus transactionStatus) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Toast(
         label: transactionStatus.label,
         message: transactionStatus.message,
@@ -451,76 +448,68 @@ class _SendAssetScreenState extends State<SendAssetScreen> {
     );
   }
 
-  _savedAddress() {
-    return StreamBuilder<List<UserAddress>>(
-        stream: context.read<SendAssetCubit>().getUserAddresses(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return Container();
-          return Container(
-            margin: EdgeInsets.fromLTRB(0, 4, 12, 4),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Color(MyColors.kAddressBorder)
-                        .withOpacity(0.5)),
-                borderRadius:
-                BorderRadius.all(Radius.circular(6))),
-            padding: const EdgeInsets.symmetric(
-                vertical: 8, horizontal: 16),
-            child: PopupMenuButton<UserAddress>(
-              child: Text("Show Saved Addresses",
-                  style: TextStyle(
-                      fontFamily: MyStyles.kFontFamily,
-                      fontWeight: FontWeight.w300,
-                      fontSize: MyStyles.S6,
-                      foreground: Paint()
-                        ..shader = LinearGradient(
-                          colors: <Color>[
-                            Color(0xff0779E4),
-                            Color(0xff1DD3BD)
-                          ],
-                        ).createShader(Rect.fromLTWH(
-                            0.0, 0.0, 200.0, 70.0)))),
-              padding: EdgeInsets.only(
-                  top: 5, bottom: 5, right: 0, left: 5),
-              color: MyColors.White,
-              // icon: Icon(Icons.keyboard_arrow_down_sharp),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-              itemBuilder: (BuildContext context) {
-                List<PopupMenuEntry<UserAddress>> list = [];
-                snapshot.data!.forEach((element) {
-                  list.add(
-                    PopupMenuItem<UserAddress>(
-                        child: Container(
-                          width: 150,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  element.name,
-                                  style: MyStyles.blackSmallTextStyle
-                                      .copyWith(fontSize: 15),
-                                ),
-                                Text(
-                                  element.address,
-                                  style: MyStyles.blackSmallTextStyle,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )),
-                  );
-                });
-                return list;
-              },
-              onSelected: (UserAddress address) {
-                context.read<SendAssetCubit>().setAddress(address);
-              },
-            ),
-          );
-        });
-  }
+  // Widget _savedAddress() {
+  //   return StreamBuilder<List<UserAddress>>(
+  //       stream: context.read<SendAssetCubit>().getUserAddresses(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.waiting)
+  //           return Container();
+  //         return Container(
+  //           margin: const EdgeInsets.fromLTRB(0, 4, 12, 4),
+  //           decoration: BoxDecoration(
+  //               border: Border.all(
+  //                   color: const Color(MyColors.kAddressBorder).withOpacity(0.5)),
+  //               borderRadius: const BorderRadius.all(Radius.circular(6))),
+  //           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+  //           child: PopupMenuButton<UserAddress>(
+  //             child: Text("Show Saved Addresses",
+  //                 style: TextStyle(
+  //                     fontFamily: MyStyles.kFontFamily,
+  //                     fontWeight: FontWeight.w300,
+  //                     fontSize: MyStyles.S6,
+  //                     foreground: Paint()
+  //                       ..shader = const LinearGradient(
+  //                         colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
+  //                       ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)))),
+  //             padding: const EdgeInsets.only(top: 5, bottom: 5, right: 0, left: 5),
+  //             color: MyColors.White,
+  //             // icon: Icon(Icons.keyboard_arrow_down_sharp),
+  //             shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(5)),
+  //             itemBuilder: (BuildContext context) {
+  //               final List<PopupMenuEntry<UserAddress>> list = [];
+  //               snapshot.data!.forEach((element) {
+  //                 list.add(
+  //                   PopupMenuItem<UserAddress>(
+  //                       child: Container(
+  //                     width: 150,
+  //                     child: Align(
+  //                       alignment: Alignment.centerLeft,
+  //                       child: Column(
+  //                         mainAxisAlignment: MainAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                             element.name,
+  //                             style: MyStyles.blackSmallTextStyle
+  //                                 .copyWith(fontSize: 15),
+  //                           ),
+  //                           Text(
+  //                             element.address,
+  //                             style: MyStyles.blackSmallTextStyle,
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   )),
+  //                 );
+  //               });
+  //               return list;
+  //             },
+  //             onSelected: (UserAddress address) {
+  //               context.read<SendAssetCubit>().setAddress(address);
+  //             },
+  //           ),
+  //         );
+  //       });
+  // }
 }

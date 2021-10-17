@@ -3,9 +3,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/token.dart';
+import '../data_source/currency_data.dart';
+import '../models/swap/gas.dart';
+import '../models/token.dart';
 
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
@@ -49,30 +49,28 @@ class EthereumService {
   // IMPORTANT use http instead of wss infura endpoint, web3dart not supporting wss yet
   String get INFURA_URL {
     //bsc
-    if(chainId == 56){
+    if (chainId == 56) {
       return 'https://bsc-dataseed.binance.org/';
-    }
-    else if(chainId == 97){
+    } else if (chainId == 97) {
       return 'https://data-seed-prebsc-1-s1.binance.org:8545/';
     }
     //heco
     else if (chainId == 128) {
       return 'https://http-mainnet.hecochain.com/';
-    } else if(chainId == 256) {
+    } else if (chainId == 256) {
       return 'https://http-testnet.hecochain.com';
     }
     //matic
     else if (chainId == 137)
       return 'https://rpc-mainnet.maticvigil.com/';
 
-
     //xdai
-    else if(this.chainId == 100){
+    else if (this.chainId == 100) {
       return 'https://rpc.xdaichain.com/';
-    }
-
-    else{
-      return 'https://' + networkName! + '.infura.io/v3/8344fd70eef24c50b3fa252322585913';
+    } else {
+      return 'https://' +
+          networkName! +
+          '.infura.io/v3/8344fd70eef24c50b3fa252322585913';
     }
   }
 
@@ -82,12 +80,13 @@ class EthereumService {
     makeAddrDict();
   }
 
-  makeAddrDict() async {
-    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
-    final decodedAddresses = jsonDecode(allAddresses);
-    final tokensAddresses = decodedAddresses["token"];
+  void makeAddrDict() async {
+    final String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final Map<String, dynamic> decodedAddresses = jsonDecode(allAddresses);
+    final Map<String, Map<String, dynamic>> tokensAddresses =
+        decodedAddresses["token"];
     tokensAddresses.forEach((key, value) {
-      Token? t = _getTokenObjectByName(key);
+      final Token? t = _getTokenObjectByName(key);
       if (t != null) {
         addressToTokenMap.addEntries(
             [MapEntry<String, Token>(value["1"].toString().toLowerCase(), t)]);
@@ -110,13 +109,14 @@ class EthereumService {
   }
 
   static BigInt getWei(String amount, [String token = "eth"]) {
-    int max =
-        TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token]??18 : 18;
+    final int max = TOKEN_MAX_DIGITS.containsKey(token)
+        ? TOKEN_MAX_DIGITS[token] ?? 18
+        : 18;
     if (amount == "") {
       amount = "0.0";
     }
-    int dotIndex = amount.indexOf(".");
-    var ans;
+    final int dotIndex = amount.indexOf(".");
+    String ans;
 
     if (dotIndex == -1) {
       ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount)
@@ -124,7 +124,7 @@ class EthereumService {
           .toString();
     } else {
 //      TODO check larger than 18
-      int zerosNo = 18 - (amount.length - dotIndex - 1);
+      final int zerosNo = 18 - (amount.length - dotIndex - 1);
       amount = amount.replaceAll(".", "");
       if (zerosNo < 0) {
         amount = amount.substring(0, amount.length + zerosNo - 1);
@@ -140,7 +140,7 @@ class EthereumService {
   }
 
   static String fromWei(BigInt value, [String token = "eth"]) {
-    var max =
+    final max =
         TOKEN_MAX_DIGITS.containsKey(token) ? TOKEN_MAX_DIGITS[token] : 18;
     String ans = value.toString();
 
@@ -157,27 +157,26 @@ class EthereumService {
   }
 
   static String formatDouble(String value, [int doubleNo = 9]) {
-    int dotIndex = value.indexOf(".");
+    final int dotIndex = value.indexOf(".");
     if (dotIndex >= 0) {
       while (value.endsWith("0")) {
         if (value.length > 2) {
           value = value.substring(0, value.length - 1);
         }
       }
-      int float = value.length - dotIndex - 1;
+      final int float = value.length - dotIndex - 1;
       if (float > doubleNo) {
         value = value.substring(0, dotIndex + doubleNo + 1);
       }
     }
-    if(value == "0.")
-      value = "0.0";
+    if (value == "0.") value = "0.0";
     return value;
   }
 
   Future<DeployedContract> loadTokenContract(String tokenName) async {
-    String allAbis = await rootBundle.loadString(ABIS_PATH);
+    final String allAbis = await rootBundle.loadString(ABIS_PATH);
 
-    final decodedAbis = jsonDecode(allAbis);
+    final Map<String, dynamic> decodedAbis = jsonDecode(allAbis);
     final abiCode = jsonEncode(decodedAbis["token"]);
 
     final contractAddress = await getTokenAddr(tokenName, "token");
@@ -186,34 +185,38 @@ class EthereumService {
   }
 
   Future<DeployedContract> loadContractWithGivenAddress(
-      String contractName, contractAddress) async {
-    String allAbis = await rootBundle.loadString(ABIS_PATH);
-    final decodedAbis = jsonDecode(allAbis);
+      String contractName, EthereumAddress contractAddress) async {
+    final String allAbis = await rootBundle.loadString(ABIS_PATH);
+    final Map<String, dynamic> decodedAbis = jsonDecode(allAbis);
     final abiCode = jsonEncode(decodedAbis[contractName]);
     return DeployedContract(
         ContractAbi.fromJson(abiCode, contractName), contractAddress);
   }
 
   Future<DeployedContract> loadContract(String contractName) async {
-    String allAbis = await rootBundle.loadString(ABIS_PATH);
-    final decodedAbis = jsonDecode(allAbis);
-    final abiCode = jsonEncode(decodedAbis[contractName]);
+    final String allAbis = await rootBundle.loadString(ABIS_PATH);
+    final Map<String, dynamic> decodedAbis = jsonDecode(allAbis);
+    final String abiCode = jsonEncode(decodedAbis[contractName]);
     final contractAddress = await getContractAddress(contractName);
-    return DeployedContract(ContractAbi.fromJson(abiCode, contractName), contractAddress);
+    return DeployedContract(
+        ContractAbi.fromJson(abiCode, contractName), contractAddress);
   }
 
   // will probably throw error since addresses is not complete
   Future<EthereumAddress> getContractAddress(String contractName) async {
-    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
-    final decodedAddresses = jsonDecode(allAddresses);
-    final hexAddress = decodedAddresses[contractName][chainId.toString()];
+    final String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final Map<String, Map<String, dynamic>> decodedAddresses =
+        jsonDecode(allAddresses);
+    final String hexAddress =
+        decodedAddresses[contractName]![chainId.toString()];
     return EthereumAddress.fromHex(hexAddress);
   }
 
   Future<EthereumAddress> getTokenAddr(String tokenName, String type) async {
-    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
-    final decodedAddresses = jsonDecode(allAddresses);
-    final hexAddress = decodedAddresses[type][tokenName][chainId.toString()];
+    final String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final Map<String, Map<String, Map<String, dynamic>>> decodedAddresses =
+        jsonDecode(allAddresses);
+    final hexAddress = decodedAddresses[type]![tokenName]![chainId.toString()];
     return EthereumAddress.fromHex(hexAddress);
   }
 
@@ -222,9 +225,10 @@ class EthereumService {
   }
 
   Future<EthereumAddress> getAddr(String tokenName) async {
-    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
-    final decodedAddresses = jsonDecode(allAddresses);
-    final hexAddress = decodedAddresses[tokenName][chainId.toString()];
+    final String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final Map<String, Map<String, dynamic>> decodedAddresses =
+        jsonDecode(allAddresses);
+    final hexAddress = decodedAddresses[tokenName]![chainId.toString()];
     return EthereumAddress.fromHex(hexAddress);
   }
 
@@ -242,19 +246,17 @@ class EthereumService {
   Future<String> submit(Credentials credentials, DeployedContract contract,
       String functionName, List<dynamic> args,
       {EtherAmount? value, Gas? gas}) async {
-    Transaction transaction = await makeTransaction(credentials, contract, functionName, args,
+    final Transaction transaction = await makeTransaction(
+        credentials, contract, functionName, args,
         gas: gas, value: value);
-    var result = await ethClient.sendTransaction(
-        credentials,
-        transaction,
+    final result = await ethClient.sendTransaction(credentials, transaction,
         chainId: chainId);
     return result;
   }
 
-
   Future<String> sendTransaction(
       Credentials credentials, Transaction transaction) async {
-    var result = await ethClient.sendTransaction(credentials, transaction,
+    final result = await ethClient.sendTransaction(credentials, transaction,
         chainId: chainId);
     return result;
   }
@@ -265,13 +267,14 @@ class EthereumService {
     final ethFunction = contract.function(functionName);
     Transaction transaction;
     if (gas != null && gas.nonce > 0) {
-      if(value!=null)
+      if (value != null)
         transaction = Transaction.callContract(
             from: await credentials.extractAddress(),
             contract: contract,
             function: ethFunction,
             parameters: args,
-            gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
+            gasPrice:
+                EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
             maxGas: gas.gasLimit > 0 ? gas.gasLimit : 650000,
             nonce: gas.nonce,
             value: value);
@@ -281,19 +284,20 @@ class EthereumService {
             contract: contract,
             function: ethFunction,
             parameters: args,
-            gasPrice: EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
+            gasPrice:
+                EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice()),
             maxGas: gas.gasLimit > 0 ? gas.gasLimit : 650000,
             nonce: gas.nonce);
-
     } else {
-      if(value!=null)
+      if (value != null)
         transaction = Transaction.callContract(
             from: await credentials.extractAddress(),
             contract: contract,
             function: ethFunction,
             parameters: args,
             gasPrice: gas != null
-                ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
+                ? EtherAmount.fromUnitAndValue(
+                    EtherUnit.gwei, gas.getGasPrice())
                 : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
             maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 650000,
             value: value);
@@ -304,7 +308,8 @@ class EthereumService {
             function: ethFunction,
             parameters: args,
             gasPrice: gas != null
-                ? EtherAmount.fromUnitAndValue(EtherUnit.gwei, gas.getGasPrice())
+                ? EtherAmount.fromUnitAndValue(
+                    EtherUnit.gwei, gas.getGasPrice())
                 : EtherAmount.fromUnitAndValue(EtherUnit.gwei, 1),
             maxGas: gas != null && gas.gasLimit > 0 ? gas.gasLimit : 650000);
     }
@@ -312,9 +317,11 @@ class EthereumService {
     return transaction;
   }
 
-  Future<List<dynamic>> query(DeployedContract contract, String functionName, List<dynamic> args) async {
+  Future<List<dynamic>> query(DeployedContract contract, String functionName,
+      List<dynamic> args) async {
     final ethFunction = contract.function(functionName);
-    final data = await ethClient.call(contract: contract, function: ethFunction, params: args);
+    final data = await ethClient.call(
+        contract: contract, function: ethFunction, params: args);
     return data;
   }
 
@@ -325,23 +332,24 @@ class EthereumService {
 
   Stream<TransactionReceipt> pollTransactionReceipt(String txHash,
       {int pollingTimeMs = 1500}) async* {
-    StreamController<TransactionReceipt> controller = StreamController();
+    final StreamController<TransactionReceipt> controller = StreamController();
     Timer? timer;
 
     Future<void> tick() async {
-      var receipt = await getTransactionReceipt(txHash);
+      final receipt = await getTransactionReceipt(txHash);
       if (receipt != null && !controller.isClosed) {
         timer?.cancel();
         controller.add(receipt);
-        controller.close();
+        await controller.close();
       }
     }
 
     // start first tick before timer if the receipt is available immediately
-    tick();
+    await tick();
 
     if (!controller.isClosed) {
-      timer = Timer.periodic(Duration(milliseconds: pollingTimeMs), (timer) async {
+      timer =
+          Timer.periodic(Duration(milliseconds: pollingTimeMs), (timer) async {
         await tick();
       });
     }
@@ -350,12 +358,13 @@ class EthereumService {
   }
 
   Future<Credentials> credentialsForKey(String privateKey) {
+    // ignore: deprecated_member_use
     return ethClient.credentialsFromPrivateKey(privateKey);
   }
 
   EthPrivateKey generateKeyPair() {
-    var rng = new Random.secure();
-    EthPrivateKey random = EthPrivateKey.createRandom(rng);
+    final rng = new Random.secure();
+    final EthPrivateKey random = EthPrivateKey.createRandom(rng);
     return random;
   }
 
@@ -371,9 +380,11 @@ class EthereumService {
   }
 
   Future<EthereumAddress> getStakingAddr(String tokenName) async {
-    String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
-    final decodedAddresses = jsonDecode(allAddresses);
-    final hexAddress = decodedAddresses["staking"][tokenName][chainId.toString()];
+    final String allAddresses = await rootBundle.loadString(ADDRESSES_PATH);
+    final Map<String, Map<String, Map<String, dynamic>>> decodedAddresses =
+        jsonDecode(allAddresses);
+    final hexAddress =
+        decodedAddresses["staking"]![tokenName]![chainId.toString()];
     return EthereumAddress.fromHex(hexAddress);
   }
 }

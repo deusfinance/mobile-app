@@ -1,11 +1,12 @@
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/styles.dart';
+
 ///TODO (@CodingDavid8): Clean up buttons and put them in core/widgets/buttons/
 import 'package:flutter/material.dart';
 
 class RaisedGradientButton extends StatelessWidget {
-  String? label;
-  VoidCallback? onPressed;
-  final gradient;
+  final String? label;
+  final VoidCallback? onPressed;
+  final Gradient gradient;
 
   RaisedGradientButton({this.label, this.onPressed, required this.gradient});
 
@@ -14,15 +15,18 @@ class RaisedGradientButton extends StatelessWidget {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-            gradient: gradient, borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
         height: 55,
-        child: RaisedButton(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
-          color: Colors.transparent,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
+            // color: Colors.transparent,
+          ),
           child: Text(
             label!,
-            style: TextStyle(fontSize: 20, color: Colors.black),
+            style: const TextStyle(fontSize: 20, color: Colors.black),
           ),
           onPressed: onPressed,
         ),

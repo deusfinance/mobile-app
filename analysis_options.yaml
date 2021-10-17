@@ -1,0 +1,62 @@
+# # https://dart-lang.github.io/linter/lints/
+analyzer:
+  errors:
+#     # Einheitlichkeit
+    prefer_single_quotes: info
+    prefer_relative_imports: info #TODO: warning
+    annotate_overrides: warning
+   # file_names: warning # TODO: Error
+    camel_case_types: warning
+    non_constant_identifier_names: info
+    constant_identifier_names: info
+
+    # Performance
+    prefer_const_constructors: info #warning
+    prefer_const_declarations: info
+    avoid_print: error
+    prefer_final_locals: info #warning
+    prefer_final_fields: info # ggf. warning je nach Projekt
+    # prefer_final_in_for_each: warning
+    
+    # besseres Codeverständnis/Lesbarkeit
+    empty_catches: info
+    prefer_is_not_empty: warning
+    prefer_is_empty: warning
+    type_annotate_public_apis: warning
+    public_member_api_docs: warning 
+    slash_for_doc_comments: info
+    use_is_even_rather_than_modulo: info
+
+    # Fehlervermeidung
+    unawaited_futures: info
+    avoid_dynamic_calls: warning
+
+    flutter_style_todos: info
+    # Use Flutter TODO format: // TODO(username): message, https://URL-to-issue.
+  
+linter:
+  rules:
+    prefer_single_quotes: false 
+    non_constant_identifier_names: false 
+    constant_identifier_names: false
+    flutter_style_todos: false
+    public_member_api_docs: false # erst bei Production
+
+    avoid_dynamic_calls: true
+    prefer_relative_imports: true
+    annotate_overrides: true
+    empty_catches: true
+    file_names: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    camel_case_types: true
+    prefer_final_locals: true
+    prefer_final_fields: true
+    prefer_final_in_for_each: false
+    prefer_is_not_empty: true
+    prefer_is_empty: true
+    type_annotate_public_apis: true
+    slash_for_doc_comments: true
+    use_is_even_rather_than_modulo: true
+    unawaited_futures: true
+    avoid_print: true

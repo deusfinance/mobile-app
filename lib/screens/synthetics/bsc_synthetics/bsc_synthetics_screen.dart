@@ -1,18 +1,17 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
-import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/core/widgets/token_selector/bsc_stock_selector_screen/bsc_stock_selector_screen.dart';
-import 'package:deus_mobile/data_source/sync_data/bsc_stock_data.dart';
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/synthetics/stock.dart';
-import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/synthetics_cubit.dart';
-import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import '../../../core/widgets/default_screen/default_screen.dart';
+import '../../../core/widgets/default_screen/sync_chain_selector.dart';
+import '../../../core/widgets/toast.dart';
+import '../../../core/widgets/token_selector/bsc_stock_selector_screen/bsc_stock_selector_screen.dart';
+import '../../../data_source/sync_data/bsc_stock_data.dart';
+import '../../../models/swap/crypto_currency.dart';
+import '../../../models/swap/gas.dart';
+import '../../../models/synthetics/stock.dart';
+import '../../confirm_gas/confirm_gas.dart';
+import '../synthetics_state.dart';
+import '../../../statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -112,7 +111,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         Statics.bscSyncState = state;
       }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (state is SyntheticsErrorState) {
@@ -127,7 +126,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
   }
 
   Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas? res = await showGeneralDialog(
+    final Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -146,7 +145,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
           opacity: anim1,
         ),
       ),
-      transitionDuration: Duration(milliseconds: 10),
+      transitionDuration: const Duration(milliseconds: 10),
     );
     return res;
   }
@@ -156,20 +155,25 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
       enablePullDown: true,
       controller: state.refreshController,
       onRefresh: context.read<BscSyntheticsCubit>().refresh,
-      header: BezierHeader(child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-        child: Center(child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text("Release to Refresh", style: MyStyles.lightWhiteSmallTextStyle,),
-              Icon(Icons.refresh_sharp),
-            ],
-          ),
-        )),
-      ),),
-
+      header: BezierHeader(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  "Release to Refresh",
+                  style: MyStyles.lightWhiteSmallTextStyle,
+                ),
+                const Icon(Icons.refresh_sharp),
+              ],
+            ),
+          )),
+        ),
+      ),
       child: Container(
-        padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+        padding: const EdgeInsets.all(MyStyles.mainPadding * 1.5),
         decoration: BoxDecoration(color: MyColors.Main_BG_Black),
         child: Stack(
           children: [
@@ -188,19 +192,21 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
   }
 
   Widget _buildUserInput(SyntheticsState state) {
-    SwapField fromField = new SwapField(
+    final SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
         selectAssetRoute: BscStockSelectorScreen.url,
         controller: state.fromFieldController,
         syncData: state.syncData as BscStockData,
         tokenSelected: (selectedToken) async {
-          context.read<BscSyntheticsCubit>().fromTokenChanged(selectedToken);
+          await context
+              .read<BscSyntheticsCubit>()
+              .fromTokenChanged(selectedToken);
         });
 
     // context.read<BscSyntheticsCubit>().addListenerToFromField();
 
-    SwapField toField = new SwapField(
+    final SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
       controller: state.toFieldController,
@@ -236,7 +242,9 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
+                      // ignore: unnecessary_null_comparison
                       ? "${context.read<BscSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      // ignore: unnecessary_null_comparison
                       : "${context.read<BscSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
@@ -245,7 +253,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
                     context.read<BscSyntheticsCubit>().reversePriceRatio();
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 4.0),
+                    margin: const EdgeInsets.only(left: 4.0),
                     child: PlatformSvg.asset("images/icons/exchange.svg",
                         width: 15),
                   ),
@@ -260,7 +268,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         Opacity(
             opacity: state.isInProgress ? 0.5 : 1,
             child: _buildMainButton(state)),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         _buildRemainingCapacity(state),
@@ -272,7 +280,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -287,7 +295,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
     if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -303,12 +311,12 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction? transaction =
+          final Transaction? transaction =
               await context.read<BscSyntheticsCubit>().makeApproveTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<BscSyntheticsCubit>().approve(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<BscSyntheticsCubit>().approve(gas);
           }
         },
         gradient: MyColors.blueToPurpleGradient,
@@ -320,7 +328,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
             double.tryParse(state.fromFieldController.text) == 0)) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -344,7 +352,7 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
             state.fromFieldController.text, state.fromToken.getTokenName())) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -360,20 +368,20 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
       label: state.fromToken == CurrencyData.busd ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.busd) {
-          Transaction? transaction =
+          final Transaction? transaction =
               await context.read<BscSyntheticsCubit>().makeBuyTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<BscSyntheticsCubit>().buy(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<BscSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction? transaction =
+          final Transaction? transaction =
               await context.read<BscSyntheticsCubit>().makeSellTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<BscSyntheticsCubit>().sell(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<BscSyntheticsCubit>().sell(gas);
           }
         }
       },
@@ -471,15 +479,15 @@ class _BscSyntheticsScreenState extends State<BscSyntheticsScreen> {
         "Remaining Synchronize Capacity",
         style: MyStyles.lightWhiteSmallTextStyle,
       ),
-      Spacer(),
+      const Spacer(),
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircleAvatar(
+          const CircleAvatar(
               radius: 12,
               backgroundImage:
                   provider.Svg("assets/images/currencies/busd.svg")),
-          SizedBox(
+          const SizedBox(
             width: 6,
           ),
           FutureBuilder(

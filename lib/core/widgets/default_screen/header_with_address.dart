@@ -1,18 +1,14 @@
-import 'package:deus_mobile/core/util/clipboard.dart';
-import 'package:deus_mobile/core/util/crypto_util.dart';
-import 'package:deus_mobile/core/widgets/svg.dart';
-import 'package:deus_mobile/infrastructure/wallet_provider/wallet_handler.dart';
-import 'package:deus_mobile/infrastructure/wallet_provider/wallet_provider.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/screens/wallet_intro_screen/intro_page.dart';
-import 'package:deus_mobile/screens/wallet_settings_screen/wallet_settings_screen.dart';
-import 'package:deus_mobile/service/address_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../util/clipboard.dart';
+import '../../util/crypto_util.dart';
+import '../svg.dart';
+import '../../../infrastructure/wallet_provider/wallet_handler.dart';
+import '../../../infrastructure/wallet_provider/wallet_provider.dart';
+import '../../../routes/navigation_service.dart';
+import '../../../screens/wallet_settings_screen/wallet_settings_screen.dart';
+import '../../../service/address_service.dart';
+import '../../../statics/my_colors.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
 import 'package:web3dart/credentials.dart';
 
 import '../../../locator.dart';
@@ -52,9 +48,12 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
   InkWell _buildWalletLogout(WalletHandler walletStore) {
     return InkWell(
         onTap: () {
-          locator<NavigationService>().navigateTo(WalletSettingsScreen.url, context);
+          locator<NavigationService>()
+              .navigateTo(WalletSettingsScreen.url, context);
         },
-        child: Container(margin: EdgeInsets.symmetric(horizontal: 6), child: PlatformSvg.asset('images/logout.svg')));
+        child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 6),
+            child: PlatformSvg.asset('images/logout.svg')));
   }
 
   Container _buildAddressContainer() {
@@ -62,9 +61,10 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
-          border: Border.all(color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
-          color: Color(MyColors.kAddressBackground).withOpacity(0.25),
-          borderRadius: BorderRadius.all(Radius.circular(6))),
+          border: Border.all(
+              color: const Color(MyColors.kAddressBackground).withOpacity(0.5)),
+          color: const Color(MyColors.kAddressBackground).withOpacity(0.25),
+          borderRadius: const BorderRadius.all(Radius.circular(6))),
       child: this.widget.walletAddress != null
           ? _buildAddress(widget.walletAddress!)
           : FutureBuilder(
@@ -73,7 +73,7 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
                 if (snapshot.hasData)
                   return _buildAddress((snapshot.data! as EthereumAddress).hex);
                 else
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
               }),
     );
   }
@@ -81,7 +81,8 @@ class _HeaderWithAddressState extends State<HeaderWithAddress> {
   Widget _buildAddress(String address) {
     return InkWell(
         onTap: () {
-          locator<NavigationService>().navigateTo(WalletSettingsScreen.url, context);
+          locator<NavigationService>()
+              .navigateTo(WalletSettingsScreen.url, context);
         },
         onLongPress: () async => await copyToClipBoard(address),
         child: Center(

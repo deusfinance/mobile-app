@@ -1,25 +1,21 @@
-import 'dart:collection';
-import 'dart:convert';
-import 'dart:async';
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/database/database.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/locator.dart';
-import 'package:deus_mobile/models/wallet/wallet_asset_api.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:deus_mobile/service/wallet_service.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import '../../../core/database/chain.dart';
+import '../../../core/database/database.dart';
+import '../../../core/database/wallet_asset.dart';
+import '../../../locator.dart';
+import '../../../service/config_service.dart';
+import '../../../service/wallet_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'asset_detail_state.dart';
 
 class AssetDetailCubit extends Cubit<AssetDetailState> {
-  AssetDetailCubit(WalletAsset walletAsset, Chain chain) : super(AssetDetailInitialState(walletAsset, chain));
+  AssetDetailCubit(WalletAsset walletAsset, Chain chain)
+      : super(AssetDetailInitialState(walletAsset, chain));
 
-  init() async {
+  void init() async {
     emit(AssetDetailLoadingState(state));
     state.database = await AppDatabase.getInstance();
-    state.walletService = new WalletService(state.chain, locator<ConfigurationService>().getPrivateKey()!);
+    state.walletService = new WalletService(
+        state.chain, locator<ConfigurationService>().getPrivateKey()!);
     emit(AssetDetailLoadedState(state));
   }
 }

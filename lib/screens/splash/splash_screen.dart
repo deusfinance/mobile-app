@@ -12,7 +12,7 @@ class SplashScreen extends StatelessWidget {
     debugPrint("Initializing data...");
     final bool success = await context.read<SplashCubit>().initializeData();
     debugPrint("Call finished.");
-    if(!success) return null;
+    if (!success) return null;
     return true;
   }
 
@@ -22,13 +22,18 @@ class SplashScreen extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-              decoration: BoxDecoration(gradient: MyColors.splashGradient),
-              child: BlocBuilder<SplashCubit, SplashState>(builder: (context, state) {
+              decoration:
+                  const BoxDecoration(gradient: MyColors.splashGradient),
+              child: BlocBuilder<SplashCubit, SplashState>(
+                  builder: (context, state) {
                 if (state is SplashError)
                   return Center(
-                      child: InkWell(onTap: () async => await init(context) , child: Icon(Icons.refresh, color: MyColors.White)));
+                      child: InkWell(
+                          onTap: () async => await init(context),
+                          child: Icon(Icons.refresh, color: MyColors.White)));
                 else
-                  return Center(child: SvgPicture.asset("assets/images/deus.svg"));
+                  return Center(
+                      child: SvgPicture.asset("assets/images/deus.svg"));
               })),
 //          SvgPicture.asset("assets/images/splash_bg.svg"),
         ],

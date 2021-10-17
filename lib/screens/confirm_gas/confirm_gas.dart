@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 
-import 'package:deus_mobile/core/util/responsive.dart';
-import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/models/swap/GWei.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
-import 'package:flutter/cupertino.dart';
+import '../../core/util/responsive.dart';
+import '../../core/widgets/selection_button.dart';
+import '../../models/swap/gwei.dart';
+import '../../models/swap/gas.dart';
+import '../../routes/navigation_service.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
@@ -17,15 +16,15 @@ import 'package:http/http.dart' as http;
 
 import '../../locator.dart';
 
-enum Network{ETH, XDAI, HECO, BSC, MATIC}
+enum Network { ETH, XDAI, HECO, BSC, MATIC }
 enum ConfirmShowingMode { CONFIRM, BASIC_CUSTOMIZE, ADVANCED_CUSTOMIZE }
 enum ShowingMode { LOADING, NONE }
 enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
 
 class ConfirmGasScreen extends StatefulWidget {
   static const route = '/confirm_gas';
-  Transaction transaction;
-  Network network;
+  final Transaction transaction;
+  final Network network;
 
   ConfirmGasScreen({required this.transaction, required this.network});
 
@@ -46,79 +45,83 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   TextEditingController gWeiController = new TextEditingController();
 
   Future<GWei?> getGWei() async {
-    switch(widget.network){
+    switch (widget.network) {
       case Network.ETH:
-        var response =
-        await http.get(Uri.parse("https://www.gasnow.org/api/v3/gas/price?utm_source=:deusApp"));
+        final response = await http.get(Uri.parse(
+            "https://www.gasnow.org/api/v3/gas/price?utm_source=:deusApp"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          GWei g = GWei.fromJson(map["data"]);
+          final Map<String, dynamic> map = json.decode(response.body);
+          final GWei g = GWei.fromJson(map["data"]);
           return g;
         }
         return null;
       case Network.XDAI:
-        GWei g = new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
+        final GWei g =
+            new GWei.init(1.0 * 1000000000, 1.0 * 1000000000, 1.0 * 1000000000);
         return g;
       case Network.HECO:
         double gNumber = 2.0;
-        var response =
-        await http.get(Uri.parse("https://tc.hecochain.com/price/prediction"));
+        final response = await http
+            .get(Uri.parse("https://tc.hecochain.com/price/prediction"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          try{gNumber = map['prices']['median'] * 1.0;}
-          catch(e){
-          }
+          final Map<String, Map<String, int>> map = json.decode(response.body);
+          try {
+            gNumber = map['prices']!['median']! * 1.0;
+            // ignore: empty_catches
+          } catch (e) {}
         }
-        GWei g = new GWei.init(gNumber * 1000000000, gNumber * 1000000000, gNumber * 1000000000);
+        final GWei g = new GWei.init(
+            gNumber * 1000000000, gNumber * 1000000000, gNumber * 1000000000);
         return g;
       case Network.BSC:
-        GWei g = new GWei.init(5.0 * 1000000000, 5.0 * 1000000000, 5.0 * 1000000000);
+        final GWei g =
+            new GWei.init(5.0 * 1000000000, 5.0 * 1000000000, 5.0 * 1000000000);
         return g;
       case Network.MATIC:
         // TODO: Handle this case.
         break;
     }
-
   }
 
   Future<double?> getGasTokenPrice() async {
-    switch(widget.network){
+    switch (widget.network) {
       case Network.ETH:
-        var response = await http.get(
-            Uri.parse("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"));
+        final response = await http.get(Uri.parse(
+            "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          return map['ethereum']['usd'];
+          final Map<String, Map<String, double>> map =
+              json.decode(response.body);
+          return map['ethereum']!['usd'];
         }
         return 0;
       case Network.XDAI:
         return 1;
       case Network.HECO:
-        var response = await http.get(
-            Uri.parse("https://api.coingecko.com/api/v3/simple/price?ids=huobi-token&vs_currencies=usd"));
+        final response = await http.get(Uri.parse(
+            "https://api.coingecko.com/api/v3/simple/price?ids=huobi-token&vs_currencies=usd"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          return map['huobi-token']['usd'];
+          final Map<String, Map<String, double>> map =
+              json.decode(response.body);
+          return map['huobi-token']!['usd'];
         }
         return 0;
       case Network.BSC:
-        var response = await http.get(
-            Uri.parse("https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd"));
+        final response = await http.get(Uri.parse(
+            "https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          return map['binancecoin']['usd'];
+          final Map<String, Map<String, double>> map =
+              json.decode(response.body);
+          return map['binancecoin']!['usd'];
         }
         return 0;
       case Network.MATIC:
         // TODO: Handle this case.
         break;
     }
-
   }
 
-
-  String getGasTokenName(){
-    switch(widget.network){
+  String getGasTokenName() {
+    switch (widget.network) {
       case Network.ETH:
         return "ETH";
       case Network.XDAI:
@@ -131,6 +134,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         return "ETH";
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -144,17 +148,17 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
     return Material(
       color: Colors.transparent,
       child: mode == ShowingMode.LOADING
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : Container(
-        margin: EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
-        padding: EdgeInsets.all(12.0),
-        decoration: MyStyles.darkWithBorderDecoration,
-        child: confirmSwapShowingMode == ConfirmShowingMode.CONFIRM
-            ? confirmScreen()
-            : customizeScreen(),
-      ),
+              margin: const EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
+              padding: const EdgeInsets.all(12.0),
+              decoration: MyStyles.darkWithBorderDecoration,
+              child: confirmSwapShowingMode == ConfirmShowingMode.CONFIRM
+                  ? confirmScreen()
+                  : customizeScreen(),
+            ),
     );
   }
 
@@ -193,9 +197,9 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                         fontSize: MyStyles.S5,
                         foreground: Paint()
                           ..shader = MyColors.greenToBlueGradient
-                              .createShader(Rect.fromLTRB(0, 0, 20, 5)))),
+                              .createShader(const Rect.fromLTRB(0, 0, 20, 5)))),
               )),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Row(
@@ -214,12 +218,13 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               )
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Align(
               alignment: Alignment.centerRight,
-              child: Text("\$ ${(_computeGasFee() * gasTokenPrice!).toStringAsFixed(6)}",
+              child: Text(
+                  "\$ ${(_computeGasFee() * gasTokenPrice!).toStringAsFixed(6)}",
                   style: MyStyles.lightWhiteSmallTextStyle)),
           const Divider(
             height: 15,
@@ -229,7 +234,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
           Visibility(
             visible: showingError == true,
             child: InkWell(
-              onTap: (){
+              onTap: () {
                 getData();
               },
               child: Text("can not estimate gas fee. Tap this to try again",
@@ -241,57 +246,57 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   )),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 250,
           ),
           Row(
             children: [
               Expanded(
                   child: InkWell(
-                    onTap: () {
-                      locator<NavigationService>().goBack(context);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                          color: Color(0xFFC4C4C4),
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.all(16.0),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "REJECT",
-                          style: TextStyle(
-                            fontFamily: MyStyles.kFontFamily,
-                            fontWeight: FontWeight.w300,
-                            fontSize: MyStyles.S4,
-                            color: MyColors.HalfBlack,
-                          ),
-                        ),
+                onTap: () {
+                  locator<NavigationService>().goBack(context);
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                      color: const Color(0xFFC4C4C4),
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "REJECT",
+                      style: TextStyle(
+                        fontFamily: MyStyles.kFontFamily,
+                        fontWeight: FontWeight.w300,
+                        fontSize: MyStyles.S4,
+                        color: MyColors.HalfBlack,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              )),
               Expanded(
                   child: Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: SelectionButton(
-                      label: 'CONFIRM',
-                      onPressed: (bool selected) async {
-                        Gas gas = new Gas();
-                        gas.gasPrice = _computeGasPrice();
-                        if (gasFee == GasFee.CUSTOM) {
-                          gas.nonce = int.tryParse(nonceController.text) ?? 0;
-                          gas.gasLimit = int.tryParse(gasLimitController.text) ?? 0;
-                        }else{
-                          gas.gasLimit = estimatedGasNumber;
-                        }
-                        locator<NavigationService>().goBack(context, gas);
-                      },
-                      selected: true,
-                      gradient: MyColors.greenToBlueGradient,
-                      textStyle: MyStyles.blackMediumTextStyle,
-                    ),
-                  ))
+                margin: const EdgeInsets.all(8.0),
+                child: SelectionButton(
+                  label: 'CONFIRM',
+                  onPressed: (bool selected) async {
+                    final Gas gas = new Gas();
+                    gas.gasPrice = _computeGasPrice();
+                    if (gasFee == GasFee.CUSTOM) {
+                      gas.nonce = int.tryParse(nonceController.text) ?? 0;
+                      gas.gasLimit = int.tryParse(gasLimitController.text) ?? 0;
+                    } else {
+                      gas.gasLimit = estimatedGasNumber;
+                    }
+                    locator<NavigationService>().goBack(context, gas);
+                  },
+                  selected: true,
+                  gradient: MyColors.greenToBlueGradient,
+                  textStyle: MyStyles.blackMediumTextStyle,
+                ),
+              ))
             ],
           ),
         ],
@@ -304,7 +309,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          margin: EdgeInsets.only(left: 8.0, right: 8.0),
+          margin: const EdgeInsets.only(left: 8.0, right: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -318,32 +323,33 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                   InkWell(
                       onTap: () {
                         setState(() {
-                          confirmSwapShowingMode = ConfirmShowingMode.BASIC_CUSTOMIZE;
+                          confirmSwapShowingMode =
+                              ConfirmShowingMode.BASIC_CUSTOMIZE;
                         });
                       },
                       child: Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           children: [
                             Text(
                               "BASIC",
                               style: confirmSwapShowingMode ==
-                                  ConfirmShowingMode.BASIC_CUSTOMIZE
+                                      ConfirmShowingMode.BASIC_CUSTOMIZE
                                   ? TextStyle(
-                                  fontFamily: MyStyles.kFontFamily,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: MyStyles.S6,
-                                  foreground: Paint()
-                                    ..shader = MyColors.greenToBlueGradient
-                                        .createShader(
-                                        Rect.fromLTRB(0, 0, 50, 30)))
+                                      fontFamily: MyStyles.kFontFamily,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: MyStyles.S6,
+                                      foreground: Paint()
+                                        ..shader = MyColors.greenToBlueGradient
+                                            .createShader(const Rect.fromLTRB(
+                                                0, 0, 50, 30)))
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
                               visible: confirmSwapShowingMode ==
                                   ConfirmShowingMode.BASIC_CUSTOMIZE,
                               child: Container(
-                                  margin: EdgeInsets.only(top: 3),
+                                  margin: const EdgeInsets.only(top: 3),
                                   height: 2.0,
                                   width: 40,
                                   decoration: MyStyles.greenToBlueDecoration),
@@ -351,38 +357,39 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                           ],
                         ),
                       )),
-                  SizedBox(
+                  const SizedBox(
                     width: 12,
                   ),
                   InkWell(
                       onTap: () {
                         setState(() {
-                          confirmSwapShowingMode = ConfirmShowingMode.ADVANCED_CUSTOMIZE;
+                          confirmSwapShowingMode =
+                              ConfirmShowingMode.ADVANCED_CUSTOMIZE;
                         });
                       },
                       child: Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           children: [
                             Text(
                               "ADVANCED",
                               style: confirmSwapShowingMode ==
-                                  ConfirmShowingMode.ADVANCED_CUSTOMIZE
+                                      ConfirmShowingMode.ADVANCED_CUSTOMIZE
                                   ? TextStyle(
-                                  fontFamily: MyStyles.kFontFamily,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: MyStyles.S6,
-                                  foreground: Paint()
-                                    ..shader = MyColors.greenToBlueGradient
-                                        .createShader(
-                                        Rect.fromLTRB(0, 0, 50, 30)))
+                                      fontFamily: MyStyles.kFontFamily,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: MyStyles.S6,
+                                      foreground: Paint()
+                                        ..shader = MyColors.greenToBlueGradient
+                                            .createShader(const Rect.fromLTRB(
+                                                0, 0, 50, 30)))
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
                               visible: confirmSwapShowingMode ==
                                   ConfirmShowingMode.ADVANCED_CUSTOMIZE,
                               child: Container(
-                                  margin: EdgeInsets.only(top: 3),
+                                  margin: const EdgeInsets.only(top: 3),
                                   height: 2.0,
                                   width: 60,
                                   decoration: MyStyles.greenToBlueDecoration),
@@ -403,16 +410,17 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         confirmSwapShowingMode == ConfirmShowingMode.ADVANCED_CUSTOMIZE
             ? advancedCustomize()
             : basicCustomize(),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Container(
-          margin: EdgeInsets.only(left: 8, right: 8.0),
+          margin: const EdgeInsets.only(left: 8, right: 8.0),
           child: SelectionButton(
             label: 'SAVE',
             onPressed: (bool selected) {
               setState(() {
-                if (confirmSwapShowingMode == ConfirmShowingMode.ADVANCED_CUSTOMIZE) {
+                if (confirmSwapShowingMode ==
+                    ConfirmShowingMode.ADVANCED_CUSTOMIZE) {
                   gasFee = GasFee.CUSTOM;
                 }
                 confirmSwapShowingMode = ConfirmShowingMode.CONFIRM;
@@ -433,7 +441,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         borderRadius: BorderRadius.circular(10));
 
     return Container(
-      margin: EdgeInsets.only(left: 8, right: 8),
+      margin: const EdgeInsets.only(left: 8, right: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -444,7 +452,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               style: MyStyles.lightWhiteSmallTextStyle,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Align(
@@ -454,20 +462,20 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               style: MyStyles.whiteMediumTextStyle,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 24,
           ),
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(left: 12.0),
+              margin: const EdgeInsets.only(left: 12.0),
               child: Text(
                 "Gas Price (GWEI)",
                 style: MyStyles.lightWhiteSmallTextStyle,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           SizedBox(
@@ -481,7 +489,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Colors.white,
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(
+                  FilteringTextInputFormatter.allow(
                       new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
                 ],
                 onChanged: (value) {
@@ -501,20 +509,20 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(left: 12.0),
+              margin: const EdgeInsets.only(left: 12.0),
               child: Text(
                 "Gas Limit",
                 style: MyStyles.lightWhiteSmallTextStyle,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           SizedBox(
@@ -528,7 +536,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Colors.white,
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(new RegExp(r'([0-9])'))
+                  FilteringTextInputFormatter.allow(new RegExp(r'([0-9])'))
                 ],
                 controller: gasLimitController,
                 keyboardType: TextInputType.number,
@@ -544,20 +552,20 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(left: 12.0),
+              margin: const EdgeInsets.only(left: 12.0),
               child: Text(
                 "Nonce (optional)",
                 style: MyStyles.lightWhiteSmallTextStyle,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           SizedBox(
@@ -571,7 +579,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Colors.white,
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(new RegExp(r'([0-9])'))
+                  FilteringTextInputFormatter.allow(new RegExp(r'([0-9])'))
                 ],
                 controller: nonceController,
                 keyboardType: TextInputType.number,
@@ -592,7 +600,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
 
   Widget basicCustomize() {
     return Container(
-      margin: EdgeInsets.only(left: 8.0, right: 8.0),
+      margin: const EdgeInsets.only(left: 8.0, right: 8.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -602,7 +610,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                 "Estimated Processing Times",
                 style: MyStyles.lightWhiteMediumTextStyle,
               )),
-          SizedBox(
+          const SizedBox(
             height: 12.0,
           ),
           Align(
@@ -611,7 +619,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                 "Select a higher gas fee to accelerate the processing of your transaction.*",
                 style: MyStyles.lightWhiteSmallTextStyle,
               )),
-          SizedBox(
+          const SizedBox(
             height: 24.0,
           ),
           InkWell(
@@ -622,12 +630,10 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
             },
             child: Container(
               width: getScreenWidth(context),
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-                color: gasFee == GasFee.SLOW
-                    ? MyColors.Black
-                    : MyColors.Gray,
+                color: gasFee == GasFee.SLOW ? MyColors.Black : MyColors.Gray,
               ),
               child: Column(
                 children: [
@@ -638,7 +644,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -648,7 +654,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -662,7 +668,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           InkWell(
@@ -673,12 +679,11 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
             },
             child: Container(
               width: getScreenWidth(context),
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-                color: gasFee == GasFee.AVERAGE
-                    ? MyColors.Black
-                    : MyColors.Gray,
+                color:
+                    gasFee == GasFee.AVERAGE ? MyColors.Black : MyColors.Gray,
               ),
               child: Column(
                 children: [
@@ -689,7 +694,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -699,7 +704,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -713,7 +718,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           InkWell(
@@ -724,12 +729,10 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
             },
             child: Container(
               width: getScreenWidth(context),
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
-                color: gasFee == GasFee.FAST
-                    ? MyColors.Black
-                    : MyColors.Gray,
+                color: gasFee == GasFee.FAST ? MyColors.Black : MyColors.Gray,
               ),
               child: Column(
                 children: [
@@ -740,7 +743,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -750,7 +753,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -777,11 +780,11 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
     gasTokenPrice = await getGasTokenPrice();
     estimatedGasNumber = await estimateGas();
 
-    if(estimatedGasNumber == 0 || gasTokenPrice == 0 || gWei == null){
+    if (estimatedGasNumber == 0 || gasTokenPrice == 0 || gWei == null) {
       setState(() {
         showingError = true;
       });
-    }else{
+    } else {
       setState(() {
         showingError = false;
       });
@@ -799,22 +802,25 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
   }
 
   Future<int> estimateGas() async {
-    switch(widget.network){
+    switch (widget.network) {
       case Network.ETH:
-        Map<String, dynamic> map = new Map();
+        final Map<String, dynamic> map = new Map();
         map['from'] = widget.transaction.from.toString();
         map['to'] = widget.transaction.to.toString();
-        if(widget.transaction.data != null) {
-          var result = hex.encode(widget.transaction.data!);
+        if (widget.transaction.data != null) {
+          final result = hex.encode(widget.transaction.data!);
           map['data'] = "0x$result";
         }
-        if ( widget.transaction.value != null)
+        if (widget.transaction.value != null)
           map['value'] = widget.transaction.value!.getInWei.toInt();
         else
           map['value'] = 0;
-        var response = await http.post(Uri.parse("https://app.deus.finance/app/mainnet/swap/estimate"), body: json.encode(map), headers: {"Content-Type": "application/json"});
+        final response = await http.post(
+            Uri.parse("https://app.deus.finance/app/mainnet/swap/estimate"),
+            body: json.encode(map),
+            headers: {"Content-Type": "application/json"});
         if (response.statusCode == 200) {
-          var js = json.decode(response.body);
+          final Map<String, dynamic> js = json.decode(response.body);
           return js['gas_fee'];
         }
         return 650000;
@@ -827,11 +833,10 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
       case Network.MATIC:
         return 650000;
     }
-
   }
 
   _computeGasPrice({GasFee? gFee}) {
-    if(gWei != null) {
+    if (gWei != null) {
       if (gFee == null) {
         gFee = gasFee;
       }
@@ -849,7 +854,7 @@ class _ConfirmGasScreenState extends State<ConfirmGasScreen> {
         }
         return 0.000000001 * gw;
       }
-    }else
+    } else
       return 0;
   }
 }

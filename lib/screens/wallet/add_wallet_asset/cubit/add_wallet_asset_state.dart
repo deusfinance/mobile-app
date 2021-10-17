@@ -1,19 +1,13 @@
 import 'dart:async';
 
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/database/database.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/data_source/sync_data/bsc_stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/heco_stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/matic_stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/sync_data.dart';
-import 'package:deus_mobile/data_source/sync_data/xdai_stock_data.dart';
-import 'package:deus_mobile/models/token.dart';
-import 'package:deus_mobile/models/wallet/wallet_asset_api.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
+import '../../../../core/database/chain.dart';
+import '../../../../core/database/database.dart';
+import '../../../../models/wallet/wallet_asset_api.dart';
+import 'package:equatable/equatable.dart';
+
+// ignore: must_be_immutable
 abstract class AddWalletAssetState extends Equatable {
   AppDatabase? database;
   Chain chain;
@@ -25,19 +19,17 @@ abstract class AddWalletAssetState extends Equatable {
   bool symbolConfirmed;
   bool visibleErrors;
 
+  late TextEditingController tokenSearchController;
+  late TextEditingController tokenDecimalController;
+  late TextEditingController tokenSymbolController;
+  late TextEditingController tokenAddressController;
 
-  var tokenSearchController;
-  var tokenDecimalController;
-  var tokenSymbolController;
-  var tokenAddressController;
-
-  AddWalletAssetState.init(this.chain):
-      addressConfirmed = false,
-      visibleErrors = false,
-      decimalConfirmed = false,
-      symbolConfirmed = false,
-        streamController = new StreamController()
-  {
+  AddWalletAssetState.init(this.chain)
+      : addressConfirmed = false,
+        visibleErrors = false,
+        decimalConfirmed = false,
+        symbolConfirmed = false,
+        streamController = new StreamController() {
     walletAssetApis = new List.empty();
     searchedWalletAssetApis = new List.empty();
     tokenSearchController = new TextEditingController();
@@ -65,22 +57,27 @@ abstract class AddWalletAssetState extends Equatable {
   List<Object?> get props => [chain];
 }
 
+// ignore: must_be_immutable
 class AddWalletAssetInitialState extends AddWalletAssetState {
   AddWalletAssetInitialState(Chain chain) : super.init(chain);
 }
 
+// ignore: must_be_immutable
 class AddWalletAssetLoadingState extends AddWalletAssetState {
   AddWalletAssetLoadingState(AddWalletAssetState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class AddWalletAssetErrorState extends AddWalletAssetState {
   AddWalletAssetErrorState(AddWalletAssetState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class AddWalletAssetSearchState extends AddWalletAssetState {
   AddWalletAssetSearchState(AddWalletAssetState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class AddWalletAssetCustomState extends AddWalletAssetState {
   AddWalletAssetCustomState(AddWalletAssetState state) : super.copy(state);
 }

@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../../models/swap/crypto_currency.dart';
+import '../../../routes/navigation_service.dart';
+import '../../../service/ethereum_service.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -27,11 +27,19 @@ class TokenListTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(currency.symbol,maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.whiteMediumTextStyle), //const TextStyle(fontSize: 25, height: 0.99999)
+          Text(currency.symbol,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: MyStyles
+                  .whiteMediumTextStyle), //const TextStyle(fontSize: 25, height: 0.99999)
           const SizedBox(
             width: 15,
           ),
-          Text(currency.name, maxLines: 1,overflow: TextOverflow.ellipsis, style: MyStyles.lightWhiteSmallTextStyle), //  const TextStyle(fontSize: 15, height: 0.99999)
+          Text(currency.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: MyStyles
+                  .lightWhiteSmallTextStyle), //  const TextStyle(fontSize: 15, height: 0.99999)
         ],
       ),
       trailing: Text(

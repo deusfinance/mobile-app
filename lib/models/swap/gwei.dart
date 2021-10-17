@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'GWei.g.dart';
+part 'gwei.g.dart';
 
 @JsonSerializable()
 class GWei {

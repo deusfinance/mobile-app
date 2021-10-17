@@ -1,16 +1,15 @@
 import 'dart:convert';
 
 import 'package:convert/convert.dart';
-import 'package:deus_mobile/core/database/chain.dart';
+import '../../core/database/chain.dart';
 
-import 'package:deus_mobile/core/util/responsive.dart';
-import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/models/swap/GWei.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
-import 'package:flutter/cupertino.dart';
+import '../../core/util/responsive.dart';
+import '../../core/widgets/selection_button.dart';
+import '../../models/swap/gwei.dart';
+import '../../models/swap/gas.dart';
+import '../../routes/navigation_service.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
@@ -24,8 +23,8 @@ enum GasFee { SLOW, AVERAGE, FAST, CUSTOM }
 
 class ManageGasScreen extends StatefulWidget {
   static const route = '/confirm_gas';
-  Transaction transaction;
-  Chain chain;
+  final Transaction transaction;
+  final Chain chain;
 
   ManageGasScreen({required this.transaction, required this.chain});
 
@@ -48,19 +47,20 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
   Future<GWei?> getGWei() async {
     switch (widget.chain.id) {
       case 1:
-        var response = await http.get(Uri.parse(
+        final response = await http.get(Uri.parse(
             "https://www.gasnow.org/api/v3/gas/price?utm_source=:deusApp"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          GWei gApi = GWei.fromJson(map["data"]);
+          final Map<String, dynamic> map = json.decode(response.body);
+          final GWei gApi = GWei.fromJson(map["data"]);
 
-          double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
+          final double d =
+              widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
           if (d > gApi.getFast() * 1000000000 + 10 * 1000000000) {
-            GWei g = new GWei.init(
+            final GWei g = new GWei.init(
                 d + 10 * 1000000000, d + 10 * 1000000000, d + 10 * 1000000000);
             return g;
           } else {
-            GWei g = new GWei.init(
+            final GWei g = new GWei.init(
                 gApi.getFast() * 1000000000 + 10 * 1000000000,
                 gApi.getFast() * 1000000000 + 10 * 1000000000,
                 gApi.getFast() * 1000000000 + 10 * 1000000000);
@@ -69,42 +69,44 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
         }
         return null;
       case 100:
-        double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
+        final double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
         if (d > 1.0 * 1000000000 * 2) {
-          GWei g = new GWei.init(d * 2, d * 2, d * 2);
+          final GWei g = new GWei.init(d * 2, d * 2, d * 2);
           return g;
         } else {
-          GWei g = new GWei.init(
+          final GWei g = new GWei.init(
               1.0 * 1000000000 * 2, 1.0 * 1000000000 * 2, 1.0 * 1000000000 * 2);
           return g;
         }
       case 128:
         double gNumber = 2.0;
-        var response = await http
+        final response = await http
             .get(Uri.parse("https://tc.hecochain.com/price/prediction"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
+          final Map<String, Map<String, dynamic>> map =
+              json.decode(response.body);
           try {
-            gNumber = map['prices']['median'];
+            gNumber = map['prices']!['median'];
+            // ignore: empty_catches
           } catch (e) {}
         }
 
-        double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
+        final double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
         if (d > gNumber * 1000000000 * 2) {
-          GWei g = new GWei.init(d * 2, d * 2, d * 2);
+          final GWei g = new GWei.init(d * 2, d * 2, d * 2);
           return g;
         } else {
-          GWei g = new GWei.init(gNumber * 1000000000 * 2,
+          final GWei g = new GWei.init(gNumber * 1000000000 * 2,
               gNumber * 1000000000 * 2, gNumber * 1000000000 * 2);
           return g;
         }
       case 56:
-        double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
+        final double d = widget.transaction.gasPrice?.getInWei.toDouble() ?? 0;
         if (d > 5.0 * 1000000000 * 2) {
-          GWei g = new GWei.init(d * 2, d * 2, d * 2);
+          final GWei g = new GWei.init(d * 2, d * 2, d * 2);
           return g;
         } else {
-          GWei g = new GWei.init(
+          final GWei g = new GWei.init(
               5.0 * 1000000000 * 2, 5.0 * 1000000000 * 2, 5.0 * 1000000000 * 2);
           return g;
         }
@@ -119,29 +121,32 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
   Future<double?> getGasTokenPrice() async {
     switch (widget.chain.id) {
       case 1:
-        var response = await http.get(Uri.parse(
+        final response = await http.get(Uri.parse(
             "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          return map['ethereum']['usd'];
+          final Map<String, Map<String, dynamic>> map =
+              json.decode(response.body);
+          return map['ethereum']!['usd'];
         }
         return 0;
       case 100:
         return 1;
       case 128:
-        var response = await http.get(Uri.parse(
+        final response = await http.get(Uri.parse(
             "https://api.coingecko.com/api/v3/simple/price?ids=huobi-token&vs_currencies=usd"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          return map['huobi-token']['usd'];
+          final Map<String, Map<String, dynamic>> map =
+              json.decode(response.body);
+          return map['huobi-token']!['usd'];
         }
         return 0;
       case 56:
-        var response = await http.get(Uri.parse(
+        final response = await http.get(Uri.parse(
             "https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd"));
         if (response.statusCode == 200) {
-          var map = json.decode(response.body);
-          return map['binancecoin']['usd'];
+          final Map<String, Map<String, dynamic>> map =
+              json.decode(response.body);
+          return map['binancecoin']!['usd'];
         }
         return 0;
       case 137:
@@ -169,12 +174,12 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
     return Material(
       color: Colors.transparent,
       child: mode == ShowingMode.LOADING
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : Container(
-              margin: EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
-              padding: EdgeInsets.all(12.0),
+              margin: const EdgeInsets.fromLTRB(8.0, 8, 8.0, 8.0),
+              padding: const EdgeInsets.all(12.0),
               decoration: MyStyles.darkWithBorderDecoration,
               child: confirmSwapShowingMode == ConfirmShowingMode.CONFIRM
                   ? confirmScreen()
@@ -236,9 +241,9 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                         fontSize: MyStyles.S5,
                         foreground: Paint()
                           ..shader = MyColors.greenToBlueGradient
-                              .createShader(Rect.fromLTRB(0, 0, 20, 5)))),
+                              .createShader(const Rect.fromLTRB(0, 0, 20, 5)))),
               )),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Row(
@@ -257,7 +262,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               )
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Align(
@@ -285,18 +290,18 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                   )),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 250,
           ),
           Row(
             children: [
               Expanded(
                   child: Container(
-                margin: EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(8.0),
                 child: SelectionButton(
                   label: 'CONFIRM',
                   onPressed: (bool selected) async {
-                    Gas gas = new Gas();
+                    final Gas gas = new Gas();
                     gas.gasPrice = _computeGasPrice();
                     if (gasFee == GasFee.CUSTOM) {
                       gas.nonce = int.tryParse(nonceController.text) ?? 0;
@@ -323,7 +328,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          margin: EdgeInsets.only(left: 8.0, right: 8.0),
+          margin: const EdgeInsets.only(left: 8.0, right: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -342,7 +347,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                         });
                       },
                       child: Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           children: [
                             Text(
@@ -355,15 +360,15 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                                       fontSize: MyStyles.S6,
                                       foreground: Paint()
                                         ..shader = MyColors.greenToBlueGradient
-                                            .createShader(
-                                                Rect.fromLTRB(0, 0, 50, 30)))
+                                            .createShader(const Rect.fromLTRB(
+                                                0, 0, 50, 30)))
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
                               visible: confirmSwapShowingMode ==
                                   ConfirmShowingMode.BASIC_CUSTOMIZE,
                               child: Container(
-                                  margin: EdgeInsets.only(top: 3),
+                                  margin: const EdgeInsets.only(top: 3),
                                   height: 2.0,
                                   width: 40,
                                   decoration: MyStyles.greenToBlueDecoration),
@@ -371,7 +376,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                           ],
                         ),
                       )),
-                  SizedBox(
+                  const SizedBox(
                     width: 12,
                   ),
                   InkWell(
@@ -382,7 +387,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                         });
                       },
                       child: Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           children: [
                             Text(
@@ -395,15 +400,15 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                                       fontSize: MyStyles.S6,
                                       foreground: Paint()
                                         ..shader = MyColors.greenToBlueGradient
-                                            .createShader(
-                                                Rect.fromLTRB(0, 0, 50, 30)))
+                                            .createShader(const Rect.fromLTRB(
+                                                0, 0, 50, 30)))
                                   : MyStyles.lightWhiteSmallTextStyle,
                             ),
                             Visibility(
                               visible: confirmSwapShowingMode ==
                                   ConfirmShowingMode.ADVANCED_CUSTOMIZE,
                               child: Container(
-                                  margin: EdgeInsets.only(top: 3),
+                                  margin: const EdgeInsets.only(top: 3),
                                   height: 2.0,
                                   width: 60,
                                   decoration: MyStyles.greenToBlueDecoration),
@@ -424,11 +429,11 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
         confirmSwapShowingMode == ConfirmShowingMode.ADVANCED_CUSTOMIZE
             ? advancedCustomize()
             : basicCustomize(),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Container(
-          margin: EdgeInsets.only(left: 8, right: 8.0),
+          margin: const EdgeInsets.only(left: 8, right: 8.0),
           child: SelectionButton(
             label: 'SAVE',
             onPressed: (bool selected) {
@@ -455,7 +460,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
         borderRadius: BorderRadius.circular(10));
 
     return Container(
-      margin: EdgeInsets.only(left: 8, right: 8),
+      margin: const EdgeInsets.only(left: 8, right: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -466,7 +471,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               style: MyStyles.lightWhiteSmallTextStyle,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Align(
@@ -476,20 +481,20 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               style: MyStyles.whiteMediumTextStyle,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 24,
           ),
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(left: 12.0),
+              margin: const EdgeInsets.only(left: 12.0),
               child: Text(
                 "Gas Price (GWEI)",
                 style: MyStyles.lightWhiteSmallTextStyle,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           SizedBox(
@@ -503,7 +508,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Colors.white,
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(
+                  FilteringTextInputFormatter.allow(
                       new RegExp(r'([0-9]+([.][0-9]*)?|[.][0-9]+)'))
                 ],
                 onChanged: (value) {
@@ -523,20 +528,20 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(left: 12.0),
+              margin: const EdgeInsets.only(left: 12.0),
               child: Text(
                 "Gas Limit",
                 style: MyStyles.lightWhiteSmallTextStyle,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           SizedBox(
@@ -550,7 +555,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Colors.white,
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(new RegExp(r'([0-9])'))
+                  FilteringTextInputFormatter.allow(new RegExp(r'([0-9])'))
                 ],
                 controller: gasLimitController,
                 keyboardType: TextInputType.number,
@@ -566,20 +571,20 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              margin: EdgeInsets.only(left: 12.0),
+              margin: const EdgeInsets.only(left: 12.0),
               child: Text(
                 "Nonce (optional)",
                 style: MyStyles.lightWhiteSmallTextStyle,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           SizedBox(
@@ -593,7 +598,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                 textAlignVertical: TextAlignVertical.center,
                 cursorColor: Colors.white,
                 inputFormatters: [
-                  WhitelistingTextInputFormatter(new RegExp(r'([0-9])'))
+                  FilteringTextInputFormatter.allow(new RegExp(r'([0-9])'))
                 ],
                 controller: nonceController,
                 keyboardType: TextInputType.number,
@@ -614,7 +619,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
 
   Widget basicCustomize() {
     return Container(
-      margin: EdgeInsets.only(left: 8.0, right: 8.0),
+      margin: const EdgeInsets.only(left: 8.0, right: 8.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -624,7 +629,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                 "Estimated Processing Times",
                 style: MyStyles.lightWhiteMediumTextStyle,
               )),
-          SizedBox(
+          const SizedBox(
             height: 12.0,
           ),
           Align(
@@ -633,7 +638,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                 "Select a higher gas fee to accelerate the processing of your transaction.*",
                 style: MyStyles.lightWhiteSmallTextStyle,
               )),
-          SizedBox(
+          const SizedBox(
             height: 24.0,
           ),
           InkWell(
@@ -644,7 +649,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
             },
             child: Container(
               width: getScreenWidth(context),
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
                 color: gasFee == GasFee.SLOW ? MyColors.Black : MyColors.Gray,
@@ -658,7 +663,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -668,7 +673,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -682,7 +687,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           InkWell(
@@ -693,7 +698,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
             },
             child: Container(
               width: getScreenWidth(context),
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
                 color:
@@ -708,7 +713,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -718,7 +723,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -732,7 +737,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 8.0,
           ),
           InkWell(
@@ -743,7 +748,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
             },
             child: Container(
               width: getScreenWidth(context),
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
                 color: gasFee == GasFee.FAST ? MyColors.Black : MyColors.Gray,
@@ -757,7 +762,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -767,7 +772,7 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
                       style: MyStyles.whiteSmallTextStyle,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Align(
@@ -818,23 +823,23 @@ class _ManageGasScreenState extends State<ManageGasScreen> {
   Future<int> estimateGas() async {
     switch (widget.chain.id) {
       case 1:
-        Map<String, dynamic> map = new Map();
+        final Map<String, dynamic> map = new Map();
         map['from'] = widget.transaction.from.toString();
         map['to'] = widget.transaction.to.toString();
         if (widget.transaction.data != null) {
-          var result = hex.encode(widget.transaction.data!);
+          final result = hex.encode(widget.transaction.data!);
           map['data'] = "0x$result";
         }
         if (widget.transaction.value != null)
           map['value'] = widget.transaction.value!.getInWei.toInt();
         else
           map['value'] = 0;
-        var response = await http.post(
+        final response = await http.post(
             Uri.parse("https://app.deus.finance/app/mainnet/swap/estimate"),
             body: json.encode(map),
             headers: {"Content-Type": "application/json"});
         if (response.statusCode == 200) {
-          var js = json.decode(response.body);
+          final Map<String, dynamic> js = json.decode(response.body);
           return js['gas_fee'];
         }
         return 650000;

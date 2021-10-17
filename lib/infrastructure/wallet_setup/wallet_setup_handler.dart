@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:deus_mobile/models/wallet/wallet_setup.dart';
-import 'package:deus_mobile/service/address_service.dart';
+import '../../models/wallet/wallet_setup.dart';
+import '../../service/address_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hex/hex.dart';
 import 'package:string_validator/string_validator.dart';
 
 import 'setup/../wallet_setup_state.dart';
@@ -17,13 +16,14 @@ class WalletSetupHandler {
   WalletSetup get state => _store.state;
 
   void generateMnemonic() {
-    var mnemonic = _addressService.generateMnemonic();
+    final mnemonic = _addressService.generateMnemonic();
     _store.dispatch(WalletSetupConfirmMnemonic(mnemonic!));
   }
 
   Future<bool> confirmMnemonic(String mnemonic) async {
     if (state.mnemonic != mnemonic) {
-      _store.dispatch(WalletSetupAddError("Invalid mnemonic, please try again."));
+      _store
+          .dispatch(WalletSetupAddError("Invalid mnemonic, please try again."));
       return false;
     }
     _store.dispatch(WalletSetupStarted());
@@ -50,7 +50,8 @@ class WalletSetupHandler {
       _store.dispatch(WalletSetupAddError(e.toString()));
     }
 
-    _store.dispatch(WalletSetupAddError("Invalid mnemonic, it requires 12 words."));
+    _store.dispatch(
+        WalletSetupAddError("Invalid mnemonic, it requires 12 words."));
 
     return false;
   }
@@ -59,10 +60,14 @@ class WalletSetupHandler {
     try {
       _store.dispatch(WalletSetupStarted());
 
-      privateKey = privateKey.startsWith('0x') ? privateKey.substring(2) : privateKey;
+      privateKey =
+          privateKey.startsWith('0x') ? privateKey.substring(2) : privateKey;
 
-      if (!isHexadecimal(privateKey) || privateKey.length.isOdd || privateKey.isEmpty) {
-        _store.dispatch(WalletSetupAddError("The entered key is not a private key."));
+      if (!isHexadecimal(privateKey) ||
+          privateKey.length.isOdd ||
+          privateKey.isEmpty) {
+        _store.dispatch(
+            WalletSetupAddError("The entered key is not a private key."));
         return false;
       }
 
@@ -72,19 +77,19 @@ class WalletSetupHandler {
       _store.dispatch(WalletSetupAddError(e.toString()));
     }
 
-    _store.dispatch(WalletSetupAddError("Invalid private key, please try again."));
+    _store.dispatch(
+        WalletSetupAddError("Invalid private key, please try again."));
 
     return false;
   }
 
-  String _mnemonicNormalise(String mnemonic) {
-    return _mnemonicWords(mnemonic).join(" ");
-  }
+  String _mnemonicNormalise(String mnemonic) =>
+      _mnemonicWords(mnemonic).join(" ");
 
   List<String> _mnemonicWords(String mnemonic) {
     return mnemonic
         .split(" ")
-        .where((item) => item != null && item.trim().isNotEmpty)
+        .where((item) => item.trim().isNotEmpty)
         .map((item) => item.trim())
         .toList();
   }

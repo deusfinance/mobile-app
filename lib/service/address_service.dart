@@ -16,7 +16,7 @@ abstract class IAddressService {
 }
 
 class AddressService implements IAddressService {
-  IConfigurationService _configService;
+  final IConfigurationService _configService;
   AddressService(this._configService);
 
   @override
@@ -24,19 +24,19 @@ class AddressService implements IAddressService {
     return bip39.generateMnemonic();
   }
 
+  @override
   String entropyToMnemonic(String entropyMnemonic) {
     return bip39.entropyToMnemonic(entropyMnemonic);
   }
 
   @override
   String? getPrivateKey(String mnemonic) {
-    String seed = bip39.mnemonicToSeedHex(mnemonic);
-    KeyData master = HDKey.getMasterKeyFromSeed(seed);
+    final String seed = bip39.mnemonicToSeedHex(mnemonic);
+    final KeyData master = HDKey.getMasterKeyFromSeed(seed);
     final privateKey = HEX.encode(master.key!);
     return privateKey;
   }
 
-  @override
   String? getMnemonic() {
     return bip39
         .entropyToMnemonic(locator<ConfigurationService>().getMnemonic()!);

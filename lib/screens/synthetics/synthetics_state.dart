@@ -1,28 +1,28 @@
 import 'dart:async';
 
-import 'package:deus_mobile/core/database/database.dart';
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/data_source/sync_data/bsc_stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/heco_stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/matic_stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/stock_data.dart';
-import 'package:deus_mobile/data_source/sync_data/sync_data.dart';
-import 'package:deus_mobile/data_source/sync_data/xdai_stock_data.dart';
-import 'package:deus_mobile/locator.dart';
-import 'package:deus_mobile/models/synthetics/stock_price.dart';
-import 'package:deus_mobile/models/token.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/service/sync/bsc_stock_service.dart';
-import 'package:deus_mobile/service/sync/heco_stock_service.dart';
-import 'package:deus_mobile/service/sync/matic_stock_service.dart';
-import 'package:deus_mobile/service/sync/stock_service.dart';
-import 'package:deus_mobile/service/sync/sync_service.dart';
-import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import 'package:flutter/material.dart';
+
+import '../../core/database/database.dart';
+import '../../data_source/currency_data.dart';
+import '../../data_source/sync_data/bsc_stock_data.dart';
+import '../../data_source/sync_data/heco_stock_data.dart';
+import '../../data_source/sync_data/matic_stock_data.dart';
+import '../../data_source/sync_data/stock_data.dart';
+import '../../data_source/sync_data/sync_data.dart';
+import '../../data_source/sync_data/xdai_stock_data.dart';
+import '../../locator.dart';
+import '../../models/synthetics/stock_price.dart';
+import '../../models/token.dart';
+import '../../models/transaction_status.dart';
+import '../../service/config_service.dart';
+import '../../service/ethereum_service.dart';
+import '../../service/sync/bsc_stock_service.dart';
+import '../../service/sync/heco_stock_service.dart';
+import '../../service/sync/matic_stock_service.dart';
+import '../../service/sync/stock_service.dart';
+import '../../service/sync/sync_service.dart';
+import '../../service/sync/xdai_stock_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 enum Mode { LONG, SHORT, NONE }
@@ -162,22 +162,27 @@ abstract class SyntheticsState extends Equatable {
       ];
 }
 
+// ignore: must_be_immutable
 class SyntheticsInitialState extends SyntheticsState {
   SyntheticsInitialState(SyntheticsChain chain) : super.init(chain);
 }
 
+// ignore: must_be_immutable
 class SyntheticsLoadingState extends SyntheticsState {
   SyntheticsLoadingState(SyntheticsState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class SyntheticsErrorState extends SyntheticsState {
   SyntheticsErrorState(SyntheticsState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class SyntheticsSelectAssetState extends SyntheticsState {
   SyntheticsSelectAssetState(SyntheticsState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class SyntheticsAssetSelectedState extends SyntheticsState {
   SyntheticsAssetSelectedState(SyntheticsState state,
       {bool? isInProgress,
@@ -195,6 +200,7 @@ class SyntheticsAssetSelectedState extends SyntheticsState {
   }
 }
 
+// ignore: must_be_immutable
 class SyntheticsTransactionPendingState extends SyntheticsState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
@@ -230,6 +236,7 @@ class SyntheticsTransactionPendingState extends SyntheticsState {
   List<Object?> get props => [showingToast, transactionStatus];
 }
 
+// ignore: must_be_immutable
 class SyntheticsTransactionFinishedState extends SyntheticsState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;

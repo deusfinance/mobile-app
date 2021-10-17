@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
-import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
-import 'package:deus_mobile/data_source/sync_data/stock_data.dart';
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/synthetics/stock.dart';
-import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import '../../../core/widgets/default_screen/default_screen.dart';
+import '../../../core/widgets/default_screen/sync_chain_selector.dart';
+import '../../../core/widgets/toast.dart';
+import '../../../core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
+import '../../../data_source/sync_data/stock_data.dart';
+import '../../../models/swap/crypto_currency.dart';
+import '../../../models/swap/gas.dart';
+import '../../../models/synthetics/stock.dart';
+import '../../confirm_gas/confirm_gas.dart';
+import '../synthetics_state.dart';
+import '../../../statics/statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -111,7 +111,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         Statics.ethSyncState = state;
       }, builder: (context, state) {
         if (state is SyntheticsLoadingState) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (state is SyntheticsErrorState) {
@@ -126,7 +126,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   }
 
   Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas? res = await showGeneralDialog(
+    final Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
@@ -143,7 +143,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
           opacity: anim1,
         ),
       ),
-      transitionDuration: Duration(milliseconds: 10),
+      transitionDuration: const Duration(milliseconds: 10),
     );
     return res;
   }
@@ -153,20 +153,25 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       enablePullDown: true,
       controller: state.refreshController,
       onRefresh: context.read<MainnetSyntheticsCubit>().refresh,
-      header: BezierHeader(child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-        child: Center(child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text("Release to Refresh", style: MyStyles.lightWhiteSmallTextStyle,),
-              Icon(Icons.refresh_sharp),
-            ],
-          ),
-        )),
-      ),),
-
+      header: BezierHeader(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  "Release to Refresh",
+                  style: MyStyles.lightWhiteSmallTextStyle,
+                ),
+                const Icon(Icons.refresh_sharp),
+              ],
+            ),
+          )),
+        ),
+      ),
       child: Container(
-        padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+        padding: const EdgeInsets.all(MyStyles.mainPadding * 1.5),
         decoration: BoxDecoration(color: MyColors.Main_BG_Black),
         child: Stack(
           children: [
@@ -185,21 +190,21 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
   }
 
   Widget _buildUserInput(SyntheticsState state) {
-    SwapField fromField = new SwapField(
+    final SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
         selectAssetRoute: StockSelectorScreen.url,
         syncData: state.syncData as StockData,
         controller: state.fromFieldController,
         tokenSelected: (selectedToken) async {
-          context
+          await context
               .read<MainnetSyntheticsCubit>()
               .fromTokenChanged(selectedToken);
         });
 
     // context.read<MainnetSyntheticsCubit>().addListenerToFromField();
 
-    SwapField toField = new SwapField(
+    final SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
       syncData: state.syncData as StockData,
@@ -235,7 +240,9 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
+                      // ignore: unnecessary_null_comparison
                       ? "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      // ignore: unnecessary_null_comparison
                       : "${context.read<MainnetSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
@@ -244,7 +251,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
                     context.read<MainnetSyntheticsCubit>().reversePriceRatio();
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 4.0),
+                    margin: const EdgeInsets.only(left: 4.0),
                     child: PlatformSvg.asset("images/icons/exchange.svg",
                         width: 15),
                   ),
@@ -259,7 +266,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         Opacity(
             opacity: state.isInProgress ? 0.5 : 1,
             child: _buildMainButton(state)),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         _buildRemainingCapacity(state),
@@ -271,7 +278,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -286,7 +293,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
     if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -302,13 +309,13 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction? transaction = await context
+          final Transaction? transaction = await context
               .read<MainnetSyntheticsCubit>()
               .makeApproveTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<MainnetSyntheticsCubit>().approve(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<MainnetSyntheticsCubit>().approve(gas);
           }
         },
         gradient: MyColors.blueToPurpleGradient,
@@ -320,7 +327,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
             double.tryParse(state.fromFieldController.text) == 0)) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -344,7 +351,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
             state.fromFieldController.text, state.fromToken.getTokenName())) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -360,21 +367,21 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
       label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.dai) {
-          Transaction? transaction =
+          final Transaction? transaction =
               await context.read<MainnetSyntheticsCubit>().makeBuyTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<MainnetSyntheticsCubit>().buy(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<MainnetSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction? transaction = await context
+          final Transaction? transaction = await context
               .read<MainnetSyntheticsCubit>()
               .makeSellTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<MainnetSyntheticsCubit>().sell(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<MainnetSyntheticsCubit>().sell(gas);
           }
         }
       },
@@ -472,7 +479,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
         "Remaining Synchronize Capacity",
         style: MyStyles.lightWhiteSmallTextStyle,
       ),
-      Spacer(),
+      const Spacer(),
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -480,7 +487,7 @@ class _MainnetSyntheticsScreenState extends State<MainnetSyntheticsScreen> {
             "assets/images/currencies/dai.png",
             height: 20,
           ),
-          SizedBox(
+          const SizedBox(
             width: 6,
           ),
           FutureBuilder(

@@ -1,11 +1,9 @@
-import 'package:deus_mobile/models/wallet/wallet.dart';
-import 'package:deus_mobile/service/address_service.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
+import '../../models/wallet/wallet.dart';
+import '../../service/address_service.dart';
+import '../../service/config_service.dart';
+import '../../service/ethereum_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:web3dart/web3dart.dart' as web3;
 
-import '../../locator.dart';
 import 'wallet_state.dart';
 
 //TODO: Use cubit instead of Hooks.
@@ -29,11 +27,11 @@ class WalletHandler {
     final privateKey = _configurationService.getPrivateKey();
 
     if (entropyMnemonic != null && entropyMnemonic.isNotEmpty) {
-      _initialiseFromMnemonic(entropyMnemonic);
+      await _initialiseFromMnemonic(entropyMnemonic);
       return;
     }
 
-    _initialiseFromPrivateKey(privateKey!);
+    await _initialiseFromPrivateKey(privateKey!);
   }
 
   Future<void> _initialiseFromMnemonic(String entropyMnemonic) async {
@@ -76,7 +74,8 @@ class WalletHandler {
   Future<void> fetchOwnBalance() async {
     _store.dispatch(UpdatingBalance());
 
-    var ethBalance = await _ethereumService.getEtherBalance(await _ethereumService.credentialsForKey(state.privateKey!));
+    final ethBalance = await _ethereumService.getEtherBalance(
+        await _ethereumService.credentialsForKey(state.privateKey!));
 
     _store.dispatch(BalanceUpdated(ethBalance.getInWei));
   }

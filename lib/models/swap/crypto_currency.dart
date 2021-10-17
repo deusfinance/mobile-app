@@ -1,15 +1,13 @@
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import '../../service/ethereum_service.dart';
 
 import '../token.dart';
 
+// ignore: must_be_immutable
 class CryptoCurrency extends Token {
   String? _balance;
   String? _allowances;
 
-
-  String get balance => _balance??"0";
+  String get balance => _balance ?? "0";
 
   set balance(String? value) {
     _balance = value;
@@ -29,7 +27,7 @@ class CryptoCurrency extends Token {
     required String logoPath,
   }) : super(name, symbol, logoPath);
 
-  String get allowances => _allowances??"0";
+  String get allowances => _allowances ?? "0";
 
   set allowances(String? value) {
     _allowances = value;

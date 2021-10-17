@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:floor/floor.dart';
 import 'package:web3dart/web3dart.dart';
 
-enum TransactionType{APPROVE, SWAP, BUY, SELL, SEND, CANCEL, SPEEDUP}
+enum TransactionType { APPROVE, SWAP, BUY, SELL, SEND, CANCEL, SPEEDUP }
 
 @entity
 class DbTransaction {
@@ -33,11 +33,17 @@ class DbTransaction {
   @ignore
   BlockNum? blockNum;
 
+  DbTransaction(
+      {this.id,
+      required this.walletAddress,
+      required this.chainId,
+      required this.hash,
+      required this.type,
+      required this.title,
+      this.isSuccess});
 
-  DbTransaction({this.id, required this.walletAddress, required this.chainId, required this.hash, required this.type, required this.title, this.isSuccess});
-
-  String getTitle(){
-    switch(type){
+  String getTitle() {
+    switch (type) {
       case 0:
         return "APPROVE: ${title}";
       case 1:
@@ -54,9 +60,5 @@ class DbTransaction {
         return "SPEED UP: ${title}";
     }
     return "";
-  }
-
-  getDate(Web3Client web3client){
-
   }
 }

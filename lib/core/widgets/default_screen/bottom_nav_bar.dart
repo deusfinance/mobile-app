@@ -1,8 +1,7 @@
-import 'package:deus_mobile/routes/navigation_item.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
-import 'package:flutter/cupertino.dart';
+import '../../../routes/navigation_item.dart';
+import '../../../routes/navigation_service.dart';
+import '../../../statics/my_colors.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -19,7 +18,9 @@ class MyBottomNavBar extends StatelessWidget {
           )),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: NavigationItem.items.map((item) => _buildNavItem(item, context)).toList()),
+          children: NavigationItem.items
+              .map((item) => _buildNavItem(item, context))
+              .toList()),
     );
   }
 
@@ -27,7 +28,8 @@ class MyBottomNavBar extends StatelessWidget {
     return InkWell(
         onTap: () {
           locator<NavigationService>().selectedNavItem = item;
-          locator<NavigationService>().navigateTo(item.routeUrl, context, replaceAll: true);
+          locator<NavigationService>()
+              .navigateTo(item.routeUrl, context, replaceAll: true);
         },
         child: Container(
           child: Column(
@@ -40,11 +42,13 @@ class MyBottomNavBar extends StatelessWidget {
                         fontFamily: MyStyles.kFontFamily,
                         fontWeight: FontWeight.w300,
                         fontSize: MyStyles.S5,
-                        foreground: Paint()..shader = _getGradient(item).createShader(Rect.fromLTRB(0, 0, 50, 30)))
+                        foreground: Paint()
+                          ..shader = _getGradient(item)
+                              .createShader(const Rect.fromLTRB(0, 0, 50, 30)))
                     : MyStyles.bottomNavBarUnSelectedStyle,
               ),
               Container(
-                  margin: EdgeInsets.only(top: 8, bottom: 8),
+                  margin: const EdgeInsets.only(top: 8, bottom: 8),
                   height: 3.0,
                   width: (MediaQuery.of(context).size.width - 50) / 4,
                   decoration: locator<NavigationService>().isSelected(item)
@@ -58,7 +62,7 @@ class MyBottomNavBar extends StatelessWidget {
   Decoration _getDecoration(NavigationItem item) {
     if (item.style == NavigationStyle.GreenBlue)
       return MyStyles.greenToBlueDecoration;
-    else if(item.style == NavigationStyle.BlueGreen)
+    else if (item.style == NavigationStyle.BlueGreen)
       return MyStyles.blueToGreenDecoration;
     else
       return MyStyles.blueToPurpleDecoration;
@@ -67,7 +71,7 @@ class MyBottomNavBar extends StatelessWidget {
   Gradient _getGradient(NavigationItem item) {
     if (item.style == NavigationStyle.GreenBlue)
       return MyColors.greenToBlueGradient;
-    else if(item.style == NavigationStyle.BlueGreen)
+    else if (item.style == NavigationStyle.BlueGreen)
       return MyColors.blueToGreenGradient;
     else
       return MyColors.blueToPurpleGradient;

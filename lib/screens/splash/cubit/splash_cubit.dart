@@ -27,7 +27,7 @@ class SplashCubit extends Cubit<SplashState> {
       return false;
     }
 
-    emit(SplashSuccess());
+    emit(const SplashSuccess());
     return true;
   }
 }

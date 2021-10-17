@@ -1,8 +1,6 @@
+import 'stock_price_detail.dart';
 
-
-import 'package:deus_mobile/models/synthetics/stock_price_detail.dart';
-
-class StockPrice{
+class StockPrice {
   StockPriceDetail long;
   StockPriceDetail short;
 

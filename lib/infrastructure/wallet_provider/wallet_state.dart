@@ -1,6 +1,4 @@
-
-
-import 'package:deus_mobile/models/wallet/wallet.dart';
+import '../../models/wallet/wallet.dart';
 
 abstract class WalletAction {}
 
@@ -31,10 +29,10 @@ Wallet reducer(Wallet state, WalletAction action) {
 
   if (action is BalanceUpdated) {
     return state.rebuild((b) => b
-      ..loading = false
-      ..ethBalance = action.ethBalance
-      // ..tokenBalance = action.tokenBalance
-      );
+          ..loading = false
+          ..ethBalance = action.ethBalance
+        // ..tokenBalance = action.tokenBalance
+        );
   }
 
   return state;

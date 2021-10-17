@@ -1,7 +1,7 @@
 Map<Duration, String> durationTimeSpan = {
-  Duration(hours: 1): 'Past Hour',
-  Duration(days: 1): 'Past Day',
-  Duration(days: 7): 'Past Week',
-  Duration(days: 30): 'Past Month',
-  Duration(days: 365): 'Past Year',
+  const Duration(hours: 1): 'Past Hour',
+  const Duration(days: 1): 'Past Day',
+  const Duration(days: 7): 'Past Week',
+  const Duration(days: 30): 'Past Month',
+  const Duration(days: 365): 'Past Year',
 };

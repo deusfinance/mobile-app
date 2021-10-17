@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class DarkButton extends StatelessWidget {
@@ -25,7 +25,7 @@ class DarkButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
             splashColor: Colors.grey[600],
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Center(
                 child: Text(label!, style: labelStyle),
               ),

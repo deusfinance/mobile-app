@@ -1,14 +1,13 @@
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:flutter/cupertino.dart';
+import 'my_colors.dart';
 import 'package:flutter/material.dart';
 
 class MyStyles {
   static final ThemeData theme = ThemeData(
     primarySwatch: Colors.blue,
     fontFamily: MyStyles.kFontFamily,
-    backgroundColor: Color(MyColors.Background),
+    backgroundColor: const Color(MyColors.Background),
     brightness: Brightness.dark,
-    canvasColor: Color(MyColors.Background),
+    canvasColor: const Color(MyColors.Background),
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
@@ -112,23 +111,25 @@ class MyStyles {
       color: Colors.transparent,
       decoration: TextDecoration.underline,
       decorationColor: MyColors.White,
-      shadows: [Shadow(color: MyColors.White, offset: Offset(0, -5))]);
+      shadows: [Shadow(color: MyColors.White, offset: const Offset(0, -5))]);
 
   static final unselectedToggleButtonTextStyle = TextStyle(
       fontFamily: kFontFamily,
       fontWeight: FontWeight.w300,
       fontSize: S5,
       color: Colors.transparent,
-      shadows: [Shadow(color: MyColors.HalfWhite, offset: Offset(0, -5))]);
+      shadows: [
+        Shadow(color: MyColors.HalfWhite, offset: const Offset(0, -5))
+      ]);
 
   static TextStyle gradientMediumTextStyle = TextStyle(
       fontFamily: kFontFamily,
       fontWeight: FontWeight.w300,
       fontSize: S4,
       foreground: Paint()
-        ..shader = LinearGradient(
+        ..shader = const LinearGradient(
           colors: <Color>[Color(0xff0779E4), Color(0xff1DD3BD)],
-        ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
+        ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)));
 
   static final whiteMediumUnderlinedTextStyle = TextStyle(
     fontFamily: kFontFamily,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +17,7 @@ class WalletSetupProvider extends ContextProviderWidget<WalletSetupHandler> {
   @override
   Widget build(BuildContext context) {
     final store = useReducer<WalletSetup, WalletSetupAction>(reducer,
-        initialState: WalletSetup());
+        initialState: WalletSetup(), initialAction: WalletSetupStarted());
 
     final addressService = locator<AddressService>();
     final handler = useMemoized(
@@ -31,7 +30,7 @@ class WalletSetupProvider extends ContextProviderWidget<WalletSetupHandler> {
 }
 
 WalletSetupHandler useWalletSetup(BuildContext context) {
-  var handler = Provider.of<WalletSetupHandler>(context);
+  final handler = Provider.of<WalletSetupHandler>(context);
 
   return handler;
 }

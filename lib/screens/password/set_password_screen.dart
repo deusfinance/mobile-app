@@ -1,31 +1,30 @@
-import 'package:deus_mobile/locator.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/routes/route_generator.dart';
-import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/screens/wallet_intro_screen/intro_page.dart';
-import 'package:deus_mobile/screens/wallet_intro_screen/widgets/form/paper_input.dart';
-import 'package:deus_mobile/service/config_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
-import 'package:flutter/cupertino.dart';
+import '../../locator.dart';
+import '../../routes/navigation_service.dart';
+import '../swap/swap_screen.dart';
+import '../wallet_intro_screen/intro_page.dart';
+import '../wallet_intro_screen/widgets/form/paper_input.dart';
+import '../../service/config_service.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class SetPasswordScreen extends StatefulWidget {
-  static var url = '/set_password';
+  static String url = '/set_password';
 
   @override
   _SetPasswordScreenState createState() => _SetPasswordScreenState();
 }
 
 class _SetPasswordScreenState extends State<SetPasswordScreen> {
-  var passwordController;
-  var repeatPasswordController;
+  late TextEditingController passwordController;
+  late TextEditingController repeatPasswordController;
   late ConfigurationService configurationService;
   late bool error;
   late String errorText;
 
-  final darkGrey = Color(0xFF1C1C1C);
-  final LinearGradient button_gradient = LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
+  final darkGrey = const Color(0xFF1C1C1C);
+  final LinearGradient button_gradient =
+      const LinearGradient(colors: [Color(0xFF0779E4), Color(0xFF1DD3BD)]);
 
   @override
   void initState() {
@@ -36,18 +35,20 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
     configurationService = locator<ConfigurationService>();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
-            children: [
-              _buildHeader(),
-              SizedBox(height: 150,),
-              _buildInput(),
-
-            ],
-          ),
+          children: [
+            _buildHeader(),
+            const SizedBox(
+              height: 150,
+            ),
+            _buildInput(),
+          ],
+        ),
       ),
     );
   }
@@ -57,27 +58,27 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        SizedBox(height: 50),
-        Text(
+        const SizedBox(height: 50),
+        const Text(
           'Set your password',
           style: TextStyle(fontSize: 25),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 50),
           child: Text(
             'Choose a strong password for your DEUS finance app on your device to ensure security.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 50),
           child: Text(
             'This will be your password to enter the app. It\'s the only way to log in and can\'t be recovered.',
             textAlign: TextAlign.center,
@@ -90,13 +91,13 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
 
   _buildInput() {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 15, bottom: 5),
+          const Padding(
+            padding: EdgeInsets.only(left: 15, bottom: 5),
             child: Text(
               'Password',
               style: TextStyle(fontSize: 12),
@@ -114,9 +115,11 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
               controller: passwordController,
             ),
           ),
-          SizedBox(height: 16,),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, bottom: 5),
+          const SizedBox(
+            height: 16,
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 15, bottom: 5),
             child: Text(
               'Repeat Password',
               style: TextStyle(fontSize: 12),
@@ -135,16 +138,22 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
             ),
           ),
           _buildErrorText(),
-          SizedBox(height: 30,),
+          const SizedBox(
+            height: 30,
+          ),
           Container(
-            decoration:
-            BoxDecoration(gradient: button_gradient, borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
+            decoration: BoxDecoration(
+                gradient: button_gradient,
+                borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
             height: 55,
             width: double.infinity,
-            child: RaisedButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
-              color: Colors.transparent,
-              child: Text(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(MyStyles.cardRadiusSize)),
+              ),
+              child: const Text(
                 "Set Password",
                 style: TextStyle(fontSize: 20, color: Colors.black),
               ),
@@ -160,30 +169,31 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
 
   Future<void> checkPassword() async {
     //TODO check password
-    if(passwordController.text==""){
+    if (passwordController.text == "") {
       setState(() {
         error = true;
         errorText = "password is empty";
       });
-    }else if(passwordController.text != repeatPasswordController.text){
+    } else if (passwordController.text != repeatPasswordController.text) {
       setState(() {
         error = true;
         errorText = "passwords do not match";
       });
-    }else{
+    } else {
       setState(() {
         error = false;
       });
-      configurationService.setPassword(passwordController.text);
+      await configurationService.setPassword(passwordController.text);
       await configurationService.setupPasswordDone(true);
 
       if (locator<ConfigurationService>().didSetupWallet()) {
-        locator<NavigationService>().navigateTo(SwapScreen.route, context, replaceAll: true);
+        await locator<NavigationService>()
+            .navigateTo(SwapScreen.route, context, replaceAll: true);
       } else {
-        locator<NavigationService>().navigateTo(IntroPage.url, context, replaceAll: true);
+        await locator<NavigationService>()
+            .navigateTo(IntroPage.url, context, replaceAll: true);
       }
     }
-
   }
 
   _buildErrorText() {

@@ -1,19 +1,16 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/default_screen/sync_chain_selector.dart';
-import 'package:deus_mobile/core/widgets/toast.dart';
-import 'package:deus_mobile/core/widgets/token_selector/bsc_stock_selector_screen/bsc_stock_selector_screen.dart';
-import 'package:deus_mobile/core/widgets/token_selector/heco_stock_selector_screen/bsc_stock_selector_screen.dart';
-import 'package:deus_mobile/core/widgets/token_selector/matic_stock_selector_screen/matic_stock_selector_screen.dart';
-import 'package:deus_mobile/core/widgets/token_selector/stock_selector_screen/stock_selector_screen.dart';
-import 'package:deus_mobile/data_source/sync_data/matic_stock_data.dart';
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/synthetics/stock.dart';
-import 'package:deus_mobile/screens/confirm_gas/confirm_gas.dart';
-import 'package:deus_mobile/screens/synthetics/synthetics_state.dart';
+import '../../../core/widgets/default_screen/default_screen.dart';
+import '../../../core/widgets/default_screen/sync_chain_selector.dart';
+import '../../../core/widgets/toast.dart';
+import '../../../core/widgets/token_selector/matic_stock_selector_screen/matic_stock_selector_screen.dart';
+import '../../../data_source/sync_data/matic_stock_data.dart';
+import '../../../models/swap/crypto_currency.dart';
+import '../../../models/swap/gas.dart';
+import '../../../models/synthetics/stock.dart';
+import '../../confirm_gas/confirm_gas.dart';
+import '../synthetics_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -109,7 +106,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       child: BlocBuilder<MaticSyntheticsCubit, SyntheticsState>(
           builder: (context, state) {
         if (state is SyntheticsLoadingState) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (state is SyntheticsErrorState) {
@@ -124,16 +121,14 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
   }
 
   Future<Gas?> showConfirmGasFeeDialog(Transaction transaction) async {
-    Gas? res = await showGeneralDialog(
+    final Gas? res = await showGeneralDialog(
       context: context,
       barrierColor: Colors.black38,
       barrierLabel: "Barrier",
       pageBuilder: (_, __, ___) => Align(
           alignment: Alignment.center,
           child: ConfirmGasScreen(
-            transaction: transaction,
-              network: Network.MATIC
-          )),
+              transaction: transaction, network: Network.MATIC)),
       barrierDismissible: true,
       transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
         filter:
@@ -143,7 +138,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
           opacity: anim1,
         ),
       ),
-      transitionDuration: Duration(milliseconds: 10),
+      transitionDuration: const Duration(milliseconds: 10),
     );
     return res;
   }
@@ -153,20 +148,25 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       enablePullDown: true,
       controller: state.refreshController,
       onRefresh: context.read<MaticSyntheticsCubit>().refresh,
-      header: BezierHeader(child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-        child: Center(child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text("Release to Refresh", style: MyStyles.lightWhiteSmallTextStyle,),
-              Icon(Icons.refresh_sharp),
-            ],
-          ),
-        )),
-      ),),
-
+      header: BezierHeader(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  "Release to Refresh",
+                  style: MyStyles.lightWhiteSmallTextStyle,
+                ),
+                const Icon(Icons.refresh_sharp),
+              ],
+            ),
+          )),
+        ),
+      ),
       child: Container(
-        padding: EdgeInsets.all(MyStyles.mainPadding * 1.5),
+        padding: const EdgeInsets.all(MyStyles.mainPadding * 1.5),
         decoration: BoxDecoration(color: MyColors.Main_BG_Black),
         child: Stack(
           children: [
@@ -185,19 +185,21 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
   }
 
   Widget _buildUserInput(SyntheticsState state) {
-    SwapField fromField = new SwapField(
+    final SwapField fromField = new SwapField(
         direction: Direction.from,
         initialToken: state.fromToken,
         syncData: state.syncData as MaticStockData,
         selectAssetRoute: MaticStockSelectorScreen.url,
         controller: state.fromFieldController,
         tokenSelected: (selectedToken) async {
-          context.read<MaticSyntheticsCubit>().fromTokenChanged(selectedToken);
+          await context
+              .read<MaticSyntheticsCubit>()
+              .fromTokenChanged(selectedToken);
         });
 
     // context.read<MaticSyntheticsCubit>().addListenerToFromField();
 
-    SwapField toField = new SwapField(
+    final SwapField toField = new SwapField(
       direction: Direction.to,
       initialToken: state.toToken,
       controller: state.toFieldController,
@@ -233,7 +235,9 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
               children: [
                 Text(
                   state.isPriceRatioForward
+                      // ignore: unnecessary_null_comparison
                       ? "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.fromToken != null ? state.fromToken.symbol : "asset name"} per ${state.toToken != null ? state.toToken!.symbol : "asset name"}"
+                      // ignore: unnecessary_null_comparison
                       : "${context.read<MaticSyntheticsCubit>().getPriceRatio()} ${state.toToken != null ? state.toToken!.symbol : "asset name"} per ${state.fromToken != null ? state.fromToken.symbol : "asset name"}",
                   style: MyStyles.whiteSmallTextStyle,
                 ),
@@ -242,7 +246,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
                     context.read<MaticSyntheticsCubit>().reversePriceRatio();
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 4.0),
+                    margin: const EdgeInsets.only(left: 4.0),
                     child: PlatformSvg.asset("images/icons/exchange.svg",
                         width: 15),
                   ),
@@ -257,7 +261,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         Opacity(
             opacity: state.isInProgress ? 0.5 : 1,
             child: _buildMainButton(state)),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         _buildRemainingCapacity(state),
@@ -269,7 +273,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     if (state.marketClosed) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -284,7 +288,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     if (state is SyntheticsSelectAssetState) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -300,12 +304,13 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       return FilledGradientSelectionButton(
         label: 'Approve',
         onPressed: () async {
-          Transaction? transaction =
-              await context.read<MaticSyntheticsCubit>().makeApproveTransaction();
+          final Transaction? transaction = await context
+              .read<MaticSyntheticsCubit>()
+              .makeApproveTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<MaticSyntheticsCubit>().approve(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<MaticSyntheticsCubit>().approve(gas);
           }
         },
         gradient: MyColors.blueToPurpleGradient,
@@ -317,7 +322,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
             double.tryParse(state.fromFieldController.text) == 0)) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -341,7 +346,7 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
             state.fromFieldController.text, state.fromToken.getTokenName())) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: MyStyles.darkWithNoBorderDecoration,
         child: Align(
           alignment: Alignment.center,
@@ -357,20 +362,20 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
       label: state.fromToken == CurrencyData.dai ? 'Buy' : 'Sell',
       onPressed: () async {
         if (state.fromToken == CurrencyData.dai) {
-          Transaction? transaction =
+          final Transaction? transaction =
               await context.read<MaticSyntheticsCubit>().makeBuyTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<MaticSyntheticsCubit>().buy(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<MaticSyntheticsCubit>().buy(gas);
           }
         } else {
-          Transaction? transaction =
+          final Transaction? transaction =
               await context.read<MaticSyntheticsCubit>().makeSellTransaction();
           WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
           if (transaction != null) {
-            Gas? gas = await showConfirmGasFeeDialog(transaction);
-            context.read<MaticSyntheticsCubit>().sell(gas);
+            final Gas? gas = await showConfirmGasFeeDialog(transaction);
+            await context.read<MaticSyntheticsCubit>().sell(gas);
           }
         }
       },
@@ -392,10 +397,9 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
     return SizedBox(
 //      width: getScreenWidth(context) - (SynchronizerScreen.kPadding * 2),
       child: MarketTimer(
-        timerColor:
-            state.marketTimerClosed
-                ? const Color(0xFFD40000)
-                : const Color(0xFF00D16C),
+        timerColor: state.marketTimerClosed
+            ? const Color(0xFFD40000)
+            : const Color(0xFF00D16C),
         onEnd: context.read<MaticSyntheticsCubit>().marketTimerFinished(),
         label: state.marketTimerClosed
             ? 'UNTIL TRADING OPENS'
@@ -469,15 +473,15 @@ class _MaticSyntheticsScreenState extends State<MaticSyntheticsScreen> {
         "Remaining Synchronize Capacity",
         style: MyStyles.lightWhiteSmallTextStyle,
       ),
-      Spacer(),
+      const Spacer(),
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircleAvatar(
+          const CircleAvatar(
               radius: 12,
               backgroundImage:
                   provider.Svg("assets/images/currencies/usdc.svg")),
-          SizedBox(
+          const SizedBox(
             width: 6,
           ),
           FutureBuilder(

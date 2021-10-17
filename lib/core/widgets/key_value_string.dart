@@ -1,8 +1,5 @@
-import 'package:deus_mobile/statics/my_colors.dart';
+import '../../statics/my_colors.dart';
 import 'package:flutter/material.dart';
-
-
-
 
 class KeyValueString extends StatelessWidget {
   final String keyStr;

@@ -7,7 +7,7 @@
 
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:tweetnacl/tweetnacl.dart' as ED25519;
+import 'package:pinenacl/ed25519.dart' as ED25519;
 import 'package:pointycastle/digests/sha512.dart';
 import 'package:pointycastle/macs/hmac.dart';
 import 'package:pointycastle/api.dart';
@@ -38,7 +38,7 @@ class _HDKey {
   }
 
   KeyData _getCKDPriv(KeyData data, int index) {
-    Uint8List dataBytes = Uint8List(37);
+    final Uint8List dataBytes = Uint8List(37);
     dataBytes[0] = 0x00;
     dataBytes.setRange(1, 33, data.key!);
     dataBytes.buffer.asByteData().setUint32(33, index);
@@ -47,18 +47,21 @@ class _HDKey {
 
   KeyData getMasterKeyFromSeed(String seed) {
     final seedBytes = HEX.decode(seed);
-    return this._getKeys(Uint8List.fromList(seedBytes), Uint8List.fromList(_HDKey._curveBytes));
+    return this._getKeys(
+        Uint8List.fromList(seedBytes), Uint8List.fromList(_HDKey._curveBytes));
   }
 
-  Uint8List getBublickKey(Uint8List privateKey, [bool withZeroByte = true]) {
-    final signature = ED25519.Signature.keyPair_fromSeed(privateKey);
+  Uint8List getPublicKey(Uint8List privateKey, [bool withZeroByte = true]) {
+    final ED25519.SigningKey signature = ED25519.SigningKey(seed: privateKey);
+    final Uint8List dataBytes = Uint8List(33);
     if (withZeroByte == true) {
-      Uint8List dataBytes = Uint8List(33);
       dataBytes[0] = 0x00;
       dataBytes.setRange(1, 33, signature.publicKey);
       return dataBytes;
     } else {
-      return signature.publicKey;
+      // return signature.publicKey;
+      dataBytes.setRange(0, 33, signature.publicKey);
+      return dataBytes;
     }
   }
 
@@ -66,12 +69,12 @@ class _HDKey {
     if (!_HDKey._pathRegex.hasMatch(path))
       throw ArgumentError(
           "Invalid derivation path. Expected BIP32 path format");
-    KeyData master = this.getMasterKeyFromSeed(seed);
+    final KeyData master = this.getMasterKeyFromSeed(seed);
     List<String> segments = path.split('/');
     segments = segments.sublist(1);
 
     return segments.fold<KeyData>(master, (prevKeyData, indexStr) {
-      int index = int.parse(indexStr.substring(0, indexStr.length - 1));
+      final int index = int.parse(indexStr.substring(0, indexStr.length - 1));
       return this._getCKDPriv(prevKeyData, index + HARDENED_OFFSET);
     });
   }

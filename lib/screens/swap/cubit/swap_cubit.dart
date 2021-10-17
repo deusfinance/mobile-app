@@ -1,20 +1,19 @@
 import 'dart:async';
 
-import 'package:deus_mobile/core/database/database.dart';
-import 'package:deus_mobile/core/database/transaction.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/locator.dart';
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/token.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/screens/swap/cubit/swap_state.dart';
-import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/service/address_service.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
-import 'package:deus_mobile/statics/statics.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import '../../../core/database/database.dart';
+import '../../../core/database/transaction.dart';
+import '../../../core/database/wallet_asset.dart';
+import '../../../data_source/currency_data.dart';
+import '../../../locator.dart';
+import '../../../models/swap/crypto_currency.dart';
+import '../../../models/swap/gas.dart';
+import '../../../models/token.dart';
+import '../../../models/transaction_status.dart';
+import 'swap_state.dart';
+import '../../../service/address_service.dart';
+import '../../../service/ethereum_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stream_transform/stream_transform.dart';
@@ -23,7 +22,7 @@ import 'package:web3dart/web3dart.dart';
 class SwapCubit extends Cubit<SwapState> {
   SwapCubit() : super(SwapInitial());
 
-  init({SwapState? swapState}) async {
+  Future<void> init({SwapState? swapState}) async {
     if (swapState != null) {
       swapState.refreshController = RefreshController(initialRefresh: false);
       addListenerToFromField(swapState);
@@ -37,7 +36,7 @@ class SwapCubit extends Cubit<SwapState> {
     }
   }
 
-  fromTokenChanged(Token selectedToken) async {
+  void fromTokenChanged(Token selectedToken) async {
     if (state.toToken.getTokenName() == selectedToken.getTokenName()) {
       if (selectedToken.getTokenName() == "eth") {
         state.toToken = CurrencyData.deus;
@@ -57,7 +56,7 @@ class SwapCubit extends Cubit<SwapState> {
     emit(SwapLoaded(state, fromToken: state.fromToken));
   }
 
-  toTokenChanged(Token selectedToken) async {
+  Future<void> toTokenChanged(Token selectedToken) async {
     bool fromTokenChanged = false;
     if (selectedToken.getTokenName() == state.fromToken.getTokenName()) {
       fromTokenChanged = true;
@@ -74,15 +73,15 @@ class SwapCubit extends Cubit<SwapState> {
     state.toToken.balance = await getTokenBalance(selectedToken);
     emit(SwapLoading(state));
     emit(SwapLoaded(state, toToken: selectedToken));
-    if (fromTokenChanged) getAllowances();
+    if (fromTokenChanged) await getAllowances();
   }
 
-  approve(Gas? gas) async {
+  Future<void> approve(Gas? gas) async {
     if (!state.isInProgress) {
       if (gas != null) {
         DbTransaction? transaction;
         try {
-          var res = await state.swapService
+          final res = await state.swapService
               .approve(state.fromToken.getTokenName(), gas);
 
           emit(TransactionPendingState(state,
@@ -99,11 +98,11 @@ class SwapCubit extends Cubit<SwapState> {
               hash: res,
               type: TransactionType.APPROVE.index,
               title: state.fromToken.symbol);
-          List<int> ids = await state.database!.transactionDao
+          final List<int> ids = await state.database!.transactionDao
               .insertDbTransaction([transaction]);
           transaction.id = ids[0];
 
-          Stream<TransactionReceipt> result =
+          final Stream<TransactionReceipt> result =
               state.swapService.ethService.pollTransactionReceipt(res);
           result.listen((event) async {
             state.approved = event.status!;
@@ -127,12 +126,13 @@ class SwapCubit extends Cubit<SwapState> {
             await state.database!.transactionDao
                 .updateDbTransactions([transaction]);
           });
-        } on Exception catch (value) {
+        } on Exception {
           state.approved = false;
 
           if (transaction != null) {
             transaction.isSuccess = false;
-            state.database!.transactionDao.updateDbTransactions([transaction]);
+            await state.database!.transactionDao
+                .updateDbTransactions([transaction]);
           } else {
             transaction = new DbTransaction(
                 walletAddress:
@@ -141,7 +141,7 @@ class SwapCubit extends Cubit<SwapState> {
                 hash: "",
                 type: TransactionType.APPROVE.index,
                 title: state.fromToken.symbol);
-            List<int> ids = await state.database!.transactionDao
+            final List<int> ids = await state.database!.transactionDao
                 .insertDbTransaction([transaction]);
             transaction.id = ids[0];
           }
@@ -175,7 +175,7 @@ class SwapCubit extends Cubit<SwapState> {
       if (gas != null) {
         DbTransaction? transaction;
         try {
-          var res = await state.swapService.swapTokens(
+          final res = await state.swapService.swapTokens(
               state.fromToken.getTokenName(),
               state.toToken.getTokenName(),
               state.fromFieldController.text,
@@ -189,36 +189,36 @@ class SwapCubit extends Cubit<SwapState> {
                   "Transaction Pending",
                   res)));
 
-
           transaction = new DbTransaction(
-              walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
+              walletAddress:
+                  (await locator<AddressService>().getPublicAddress()).hex,
               chainId: 1,
               hash: res,
               type: TransactionType.SWAP.index,
               title: "${state.fromToken.symbol} to ${state.toToken.symbol}");
-          List<int> ids = await state.database!.transactionDao
+          final List<int> ids = await state.database!.transactionDao
               .insertDbTransaction([transaction]);
           transaction.id = ids[0];
 
-          Stream<TransactionReceipt> result =
+          final Stream<TransactionReceipt> result =
               state.swapService.ethService.pollTransactionReceipt(res);
           result.listen((event) async {
             transaction!.isSuccess = event.status;
-            int ids = await state.database!.transactionDao
+            await state.database!.transactionDao
                 .updateDbTransactions([transaction]);
 
             if (event.status!) {
-              String fromBalance = await getTokenBalance(state.fromToken);
-              String toBalance = await getTokenBalance(state.toToken);
+              final String fromBalance = await getTokenBalance(state.fromToken);
+              final String toBalance = await getTokenBalance(state.toToken);
               state.fromToken.balance = fromBalance;
               state.toToken.balance = toBalance;
 
               //TODO
-              String walletAddress =
+              final String walletAddress =
                   (await locator<AddressService>().getPublicAddress()).hex;
-              String tokenAddress = await state.swapService.ethService
+              final String tokenAddress = await state.swapService.ethService
                   .getTokenAddrHex(state.toToken.getTokenName(), "token");
-              WalletAsset? ws = await state.database!.walletAssetDao
+              final WalletAsset? ws = await state.database!.walletAssetDao
                   .getWalletAsset(1, tokenAddress, walletAddress);
 
               if (ws == null) {
@@ -229,7 +229,7 @@ class SwapCubit extends Cubit<SwapState> {
                   }
                 });
                 if (cryptoCurrency != null) {
-                  WalletAsset walletAsset = new WalletAsset(
+                  final WalletAsset walletAsset = new WalletAsset(
                       walletAddress:
                           (await locator<AddressService>().getPublicAddress())
                               .hex,
@@ -257,23 +257,22 @@ class SwapCubit extends Cubit<SwapState> {
                       "Transaction Failed",
                       res)));
             }
-
           });
-        } on Exception catch (error) {
-
+        } on Exception {
           if (transaction != null) {
             transaction.isSuccess = false;
-            int ids = await state.database!.transactionDao
+            await state.database!.transactionDao
                 .updateDbTransactions([transaction]);
           } else {
             transaction = new DbTransaction(
-                walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
+                walletAddress:
+                    (await locator<AddressService>().getPublicAddress()).hex,
                 chainId: 1,
                 hash: "",
                 isSuccess: false,
                 type: TransactionType.SELL.index,
                 title: "${state.fromToken.symbol} to ${state.toToken.symbol}");
-            List<int> ids = await state.database!.transactionDao
+            final List<int> ids = await state.database!.transactionDao
                 .insertDbTransaction([transaction]);
             transaction.id = ids[0];
           }
@@ -296,8 +295,8 @@ class SwapCubit extends Cubit<SwapState> {
     return await state.swapService.getTokenBalance(token.getTokenName());
   }
 
-  reverseSwap() {
-    CryptoCurrency a = state.fromToken;
+  void reverseSwap() {
+    final CryptoCurrency a = state.fromToken;
     state.fromToken = state.toToken;
     state.toToken = a;
     state.fromFieldController.text = "";
@@ -306,18 +305,18 @@ class SwapCubit extends Cubit<SwapState> {
     getAllowances();
   }
 
-  reversePriceRatio() {
+  void reversePriceRatio() {
     emit(SwapLoaded(state, isPriceRatioForward: !state.isPriceRatioForward));
   }
 
-  setSlippage(double s) {
+  void setSlippage(double s) {
     state.slippageController.text = "";
     emit(SwapLoaded(state, slippage: s));
   }
 
   String getPriceRatio() {
-    double a = double.tryParse(state.fromFieldController.text) ?? 0;
-    double b = state.toValue;
+    final double a = double.tryParse(state.fromFieldController.text) ?? 0;
+    final double b = state.toValue;
     if (a != 0 && b != 0) {
       if (state.isPriceRatioForward)
         return EthereumService.formatDouble((a / b).toString(), 5);
@@ -326,7 +325,7 @@ class SwapCubit extends Cubit<SwapState> {
     return "0.0";
   }
 
-  addListenerToFromField(SwapState s) {
+  void addListenerToFromField(SwapState s) {
     s.fromFieldController =
         new TextEditingController(text: s.fromFieldController.text);
     s.toFieldController =
@@ -334,11 +333,11 @@ class SwapCubit extends Cubit<SwapState> {
     s.streamController = new StreamController();
     s.fromFieldController.addListener(listenInput);
     s.streamController.stream
-        .debounce(Duration(milliseconds: 500))
+        .debounce(const Duration(milliseconds: 500))
         .listen((s) async {
       emit(SwapLoaded(state, isInProgress: true));
       if (double.tryParse(s)! > 0) {
-        state.swapService
+        await state.swapService
             .getAmountsOut(
                 state.fromToken.getTokenName(), state.toToken.getTokenName(), s)
             .then((value) {
@@ -353,13 +352,14 @@ class SwapCubit extends Cubit<SwapState> {
     });
   }
 
-  addListenerToSlippageController() {
+  void addListenerToSlippageController() {
+    // ignore: invalid_use_of_protected_member
     if (!state.slippageController.hasListeners) {
       state.slippageController.addListener(() {
         try {
-          double slippage = double.parse(state.slippageController.text);
+          final double slippage = double.parse(state.slippageController.text);
           emit(SwapLoaded(state, slippage: slippage));
-        } on Exception catch (value) {
+        } on Exception {
           emit(SwapLoaded(state, slippage: 0.5));
         }
       });
@@ -368,25 +368,25 @@ class SwapCubit extends Cubit<SwapState> {
 
   Future<double> computePriceImpact() async {
     try {
-      double x = double.parse(await state.swapService.getAmountsOut(
+      final double x = double.parse(await state.swapService.getAmountsOut(
           state.fromToken.getTokenName(), state.toToken.getTokenName(), "0.1"));
-      double r = 0.1;
-      double input = double.tryParse(state.fromFieldController.text) ?? 0;
-      double y = state.toValue;
+      const double r = 0.1;
+      final double input = double.tryParse(state.fromFieldController.text) ?? 0;
+      final double y = state.toValue;
 
       double v = 1.0;
       if (input != 0) {
         v = y / (x * (input / r));
       }
       return double.parse(((1.0 - v) * 100.0).toStringAsFixed(3));
-    } on Exception catch (value) {
+    } on Exception {
       return 0.0;
     }
   }
 
-  listenInput() async {
-    String input = state.fromFieldController.text;
-    if (input == null || input.isEmpty) {
+  void listenInput() async {
+    String? input = state.fromFieldController.text;
+    if (input.isEmpty) {
       input = "0.0";
     }
     if (state.fromToken.getAllowances() >=
@@ -400,15 +400,16 @@ class SwapCubit extends Cubit<SwapState> {
   }
 
   Future<Transaction?> makeTransaction() async {
-    Transaction? transaction = await state.swapService.makeSwapTransaction(
-        state.fromToken.getTokenName(),
-        state.toToken.getTokenName(),
-        state.fromFieldController.text,
-        ((1 - getSlippage()) * state.toValue).toString());
+    final Transaction? transaction = await state.swapService
+        .makeSwapTransaction(
+            state.fromToken.getTokenName(),
+            state.toToken.getTokenName(),
+            state.fromFieldController.text,
+            ((1 - getSlippage()) * state.toValue).toString());
     return transaction;
   }
 
-  fetchBalances() async {
+  Future<void> fetchBalances() async {
     state.fromToken.balance =
         await state.swapService.getTokenBalance(state.fromToken.getTokenName());
     state.toToken.balance =
@@ -416,7 +417,7 @@ class SwapCubit extends Cubit<SwapState> {
     await getAllowances();
   }
 
-  getAllowances() async {
+  Future<void> getAllowances() async {
     emit(SwapLoaded(state, approved: false, isInProgress: true));
     state.fromToken.allowances =
         await state.swapService.getAllowances(state.fromToken.getTokenName());
@@ -426,14 +427,14 @@ class SwapCubit extends Cubit<SwapState> {
       emit(SwapLoaded(state, approved: false, isInProgress: false));
   }
 
-  getSlippage() {
+  double getSlippage() {
     return state.slippage / 100;
   }
 
   Future<List<Token>> getRoute() async {
-    List<String> value = await state.swapService
+    final List<String> value = await state.swapService
         .getPath(state.fromToken.getTokenName(), state.toToken.getTokenName());
-    List<Token> r = [];
+    final List<Token> r = [];
     value.forEach((addr) {
       r.add(EthereumService.addressToTokenMap[addr.toLowerCase()]!);
     });
@@ -448,12 +449,12 @@ class SwapCubit extends Cubit<SwapState> {
   }
 
   Future<Transaction?> makeApproveTransaction() async {
-    Transaction? transaction = await state.swapService
+    final Transaction? transaction = await state.swapService
         .makeApproveTransaction(state.fromToken.getTokenName());
     return transaction;
   }
 
-  void refresh() async{
+  void refresh() async {
     state.refreshController.refreshCompleted();
     emit(SwapInitial());
     await init();

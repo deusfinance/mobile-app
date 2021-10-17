@@ -1,7 +1,8 @@
-import 'package:deus_mobile/models/swap/crypto_currency.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-class StakeTokenObject{
+import '../swap/crypto_currency.dart';
+
+class StakeTokenObject {
   late double apy;
   late String stakedAmount;
   late String pendingReward;
@@ -10,20 +11,17 @@ class StakeTokenObject{
   CryptoCurrency stakeToken;
   late TextEditingController controller;
 
-
-  StakeTokenObject(this.lockToken, this.stakeToken){
+  StakeTokenObject(this.lockToken, this.stakeToken) {
     this.controller = new TextEditingController();
   }
 
-  bool isValueStaked(){
-    double res = double.tryParse(stakedAmount)!;
-    if(res != null && res>0)
-      return true;
+  bool isValueStaked() {
+    final double? res = double.tryParse(stakedAmount)!;
+    if (res != null && res > 0) return true;
     return false;
   }
 
-  double percOfPool(){
+  double percOfPool() {
     return 0.12;
   }
-
 }

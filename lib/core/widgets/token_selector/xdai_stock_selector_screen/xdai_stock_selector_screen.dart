@@ -1,16 +1,15 @@
 import 'dart:async';
 
-import 'package:deus_mobile/core/widgets/token_selector/stock_selector.dart';
-import 'package:deus_mobile/data_source/sync_data/xdai_stock_data.dart';
-import 'package:deus_mobile/models/synthetics/stock.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import '../stock_selector.dart';
+import '../../../../data_source/sync_data/xdai_stock_data.dart';
+import '../../../../models/synthetics/stock.dart';
 import 'package:flutter/material.dart';
 
 import '../token_selector.dart';
 
 class XDaiStockSelectorScreen extends StatefulWidget {
   static const url = '/XDaiAssetSelector';
-  XDaiStockData xDaiStockData;
+  final XDaiStockData xDaiStockData;
 
   XDaiStockSelectorScreen(this.xDaiStockData);
 
@@ -25,7 +24,7 @@ class _XDaiStockSelectorScreenState extends State<XDaiStockSelectorScreen> {
 
   @override
   void initState() {
-    stocks  = widget.xDaiStockData.conductedStocks;
+    stocks = widget.xDaiStockData.conductedStocks;
     searchController.addListener(search);
     super.initState();
   }
@@ -39,19 +38,23 @@ class _XDaiStockSelectorScreenState extends State<XDaiStockSelectorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TokenSelector(selector: StockSelector(stocks,widget.xDaiStockData), title: 'Asset', showSearchBar: true, searchController: searchController,),
+      body: TokenSelector(
+        selector: StockSelector(stocks, widget.xDaiStockData),
+        title: 'Asset',
+        showSearchBar: true,
+        searchController: searchController,
+      ),
     );
   }
 
   void search() async {
-    String pattern = searchController.text;
+    final String pattern = searchController.text;
     stocks = await Future.sync(() {
       return widget.xDaiStockData.conductedStocks
           .where((element) =>
               element.symbol.toLowerCase().contains(pattern) ||
               element.name.toLowerCase().contains(pattern))
           .toList();
-
     });
     setState(() {});
   }

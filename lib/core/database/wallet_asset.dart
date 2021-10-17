@@ -1,10 +1,10 @@
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/widgets/svg.dart';
+import '../widgets/svg.dart';
 import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as provider;
 
-@Entity(tableName: 'WalletAsset',
+@Entity(
+  tableName: 'WalletAsset',
   // foreignKeys: [
   //   ForeignKey(
   //     childColumns: ['chain_id'],
@@ -26,7 +26,6 @@ class WalletAsset {
 
   double? valueWhenInserted;
 
-
   @ignore
   String? balance;
 
@@ -38,9 +37,16 @@ class WalletAsset {
   @ignore
   double? value;
 
-
-  WalletAsset({this.id, required this.walletAddress, required this.chainId, required this.tokenAddress, this.tokenSymbol,
-      this.tokenDecimal, this.valueWhenInserted, this.logoPath, this.tokenName});
+  WalletAsset(
+      {this.id,
+      required this.walletAddress,
+      required this.chainId,
+      required this.tokenAddress,
+      this.tokenSymbol,
+      this.tokenDecimal,
+      this.valueWhenInserted,
+      this.logoPath,
+      this.tokenName});
 
   double getValuePercentage() {
     return 12;
@@ -54,10 +60,10 @@ extension PathCheck on String {
   Widget showCircleImage({double radius = 20}) => isNetwork
       ? showCircleNetworkImage()
       : CircleAvatar(
-      radius: radius,
-      backgroundImage: isSvg
-          ? provider.Svg('assets/$this') as ImageProvider
-          : AssetImage('assets/$this'));
+          radius: radius,
+          backgroundImage: isSvg
+              ? provider.Svg('assets/$this') as ImageProvider
+              : AssetImage('assets/$this'));
 
   Widget showCircleNetworkImage({double radius = 20}) =>
       CircleAvatar(radius: radius, backgroundImage: NetworkImage(this));

@@ -1,8 +1,6 @@
-import 'dart:math';
-
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/models/synthetics/contract_input_data.dart';
-import 'package:deus_mobile/service/sync/sync_service.dart';
+import '../../models/swap/gas.dart';
+import '../../models/synthetics/contract_input_data.dart';
+import 'sync_service.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -15,12 +13,12 @@ class StockService extends SyncService {
       : super(ethService, privateKey);
 
   @override
-  Future<String> getAllowances(tokenAddress) async {
+  Future<String> getAllowances(String tokenAddress) async {
     if (tokenAddress !=
         await super.ethService.getTokenAddrHex('dai', 'token')) {
       return "1000000000000000";
     }
-    DeployedContract tokenContract =
+    final DeployedContract tokenContract =
         await ethService.loadContractWithGivenAddress(
             "token", EthereumAddress.fromHex(tokenAddress));
     final res = await ethService.query(tokenContract, "allowance",
@@ -30,24 +28,24 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<String> approve(tokenAddress, gas) async {
-    var amount = "10000000000000000000000000000";
-    DeployedContract tokenContract =
+  Future<String> approve(String tokenAddress, Gas gas) async {
+    const amount = "10000000000000000000000000000";
+    final DeployedContract tokenContract =
         await ethService.loadContractWithGivenAddress(
             "token", EthereumAddress.fromHex(tokenAddress));
-    var res = ethService.submit(await credentials, tokenContract, "approve",
+    final res = ethService.submit(await credentials, tokenContract, "approve",
         [EthereumAddress.fromHex(marketMaker), EthereumService.getWei(amount)],
         gas: gas);
     return res;
   }
 
   @override
-  Future<Transaction> makeApproveTransaction(tokenAddress) async {
-    var amount = "10000000000000000000000000000";
-    DeployedContract tokenContract =
+  Future<Transaction> makeApproveTransaction(String tokenAddress) async {
+    const amount = "10000000000000000000000000000";
+    final DeployedContract tokenContract =
         await ethService.loadContractWithGivenAddress(
             "token", EthereumAddress.fromHex(tokenAddress));
-    var res = ethService.makeTransaction(
+    final res = ethService.makeTransaction(
         await credentials,
         tokenContract,
         "approve",
@@ -56,8 +54,8 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<String> getTokenBalance(tokenAddress) async {
-    DeployedContract tokenContract =
+  Future<String> getTokenBalance(String tokenAddress) async {
+    final DeployedContract tokenContract =
         await ethService.loadContractWithGivenAddress(
             "token", EthereumAddress.fromHex(tokenAddress));
 
@@ -67,12 +65,13 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<String> buy(
-      tokenAddress, String amount, List<ContractInputData> oracles, Gas gas,
+  Future<String> buy(String tokenAddress, String amount,
+      List<ContractInputData> oracles, Gas gas,
       {String? maxPrice}) async {
-    DeployedContract contract = await ethService.loadContractWithGivenAddress(
-        "synchronizer", EthereumAddress.fromHex(this.marketMaker));
-    ContractInputData info = oracles[0];
+    final DeployedContract contract =
+        await ethService.loadContractWithGivenAddress(
+            "synchronizer", EthereumAddress.fromHex(this.marketMaker));
+    final ContractInputData info = oracles[0];
 
     return await ethService.submit(
         await credentials,
@@ -94,11 +93,12 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<String> sell(tokenAddress, String amount,
+  Future<String> sell(String tokenAddress, String amount,
       List<ContractInputData> oracles, Gas gas) async {
-    DeployedContract contract = await ethService.loadContractWithGivenAddress(
-        "synchronizer", EthereumAddress.fromHex(this.marketMaker));
-    ContractInputData info = oracles[0];
+    final DeployedContract contract =
+        await ethService.loadContractWithGivenAddress(
+            "synchronizer", EthereumAddress.fromHex(this.marketMaker));
+    final ContractInputData info = oracles[0];
 
     return ethService.submit(
         await credentials,
@@ -121,8 +121,9 @@ class StockService extends SyncService {
 
   @override
   Future<String> getUsedCap() async {
-    DeployedContract contract = await ethService.loadContractWithGivenAddress(
-        "synchronizer", EthereumAddress.fromHex(this.marketMaker));
+    final DeployedContract contract =
+        await ethService.loadContractWithGivenAddress(
+            "synchronizer", EthereumAddress.fromHex(this.marketMaker));
     final res = await ethService.query(contract, "remainingDollarCap", []);
     return EthereumService.fromWei(res.single, "ether");
   }
@@ -131,9 +132,10 @@ class StockService extends SyncService {
   Future<Transaction> makeBuyTransaction(
       String tokenAddress, String amount, List<ContractInputData> oracles,
       {String? maxPrice}) async {
-    DeployedContract contract = await ethService.loadContractWithGivenAddress(
-        "synchronizer", EthereumAddress.fromHex(this.marketMaker));
-    ContractInputData info = oracles[0];
+    final DeployedContract contract =
+        await ethService.loadContractWithGivenAddress(
+            "synchronizer", EthereumAddress.fromHex(this.marketMaker));
+    final ContractInputData info = oracles[0];
 
     return await ethService.makeTransaction(
       await credentials,
@@ -155,11 +157,12 @@ class StockService extends SyncService {
   }
 
   @override
-  Future<Transaction> makeSellTransaction(
-      tokenAddress, String amount, List<ContractInputData> oracles) async {
-    DeployedContract contract = await ethService.loadContractWithGivenAddress(
-        "synchronizer", EthereumAddress.fromHex(this.marketMaker));
-    ContractInputData info = oracles[0];
+  Future<Transaction> makeSellTransaction(String tokenAddress, String amount,
+      List<ContractInputData> oracles) async {
+    final DeployedContract contract =
+        await ethService.loadContractWithGivenAddress(
+            "synchronizer", EthereumAddress.fromHex(this.marketMaker));
+    final ContractInputData info = oracles[0];
 
     return ethService.makeTransaction(await credentials, contract, "sellFor", [
       await address,

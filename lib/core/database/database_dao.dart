@@ -1,19 +1,22 @@
-import 'package:deus_mobile/core/database/transaction.dart';
-import 'package:deus_mobile/core/database/user_address.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/data_source/currency_data.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import 'transaction.dart';
+import 'user_address.dart';
+import 'wallet_asset.dart';
+import '../../statics/statics.dart';
 import 'package:floor/floor.dart';
 
 import 'chain.dart';
 
 @dao
 abstract class WalletAssetDao {
-  @Query('SELECT * FROM WalletAsset Where chain_id = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
-  Future<List<WalletAsset>> getAllWalletAssets(int chainId, String walletAddress);
+  @Query(
+      'SELECT * FROM WalletAsset Where chain_id = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
+  Future<List<WalletAsset>> getAllWalletAssets(
+      int chainId, String walletAddress);
 
-  @Query('SELECT * FROM WalletAsset Where chain_id = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
-  Stream<List<WalletAsset>> getAllWalletAssetsStream(int chainId, String walletAddress);
+  @Query(
+      'SELECT * FROM WalletAsset Where chain_id = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
+  Stream<List<WalletAsset>> getAllWalletAssetsStream(
+      int chainId, String walletAddress);
 
   @Insert(onConflict: OnConflictStrategy.ignore)
   Future<List<int>> insertWalletAsset(List<WalletAsset> walletAssets);
@@ -26,7 +29,8 @@ abstract class WalletAssetDao {
 
   @Query(
       'SELECT * FROM WalletAsset Where chain_id = :chainId AND tokenAddress = :tokenAddress AND walletAddress = :walletAddress')
-  Future<WalletAsset?> getWalletAsset(int chainId, String tokenAddress, String walletAddress);
+  Future<WalletAsset?> getWalletAsset(
+      int chainId, String tokenAddress, String walletAddress);
 }
 
 @dao
@@ -35,8 +39,8 @@ abstract class ChainDao {
   Stream<List<Chain>> getAllChains();
 
   void insertDefaultChains() {
-
-    insertChain([Statics.eth, Statics.xdai, Statics.bsc, Statics.heco, Statics.matic]);
+    insertChain(
+        [Statics.eth, Statics.xdai, Statics.bsc, Statics.heco, Statics.matic]);
   }
 
   @Insert(onConflict: OnConflictStrategy.replace)
@@ -64,11 +68,12 @@ abstract class UserAddressDao {
   Future<int> deleteUserAddress(List<UserAddress> userAddresses);
 }
 
-
 @dao
 abstract class DbTransactionDao {
-  @Query('SELECT * FROM DbTransaction Where chainId = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
-  Stream<List<DbTransaction>> getAllDbTransactions(int chainId, String walletAddress);
+  @Query(
+      'SELECT * FROM DbTransaction Where chainId = :chainId AND walletAddress = :walletAddress ORDER BY id DESC')
+  Stream<List<DbTransaction>> getAllDbTransactions(
+      int chainId, String walletAddress);
 
   @insert
   Future<List<int>> insertDbTransaction(List<DbTransaction> transactions);

@@ -1,14 +1,10 @@
-
-import 'dart:convert';
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:web3dart/web3dart.dart';
 
 part 'sign.g.dart';
 
-@JsonSerializable(nullable: true)
+@JsonSerializable()
 class Sign {
   int v;
   String r;
@@ -19,11 +15,12 @@ class Sign {
   factory Sign.fromJson(Map<String, dynamic> json) => _$SignFromJson(json);
   Map<String, dynamic> toJson() => _$SignToJson(this);
 
-  getV(){
+  BigInt getV() {
     return BigInt.from(v);
   }
-  getR(){
-    List<int> list = [];
+
+  Uint8List getR() {
+    final List<int> list = [];
     for (int i = 2; i <= r.length - 2; i += 2) {
       final hex = r.substring(i, i + 2);
 
@@ -32,8 +29,9 @@ class Sign {
     }
     return Uint8List.fromList(list);
   }
-  getS(){
-    List<int> list = [];
+
+  Uint8List getS() {
+    final List<int> list = [];
     for (int i = 2; i <= s.length - 2; i += 2) {
       final hex = s.substring(i, i + 2);
 
@@ -42,5 +40,4 @@ class Sign {
     }
     return Uint8List.fromList(list);
   }
-  
 }

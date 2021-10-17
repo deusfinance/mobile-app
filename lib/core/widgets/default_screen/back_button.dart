@@ -1,7 +1,7 @@
-import 'package:deus_mobile/routes/navigation_service.dart';
+import '../../../routes/navigation_service.dart';
 import 'package:flutter/material.dart';
 
-import 'package:deus_mobile/statics/styles.dart';
+import '../../../statics/styles.dart';
 
 import '../../../locator.dart';
 
@@ -15,7 +15,8 @@ class BackButtonWithText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: this.onPressed ?? () => locator<NavigationService>().goBack(context),
+      onTap:
+          this.onPressed ?? () => locator<NavigationService>().goBack(context),
       child: Row(
         children: [
           const Icon(Icons.arrow_back_ios_rounded),

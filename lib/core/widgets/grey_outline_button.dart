@@ -1,14 +1,15 @@
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/styles.dart';
+
 ///TODO (@CodingDavid8): Clean up buttons and put them in core/widgets/buttons/
 import 'package:flutter/material.dart';
 
 class GreyOutlineButton extends StatelessWidget {
-  final darkGrey = Color(0xFF1C1C1C);
+  final darkGrey = const Color(0xFF1C1C1C);
 
-  final label;
-  final onPressed;
+  final String label;
+  final Function? onPressed;
 
-  GreyOutlineButton({this.label, this.onPressed});
+  GreyOutlineButton({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -16,18 +17,21 @@ class GreyOutlineButton extends StatelessWidget {
       child: Container(
         height: 55,
         decoration: BoxDecoration(
-            color: darkGrey, borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
-        child: OutlineButton(
-          highlightedBorderColor: Colors.black,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
-          color: Colors.transparent,
-          borderSide: BorderSide(color: Colors.black),
+            color: darkGrey,
+            borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            // highlightedBorderColor: Colors.black,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize)),
+            // color: Colors.transparent,
+            // borderSide: const BorderSide(color: Colors.black),
+          ),
           child: Text(
             label,
-            style: TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 20),
           ),
-          onPressed: onPressed,
+          onPressed: () => onPressed!,
         ),
       ),
     );

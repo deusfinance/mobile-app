@@ -12,21 +12,24 @@ class OmniServices {
 
     if (!locator.isRegistered(instance: ConfigurationService)) {
       try {
-        final storage = FlutterSecureStorage();
-        locator.registerLazySingleton<ConfigurationService>(() => ConfigurationService(storage));
+        const FlutterSecureStorage storage = const FlutterSecureStorage();
+        locator.registerLazySingleton<ConfigurationService>(
+            () => ConfigurationService(storage));
         await locator<ConfigurationService>().readTemporaryValues();
       } catch (e) {
-        print("Error setting up storage access ${e.runtimeType}");
-        print(e);
+        // print("Error setting up storage access ${e.runtimeType}");
+        // print(e);
       }
     }
     try {
       if (!locator.isRegistered(instance: AddressService))
-        locator.registerLazySingleton<AddressService>(() => AddressService(locator<ConfigurationService>()));
+        locator.registerLazySingleton<AddressService>(
+            () => AddressService(locator<ConfigurationService>()));
       if (!locator.isRegistered(instance: EthereumService))
-        locator.registerLazySingleton<EthereumService>(() => EthereumService(params.chainId));
+        locator.registerLazySingleton<EthereumService>(
+            () => EthereumService(params.chainId));
     } catch (e) {
-      print("Error creating providers. ${e.runtimeType}");
+      // print("Error creating providers. ${e.runtimeType}");
     }
   }
 }

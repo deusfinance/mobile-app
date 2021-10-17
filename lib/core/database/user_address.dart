@@ -10,4 +10,3 @@ class UserAddress {
 
   UserAddress({this.id, required this.name, required this.address});
 }
-

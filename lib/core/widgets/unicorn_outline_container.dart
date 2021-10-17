@@ -15,7 +15,8 @@ class UnicornOutlineContainer extends StatelessWidget {
     List<double>? cornerRadiusBLRTLR,
   })  : assert(radius != null || cornerRadiusBLRTLR != null),
         this._painter = cornerRadiusBLRTLR == null
-            ? GradientPainter(strokeWidth: strokeWidth, radius: radius!, gradient: gradient)
+            ? GradientPainter(
+                strokeWidth: strokeWidth, radius: radius!, gradient: gradient)
             : CustomGradientPainter(
                 strokeWidth: strokeWidth,
                 bottomLeftRadius: cornerRadiusBLRTLR[0],
@@ -24,7 +25,7 @@ class UnicornOutlineContainer extends StatelessWidget {
                 topRightRadius: cornerRadiusBLRTLR[3],
                 gradient: gradient),
         this._child = child;
-        // this._radius = radius;
+  // this._radius = radius;
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +78,8 @@ class CustomGradientPainter extends CustomPainter {
         topRight: Radius.circular(topRightRadius));
 
     // create inner rectangle smaller by strokeWidth
-    final Rect innerRect =
-        Rect.fromLTWH(strokeWidth, strokeWidth, size.width - strokeWidth * 2, size.height - strokeWidth * 2);
+    final Rect innerRect = Rect.fromLTWH(strokeWidth, strokeWidth,
+        size.width - strokeWidth * 2, size.height - strokeWidth * 2);
     final innerRRect = RRect.fromRectAndCorners(innerRect,
         bottomLeft: Radius.circular(bottomLeftRadius - strokeWidth),
         bottomRight: Radius.circular(bottomRightRadius - strokeWidth),
@@ -105,7 +106,10 @@ class GradientPainter extends CustomPainter {
   final double strokeWidth;
   final Gradient gradient;
 
-  GradientPainter({required double strokeWidth, required double radius, required Gradient gradient})
+  GradientPainter(
+      {required double strokeWidth,
+      required double radius,
+      required Gradient gradient})
       : this.strokeWidth = strokeWidth,
         this.radius = radius,
         this.gradient = gradient;
@@ -114,12 +118,14 @@ class GradientPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // create outer rectangle equals size
     final Rect outerRect = Offset.zero & size;
-    final outerRRect = RRect.fromRectAndRadius(outerRect, Radius.circular(radius));
+    final outerRRect =
+        RRect.fromRectAndRadius(outerRect, Radius.circular(radius));
 
     // create inner rectangle smaller by strokeWidth
-    final Rect innerRect =
-        Rect.fromLTWH(strokeWidth, strokeWidth, size.width - strokeWidth * 2, size.height - strokeWidth * 2);
-    final innerRRect = RRect.fromRectAndRadius(innerRect, Radius.circular(radius - strokeWidth));
+    final Rect innerRect = Rect.fromLTWH(strokeWidth, strokeWidth,
+        size.width - strokeWidth * 2, size.height - strokeWidth * 2);
+    final innerRRect = RRect.fromRectAndRadius(
+        innerRect, Radius.circular(radius - strokeWidth));
 
     // apply gradient shader
     _paint.shader = gradient.createShader(outerRect);

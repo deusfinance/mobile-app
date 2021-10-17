@@ -1,6 +1,4 @@
-
-import 'package:deus_mobile/routes/navigation_item.dart';
-import 'package:deus_mobile/routes/route_generator.dart';
+import 'navigation_item.dart';
 import 'package:flutter/material.dart';
 
 class NavigationService {
@@ -11,16 +9,18 @@ class NavigationService {
 
   bool isSelected(NavigationItem item) => selectedNavItem == item;
 
-  Future<Object?>? navigateTo(String routeName, BuildContext context, {bool replace = false, bool replaceAll = false , arguments}) {
+  Future<Object?>? navigateTo(String routeName, BuildContext context,
+      {bool replace = false, bool replaceAll = false, Object? arguments}) {
     if (replace)
       Navigator.pushReplacementNamed(context, routeName, arguments: arguments);
     else if (replaceAll)
-      Navigator.pushNamedAndRemoveUntil(context, routeName, (route) => false, arguments: arguments);
+      Navigator.pushNamedAndRemoveUntil(context, routeName, (route) => false,
+          arguments: arguments);
     else
       return Navigator.pushNamed(context, routeName, arguments: arguments);
   }
 
-  void goBack(BuildContext context, [result]) {
+  void goBack(BuildContext context, [dynamic result]) {
     Navigator.pop(context, result);
   }
 }

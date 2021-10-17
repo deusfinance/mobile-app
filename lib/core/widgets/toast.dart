@@ -1,5 +1,4 @@
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 class Toast extends StatelessWidget {
@@ -16,7 +15,7 @@ class Toast extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
             color: color),
@@ -29,8 +28,8 @@ class Toast extends StatelessWidget {
                   label!,
                   style: MyStyles.whiteSmallTextStyle,
                 ),
-                Spacer(),
-                InkWell(onTap: onClosed, child: Icon(Icons.close))
+                const Spacer(),
+                InkWell(onTap: onClosed, child: const Icon(Icons.close))
               ],
             ),
             Row(
@@ -44,7 +43,7 @@ class Toast extends StatelessWidget {
                 ),
                 Transform.rotate(
                   angle: 150,
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_right_alt_outlined,
                     size: 18,
                   ),
@@ -55,6 +54,5 @@ class Toast extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

@@ -45,21 +45,6 @@ abstract class MyColors {
   static MaterialColor ToastGrey = _getMaterialColor(196, 196, 196, 0xFFC4C4C4);
   static MaterialColor ToastRed = _getMaterialColor(196, 0, 0, 0xFFD40000);
 
-//  static const White = 0xFFFFFFFF;
-//  static const HalfWhite = 0xAAFFFFFF;
-//  static const Black = 0xFF000000;
-//  static const HalfBlack = 0xAA1C1C1C;
-//  static const Main_BG_Black = 0xFF0D0D0D;
-//  static const Button_BG_Black = 0xFF1C1C1C;
-//  static const Blue = 0xFF0779E4;
-//  static const Purple = 0xFFEA2C62;
-//  static const Cyan = 0xFF152b1b;
-//  static const Green = 0xFFC4EB89;
-//  static const Blue_Gr = 0xFF5EC4D6;
-  /// color of approved toast container
-  // static const ToastGreen = 0xFF00D16C;
-  // /// color of pending toast container
-  // static const ToastGrey = 0xFFC4C4C4;
   static const Background = 0xFF0D0D0D;
 
   static const kWalletFillChart = 0xFF121212;

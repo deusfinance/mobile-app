@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:deus_mobile/core/database/database.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/service/wallet_service.dart';
+import '../../../../core/database/database.dart';
+import '../../../../core/database/wallet_asset.dart';
+import '../../../../models/transaction_status.dart';
+import '../../../../service/wallet_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 abstract class SendAssetState extends Equatable {
   late TextEditingController amountController;
   late TextEditingController recAddressController;
@@ -19,8 +20,8 @@ abstract class SendAssetState extends Equatable {
 
   late bool isInProgress;
 
-  SendAssetState.init(this.walletAsset, this.walletService):
-  addressConfirmed = false{
+  SendAssetState.init(this.walletAsset, this.walletService)
+      : addressConfirmed = false {
     amountController = new TextEditingController();
     recAddressController = new TextEditingController();
     streamController = StreamController();
@@ -41,10 +42,12 @@ abstract class SendAssetState extends Equatable {
   List<Object> get props => [isInProgress];
 }
 
+// ignore: must_be_immutable
 class SendAssetLoadedState extends SendAssetState {
   SendAssetLoadedState(SendAssetState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class TransactionFinishedState extends SendAssetState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
@@ -80,6 +83,7 @@ class TransactionFinishedState extends SendAssetState {
   }
 }
 
+// ignore: must_be_immutable
 class TransactionPendingState extends SendAssetState {
   bool? _showingToast;
   TransactionStatus? _transactionStatus;
@@ -115,15 +119,18 @@ class TransactionPendingState extends SendAssetState {
   }
 }
 
+// ignore: must_be_immutable
 class SendAssetInitialState extends SendAssetState {
   SendAssetInitialState(WalletAsset walletAsset, WalletService walletService)
       : super.init(walletAsset, walletService);
 }
 
+// ignore: must_be_immutable
 class SendAssetLoadingState extends SendAssetState {
   SendAssetLoadingState(SendAssetState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class SendAssetErrorState extends SendAssetState {
   SendAssetErrorState(SendAssetState state) : super.copy(state);
 }

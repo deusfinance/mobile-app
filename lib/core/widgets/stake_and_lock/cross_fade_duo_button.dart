@@ -1,7 +1,6 @@
-import 'package:deus_mobile/core/widgets/disabled_button.dart';
-import 'package:deus_mobile/screens/stake_screen/stake_screen.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../disabled_button.dart';
+import '../../../statics/my_colors.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../filled_gradient_selection_button.dart';
@@ -34,15 +33,15 @@ class CrossFadeDuoButton extends StatelessWidget {
                 child: DisabledButton(
                   label: gradientButtonLabel,
                   child: showLoading!
-                      ? SizedBox(
-                    height: 21,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(Colors.white),
-                      strokeWidth: 2,
-                    ),
-                  )
+                      ? const SizedBox(
+                          height: 21,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            strokeWidth: 2,
+                          ),
+                        )
                       : null,
                 ),
               )
@@ -56,14 +55,14 @@ class CrossFadeDuoButton extends StatelessWidget {
                 ),
               ),
             if (showBothButtons!)
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
             Expanded(
               child: DisabledButton(
                 label: offButtonLabel,
                 child: showLoading!
-                    ? SizedBox(
+                    ? const SizedBox(
                         height: 21,
                         width: 20,
                         child: CircularProgressIndicator(
@@ -88,6 +87,6 @@ class CrossFadeDuoButton extends StatelessWidget {
         crossFadeState: !showBothButtons!
             ? CrossFadeState.showSecond
             : CrossFadeState.showFirst,
-        duration: Duration(milliseconds: 150));
+        duration: const Duration(milliseconds: 150));
   }
 }

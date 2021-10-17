@@ -1,12 +1,9 @@
-import 'package:deus_mobile/core/widgets/default_screen/custom_app_bar.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/routes/route_generator.dart';
-import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
+import '../../core/widgets/default_screen/custom_app_bar.dart';
+import '../../routes/navigation_service.dart';
+import '../swap/swap_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../core/widgets/default_screen/back_button.dart';
 import '../../infrastructure/wallet_setup/wallet_setup_provider.dart';
 import '../../locator.dart';
 import '../../models/wallet/wallet_setup.dart';
@@ -20,8 +17,9 @@ class WalletCreatePage extends HookWidget {
 
   final String title;
 
+  @override
   Widget build(BuildContext context) {
-    var store = useWalletSetup(context);
+    final store = useWalletSetup(context);
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -45,7 +43,9 @@ class WalletCreatePage extends HookWidget {
               onConfirm: !store.state.loading
                   ? (confirmedMnemonic) async {
                       if (await store.confirmMnemonic(confirmedMnemonic)) {
-                        locator<NavigationService>().navigateTo(SwapScreen.route, context, replaceAll: true);
+                        await locator<NavigationService>().navigateTo(
+                            SwapScreen.route, context,
+                            replaceAll: true);
                       }
                     }
                   : null,

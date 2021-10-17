@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../../routes/navigation_service.dart';
+import '../../../statics/my_colors.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -37,7 +37,7 @@ class TokenSelector extends StatelessWidget {
                     }),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             !showSearchBar
@@ -47,7 +47,7 @@ class TokenSelector extends StatelessWidget {
                 : SizedBox(
                     height: 55,
                     child: Container(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
                           color: const Color.fromRGBO(17, 17, 17, 1),
                           border: Border.all(color: MyColors.Black),
@@ -74,7 +74,7 @@ class TokenSelector extends StatelessWidget {
                       ),
                     ),
                   ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             Row(

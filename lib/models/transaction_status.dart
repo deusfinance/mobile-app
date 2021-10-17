@@ -1,6 +1,6 @@
-import 'package:deus_mobile/config.dart';
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/service/ethereum_service.dart';
+import '../config.dart';
+import '../core/database/chain.dart';
+import '../service/ethereum_service.dart';
 
 enum Status { PENDING, SUCCESSFUL, FAILED }
 
@@ -21,29 +21,27 @@ class TransactionStatus {
   }
 
   String? transactionUrl({int? chainId}) {
-    if(chainId != null) {
+    if (chainId != null) {
       if (chainId == 100)
         return "https://blockscout.com/xdai/mainnet/tx/" + hash;
-      if(chainId == 1)
-        return "https://etherscan.io/tx/" + hash;
-    //  heco
-      if(chainId == 128){
+      if (chainId == 1) return "https://etherscan.io/tx/" + hash;
+      //  heco
+      if (chainId == 128) {
         return "https://hecoinfo.com/tx/" + hash;
       }
       // bsc
-      if(chainId == 56)
-        return "https://bscscan.com/tx/" + hash;
-
-    }else {
-        String prefix = '';
-        final int currentChainId = AppConfig.selectedConfig.params.chainId;
-        if (currentChainId != 1) prefix =
+      if (chainId == 56) return "https://bscscan.com/tx/" + hash;
+    } else {
+      String prefix = '';
+      final int currentChainId = AppConfig.selectedConfig.params.chainId;
+      if (currentChainId != 1)
+        prefix =
             EthereumService.NETWORK_NAMES[currentChainId]!.toLowerCase() + '.';
-        return "https://${prefix}etherscan.io/tx/" + hash;
-      }
+      return "https://${prefix}etherscan.io/tx/" + hash;
+    }
   }
 
   String transactionUrlWithChain(Chain chain) {
-    return chain.blockExplorerUrl??"" + hash;
+    return chain.blockExplorerUrl ?? "" + hash;
   }
 }

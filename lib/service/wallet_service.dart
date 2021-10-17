@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/models/swap/gas.dart';
-import 'package:deus_mobile/service/sync/xdai_stock_service.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import '../core/database/chain.dart';
+import '../core/database/wallet_asset.dart';
+import '../models/swap/gas.dart';
+import '../statics/statics.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
@@ -28,23 +27,24 @@ class WalletService {
   }
 
   Future<DeployedContract> loadContractWithGivenAddress(
-      String contractName, contractAddress) async {
-    String allAbis = await rootBundle.loadString(ABIS_PATH);
+      String contractName, EthereumAddress contractAddress) async {
+    final String allAbis = await rootBundle.loadString(ABIS_PATH);
     final decodedAbis = jsonDecode(allAbis);
+    // ignore: avoid_dynamic_calls
     final abiCode = jsonEncode(decodedAbis[contractName]);
     return DeployedContract(
         ContractAbi.fromJson(abiCode, contractName), contractAddress);
   }
 
   Future<String> getEtherBalance() async {
-    EtherAmount res =
+    final EtherAmount res =
         await ethClient.getBalance(await (await credentials).extractAddress());
     return fromWei(res.getInWei, null);
   }
 
   Future<String> getTokenBalance(WalletAsset walletAsset) async {
     try {
-      DeployedContract tokenContract = await loadContractWithGivenAddress(
+      final DeployedContract tokenContract = await loadContractWithGivenAddress(
           "token", EthereumAddress.fromHex(walletAsset.tokenAddress));
 
       final res = await query(tokenContract, "balanceOf", [await address]);
@@ -63,6 +63,7 @@ class WalletService {
   }
 
   Future<Credentials> credentialsForKey(String privateKey) {
+    // ignore: deprecated_member_use
     return ethClient.credentialsFromPrivateKey(privateKey);
   }
 
@@ -72,12 +73,12 @@ class WalletService {
       (await credentials).extractAddress();
 
   static BigInt getWei(String amount, WalletAsset? walletAsset) {
-    int max = walletAsset != null? walletAsset.tokenDecimal ?? 18: 18;
+    final int max = walletAsset != null ? walletAsset.tokenDecimal ?? 18 : 18;
     if (amount == "") {
       amount = "0.0";
     }
-    int dotIndex = amount.indexOf(".");
-    var ans;
+    final int dotIndex = amount.indexOf(".");
+    String ans;
 
     if (dotIndex == -1) {
       ans = EtherAmount.fromUnitAndValue(EtherUnit.ether, amount)
@@ -85,7 +86,7 @@ class WalletService {
           .toString();
     } else {
 //      TODO check larger than 18
-      int zerosNo = 18 - (amount.length - dotIndex - 1);
+      final int zerosNo = 18 - (amount.length - dotIndex - 1);
       amount = amount.replaceAll(".", "");
       if (zerosNo < 0) {
         amount = amount.substring(0, amount.length + zerosNo - 1);
@@ -101,7 +102,7 @@ class WalletService {
   }
 
   static String fromWei(BigInt value, WalletAsset? walletAsset) {
-    int max = walletAsset != null ? walletAsset.tokenDecimal ?? 18 : 18;
+    final int max = walletAsset != null ? walletAsset.tokenDecimal ?? 18 : 18;
     String ans = value.toString();
 
     while (ans.length < max) {
@@ -120,10 +121,11 @@ class WalletService {
       String tokenAddress, String recAddress, String amount) async {
     if (tokenAddress == Statics.zeroAddress) {
       return await makeEtherTransaction(await credentials,
-          value: EtherAmount.fromUnitAndValue(EtherUnit.wei, getWei(amount, null)),
+          value:
+              EtherAmount.fromUnitAndValue(EtherUnit.wei, getWei(amount, null)),
           recAddress: recAddress);
     } else {
-      DeployedContract tokenContract = await loadContractWithGivenAddress(
+      final DeployedContract tokenContract = await loadContractWithGivenAddress(
           "token", EthereumAddress.fromHex(tokenAddress));
       return await makeTransaction(
         await credentials,
@@ -140,13 +142,14 @@ class WalletService {
   Future<String> transfer(
       String tokenAddress, String recAddress, String amount, Gas gas) async {
     if (tokenAddress == Statics.zeroAddress) {
-      Transaction tr = await makeEtherTransaction(await credentials,
-          value: EtherAmount.fromUnitAndValue(EtherUnit.wei, getWei(amount, null)),
+      final Transaction tr = await makeEtherTransaction(await credentials,
+          value:
+              EtherAmount.fromUnitAndValue(EtherUnit.wei, getWei(amount, null)),
           gas: gas,
           recAddress: recAddress);
       return await submit(transaction: tr);
     } else {
-      DeployedContract tokenContract = await loadContractWithGivenAddress(
+      final DeployedContract tokenContract = await loadContractWithGivenAddress(
           "token", EthereumAddress.fromHex(tokenAddress));
       return await submit(
           contract: tokenContract,
@@ -170,14 +173,14 @@ class WalletService {
       transaction = await makeTransaction(
           await credentials, contract!, functionName!, args!,
           gas: gas, value: value);
-    var result = await ethClient.sendTransaction(await credentials, transaction,
-        chainId: chain.id);
+    final result = await ethClient
+        .sendTransaction(await credentials, transaction, chainId: chain.id);
     return result;
   }
 
   Future<String> sendTransaction(
       Credentials credentials, Transaction transaction) async {
-    var result = await ethClient.sendTransaction(credentials, transaction,
+    final result = await ethClient.sendTransaction(credentials, transaction,
         chainId: chain.id);
     return result;
   }
@@ -281,20 +284,20 @@ class WalletService {
 
   Stream<TransactionReceipt> pollTransactionReceipt(String txHash,
       {int pollingTimeMs = 1500}) async* {
-    StreamController<TransactionReceipt> controller = StreamController();
+    final StreamController<TransactionReceipt> controller = StreamController();
     Timer? timer;
 
     Future<void> tick() async {
-      var receipt = await getTransactionReceipt(txHash);
+      final receipt = await getTransactionReceipt(txHash);
       if (receipt != null && !controller.isClosed) {
         timer?.cancel();
         controller.add(receipt);
-        controller.close();
+        await controller.close();
       }
     }
 
     // start first tick before timer if the receipt is available immediately
-    tick();
+    await tick();
 
     if (!controller.isClosed) {
       timer =

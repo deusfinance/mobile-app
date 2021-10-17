@@ -1,12 +1,9 @@
-import 'package:deus_mobile/core/widgets/default_screen/custom_app_bar.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/routes/route_generator.dart';
-import 'package:deus_mobile/screens/swap/swap_screen.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
+import '../../core/widgets/default_screen/custom_app_bar.dart';
+import '../../routes/navigation_service.dart';
+import '../swap/swap_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../core/widgets/default_screen/back_button.dart';
 import '../../infrastructure/wallet_setup/wallet_setup_provider.dart';
 import '../../locator.dart';
 import '../../models/wallet/wallet_setup.dart';
@@ -19,6 +16,7 @@ class WalletImportPage extends HookWidget {
 
   final String title;
 
+  @override
   Widget build(BuildContext context) {
     final store = useWalletSetup(context);
     return Scaffold(
@@ -29,8 +27,8 @@ class WalletImportPage extends HookWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: Container(
-                  padding:
-                      EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 30),
+                  padding: const EdgeInsets.only(
+                      top: 12, left: 12, right: 12, bottom: 30),
                   child: Text(
                     "You can choose if you want to import your wallet with your seed phrase or with your private key.",
                     textAlign: TextAlign.center,
@@ -48,13 +46,14 @@ class WalletImportPage extends HookWidget {
                             if (!await store.importFromMnemonic(value)) return;
                             break;
                           case WalletImportType.privateKey:
-                            if (!await store.importFromPrivateKey(value)) return;
+                            if (!await store.importFromPrivateKey(value))
+                              return;
 
                             break;
                           default:
                             break;
                         }
-                        locator<NavigationService>().navigateTo(
+                        await locator<NavigationService>().navigateTo(
                             SwapScreen.route, context,
                             replaceAll: true);
                       }

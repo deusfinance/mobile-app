@@ -1,36 +1,36 @@
-import 'package:deus_mobile/models/synthetics/sign.dart';
+import 'sign.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'contract_input_data.g.dart';
 
-@JsonSerializable(nullable: true)
-class ContractInputData{
+@JsonSerializable()
+class ContractInputData {
   int multiplier;
   Map<String, Sign> signs;
   String price;
   int fee;
   int blockNo;
 
-
   ContractInputData(
       this.multiplier, this.signs, this.price, this.fee, this.blockNo);
 
-  factory ContractInputData.fromJson(Map<String, dynamic> json) => _$ContractInputDataFromJson(json);
+  factory ContractInputData.fromJson(Map<String, dynamic> json) =>
+      _$ContractInputDataFromJson(json);
   Map<String, dynamic> toJson() => _$ContractInputDataToJson(this);
 
-  BigInt getPrice(){
+  BigInt getPrice() {
     return BigInt.parse(price);
   }
 
-  getBlockNo(){
+  BigInt getBlockNo() {
     return BigInt.from(blockNo);
   }
 
-  getFee(){
+  BigInt getFee() {
     return BigInt.from(fee);
   }
 
-  getMultiplier(){
+  BigInt getMultiplier() {
     return BigInt.from(multiplier);
   }
 }

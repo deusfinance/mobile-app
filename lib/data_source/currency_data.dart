@@ -4,8 +4,16 @@ import '../models/swap/crypto_currency.dart';
 abstract class CurrencyData {
   static const _basePath = 'images/currencies';
 
-  static List<CryptoCurrency> all = [eth, deus, dea, dai,  wbtc, usdc];
-  static List<CryptoCurrency> allForDict = [deus, dea, dai, eth, wbtc, usdc, weth];
+  static List<CryptoCurrency> all = [eth, deus, dea, dai, wbtc, usdc];
+  static List<CryptoCurrency> allForDict = [
+    deus,
+    dea,
+    dai,
+    eth,
+    wbtc,
+    usdc,
+    weth
+  ];
 
   static CryptoCurrency deus = CryptoCurrency(
       name: 'DEUS', symbol: 'DEUS', logoPath: '$_basePath/deus.svg');
@@ -41,7 +49,9 @@ abstract class CurrencyData {
       name: 'Time Token', symbol: 'timetoken', logoPath: '$_basePath/deus.svg');
 
   static CryptoCurrency bpt = CryptoCurrency(
-      name: 'Native Balancer', symbol: 'bpt_native', logoPath: '$_basePath/deus.svg');
+      name: 'Native Balancer',
+      symbol: 'bpt_native',
+      logoPath: '$_basePath/deus.svg');
 
   static CryptoCurrency busd = CryptoCurrency(
       name: 'BUSD', symbol: 'BUSD', logoPath: '$_basePath/busd.svg');

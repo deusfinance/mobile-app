@@ -1,23 +1,17 @@
-
-import 'package:firebase_core/firebase_core.dart';
-import 'package:deus_mobile/service/analytics_service.dart';
-import 'package:firebase_analytics/observer.dart';
+import 'service/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import 'config.dart';
-import 'core/widgets/default_screen/will_pop_dialog.dart';
 import 'locator.dart';
 import 'routes/route_generator.dart';
 import 'screens/splash/cubit/splash_cubit.dart';
 import 'screens/splash/splash_screen.dart';
-import 'service/config_service.dart';
 import 'statics/styles.dart';
 
 void deusDebugPrint(String? s, {int? wrapWidth}) {
-  if (AppConfig.selectedConfig.showDebugMessages) print(s);
+  // if (AppConfig.selectedConfig.showDebugMessages) print(s);
 }
 
 class SimpleBlocObserver extends BlocObserver {
@@ -48,7 +42,8 @@ void main() async {
   // await Firebase.initializeApp();
 
   setupLocator();
-  runApp(BlocProvider<SplashCubit>(create: (_) => SplashCubit(), child: DEUSApp()));
+  runApp(BlocProvider<SplashCubit>(
+      create: (_) => SplashCubit(), child: const DEUSApp()));
 }
 
 class DEUSApp extends StatefulWidget {
@@ -79,7 +74,10 @@ class _DEUSAppState extends State<DEUSApp> {
         builder: (context, snapshot) {
           if (!(state is SplashSuccess))
             return MaterialApp(
-                key: _loadingKey, debugShowCheckedModeBanner: false, theme: MyStyles.theme, home: SplashScreen());
+                key: _loadingKey,
+                debugShowCheckedModeBanner: false,
+                theme: MyStyles.theme,
+                home: SplashScreen());
 
           return MaterialApp(
             key: _appKey,

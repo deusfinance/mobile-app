@@ -1,19 +1,19 @@
-
 import 'dart:async';
 
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/database/transaction.dart';
-import 'package:deus_mobile/core/database/user_address.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/core/database/database_dao.dart';
-import 'package:deus_mobile/statics/statics.dart';
+import 'chain.dart';
+import 'transaction.dart';
+import 'user_address.dart';
+import 'wallet_asset.dart';
+import 'database_dao.dart';
+import '../../statics/statics.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'package:floor/floor.dart';
 
 part 'database.g.dart'; // the generated code will be there
 
-@Database(version: 1, entities: [WalletAsset, Chain, DbTransaction, UserAddress])
+@Database(
+    version: 1, entities: [WalletAsset, Chain, DbTransaction, UserAddress])
 abstract class AppDatabase extends FloorDatabase {
   static Future<AppDatabase?>? _appDatabase;
 
@@ -22,8 +22,8 @@ abstract class AppDatabase extends FloorDatabase {
   DbTransactionDao get transactionDao;
   UserAddressDao get userAddressDao;
 
-  static Future<AppDatabase?>? getInstance(){
-    if(_appDatabase == null){
+  static Future<AppDatabase?>? getInstance() {
+    if (_appDatabase == null) {
       _appDatabase = AppDatabase.constructor();
     }
     return _appDatabase;

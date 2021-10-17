@@ -1,16 +1,21 @@
-import 'package:deus_mobile/statics/styles.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class FilledGradientSelectionButton extends StatelessWidget {
   final bool? selected;
   final VoidCallback? onPressed;
   final String? label;
   final LinearGradient? gradient;
-  TextStyle? textStyle;
+  late TextStyle? textStyle;
 
   FilledGradientSelectionButton(
-      {this.selected, this.onPressed, this.label, this.gradient, this.textStyle}){
-    if(this.textStyle == null){
+      {this.selected,
+      this.onPressed,
+      this.label,
+      this.gradient,
+      this.textStyle}) {
+    if (this.textStyle == null) {
       this.textStyle = MyStyles.whiteMediumTextStyle;
     }
   }
@@ -28,7 +33,7 @@ class FilledGradientSelectionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(MyStyles.cardRadiusSize),
             splashColor: Colors.grey[500],
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Center(
                 child: Text(this.label!, style: this.textStyle),
               ),

@@ -1,10 +1,11 @@
 part of 'stake_cubit.dart';
 
+// ignore: must_be_immutable
 abstract class StakeState extends Equatable {
   late StakeService stakeService;
   late StakeTokenObject stakeTokenObject;
   late double balance;
-  var fieldController;
+  late TextEditingController fieldController;
   late bool showingToast;
   late TransactionStatus transactionStatus;
 
@@ -27,72 +28,85 @@ abstract class StakeState extends Equatable {
     this.transactionStatus = state.transactionStatus;
   }
   @override
-  List<Object> get props =>
-      [stakeService, stakeTokenObject, balance, fieldController, showingToast, transactionStatus];
+  List<Object> get props => [
+        stakeService,
+        stakeTokenObject,
+        balance,
+        fieldController,
+        showingToast,
+        transactionStatus
+      ];
 }
 
+// ignore: must_be_immutable
 class StakeLoading extends StakeState {
   StakeLoading(StakeState state) : super.copy(state);
 }
 
+// ignore: must_be_immutable
 class StakeInit extends StakeState {
   StakeInit(StakeTokenObject object) : super.init(object);
 }
 
+// ignore: must_be_immutable
 class StakeHasToApprove extends StakeState {
-  StakeHasToApprove(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
+  StakeHasToApprove(StakeState state,
+      {TransactionStatus? transactionStatus, showingToast})
+      : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
     } else {
       this.showingToast = false;
     }
-    if (showingToast != null)
-      this.showingToast = showingToast;
+    if (showingToast != null) this.showingToast = showingToast;
   }
 }
 
+// ignore: must_be_immutable
 class StakePendingApprove extends StakeState {
-
-  StakePendingApprove(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
+  StakePendingApprove(StakeState state,
+      {TransactionStatus? transactionStatus, showingToast})
+      : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
     } else {
       this.showingToast = false;
     }
-    if (showingToast != null)
-      this.showingToast = showingToast;
+    if (showingToast != null) this.showingToast = showingToast;
   }
 }
 
+// ignore: must_be_immutable
 class StakePendingStake extends StakeState {
-  StakePendingStake(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
+  StakePendingStake(StakeState state,
+      {TransactionStatus? transactionStatus, showingToast})
+      : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
     } else {
       this.showingToast = false;
     }
-    if (showingToast != null)
-      this.showingToast = showingToast;
+    if (showingToast != null) this.showingToast = showingToast;
   }
 }
 
+// ignore: must_be_immutable
 class StakeIsApproved extends StakeState {
-  StakeIsApproved(StakeState state, {TransactionStatus? transactionStatus, showingToast}) : super.copy(state){
+  StakeIsApproved(StakeState state,
+      {TransactionStatus? transactionStatus, showingToast})
+      : super.copy(state) {
     if (transactionStatus != null) {
       this.transactionStatus = transactionStatus;
       this.showingToast = true;
     } else {
       this.showingToast = false;
     }
-    if (showingToast != null)
-      this.showingToast = showingToast;
+    if (showingToast != null) this.showingToast = showingToast;
   }
 }
-
-
 
 // class StakeTransactionPendingState extends StakeState {
 //   bool showingToast;

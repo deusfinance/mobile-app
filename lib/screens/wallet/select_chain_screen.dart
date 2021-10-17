@@ -1,20 +1,20 @@
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/util/responsive.dart';
-import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/styles.dart';
+import '../../core/database/chain.dart';
+import '../../core/util/responsive.dart';
+import '../../core/widgets/selection_button.dart';
+import '../../routes/navigation_service.dart';
+import '../../statics/my_colors.dart';
+import '../../statics/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../../locator.dart';
 
 class SelectChainScreen extends StatefulWidget {
-  Chain selectedChain;
-  Stream<List<Chain>> chains;
-  void Function(Chain chain) onChainSelected;
-  void Function() addChain;
-  void Function(Chain chain) deleteChain;
-  void Function(Chain chain) updateChain;
+  final Chain selectedChain;
+  final Stream<List<Chain>> chains;
+  final void Function(Chain chain) onChainSelected;
+  final void Function() addChain;
+  final void Function(Chain chain) deleteChain;
+  final void Function(Chain chain) updateChain;
 
   SelectChainScreen(
       {required this.selectedChain,
@@ -46,9 +46,10 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
             border: Border.all(
-                color: Color(MyColors.kAddressBackground).withOpacity(0.5)),
-            color: Color(MyColors.kAddressBackground).withOpacity(0.25),
-            borderRadius: BorderRadius.all(Radius.circular(6))),
+                color:
+                    const Color(MyColors.kAddressBackground).withOpacity(0.5)),
+            color: const Color(MyColors.kAddressBackground).withOpacity(0.25),
+            borderRadius: const BorderRadius.all(Radius.circular(6))),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -56,7 +57,7 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Text(
@@ -72,9 +73,9 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.add, size: 20),
+                      const Icon(Icons.add, size: 20),
                       Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: Align(
                           alignment: Alignment.topCenter,
                           child: Text(
@@ -88,7 +89,7 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
                 )
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Expanded(
@@ -103,15 +104,14 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
                         child: ListView.builder(
                           itemCount: snapshot.data?.length ?? 0,
                           itemBuilder: (context, index) {
-                            Chain chain = snapshot.data![index];
+                            final Chain chain = snapshot.data![index];
                             return GestureDetector(
                               onTap: () {
                                 selectedChain = chain;
-                                setState(() {
-                                });
+                                setState(() {});
                               },
                               child: Container(
-                                margin: EdgeInsets.symmetric(
+                                margin: const EdgeInsets.symmetric(
                                     horizontal: 4, vertical: 8),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
@@ -146,9 +146,8 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
                                                 onTap: () {
                                                   widget.updateChain(chain);
                                                 },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(1.0),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(1.0),
                                                   child: Icon(
                                                     Icons.edit,
                                                     color: Colors.white,
@@ -160,9 +159,8 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
                                                 onTap: () {
                                                   widget.deleteChain(chain);
                                                 },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(8.0),
                                                   child: Icon(
                                                     Icons.delete,
                                                     color: Colors.red,
@@ -187,11 +185,11 @@ class _SelectChainScreenState extends State<SelectChainScreen> {
                 },
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Container(
-              margin: EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(8.0),
               child: SelectionButton(
                 label: 'Select Network',
                 onPressed: (bool selected) async {

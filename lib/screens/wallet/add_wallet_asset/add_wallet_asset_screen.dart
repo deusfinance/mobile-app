@@ -1,21 +1,14 @@
-import 'dart:collection';
-import 'dart:convert';
-
-import 'package:deus_mobile/core/database/chain.dart';
-import 'package:deus_mobile/core/database/wallet_asset.dart';
-import 'package:deus_mobile/core/widgets/default_screen/default_screen.dart';
-import 'package:deus_mobile/core/widgets/selection_button.dart';
-import 'package:deus_mobile/locator.dart';
-import 'package:deus_mobile/models/transaction_status.dart';
-import 'package:deus_mobile/models/wallet/wallet_asset_api.dart';
-import 'package:deus_mobile/routes/navigation_service.dart';
-import 'package:deus_mobile/screens/wallet/add_wallet_asset/cubit/add_wallet_asset_state.dart';
-import 'package:deus_mobile/screens/wallet_intro_screen/widgets/form/paper_input.dart';
-import 'package:deus_mobile/service/address_service.dart';
-import 'package:deus_mobile/statics/my_colors.dart';
-import 'package:deus_mobile/statics/statics.dart';
-import 'package:deus_mobile/statics/styles.dart';
-import 'package:flutter/cupertino.dart';
+import '../../../core/database/wallet_asset.dart';
+import '../../../core/widgets/default_screen/default_screen.dart';
+import '../../../core/widgets/selection_button.dart';
+import '../../../locator.dart';
+import '../../../models/wallet/wallet_asset_api.dart';
+import '../../../routes/navigation_service.dart';
+import 'cubit/add_wallet_asset_state.dart';
+import '../../wallet_intro_screen/widgets/form/paper_input.dart';
+import '../../../service/address_service.dart';
+import '../../../statics/my_colors.dart';
+import '../../../statics/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,7 +23,7 @@ class AddWalletAssetScreen extends StatefulWidget {
 }
 
 class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
-  final darkGrey = Color(0xFF1C1C1C);
+  final darkGrey = const Color(0xFF1C1C1C);
 
   @override
   void initState() {
@@ -44,7 +37,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
         builder: (context, state) {
       if (state is AddWalletAssetLoadingState) {
         return DefaultScreen(
-          child: Center(
+          child: const Center(
             child: CircularProgressIndicator(),
           ),
         );
@@ -89,7 +82,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              WalletAssetApi wa = state.searchedWalletAssetApis![index];
+              final WalletAssetApi wa = state.searchedWalletAssetApis![index];
               return walletAssetApiCard(wa, state);
             }),
       ],
@@ -98,13 +91,13 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
 
   Widget addCustomAsset(AddWalletAssetState state) {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 15, bottom: 5),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, bottom: 5),
               child: Text(
                 'Token Contract Address',
                 style: TextStyle(fontSize: 12),
@@ -123,7 +116,9 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
               ),
             ),
             Visibility(
-              visible: state.tokenAddressController.text.toString().length > 0 || state.visibleErrors,
+              visible:
+                  state.tokenAddressController.text.toString().isNotEmpty ||
+                      state.visibleErrors,
               child: Padding(
                 padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
                 child: Text(
@@ -137,11 +132,11 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, bottom: 5),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, bottom: 5),
               child: Text(
                 'Token Symbol',
                 style: TextStyle(fontSize: 12),
@@ -160,7 +155,8 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
               ),
             ),
             Visibility(
-              visible: state.tokenSymbolController.text.toString().length > 0 || state.visibleErrors,
+              visible: state.tokenSymbolController.text.toString().isNotEmpty ||
+                  state.visibleErrors,
               child: Padding(
                 padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
                 child: Text(
@@ -173,11 +169,11 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, bottom: 5),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, bottom: 5),
               child: Text(
                 'Token Decimal',
                 style: TextStyle(fontSize: 12),
@@ -196,7 +192,9 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
               ),
             ),
             Visibility(
-              visible: state.tokenDecimalController.text.toString().length > 0 || state.visibleErrors,
+              visible:
+                  state.tokenDecimalController.text.toString().isNotEmpty ||
+                      state.visibleErrors,
               child: Padding(
                 padding: const EdgeInsets.only(left: 12, bottom: 5, top: 6),
                 child: Text(
@@ -210,11 +208,11 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
             ),
             Container(
-              margin: EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(8.0),
               child: SelectionButton(
                 label: 'Add Token',
                 onPressed: (bool selected) async {
@@ -222,8 +220,10 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                     if (state.decimalConfirmed &&
                         state.symbolConfirmed &&
                         state.addressConfirmed) {
-                      WalletAsset walletAsset = new WalletAsset(
-                          walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
+                      final WalletAsset walletAsset = new WalletAsset(
+                          walletAddress: (await locator<AddressService>()
+                                  .getPublicAddress())
+                              .hex,
                           chainId: state.chain.id,
                           tokenAddress:
                               state.tokenAddressController.text.toString(),
@@ -234,10 +234,11 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                           tokenSymbol:
                               state.tokenSymbolController.text.toString());
                       locator<NavigationService>().goBack(context, walletAsset);
-                    }else{
+                    } else {
                       context.read<AddWalletAssetCubit>().visibleErrors(true);
                     }
-                  } on Exception catch (e) {}
+                    // ignore: empty_catches
+                  } on Exception {}
                 },
                 selected: true,
                 gradient: MyColors.greenToBlueGradient,
@@ -252,13 +253,13 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
 
   _buildBody(AddWalletAssetState state) {
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              margin: EdgeInsets.all(8),
+              margin: const EdgeInsets.all(8),
               child: Column(
                 children: [
                   Row(
@@ -273,7 +274,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                           },
                           child: Center(
                               child: Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             child: Text(
                               "Search",
                               overflow: TextOverflow.ellipsis,
@@ -284,8 +285,8 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                                       fontSize: 14,
                                       foreground: Paint()
                                         ..shader = MyColors.greenToBlueGradient
-                                            .createShader(
-                                                Rect.fromLTRB(0, 0, 50, 30)))
+                                            .createShader(const Rect.fromLTRB(
+                                                0, 0, 50, 30)))
                                   : TextStyle(
                                       fontFamily: MyStyles.kFontFamily,
                                       fontWeight: FontWeight.w300,
@@ -296,7 +297,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                           )),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 12,
                       ),
                       Expanded(
@@ -308,7 +309,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                           },
                           child: Center(
                               child: Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             child: Text(
                               "Custom Token",
                               overflow: TextOverflow.ellipsis,
@@ -319,8 +320,8 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                                       fontSize: 14,
                                       foreground: Paint()
                                         ..shader = MyColors.greenToBlueGradient
-                                            .createShader(
-                                                Rect.fromLTRB(0, 0, 50, 30)))
+                                            .createShader(const Rect.fromLTRB(
+                                                0, 0, 50, 30)))
                                   : TextStyle(
                                       fontFamily: MyStyles.kFontFamily,
                                       fontWeight: FontWeight.w300,
@@ -333,7 +334,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Row(
@@ -343,7 +344,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                         child: Visibility(
                           visible: state is AddWalletAssetSearchState,
                           child: Container(
-                              margin: EdgeInsets.only(top: 3),
+                              margin: const EdgeInsets.only(top: 3),
                               height: 2.0,
                               width: 40,
                               decoration: MyStyles.greenToBlueDecoration),
@@ -353,7 +354,7 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
                         child: Visibility(
                           visible: state is AddWalletAssetCustomState,
                           child: Container(
-                              margin: EdgeInsets.only(top: 3),
+                              margin: const EdgeInsets.only(top: 3),
                               height: 2.0,
                               width: 60,
                               decoration: MyStyles.greenToBlueDecoration),
@@ -380,8 +381,8 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
 
   Widget walletAssetApiCard(WalletAssetApi wa, AddWalletAssetState state) {
     return Container(
-      margin: EdgeInsets.all(8),
-      padding: EdgeInsets.all(4),
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(4),
       child: Row(
         children: [
           Padding(
@@ -409,24 +410,26 @@ class _AddWalletAssetScreenState extends State<AddWalletAssetScreen> {
             ),
           ),
           InkWell(
-            onTap: () async{
-              WalletAsset walletAsset = new WalletAsset(
-                  walletAddress: (await locator<AddressService>().getPublicAddress()).hex,
+            onTap: () async {
+              final WalletAsset walletAsset = new WalletAsset(
+                  walletAddress:
+                      (await locator<AddressService>().getPublicAddress()).hex,
                   chainId: state.chain.id,
                   tokenAddress: wa.address,
                   tokenSymbol: wa.symbol,
                   logoPath: wa.img,
+                  // ignore: avoid_dynamic_calls
                   tokenDecimal: wa.decimals.runtimeType == int
                       ? wa.decimals
                       : int.tryParse(wa.decimals));
               locator<NavigationService>().goBack(context, walletAsset);
             },
             child: Container(
-              padding: EdgeInsets.all(4),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.white.withOpacity(0.5)),
-                  borderRadius: BorderRadius.all(Radius.circular(6))),
-              child: Text("ADD"),
+                  borderRadius: const BorderRadius.all(Radius.circular(6))),
+              child: const Text("ADD"),
             ),
           ),
         ],
