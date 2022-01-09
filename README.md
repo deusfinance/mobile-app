@@ -1,3 +1,4 @@
+# DEPRICATED
 # DEUS.Finance Mobile App
 This is the repository for our mobile app, built using Flutter.
 
